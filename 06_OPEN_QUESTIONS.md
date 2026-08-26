@@ -30,6 +30,28 @@ When a new conflict is found, add it here with the same shape. Do not resolve it
 
 **Needed.** A final target, and whether a session with one farmer counts the same as a session with a group.
 
+### Added 26 Aug 2026 — is C1.3 the new advisory sessions, or mentorship on funded initiatives?
+
+The platform has gained an **advisory stage**: a published session that a person applies to, sitting between training and market linkage. It is a new table, `advisory_session`, added in migration `0045`.
+
+That raises a question C1.3 cannot answer for itself, because its definition is blank.
+
+**The two readings are structurally different, not just differently worded:**
+
+| | `mentorship_session` (what C1.3 counts today) | `advisory_session` (new) |
+|---|---|---|
+| Attached to | a `production_initiative` — `initiative_id` is **NOT NULL** | a person, via `advisory_enrolment` |
+| Position in the flow | **downstream** of linkage: the producer must already have an initiative | **upstream** of linkage: it is the gate that unlocks it |
+| Counts | sessions delivered | sessions delivered |
+
+So they are not two names for one thing. `mentorship_session` is hand-holding for producers who already have a funded initiative; advisory is a step on the way to getting one.
+
+The workbook name — *"provided to the selected initiatives"* — points at the mentorship reading. But the name is all there is, and "selected initiatives" may simply be loose wording.
+
+**The question for the M&E lead:** *When the framework says "advisory mentorship sessions", does it mean the new advisory sessions people apply to, or mentorship delivered to initiatives that have already been selected for support?*
+
+**Interim behaviour.** `v_ind_c1_3` still counts `mentorship_session` and was **deliberately not repointed**. Choosing would mean inventing an indicator definition, which CLAUDE.md rule 1 forbids. `advisory_session` is shaped so it could feed C1.3 later with no change to the table if the answer is the former.
+
 ---
 
 ## 🔴 OQ-2 · G0.2 arithmetic does not add up
