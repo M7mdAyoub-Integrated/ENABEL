@@ -8,6 +8,12 @@ import {
   useUpdatePartnership,
   type PartnershipInput,
 } from './partnerships'
+import {
+  useExhibition,
+  useCreateExhibition,
+  useUpdateExhibition,
+  type ExhibitionInput,
+} from './exhibitions'
 
 /**
  * The form half of the migration seam.
@@ -120,12 +126,70 @@ function usePartnershipWrite(
   }
 }
 
+/**
+ * Exhibitions — module 2.
+ *
+ * There is no duration column and the form has no duration field: the value is
+ * always derivable from the two dates, and storing it would create a second
+ * source for the same fact. The list and detail screens compute it for display
+ * with `durationDays()`.
+ */
+function useExhibitionWrite(id: string | undefined, enabled: boolean): ModuleWrite {
+  const existing = useExhibition(enabled && id ? id : undefined)
+  const create = useCreateExhibition()
+  const update = useUpdateExhibition()
+
+  const initialValues = useMemo((): FormValues | null => {
+    const e = existing.data
+    if (!e) return null
+    return {
+      name: e.name,
+      start: e.startDate,
+      end: e.endDate,
+      location: e.location,
+      capacity: String(e.boothCapacity),
+      sponsor: e.externalSponsor ?? '',
+    }
+  }, [existing.data])
+
+  const toInput = (v: FormValues): ExhibitionInput => ({
+    name: str(v, 'name'),
+    startDate: str(v, 'start'),
+    endDate: str(v, 'end'),
+    location: str(v, 'location'),
+    // Empty stays 0, which the check constraint rejects with a readable
+    // message rather than silently writing a bad row.
+    boothCapacity: Number(str(v, 'capacity') || '0'),
+    externalSponsor: str(v, 'sponsor') || null,
+  })
+
+  const save = async (v: FormValues) => {
+    if (id && existing.data) return update.mutateAsync({ id, input: toInput(v) })
+    return create.mutateAsync(toInput(v))
+  }
+
+  return {
+    initialValues,
+    isLoadingInitial: existing.isLoading,
+    save,
+    isSaving: create.isPending || update.isPending,
+    error: create.error ?? update.error,
+    reset: () => {
+      create.reset()
+      update.reset()
+    },
+    isLive: true,
+  }
+}
+
 export function useModuleWrite(module: ModuleId, id: string | undefined): ModuleWrite {
   const mockValues = useEditValues(module, id)
   const tp = usePartnershipWrite('tp', id, module === 'tp')
   const pp = usePartnershipWrite('pp', id, module === 'pp')
+  const ex = useExhibitionWrite(id, module === 'ex')
 
   if (module === 'tp') return tp
   if (module === 'pp') return pp
+  if (module === 'ex') return ex
   return { ...IDLE, initialValues: mockValues }
 }

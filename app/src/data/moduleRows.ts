@@ -5,6 +5,8 @@ import { useListRows } from '../hooks/useData'
 import type { Translate } from '../i18n/tx'
 import { usePartnerships, type PartnershipType } from './partnerships'
 import { refLabel, useRef } from './refTables'
+import { useExhibitions, durationDays } from './exhibitions'
+import { formatDateRange } from '../lib/format'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -19,7 +21,7 @@ import { refLabel, useRef } from './refTables'
  *
  *      MODULE                      STATUS
  *      tp / pp  Partnerships       LIVE     module 1
- *      ex       Exhibitions        mock     module 2
+ *      ex       Exhibitions        LIVE     module 2
  *      tc       Training completion mock    module 3
  *      rg       Registrations      mock     module 4
  *      ln       Market linkages    mock     module 5
@@ -102,6 +104,45 @@ function usePartnershipRows(type: PartnershipType, locale: string, enabled: bool
   }
 }
 
+/** Exhibitions (ex) — module 2. */
+function useExhibitionRows(t: Translate, locale: string, enabled: boolean): ModuleRows {
+  const q = useExhibitions(enabled)
+
+  const rows = useMemo(
+    () =>
+      (q.data ?? []).map((e): ListRow => {
+        const held = e.hasEnded
+        const status = held ? t('common:chips.held') : t('common:chips.upcoming')
+        const cells: Cell[] = [
+          { kind: 'text', text: e.name },
+          { kind: 'text', text: formatDateRange(e.startDate, e.endDate, locale) },
+          { kind: 'text', text: e.location },
+          { kind: 'text', text: t('common:units.days', { count: durationDays(e.startDate, e.endDate) }) },
+          { kind: 'text', text: t('common:units.booths', { count: e.boothCapacity }) },
+          held
+            ? { kind: 'chip', text: status, tone: 'mute' }
+            : { kind: 'chip', text: status, tone: 'warn' },
+        ]
+        return {
+          id: e.id,
+          filterValue: status,
+          search: `${e.name} ${e.location} ${e.externalSponsor ?? ''}`,
+          cells,
+        }
+      }),
+    [q.data, t, locale],
+  )
+
+  return {
+    rows,
+    isLoading: q.isLoading,
+    isError: q.isError,
+    error: q.error,
+    refetch: () => void q.refetch(),
+    isLive: true,
+  }
+}
+
 /**
  * Rows for a module's list screen.
  *
@@ -115,8 +156,10 @@ export function useModuleRows(module: ModuleId, t: Translate, locale: string): M
   const mockRows = useListRows(module, t, locale)
   const training = usePartnershipRows('training', locale, module === 'tp')
   const production = usePartnershipRows('production_support', locale, module === 'pp')
+  const exhibitions = useExhibitionRows(t, locale, module === 'ex')
 
   if (module === 'tp') return training
   if (module === 'pp') return production
+  if (module === 'ex') return exhibitions
   return { ...MOCK, rows: mockRows }
 }

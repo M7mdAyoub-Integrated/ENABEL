@@ -56,6 +56,8 @@ const CONSTRAINT_MESSAGES: Record<string, string> = {
   person_national_id_format: 'errors:db.nationalIdFormat',
   training_enrolment_unique: 'errors:db.enrolmentDuplicate',
   exhibition_registration_unique: 'errors:db.registrationDuplicate',
+  exhibition_booth_capacity_check: 'errors:db.boothCapacityPositive',
+  exhibition_dates: 'errors:db.exhibitionDateOrder',
 }
 
 /** Trigger messages we recognise, matched on a distinctive fragment. */

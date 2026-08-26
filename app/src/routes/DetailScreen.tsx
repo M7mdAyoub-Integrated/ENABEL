@@ -8,6 +8,7 @@ import { can, canWriteModule } from '../auth/permissions'
 import { useMutations } from '../hooks/useData'
 import { useModuleDetail } from '../data/moduleDetail'
 import { useDeletePartnership } from '../data/partnerships'
+import { useDeleteExhibition } from '../data/exhibitions'
 import { DetailSkeleton, ErrorState, WriteError } from '../ui/states'
 import { BidiIsolate } from '../components/BidiIsolate'
 import {
@@ -50,9 +51,21 @@ export function DetailScreen() {
 
   // Live soft delete for module 1. Both are created unconditionally so the
   // hook order is stable when the route's :module param changes.
+  // One hook per live module, all called unconditionally so hook order cannot
+  // shift when the :module route param changes. A module with no entry here
+  // still falls through to the session-local mock remove -- which is why a
+  // delete that looked like it worked did nothing before Exhibitions was added.
   const delTraining = useDeletePartnership('training')
   const delProduction = useDeletePartnership('production_support')
-  const liveDelete = module === 'tp' ? delTraining : module === 'pp' ? delProduction : null
+  const delExhibition = useDeleteExhibition()
+  const liveDelete =
+    module === 'tp'
+      ? delTraining
+      : module === 'pp'
+        ? delProduction
+        : module === 'ex'
+          ? delExhibition
+          : null
 
   if (!valid) return <NotFound />
   if (detail.isLoading) {

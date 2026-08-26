@@ -27,7 +27,9 @@
     "exhibitionFull": "That exhibition has no booths left.",
     "rejected": "The database rejected this change.",
     "unknown": "Something went wrong. Try again, and tell the Coordinator if it keeps happening.",
-    "roleRemovalUnsupported": "Everything else was saved, but a role cannot be removed once it is attached. The database has no way to detach one yet — tell the Coordinator."
+    "roleRemovalUnsupported": "Everything else was saved, but a role cannot be removed once it is attached. The database has no way to detach one yet — tell the Coordinator.",
+    "boothCapacityPositive": "Capacity must be at least one booth.",
+    "exhibitionDateOrder": "The end date cannot be before the start date."
   },
   "state": {
     "failedTitle": "Could not load",

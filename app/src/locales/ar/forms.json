@@ -205,7 +205,8 @@
     "capacityPh": "Booths",
     "capacityHelp": "Number of booths available.",
     "sponsor": "راعٍ خارجي",
-    "sponsorPh": "Leave blank if none"
+    "sponsorPh": "Leave blank if none",
+    "boothsTaken": "الأكشاك المحجوزة"
   },
   "registration": {
     "exhibition": "المعرض",

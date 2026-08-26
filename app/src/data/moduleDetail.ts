@@ -4,7 +4,8 @@ import { useDetail, type DetailRecord } from '../hooks/useData'
 import type { Translate } from '../i18n/tx'
 import { usePartnership, type PartnershipType } from './partnerships'
 import { refLabel, useRef } from './refTables'
-import { formatDate } from '../lib/format'
+import { formatDate, formatDateRange } from '../lib/format'
+import { useExhibition, durationDays } from './exhibitions'
 
 /**
  * The detail-screen half of the migration seam. Same rules as `moduleRows`:
@@ -82,6 +83,57 @@ function usePartnershipDetail(
   }
 }
 
+/** Exhibitions — module 2. */
+function useExhibitionDetail(
+  id: string | undefined,
+  enabled: boolean,
+  t: Translate,
+  locale: string,
+): ModuleDetail {
+  const q = useExhibition(enabled ? id : undefined)
+  const record = useMemo((): DetailRecord | null => {
+    const e = q.data
+    if (!e) return null
+    return {
+      id: e.id,
+      title: e.name,
+      subtitle: e.location,
+      status: e.hasEnded
+        ? { text: t('common:chips.held'), tone: 'mute' }
+        : { text: t('common:chips.upcoming'), tone: 'warn' },
+      fields: [
+        { labelKey: 'columns.ex.0', value: e.name },
+        { labelKey: 'columns.ex.1', value: formatDateRange(e.startDate, e.endDate, locale) },
+        { labelKey: 'columns.ex.2', value: e.location },
+        {
+          labelKey: 'columns.ex.3',
+          value: t('common:units.days', { count: durationDays(e.startDate, e.endDate) }),
+        },
+        { labelKey: 'columns.ex.4', value: t('common:units.booths', { count: e.boothCapacity }) },
+        {
+          labelKey: 'exhibition.boothsTaken',
+          value: t('forms:registration.boothsTaken', {
+            taken: e.boothsTaken,
+            capacity: e.boothCapacity,
+          }),
+        },
+        { labelKey: 'exhibition.sponsor', value: e.externalSponsor ?? '' },
+      ],
+      by: t('forms:detail.coordinator'),
+      at: e.createdAt,
+    }
+  }, [q.data, t, locale])
+
+  return {
+    record,
+    isLoading: q.isLoading,
+    isError: q.isError,
+    error: q.error,
+    refetch: () => void q.refetch(),
+    isLive: true,
+  }
+}
+
 export function useModuleDetail(
   module: ModuleId,
   id: string,
@@ -91,9 +143,11 @@ export function useModuleDetail(
   const mock = useDetail(module, id, t, locale)
   const tp = usePartnershipDetail('tp', id, module === 'tp', t, locale)
   const pp = usePartnershipDetail('pp', id, module === 'pp', t, locale)
+  const ex = useExhibitionDetail(id, module === 'ex', t, locale)
 
   if (module === 'tp') return tp
   if (module === 'pp') return pp
+  if (module === 'ex') return ex
   return {
     record: mock,
     isLoading: false,
