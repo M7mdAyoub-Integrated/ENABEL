@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LocaleSwitcher } from '../../components/LocaleSwitcher'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/AuthProvider'
+import { DEMO_MODE } from '../../demo/demoMode'
 
 /**
  * The producer portal's frame, copied from the prototype.
@@ -16,8 +18,9 @@ import { useAuth } from '../../auth/AuthProvider'
  * carries the language switch and the way out instead.
  */
 export function PortalShell({ children }: { children: ReactNode }) {
-  const { t } = useTranslation(['portal', 'common', 'auth'])
+  const { t } = useTranslation(['portal', 'common', 'auth', 'nav'])
   const { signOut } = useAuth()
+  const navigate = useNavigate()
 
   return (
     <div className="min-h-dvh bg-teal text-bg">
@@ -35,13 +38,34 @@ export function PortalShell({ children }: { children: ReactNode }) {
         </div>
         <div className="flex flex-none gap-2.5">
           <LocaleSwitcher tone="invert" />
-          <button
-            type="button"
-            onClick={() => void signOut()}
-            className="cursor-pointer border-[1.5px] border-bg px-[11px] py-[5px] font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-bg hover:bg-bg hover:text-teal"
-          >
-            {t('auth:signOut')}
-          </button>
+          {/* Demo mode: the same two-way toggle as the municipality header, in
+              the portal's inverted colours. Otherwise, sign out.
+              See src/demo/demoMode.ts. */}
+          {DEMO_MODE ? (
+            <div className="flex flex-none border-[1.5px] border-bg">
+              <button
+                type="button"
+                onClick={() => navigate('/dashboard')}
+                className="min-h-11 cursor-pointer whitespace-nowrap px-[11px] py-[5px] font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-bg sm:min-h-0"
+              >
+                {t('nav:municipality')}
+              </button>
+              <span
+                aria-current="true"
+                className="flex min-h-11 items-center whitespace-nowrap border-s-[1.5px] border-bg bg-bg px-[11px] py-[5px] font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-teal sm:min-h-0"
+              >
+                {t('nav:participant')}
+              </span>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => void signOut()}
+              className="cursor-pointer border-[1.5px] border-bg px-[11px] py-[5px] font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-bg hover:bg-bg hover:text-teal"
+            >
+              {t('auth:signOut')}
+            </button>
+          )}
         </div>
       </header>
       {children}

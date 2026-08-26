@@ -11,6 +11,7 @@ import {
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { isRole, type Role } from './permissions'
+import { DEMO_MODE, DEMO_ACCOUNT, DEMO_PORTAL_NATIONAL_ID, warnIfDemo } from '../demo/demoMode'
 
 export type AuthStatus = 'loading' | 'signedOut' | 'signedIn'
 
@@ -84,7 +85,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     const [{ data: appUser }, { data: person }] = await Promise.all([
       supabase.from('app_user').select('role, is_active').eq('id', s.user.id).maybeSingle(),
-      supabase.from('person').select('id').eq('auth_user_id', s.user.id).maybeSingle(),
+      // Demo mode: the coordinator is not a participant, so `auth_user_id`
+      // matches nobody and `my_person_id()` returns null. Look the demo person
+      // up by national ID instead so the portal has someone to represent.
+      // One constant, in src/demo/demoMode.ts.
+      DEMO_MODE
+        ? supabase
+            .from('person')
+            .select('id')
+            .eq('national_id', DEMO_PORTAL_NATIONAL_ID)
+            .is('deleted_at', null)
+            .maybeSingle()
+        : supabase.from('person').select('id').eq('auth_user_id', s.user.id).maybeSingle(),
     ])
     if (seq !== requestSeq.current) return // superseded
 
@@ -102,8 +114,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let cancelled = false
 
-    void supabase.auth.getSession().then(({ data }) => {
+    /**
+     * Demo mode signs in silently as the coordinator. See src/demo/demoMode.ts
+     * -- set DEMO_MODE to false there to restore normal sign-in.
+     *
+     * A REAL sign-in, not a stub: RLS gates every table, so without a session
+     * every read is empty and every write refused. The session is never shown
+     * or offered as a choice.
+     */
+    const demoSignIn = async (existing: Session | null): Promise<Session | null> => {
+      if (existing?.user.email === DEMO_ACCOUNT.email) return existing
+      if (existing) await supabase.auth.signOut()
+      const { data, error } = await supabase.auth.signInWithPassword(DEMO_ACCOUNT)
+      if (error) {
+        console.error(
+          `[demo-mode] could not sign in as ${DEMO_ACCOUNT.email}: ${error.message}. ` +
+            'That account comes from migrations 0030/0031 -- check they are applied.',
+        )
+        return null
+      }
+      return data.session
+    }
+
+    void supabase.auth.getSession().then(async ({ data }) => {
       if (cancelled) return
+
+      if (DEMO_MODE) {
+        warnIfDemo()
+        const s = await demoSignIn(data.session)
+        if (cancelled) return
+        setSession(s)
+        setStatus(s ? 'signedIn' : 'signedOut')
+        void loadRoleFor(s)
+        return
+      }
+
       setSession(data.session)
       setStatus(data.session ? 'signedIn' : 'signedOut')
       void loadRoleFor(data.session)

@@ -1,4 +1,5 @@
 import type { ModuleId } from '../modules'
+import { DEMO_MODE } from '../demo/demoMode'
 
 /**
  * The five application roles, from `app_role_t`.
@@ -96,6 +97,10 @@ const CAPABILITIES: Record<Role, ReadonlySet<Capability>> = {
 }
 
 export function can(role: Role | null, capability: Capability): boolean {
+  // Demo mode: no roles exist in the UI, so every capability is granted and
+  // nothing is hidden. RLS is unchanged underneath -- the session is the
+  // coordinator, which really can do all of this. See src/demo/demoMode.ts.
+  if (DEMO_MODE) return true
   if (!role) return false
   return CAPABILITIES[role].has(capability)
 }
@@ -122,6 +127,8 @@ const MODULE_ACCESS: Record<Role, readonly ModuleId[]> = {
 }
 
 export function modulesFor(role: Role | null): readonly ModuleId[] {
+  // Demo mode: one navigation, everything visible. See src/demo/demoMode.ts.
+  if (DEMO_MODE) return MODULE_ACCESS.coordinator
   if (!role) return []
   return MODULE_ACCESS[role]
 }
@@ -139,6 +146,7 @@ export function canAccessModule(role: Role | null, module: ModuleId): boolean {
  * here, so the UI matches both.
  */
 export function canWriteModule(role: Role | null, module: ModuleId): boolean {
+  if (DEMO_MODE) return true
   if (!role) return false
   if (!canAccessModule(role, module)) return false
   if (module === 'fu') return role === 'coordinator' || role === 'enumerator'
@@ -147,6 +155,8 @@ export function canWriteModule(role: Role | null, module: ModuleId): boolean {
 
 /** Where a role lands after signing in. */
 export function homeRouteFor(role: Role | null): string {
+  // Demo mode always opens on the municipality view.
+  if (DEMO_MODE) return '/dashboard'
   if (!role) return '/signin'
   if (role === 'participant') return '/portal'
   if (role === 'enumerator') return '/forms/fu'

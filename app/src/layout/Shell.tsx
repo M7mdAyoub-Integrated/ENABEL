@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { type ModuleId } from '../modules'
 import { useNavCounts } from '../data/moduleCounts'
@@ -7,6 +7,7 @@ import { LocaleSwitcher } from '../components/LocaleSwitcher'
 import { OfflineBar } from '../components/OfflineBar'
 import { useAuth } from '../auth/AuthProvider'
 import { can, modulesFor } from '../auth/permissions'
+import { DEMO_MODE } from '../demo/demoMode'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -142,6 +143,10 @@ function NavGroups({
 function SignedInAs({ compact = false }: { compact?: boolean }) {
   const { t } = useTranslation(['auth', 'nav'])
   const { email, role, signOut } = useAuth()
+  // Demo mode shows nothing about accounts, roles or sessions. The component is
+  // untouched and returns in full when DEMO_MODE is false.
+  // See src/demo/demoMode.ts.
+  if (DEMO_MODE) return null
   if (!email) return null
   return (
     <div className={`border-t-2 border-ink px-[18px] py-[14px] ${compact ? '' : 'mt-auto'}`}>
@@ -185,20 +190,53 @@ function Brand() {
 }
 
 /**
- * The role chip.
+ * Municipality / Participant.
  *
- * The prototype puts a Municipality/Participant TOGGLE here, because it is a
- * mock with no accounts behind it. This build has real roles from `app_user`,
- * so the same chip shows which side you are actually on and does not offer to
- * switch -- letting a user flip their own role in the header would undo Phase 3.
+ * In demo mode this is the prototype's toggle: two segments, one button, same
+ * placement in the header. It switches VIEW, not identity -- there is one
+ * session underneath and it never changes. Participant simply routes to the
+ * producer portal, which is a different screen, not a different account.
+ *
+ * With DEMO_MODE off it goes back to being a static label showing which side of
+ * the app you are on, because then the side is decided by your real role and
+ * offering to switch it would undo Phase 3. See src/demo/demoMode.ts.
  */
-function RoleChip() {
+function ViewToggle() {
   const { t } = useTranslation('nav')
+  const navigate = useNavigate()
+  const { pathname } = useLocation()
+  const onPortal = pathname.startsWith('/portal')
+
+  if (!DEMO_MODE) {
+    return (
+      <div className="flex border-[1.5px] border-ink">
+        <span className="flex min-h-11 items-center bg-ink px-[11px] py-[5px] font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-bg sm:min-h-0">
+          {t('municipality')}
+        </span>
+      </div>
+    )
+  }
+
+  const segments = [
+    { key: 'municipality' as const, to: '/dashboard', active: !onPortal },
+    { key: 'participant' as const, to: '/portal', active: onPortal },
+  ]
+
   return (
-    <div className="flex border-[1.5px] border-ink">
-      <span className="flex min-h-11 items-center bg-ink px-[11px] py-[5px] font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-bg sm:min-h-0">
-        {t('municipality')}
-      </span>
+    <div className="flex flex-none border-[1.5px] border-ink">
+      {segments.map((seg, i) => (
+        <button
+          key={seg.key}
+          type="button"
+          aria-pressed={seg.active}
+          onClick={() => navigate(seg.to)}
+          className={`min-h-11 cursor-pointer whitespace-nowrap px-[11px] py-[5px] font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] sm:min-h-0 ${
+            i > 0 ? 'border-s-[1.5px] border-ink' : ''
+          } ${seg.active ? 'bg-ink text-bg' : 'bg-bg text-muted hover:text-ink'}`}
+        >
+          {t(seg.key)}
+        </button>
+      ))}
     </div>
   )
 }
@@ -250,7 +288,7 @@ export function Shell({ children }: { children: ReactNode }) {
           </div>
           <div className="flex flex-none items-stretch gap-[10px]">
             <div className="hidden sm:flex">
-              <RoleChip />
+              <ViewToggle />
             </div>
             <LocaleSwitcher />
           </div>

@@ -1,9 +1,10 @@
-import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, Outlet, Navigate } from 'react-router-dom'
 import { Shell } from './layout/Shell'
 import { ToastProvider } from './ui/Toast'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider } from './auth/AuthProvider'
 import { queryClient } from './data/queryClient'
+import { DEMO_MODE } from './demo/demoMode'
 import { useQueueSync } from './data/useOffline'
 import { useDirection } from './hooks/useDirection'
 import { RequireCapability, RequireModule, RequirePortal } from './auth/guards'
@@ -21,15 +22,26 @@ import SignIn from './routes/auth/SignIn'
 import ForgotPassword from './routes/auth/ForgotPassword'
 import ResetPassword from './routes/auth/ResetPassword'
 
-/** Municipal screens: shell + a capability check on every child route. */
+/**
+ * Municipal screens.
+ *
+ * Demo mode drops the capability check -- there are no roles in the UI, so
+ * there is nothing to check against. The guard component itself is untouched
+ * and comes straight back when DEMO_MODE is false. See src/demo/demoMode.ts.
+ */
 function ShellLayout() {
-  return (
-    <RequireCapability capability="app.access">
-      <Shell>
-        <Outlet />
-      </Shell>
-    </RequireCapability>
+  const inner = (
+    <Shell>
+      <Outlet />
+    </Shell>
   )
+  if (DEMO_MODE) return inner
+  return <RequireCapability capability="app.access">{inner}</RequireCapability>
+}
+
+/** Wraps a route in a guard, or passes it through untouched in demo mode. */
+function guard(node: React.ReactElement, wrap: (n: React.ReactElement) => React.ReactElement) {
+  return DEMO_MODE ? node : wrap(node)
 }
 
 /**
@@ -43,29 +55,38 @@ function ShellLayout() {
  * gives a participant their own record and registrations and nothing else, so
  * municipal navigation would be misleading as well as useless.
  */
+/**
+ * The unauthenticated routes.
+ *
+ * Demo mode removes them from routing entirely -- they redirect to the root --
+ * but the components stay imported and the paths stay declared, so restoring
+ * them is a one-line change. See src/demo/demoMode.ts.
+ */
+const authRoutes = DEMO_MODE
+  ? [
+      { path: '/signin', element: <Navigate to="/" replace /> },
+      { path: '/forgot', element: <Navigate to="/" replace /> },
+      { path: '/reset', element: <Navigate to="/" replace /> },
+    ]
+  : [
+      { path: '/signin', element: <SignIn /> },
+      { path: '/forgot', element: <ForgotPassword /> },
+      { path: '/reset', element: <ResetPassword /> },
+    ]
+
 const router = createBrowserRouter([
-  { path: '/signin', element: <SignIn /> },
-  { path: '/forgot', element: <ForgotPassword /> },
-  { path: '/reset', element: <ResetPassword /> },
+  ...authRoutes,
 
   // Landing decides where a signed-in user belongs.
   { path: '/', element: <Landing /> },
 
   {
     path: '/portal',
-    element: (
-      <RequirePortal>
-        <PortalDashboard />
-      </RequirePortal>
-    ),
+    element: guard(<PortalDashboard />, (n) => <RequirePortal>{n}</RequirePortal>),
   },
   {
     path: '/portal/register',
-    element: (
-      <RequirePortal>
-        <PortalRegister />
-      </RequirePortal>
-    ),
+    element: guard(<PortalRegister />, (n) => <RequirePortal>{n}</RequirePortal>),
   },
 
   {
@@ -73,41 +94,39 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/dashboard',
-        element: (
-          <RequireCapability capability="dashboard.view">
-            <Dashboard />
-          </RequireCapability>
-        ),
+        element: guard(<Dashboard />, (n) => (
+          <RequireCapability capability="dashboard.view">{n}</RequireCapability>
+        )),
       },
-      { path: '/forms/:module', element: <RequireModule><ListScreen /></RequireModule> },
+      {
+        path: '/forms/:module',
+        element: guard(<ListScreen />, (n) => <RequireModule>{n}</RequireModule>),
+      },
       {
         path: '/forms/:module/new',
-        element: (
+        element: guard(<FormScreen mode="new" />, (n) => (
           <RequireModule>
-            <RequireCapability capability="record.create">
-              <FormScreen mode="new" />
-            </RequireCapability>
+            <RequireCapability capability="record.create">{n}</RequireCapability>
           </RequireModule>
-        ),
+        )),
       },
-      { path: '/forms/:module/:id', element: <RequireModule><DetailScreen /></RequireModule> },
+      {
+        path: '/forms/:module/:id',
+        element: guard(<DetailScreen />, (n) => <RequireModule>{n}</RequireModule>),
+      },
       {
         path: '/forms/:module/:id/edit',
-        element: (
+        element: guard(<FormScreen mode="edit" />, (n) => (
           <RequireModule>
-            <RequireCapability capability="record.edit">
-              <FormScreen mode="edit" />
-            </RequireCapability>
+            <RequireCapability capability="record.edit">{n}</RequireCapability>
           </RequireModule>
-        ),
+        )),
       },
       {
         path: '/manual-entries',
-        element: (
-          <RequireCapability capability="manual.view">
-            <ManualEntries />
-          </RequireCapability>
-        ),
+        element: guard(<ManualEntries />, (n) => (
+          <RequireCapability capability="manual.view">{n}</RequireCapability>
+        )),
       },
       { path: '/settings', element: <Settings /> },
       { path: '*', element: <NotFound /> },
