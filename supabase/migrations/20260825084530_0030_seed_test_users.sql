@@ -1,61 +1,49 @@
--- 0030 seed_test_users
+-- ═══════════════════════════════════════════════════════════════════════════
+--  0030 — test accounts: app_user rows only, NO auth users, NO passwords
 --
--- BUILD-PHASE ONLY. One test identity per role so Phase 3 access control can be
--- verified by actually signing in, rather than asserted. These are throwaway
--- credentials in a development project; they must be removed by the go-live
--- boundary step in 07_BUILD_CHECKLIST.md before any real participant data
--- exists. They all share one obvious non-production password.
+--  ── WHY THIS FILE NO LONGER CREATES ACCOUNTS ──
 --
--- The participant is linked to an existing demo person so the person <-> auth
--- link (my_person_id()) can be exercised. A SECOND participant is created with
--- NO person row on purpose, so the "signed in but not linked" path has a
--- fixture too -- that case must show a message, not crash.
+--  It used to insert six rows into auth.users with a shared password literal,
+--  `crypt('...')`, written directly in this file. That was wrong for one
+--  structural reason: MIGRATIONS ARE COMMITTED BY DESIGN. A password in a
+--  migration is a password in the repository, in every clone, and in the git
+--  history forever. When this repository became public that password became
+--  public with it -- and the coordinator account it belonged to can read every
+--  national ID in the database.
+--
+--  Rotating a password does not remove it from history. The only fix that
+--  holds is for credentials never to enter the repository at all.
+--
+--  ── HOW TEST ACCOUNTS ARE CREATED NOW ──
+--
+--  Out of band, and never from a committed file:
+--
+--    • Supabase dashboard -> Authentication -> Users -> Add user, or
+--    • a local script that reads passwords from app/.env.local (gitignored)
+--
+--  One generated password per account. Never a shared literal. The values live
+--  in app/.env.local and nowhere else; app/.env.example carries placeholders.
+--
+--  The six accounts, for reference:
+--
+--    coordinator@shm.test   coordinator     reads and writes everything
+--    dataentry@shm.test     data_entry
+--    enumerator@shm.test    enumerator
+--    viewer@shm.test        partner_viewer  aggregates only, no identities
+--    producer@shm.test      participant     linked to Demo Person One
+--    unlinked@shm.test      participant     deliberately NOT linked, so the
+--                                           "no linked person" state is testable
+--
+--  ── WHAT THIS FILE STILL DOES ──
+--
+--  Nothing. It is kept as an applied, numbered migration so the sequence stays
+--  contiguous and append-only (CLAUDE.md rule 5). The app_user rows for these
+--  accounts are created by the handle_new_user trigger when each auth user is
+--  created out of band, so there is nothing left for a migration to do.
+--
+--  Do not re-add credentials here. If a test account is needed, create it in
+--  the dashboard.
+-- ═══════════════════════════════════════════════════════════════════════════
 
-insert into auth.users
-  (id, instance_id, aud, role, email, encrypted_password,
-   email_confirmed_at, created_at, updated_at, raw_user_meta_data, raw_app_meta_data)
-values
-  ('a0000000-0000-4000-8000-000000000001','00000000-0000-0000-0000-000000000000',
-   'authenticated','authenticated','coordinator@shm.test',
-   extensions.crypt('REDACTED-ROTATED-CREDENTIAL', extensions.gen_salt('bf')),
-   now(), now(), now(), '{"full_name":"Test Coordinator"}'::jsonb,
-   '{"provider":"email","providers":["email"]}'::jsonb),
-  ('a0000000-0000-4000-8000-000000000002','00000000-0000-0000-0000-000000000000',
-   'authenticated','authenticated','dataentry@shm.test',
-   extensions.crypt('REDACTED-ROTATED-CREDENTIAL', extensions.gen_salt('bf')),
-   now(), now(), now(), '{"full_name":"Test Data Entry"}'::jsonb,
-   '{"provider":"email","providers":["email"]}'::jsonb),
-  ('a0000000-0000-4000-8000-000000000003','00000000-0000-0000-0000-000000000000',
-   'authenticated','authenticated','enumerator@shm.test',
-   extensions.crypt('REDACTED-ROTATED-CREDENTIAL', extensions.gen_salt('bf')),
-   now(), now(), now(), '{"full_name":"Test Enumerator"}'::jsonb,
-   '{"provider":"email","providers":["email"]}'::jsonb),
-  ('a0000000-0000-4000-8000-000000000004','00000000-0000-0000-0000-000000000000',
-   'authenticated','authenticated','viewer@shm.test',
-   extensions.crypt('REDACTED-ROTATED-CREDENTIAL', extensions.gen_salt('bf')),
-   now(), now(), now(), '{"full_name":"Test Partner Viewer"}'::jsonb,
-   '{"provider":"email","providers":["email"]}'::jsonb),
-  ('a0000000-0000-4000-8000-000000000005','00000000-0000-0000-0000-000000000000',
-   'authenticated','authenticated','producer@shm.test',
-   extensions.crypt('REDACTED-ROTATED-CREDENTIAL', extensions.gen_salt('bf')),
-   now(), now(), now(), '{"full_name":"Test Producer"}'::jsonb,
-   '{"provider":"email","providers":["email"]}'::jsonb),
-  ('a0000000-0000-4000-8000-000000000006','00000000-0000-0000-0000-000000000000',
-   'authenticated','authenticated','unlinked@shm.test',
-   extensions.crypt('REDACTED-ROTATED-CREDENTIAL', extensions.gen_salt('bf')),
-   now(), now(), now(), '{"full_name":"Test Unlinked Producer"}'::jsonb,
-   '{"provider":"email","providers":["email"]}'::jsonb);
-
--- handle_new_user() created each app_user row with the default 'participant'
--- role; promote the four staff roles. Promotion is coordinator-only in the
--- running app, which is why it happens here in a migration.
-update public.app_user set role = 'coordinator'    where id = 'a0000000-0000-4000-8000-000000000001';
-update public.app_user set role = 'data_entry'     where id = 'a0000000-0000-4000-8000-000000000002';
-update public.app_user set role = 'enumerator'     where id = 'a0000000-0000-4000-8000-000000000003';
-update public.app_user set role = 'partner_viewer' where id = 'a0000000-0000-4000-8000-000000000004';
--- 000005 and 000006 stay 'participant'.
-
--- Link only the first producer. 000006 is deliberately left unlinked.
-update public.person
-set auth_user_id = 'a0000000-0000-4000-8000-000000000005'
-where national_id = '300000001';
+-- Intentionally empty. See the header.
+select 1;

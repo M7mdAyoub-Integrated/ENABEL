@@ -3,9 +3,9 @@
  *  DEMO MODE — how to put sign-in and roles back
  * ═════════════════════════════════════════════════════════════════════════════
  *
- *  Set DEMO_MODE to false, below. That is the whole reversal.
+ *  Set DEMO_MODE_REQUESTED to false, below. That is the whole reversal.
  *
- *  Everything this mode changes is a conditional on that one constant. No
+ *  Everything this mode changes is a conditional on the exported DEMO_MODE. No
  *  component was deleted, no route was removed from the codebase, no guard was
  *  unpicked. Turning it off restores:
  *
@@ -33,29 +33,72 @@
  *  The database is unchanged. RLS gates every table, `anon` holds zero grants,
  *  and none of that is being unwound. Without a session every read returns an
  *  empty array and every write is refused. So the app signs in silently as the
- *  coordinator on load: invisible, automatic, never offered as a choice. The
- *  coordinator can read and write everything, so nothing in the UI is blocked.
+ *  coordinator on load: invisible, automatic, never offered as a choice.
  *
  *  This is a REAL session, not a stub. `app_user.role` is real and RLS behaves
  *  exactly as it does in production -- the demo simply never shows it.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  ⚠ DEVELOPMENT ONLY — AND WHY THAT IS NOT NEGOTIABLE
+ *
+ *  A password compiled into a client bundle is not a secret. Anyone who opens
+ *  the deployed JavaScript can read it, and with it they hold a real session
+ *  against a database containing national ID numbers. Rotating the password
+ *  does not help: whatever it is rotated to would be equally readable.
+ *
+ *  So demo mode is bound to `import.meta.env.DEV`, which Vite replaces with
+ *  `false` in a production build, and the credential is read from the
+ *  environment rather than written here. `scripts/check-no-demo-credential.mjs`
+ *  fails `npm run build` if a demo credential is present in a production build.
+ *
+ *  ⚠ CONSEQUENCE, FLAGGED DELIBERATELY:
+ *
+ *  DEMO MODE WILL NOT WORK IN A DEPLOYED BUILD. It is a `npm run dev` feature.
+ *  If a live demo URL is ever needed -- a link to send someone, a hosted
+ *  preview -- this approach cannot provide it, and the answer is a SEPARATE
+ *  SUPABASE PROJECT holding only synthetic data. That costs two projects and
+ *  keeping 42 migrations in sync, which is why it was not done now. It is the
+ *  only safe way to have a public demo, because at that point the credential
+ *  being public costs nothing: there is no real personal data behind it.
+ *
+ *  Do not "fix" a broken deployed demo by hardcoding the password again.
  * ═════════════════════════════════════════════════════════════════════════════
  */
 
-/** The one switch. `false` restores sign-in and roles. */
-export const DEMO_MODE = true
+/**
+ * The switch. `false` restores sign-in and roles.
+ *
+ * Named "requested" because it is only half the condition -- see DEMO_MODE.
+ */
+const DEMO_MODE_REQUESTED = true
 
 /**
- * The account the app signs in as, silently, on every load.
+ * Is demo mode actually on?
  *
- * From migration 0030, credentials repaired in 0031. Coordinator because it is
- * the only role that can read and write every table -- anything narrower would
- * make parts of the prototype look broken for reasons the demo deliberately
- * hides.
+ * BOTH conditions, always together. `DEV` is a build-time constant that Vite
+ * replaces with `false` in a production bundle, so this whole branch is
+ * dead-code-eliminated from a real build no matter what the flag above says.
+ */
+export const DEMO_MODE: boolean = DEMO_MODE_REQUESTED && import.meta.env.DEV
+
+/**
+ * The account demo mode signs in as.
+ *
+ * The password comes from `VITE_DEMO_PASSWORD` in `.env.local`, which is
+ * gitignored. It is NOT written here and NOT in any migration -- migrations are
+ * committed by design, so a password in one is a password in the repository,
+ * permanently.
+ *
+ * The six test accounts are created and rotated OUT OF BAND. Migrations 0030
+ * and 0031 no longer create them.
  */
 export const DEMO_ACCOUNT = {
   email: 'coordinator@shm.test',
-  password: 'REDACTED-ROTATED-CREDENTIAL',
+  password: import.meta.env['VITE_DEMO_PASSWORD'] ?? '',
 } as const
+
+/** True when demo mode is on but nobody set the password. */
+export const DEMO_CREDENTIAL_MISSING = DEMO_MODE && DEMO_ACCOUNT.password === ''
 
 /**
  * Who the producer portal represents.
@@ -74,9 +117,18 @@ export const DEMO_PORTAL_NATIONAL_ID = '300000001'
 /** Shouted once at startup so a demo session is never mistaken for a real one. */
 export function warnIfDemo(): void {
   if (!DEMO_MODE) return
+  if (DEMO_CREDENTIAL_MISSING) {
+    console.error(
+      '[demo-mode] VITE_DEMO_PASSWORD is not set in app/.env.local, so the ' +
+        'silent sign-in cannot run and every query will come back empty. ' +
+        'The test accounts are created and rotated out of band -- see ' +
+        'src/demo/demoMode.ts.',
+    )
+    return
+  }
   console.warn(
     '%c[demo-mode] ACTIVE — signed in automatically, roles and guards are off. ' +
-      'Set DEMO_MODE=false in src/demo/demoMode.ts to restore sign-in.',
+      'Development only; it is disabled in any production build.',
     'background:#A66A17;color:#FBFAF7;padding:2px 6px;font-weight:bold',
   )
 }

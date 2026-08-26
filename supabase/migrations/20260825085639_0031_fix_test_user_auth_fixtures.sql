@@ -1,65 +1,26 @@
 -- ═══════════════════════════════════════════════════════════════════════════
---  0031 — repair the BUILD-PHASE test-user fixtures created in 0030
+--  0031 — superseded: auth fixture repair, no longer applied from a migration
 --
---  ⚠ BUILD-PHASE ONLY. These six accounts and their identities must be gone
---    before go-live. The go-live audit-boundary step in 07_BUILD_CHECKLIST.md
---    owns their removal; deleting the auth.users rows removes the identity
---    rows with them, because auth.identities.user_id cascades.
+--  This file used to repair the auth.users rows that 0030 inserted: GoTrue
+--  expects empty strings rather than NULL in its token columns, and expects a
+--  matching auth.identities row per user. Without both, sign-in failed before
+--  the password was even checked.
 --
---  Migration 0030 inserted rows into auth.users directly. That is only safe if
---  you match what GoTrue expects, and it did not, in two ways.
+--  It carried the same shared password literal as 0030, and is emptied for the
+--  same reason: MIGRATIONS ARE COMMITTED, so a credential in one is a
+--  credential in the repository and in its history, permanently.
 --
---  A. The token columns were left NULL.
---     GoTrue scans confirmation_token, recovery_token, email_change and
---     email_change_token_new into a Go `string`, which cannot hold NULL. Every
---     sign-in attempt therefore failed before it reached the password check,
---     and surfaced to the browser as the generic "Database error querying
---     schema". The column default is '' for exactly this reason; 0030 wrote an
---     explicit NULL over it. Empty string means "no token outstanding".
+--  None of that repair work is needed any more. Accounts created through the
+--  Supabase dashboard or the Admin API are shaped correctly by GoTrue itself --
+--  the token columns and the identities row come out right without help. The
+--  repair only existed because 0030 hand-wrote rows into auth.users, which is
+--  exactly the practice being removed.
 --
---  B. There were no auth.identities rows.
---     An email/password user is still a user with an `email` provider identity.
---     Without it the account has no linked provider, which breaks identity
---     lookups and account linking, and leaves the fixtures unlike anything the
---     Coordinator will create through the real invite flow. If the test users
---     are not shaped like production users, testing them proves nothing.
+--  See 0030 for how test accounts are created now, and for the list of six.
+--
+--  Kept as an applied, numbered migration so the sequence stays contiguous and
+--  append-only (CLAUDE.md rule 5). Do not re-add credentials here.
 -- ═══════════════════════════════════════════════════════════════════════════
 
--- ── A. NULL tokens → empty string ─────────────────────────────────────────
-update auth.users
-set confirmation_token          = coalesce(confirmation_token, ''),
-    recovery_token              = coalesce(recovery_token, ''),
-    email_change                = coalesce(email_change, ''),
-    email_change_token_new      = coalesce(email_change_token_new, ''),
-    email_change_token_current  = coalesce(email_change_token_current, ''),
-    phone_change                = coalesce(phone_change, ''),
-    phone_change_token          = coalesce(phone_change_token, ''),
-    reauthentication_token      = coalesce(reauthentication_token, '')
-where email like '%@shm.test';
-
--- ── B. the missing email identities ───────────────────────────────────────
--- provider_id is the subject for this provider. For the email provider that is
--- the user id, which is also what the Supabase invite flow writes.
-insert into auth.identities (
-  id, user_id, provider_id, identity_data, provider,
-  last_sign_in_at, created_at, updated_at
-)
-select gen_random_uuid(),
-       u.id,
-       u.id::text,
-       jsonb_build_object(
-         'sub',            u.id::text,
-         'email',          u.email,
-         'email_verified', true,
-         'phone_verified', false
-       ),
-       'email',
-       null,
-       now(),
-       now()
-from auth.users u
-where u.email like '%@shm.test'
-  and not exists (
-    select 1 from auth.identities i
-    where i.user_id = u.id and i.provider = 'email'
-  );
+-- Intentionally empty. See the header.
+select 1;
