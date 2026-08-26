@@ -1,0 +1,49 @@
+{
+  "siteName": "Sahel Horan Municipality",
+  "programme": "Agriculture and Food Production Programme",
+  "home": {
+    "heading": "Training and markets, open to apply",
+    "intro": "The Municipality runs free training courses and rural markets for people who farm, keep livestock, or make and sell food. Anything open to apply for is listed here. You do not need an account.",
+    "openNow": "Open now",
+    "count": "{count, plural, =0 {Nothing open at the moment} one {# opportunity open} other {# opportunities open}}",
+    "emptyTitle": "Nothing open right now",
+    "emptyBody": "There are no courses or markets taking applications today. New ones are added through the year — check back, or ask at the Municipality office.",
+    "myApplications": "Check an application I made",
+    "loadFailed": "The list could not be loaded. Check your connection and try again."
+  },
+  "type": {
+    "training": "Training course",
+    "advisory": "Advisory session",
+    "exhibition": "Market"
+  },
+  "typeHint": {
+    "training": "Learn a skill. Open to anyone.",
+    "advisory": "One-to-one advice. You need to have completed a training course first.",
+    "exhibition": "Sell what you produce at a municipal market. Open to anyone."
+  },
+  "avail": {
+    "closed": "Applications closed",
+    "full": "Full",
+    "places": "{count, plural, one {# place left} other {# places left}}",
+    "open": "Open to apply",
+    "closesOn": "Apply by {date}",
+    "noClosingDate": "No closing date given"
+  },
+  "detail": {
+    "back": "All opportunities",
+    "about": "About this",
+    "noDescription": "The Municipality has not added a description for this yet.",
+    "whenWhere": "When and where",
+    "dates": "Date",
+    "location": "Where",
+    "duration": "Length",
+    "hours": "{count, plural, one {# hour} other {# hours}}",
+    "topic": "Subject",
+    "contact": "Who to ask",
+    "apply": "Apply",
+    "applyClosed": "Applications are closed",
+    "applyFull": "This is full",
+    "notFound": "This is no longer listed",
+    "notFoundBody": "It may have closed, filled up, or finished. Go back to see what is open now."
+  }
+}

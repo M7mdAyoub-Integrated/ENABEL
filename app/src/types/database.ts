@@ -55,6 +55,172 @@ export type Database = {
           },
         ]
       }
+      advisory_enrolment: {
+        Row: {
+          application_status: Database["public"]["Enums"]["record_status_t"]
+          applied_on: string | null
+          attended: boolean
+          client_uuid: string | null
+          created_at: string
+          created_by: string | null
+          decided_by: string | null
+          decided_on: string | null
+          deleted_at: string | null
+          id: string
+          met_criteria: boolean | null
+          person_id: string
+          registered_on: string
+          session_id: string
+          updated_at: string
+        }
+        Insert: {
+          application_status?: Database["public"]["Enums"]["record_status_t"]
+          applied_on?: string | null
+          attended?: boolean
+          client_uuid?: string | null
+          created_at?: string
+          created_by?: string | null
+          decided_by?: string | null
+          decided_on?: string | null
+          deleted_at?: string | null
+          id?: string
+          met_criteria?: boolean | null
+          person_id: string
+          registered_on?: string
+          session_id: string
+          updated_at?: string
+        }
+        Update: {
+          application_status?: Database["public"]["Enums"]["record_status_t"]
+          applied_on?: string | null
+          attended?: boolean
+          client_uuid?: string | null
+          created_at?: string
+          created_by?: string | null
+          decided_by?: string | null
+          decided_on?: string | null
+          deleted_at?: string | null
+          id?: string
+          met_criteria?: boolean | null
+          person_id?: string
+          registered_on?: string
+          session_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "advisory_enrolment_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "person"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "advisory_enrolment_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "v_person_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "advisory_enrolment_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "advisory_session"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      advisory_session: {
+        Row: {
+          adviser: string | null
+          application_closes_on: string | null
+          application_opens_on: string | null
+          cancellation_reason: string | null
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          delivered_by_partnership_id: string | null
+          description: string | null
+          duration_hours: number | null
+          end_date: string
+          focal_point: string | null
+          id: string
+          is_cancelled: boolean
+          is_delivered: boolean
+          is_published: boolean
+          planned_seats: number | null
+          start_date: string
+          title: string
+          topic_id: string
+          updated_at: string
+          venue: string | null
+        }
+        Insert: {
+          adviser?: string | null
+          application_closes_on?: string | null
+          application_opens_on?: string | null
+          cancellation_reason?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          delivered_by_partnership_id?: string | null
+          description?: string | null
+          duration_hours?: number | null
+          end_date: string
+          focal_point?: string | null
+          id?: string
+          is_cancelled?: boolean
+          is_delivered?: boolean
+          is_published?: boolean
+          planned_seats?: number | null
+          start_date: string
+          title: string
+          topic_id: string
+          updated_at?: string
+          venue?: string | null
+        }
+        Update: {
+          adviser?: string | null
+          application_closes_on?: string | null
+          application_opens_on?: string | null
+          cancellation_reason?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          delivered_by_partnership_id?: string | null
+          description?: string | null
+          duration_hours?: number | null
+          end_date?: string
+          focal_point?: string | null
+          id?: string
+          is_cancelled?: boolean
+          is_delivered?: boolean
+          is_published?: boolean
+          planned_seats?: number | null
+          start_date?: string
+          title?: string
+          topic_id?: string
+          updated_at?: string
+          venue?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "advisory_session_delivered_by_partnership_id_fkey"
+            columns: ["delivered_by_partnership_id"]
+            isOneToOne: false
+            referencedRelation: "partnership"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "advisory_session_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "ref_training_topic"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       app_user: {
         Row: {
           created_at: string
@@ -326,42 +492,57 @@ export type Database = {
       }
       exhibition: {
         Row: {
+          application_closes_on: string | null
+          application_opens_on: string | null
           booth_capacity: number
           created_at: string
           created_by: string | null
           deleted_at: string | null
+          description: string | null
           end_date: string
           external_sponsor: string | null
+          focal_point: string | null
           id: string
           is_cancelled: boolean
+          is_published: boolean
           location: string
           name: string
           start_date: string
           updated_at: string
         }
         Insert: {
+          application_closes_on?: string | null
+          application_opens_on?: string | null
           booth_capacity: number
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
+          description?: string | null
           end_date: string
           external_sponsor?: string | null
+          focal_point?: string | null
           id?: string
           is_cancelled?: boolean
+          is_published?: boolean
           location: string
           name: string
           start_date: string
           updated_at?: string
         }
         Update: {
+          application_closes_on?: string | null
+          application_opens_on?: string | null
           booth_capacity?: number
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
+          description?: string | null
           end_date?: string
           external_sponsor?: string | null
+          focal_point?: string | null
           id?: string
           is_cancelled?: boolean
+          is_published?: boolean
           location?: string
           name?: string
           start_date?: string
@@ -1006,6 +1187,105 @@ export type Database = {
             columns: ["period_id"]
             isOneToOne: false
             referencedRelation: "reporting_period"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      linkage_request: {
+        Row: {
+          activity_type_id: string
+          client_uuid: string | null
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          initiative_title: string
+          main_product: string | null
+          matched_initiative_id: string | null
+          matched_linkage_id: string | null
+          person_id: string
+          request: string
+          requested_on: string
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["record_status_t"]
+          updated_at: string
+        }
+        Insert: {
+          activity_type_id: string
+          client_uuid?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          initiative_title: string
+          main_product?: string | null
+          matched_initiative_id?: string | null
+          matched_linkage_id?: string | null
+          person_id: string
+          request: string
+          requested_on?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["record_status_t"]
+          updated_at?: string
+        }
+        Update: {
+          activity_type_id?: string
+          client_uuid?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          initiative_title?: string
+          main_product?: string | null
+          matched_initiative_id?: string | null
+          matched_linkage_id?: string | null
+          person_id?: string
+          request?: string
+          requested_on?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["record_status_t"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "linkage_request_activity_type_id_fkey"
+            columns: ["activity_type_id"]
+            isOneToOne: false
+            referencedRelation: "ref_activity_type"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "linkage_request_matched_initiative_id_fkey"
+            columns: ["matched_initiative_id"]
+            isOneToOne: false
+            referencedRelation: "production_initiative"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "linkage_request_matched_linkage_id_fkey"
+            columns: ["matched_linkage_id"]
+            isOneToOne: false
+            referencedRelation: "market_linkage"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "linkage_request_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "person"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "linkage_request_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "v_person_public"
             referencedColumns: ["id"]
           },
         ]
@@ -2475,6 +2755,8 @@ export type Database = {
       }
       training_enrolment: {
         Row: {
+          application_status: Database["public"]["Enums"]["record_status_t"]
+          applied_on: string | null
           attended: boolean
           client_uuid: string | null
           created_at: string
@@ -2490,6 +2772,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          application_status?: Database["public"]["Enums"]["record_status_t"]
+          applied_on?: string | null
           attended?: boolean
           client_uuid?: string | null
           created_at?: string
@@ -2505,6 +2789,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          application_status?: Database["public"]["Enums"]["record_status_t"]
+          applied_on?: string | null
           attended?: boolean
           client_uuid?: string | null
           created_at?: string
@@ -2545,13 +2831,21 @@ export type Database = {
       }
       training_session: {
         Row: {
+          application_closes_on: string | null
+          application_opens_on: string | null
+          cancellation_reason: string | null
           created_at: string
           created_by: string | null
           deleted_at: string | null
           delivered_by_partnership_id: string | null
+          description: string | null
+          duration_hours: number | null
           end_date: string
+          focal_point: string | null
           id: string
+          is_cancelled: boolean
           is_delivered: boolean
+          is_published: boolean
           planned_seats: number | null
           start_date: string
           title: string
@@ -2560,13 +2854,21 @@ export type Database = {
           venue: string | null
         }
         Insert: {
+          application_closes_on?: string | null
+          application_opens_on?: string | null
+          cancellation_reason?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
           delivered_by_partnership_id?: string | null
+          description?: string | null
+          duration_hours?: number | null
           end_date: string
+          focal_point?: string | null
           id?: string
+          is_cancelled?: boolean
           is_delivered?: boolean
+          is_published?: boolean
           planned_seats?: number | null
           start_date: string
           title: string
@@ -2575,13 +2877,21 @@ export type Database = {
           venue?: string | null
         }
         Update: {
+          application_closes_on?: string | null
+          application_opens_on?: string | null
+          cancellation_reason?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
           delivered_by_partnership_id?: string | null
+          description?: string | null
+          duration_hours?: number | null
           end_date?: string
+          focal_point?: string | null
           id?: string
+          is_cancelled?: boolean
           is_delivered?: boolean
+          is_published?: boolean
           planned_seats?: number | null
           start_date?: string
           title?: string
@@ -2816,6 +3126,30 @@ export type Database = {
         }
         Relationships: []
       }
+      v_opportunity: {
+        Row: {
+          application_closes_on: string | null
+          application_opens_on: string | null
+          applications_open: boolean | null
+          capacity: number | null
+          created_at: string | null
+          delivered_by_partnership_id: string | null
+          description: string | null
+          duration_hours: number | null
+          end_date: string | null
+          focal_point: string | null
+          id: string | null
+          is_cancelled: boolean | null
+          is_published: boolean | null
+          location: string | null
+          opportunity_type: string | null
+          seats_taken: number | null
+          start_date: string | null
+          title: string | null
+          topic_id: string | null
+        }
+        Relationships: []
+      }
       v_person_public: {
         Row: {
           age_band: string | null
@@ -2846,6 +3180,28 @@ export type Database = {
           national_id_masked?: never
           sex?: Database["public"]["Enums"]["sex_t"] | null
           village?: string | null
+        }
+        Relationships: []
+      }
+      v_public_opportunity: {
+        Row: {
+          application_closes_on: string | null
+          application_opens_on: string | null
+          applications_open: boolean | null
+          capacity: number | null
+          description: string | null
+          duration_hours: number | null
+          end_date: string | null
+          focal_point: string | null
+          id: string | null
+          is_full: boolean | null
+          location: string | null
+          opportunity_type: string | null
+          places_remaining: number | null
+          start_date: string | null
+          title: string | null
+          topic_ar: string | null
+          topic_en: string | null
         }
         Relationships: []
       }

@@ -383,3 +383,48 @@ where grantee = 'anon' and table_schema = 'public';
 ```
 
 Then test by hand: sign in as each of the five roles and confirm a `participant` cannot read another person's row, and a `partner_viewer` cannot select from `person`.
+
+---
+
+## 10. Public views and the nested-invoker trap
+
+The public site has no sign-in, so it reads as `anon`. `anon` holds **no grants on any table**, and that does not change. It reads exactly one object: `v_public_opportunity`.
+
+### The rule
+
+> **A public `security definer` view must read BASE TABLES ONLY — never another view, unless that view is `security definer` too.**
+
+### The failure mode, because it is counterintuitive
+
+A `security definer` view wrapping a `security_invoker` view **does not shield it**. Permissions on the inner view are still checked against the **original caller**, not against the outer view's owner. So:
+
+```
+anon
+  └─ v_public_opportunity      security definer  ← runs as owner
+       └─ v_opportunity        security_invoker  ← still evaluated as ANON
+            └─ training_session                  ← anon has no grant
+
+ERROR: 42501: permission denied for table training_session
+```
+
+The visitor gets **an error page, not an empty list**. This happened in migration `0048` and was fixed in `0049` by making the public view self-contained.
+
+### What follows from it
+
+- A public view carries **every** filter in its own `WHERE` clause. It cannot inherit one from a view it reads, because it must not read one.
+- `security definer` means **RLS does not apply**. The `WHERE` clause is the entire security boundary — there is nothing behind it. For `v_public_opportunity` that is four conditions on every branch: `is_published`, `not is_cancelled`, `end_date >= current_date`, `deleted_at is null`.
+- Adding a `union all` branch or a column means re-checking all four. Missing `deleted_at is null` republishes soft-deleted records to the open internet — migration `0025`'s bug from the other direction.
+
+### Testing it
+
+Reading the definition is not a test. Reading `information_schema.role_table_grants` is not a test. **Execute as the role:**
+
+```sql
+set role anon;
+select count(*) from public.v_public_opportunity;   -- must return rows
+select 1 from public.person limit 1;                -- must raise 42501
+reset role;
+```
+
+Every anon-facing object gets this before it ships.
+

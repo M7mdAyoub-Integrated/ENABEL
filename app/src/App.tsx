@@ -18,6 +18,8 @@ import Settings from './routes/Settings'
 import NotFound from './routes/NotFound'
 import PortalDashboard from './routes/portal/PortalDashboard'
 import PortalRegister from './routes/portal/PortalRegister'
+import PublicHome from './routes/public/PublicHome'
+import OpportunityDetail from './routes/public/OpportunityDetail'
 import SignIn from './routes/auth/SignIn'
 import ForgotPassword from './routes/auth/ForgotPassword'
 import ResetPassword from './routes/auth/ResetPassword'
@@ -81,7 +83,18 @@ const router = createBrowserRouter([
   ...authRoutes,
 
   // Landing decides where a signed-in user belongs.
-  { path: '/', element: <Landing /> },
+  // ── The public site ──────────────────────────────────────────────────────
+  // No session, no guard, no Shell. `/` is now the PUBLIC home page: this is a
+  // programme about participation, so the front door belongs to the public
+  // rather than to staff. Municipal screens keep their own paths below.
+  //
+  // These must stay OUTSIDE RequireSession. They read v_public_opportunity,
+  // which anon is granted, and a farmer has no account to wait for.
+  { path: '/', element: <PublicHome /> },
+  { path: '/opportunity/:id', element: <OpportunityDetail /> },
+
+  // Where staff used to land. Kept so an existing bookmark still works.
+  { path: '/home', element: <Landing /> },
 
   {
     path: '/portal',

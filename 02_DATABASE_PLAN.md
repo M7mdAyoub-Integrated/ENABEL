@@ -1159,6 +1159,13 @@ The soft-delete cascade defect (row 7 in the table above) passed every check tha
 
 **No indicator view should be considered verified until it has been exercised against a soft-deleted parent, not just a soft-deleted fact row.** A view that correctly excludes a soft-deleted `training_enrolment` can still be wrong if it does not also exclude one whose `person` or `training_session` has been soft-deleted. Final acceptance test 6 in `07_BUILD_CHECKLIST.md` exists specifically to catch this, requires seeded data with real parent-child relationships to fail meaningfully, and must be re-run after any change to an indicator view — not treated as a one-time gate.
 
+**The same lesson, from the other direction (26 Aug 2026).** Migration `0048` built a public `security definer` view on top of a `security_invoker` view. That does not work — a nested invoker view is still evaluated as the original caller, so an anonymous visitor got `42501: permission denied` instead of data. Neither reading the view definition nor inspecting `information_schema.role_table_grants` found it; the grants were correct and the SQL looked right. **Only executing as the target role found it** — `set role anon; select ...`.
+
+A related near-miss the same day: a check for `deleted_at is null` filters inside a view used `like` rather than `ilike`, and `pg_get_viewdef` prints `IS NULL` in uppercase. The check returned `0` where the true answer was `6`, and very nearly triggered a "fix" to a view that was already correct.
+
+**Two rules follow.** Any anon-facing object is tested with `set role anon`, never audited by reading. And a check that returns "nothing found" is confirmed by making it find something known to exist before it is trusted — a filter that can never match looks identical to a clean result.
+
+
 ### Migration 0027 applied and reverted (2026-08-24)
 
 `0027_form_field_additions` was applied and then reversed by `0029_revert_form_field_additions` the same day, on the project owner's instruction. **This was not a defect.** 0027 applied cleanly, was verified against the database, and the front-end fields built alongside it were tested working in a browser. The owner chose to take the change back out for now, and said the fields may be reinstated later.

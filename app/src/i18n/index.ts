@@ -11,6 +11,7 @@ import enSurvey from '../locales/en/survey.json'
 import enErrors from '../locales/en/errors.json'
 import enPortal from '../locales/en/portal.json'
 import enAuth from '../locales/en/auth.json'
+import enPublic from '../locales/en/public.json'
 
 import arCommon from '../locales/ar/common.json'
 import arNav from '../locales/ar/nav.json'
@@ -20,6 +21,7 @@ import arSurvey from '../locales/ar/survey.json'
 import arErrors from '../locales/ar/errors.json'
 import arPortal from '../locales/ar/portal.json'
 import arAuth from '../locales/ar/auth.json'
+import arPublic from '../locales/ar/public.json'
 
 export const SUPPORTED_LOCALES = ['en', 'ar'] as const
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number]
@@ -33,6 +35,7 @@ export const NAMESPACES = [
   'errors',
   'portal',
   'auth',
+  'public',
 ] as const
 
 const resources = {
@@ -45,6 +48,7 @@ const resources = {
     errors: enErrors,
     portal: enPortal,
     auth: enAuth,
+    public: enPublic,
   },
   ar: {
     common: arCommon,
@@ -55,6 +59,7 @@ const resources = {
     errors: arErrors,
     portal: arPortal,
     auth: arAuth,
+    public: arPublic,
   },
 } as const
 

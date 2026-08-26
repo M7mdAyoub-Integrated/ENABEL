@@ -438,6 +438,17 @@ export const TRAINING_SESSIONS: TrainingSession[] = [
     delivered_by_partnership_id: 'ps1',
     is_delivered: true,
     planned_seats: 20,
+    // Added by migration 0043. Mock rows predate it and carry the values a
+    // pre-existing row received: unpublished, uncancelled, nothing to describe.
+    description: null,
+    focal_point: null,
+    duration_hours: null,
+    application_opens_on: null,
+    application_closes_on: null,
+    is_published: false,
+    is_cancelled: false,
+    cancellation_reason: null,
+
   },
   {
     ...base('ts2', '2026-03-15T09:00:00Z'),
@@ -449,6 +460,17 @@ export const TRAINING_SESSIONS: TrainingSession[] = [
     delivered_by_partnership_id: 'ps2',
     is_delivered: true,
     planned_seats: 20,
+    // Added by migration 0043. Mock rows predate it and carry the values a
+    // pre-existing row received: unpublished, uncancelled, nothing to describe.
+    description: null,
+    focal_point: null,
+    duration_hours: null,
+    application_opens_on: null,
+    application_closes_on: null,
+    is_published: false,
+    is_cancelled: false,
+    cancellation_reason: null,
+
   },
   {
     ...base('ts3', '2026-04-01T09:00:00Z'),
@@ -460,6 +482,17 @@ export const TRAINING_SESSIONS: TrainingSession[] = [
     delivered_by_partnership_id: 'ps1',
     is_delivered: true,
     planned_seats: 20,
+    // Added by migration 0043. Mock rows predate it and carry the values a
+    // pre-existing row received: unpublished, uncancelled, nothing to describe.
+    description: null,
+    focal_point: null,
+    duration_hours: null,
+    application_opens_on: null,
+    application_closes_on: null,
+    is_published: false,
+    is_cancelled: false,
+    cancellation_reason: null,
+
   },
   {
     ...base('ts4', '2026-04-08T09:00:00Z'),
@@ -471,6 +504,17 @@ export const TRAINING_SESSIONS: TrainingSession[] = [
     delivered_by_partnership_id: 'ps2',
     is_delivered: true,
     planned_seats: 20,
+    // Added by migration 0043. Mock rows predate it and carry the values a
+    // pre-existing row received: unpublished, uncancelled, nothing to describe.
+    description: null,
+    focal_point: null,
+    duration_hours: null,
+    application_opens_on: null,
+    application_closes_on: null,
+    is_published: false,
+    is_cancelled: false,
+    cancellation_reason: null,
+
   },
   {
     ...base('ts5', '2026-04-22T09:00:00Z'),
@@ -482,6 +526,17 @@ export const TRAINING_SESSIONS: TrainingSession[] = [
     delivered_by_partnership_id: 'ps3',
     is_delivered: true,
     planned_seats: 20,
+    // Added by migration 0043. Mock rows predate it and carry the values a
+    // pre-existing row received: unpublished, uncancelled, nothing to describe.
+    description: null,
+    focal_point: null,
+    duration_hours: null,
+    application_opens_on: null,
+    application_closes_on: null,
+    is_published: false,
+    is_cancelled: false,
+    cancellation_reason: null,
+
   },
   {
     ...base('ts6', '2026-05-06T09:00:00Z'),
@@ -493,6 +548,17 @@ export const TRAINING_SESSIONS: TrainingSession[] = [
     delivered_by_partnership_id: 'ps3',
     is_delivered: true,
     planned_seats: 20,
+    // Added by migration 0043. Mock rows predate it and carry the values a
+    // pre-existing row received: unpublished, uncancelled, nothing to describe.
+    description: null,
+    focal_point: null,
+    duration_hours: null,
+    application_opens_on: null,
+    application_closes_on: null,
+    is_published: false,
+    is_cancelled: false,
+    cancellation_reason: null,
+
   },
 ]
 
@@ -507,6 +573,11 @@ export const TRAINING_ENROLMENTS: TrainingEnrolment[] = [
     decided_on: '2026-03-11',
     decided_by: null,
     client_uuid: null,
+    // Added by migration 0044. These are staff-entered completions, so they
+    // take the same backfill the real rows did: approved, never applied.
+    application_status: 'approved',
+    applied_on: null,
+
   },
   {
     ...base('te2', '2026-03-18T12:05:00Z'),
@@ -518,6 +589,11 @@ export const TRAINING_ENROLMENTS: TrainingEnrolment[] = [
     decided_on: '2026-03-18',
     decided_by: null,
     client_uuid: null,
+    // Added by migration 0044. These are staff-entered completions, so they
+    // take the same backfill the real rows did: approved, never applied.
+    application_status: 'approved',
+    applied_on: null,
+
   },
   {
     ...base('te3', '2026-04-02T09:20:00Z'),
@@ -529,6 +605,11 @@ export const TRAINING_ENROLMENTS: TrainingEnrolment[] = [
     decided_on: '2026-04-02',
     decided_by: null,
     client_uuid: null,
+    // Added by migration 0044. These are staff-entered completions, so they
+    // take the same backfill the real rows did: approved, never applied.
+    application_status: 'approved',
+    applied_on: null,
+
   },
   {
     ...base('te4', '2026-04-09T14:55:00Z'),
@@ -540,6 +621,11 @@ export const TRAINING_ENROLMENTS: TrainingEnrolment[] = [
     decided_on: '2026-04-09',
     decided_by: null,
     client_uuid: null,
+    // Added by migration 0044. These are staff-entered completions, so they
+    // take the same backfill the real rows did: approved, never applied.
+    application_status: 'approved',
+    applied_on: null,
+
   },
   {
     ...base('te5', '2026-04-23T11:10:00Z'),
@@ -551,6 +637,11 @@ export const TRAINING_ENROLMENTS: TrainingEnrolment[] = [
     decided_on: '2026-04-23',
     decided_by: null,
     client_uuid: null,
+    // Added by migration 0044. These are staff-entered completions, so they
+    // take the same backfill the real rows did: approved, never applied.
+    application_status: 'approved',
+    applied_on: null,
+
   },
   {
     ...base('te6', '2026-05-07T16:30:00Z'),
@@ -562,6 +653,11 @@ export const TRAINING_ENROLMENTS: TrainingEnrolment[] = [
     decided_on: '2026-05-07',
     decided_by: null,
     client_uuid: null,
+    // Added by migration 0044. These are staff-entered completions, so they
+    // take the same backfill the real rows did: approved, never applied.
+    application_status: 'approved',
+    applied_on: null,
+
   },
 ]
 
@@ -643,6 +739,13 @@ export const EXHIBITIONS: Exhibition[] = [
     location: 'Municipality Square, Al-Turra',
     booth_capacity: 30,
     external_sponsor: null,
+    // Added by migration 0043.
+    description: null,
+    focal_point: null,
+    application_opens_on: null,
+    application_closes_on: null,
+    is_published: false,
+
     is_cancelled: false,
   },
   {
@@ -653,6 +756,13 @@ export const EXHIBITIONS: Exhibition[] = [
     location: 'Municipal Hall, Ramtha',
     booth_capacity: 24,
     external_sponsor: 'Enabel',
+    // Added by migration 0043.
+    description: null,
+    focal_point: null,
+    application_opens_on: null,
+    application_closes_on: null,
+    is_published: false,
+
     is_cancelled: false,
   },
   {
@@ -663,6 +773,13 @@ export const EXHIBITIONS: Exhibition[] = [
     location: 'Sahel Horan Cultural Centre',
     booth_capacity: 36,
     external_sponsor: null,
+    // Added by migration 0043.
+    description: null,
+    focal_point: null,
+    application_opens_on: null,
+    application_closes_on: null,
+    is_published: false,
+
     is_cancelled: false,
   },
   {
@@ -673,6 +790,13 @@ export const EXHIBITIONS: Exhibition[] = [
     location: 'Municipality Square, Al-Turra',
     booth_capacity: 30,
     external_sponsor: 'Chamber of Commerce',
+    // Added by migration 0043.
+    description: null,
+    focal_point: null,
+    application_opens_on: null,
+    application_closes_on: null,
+    is_published: false,
+
     is_cancelled: false,
   },
 ]
@@ -706,6 +830,7 @@ export const REGISTRATIONS: ExhibitionRegistration[] = [
     reviewed_by: null,
     reviewed_at: '2026-08-06T10:10:00Z',
     client_uuid: null,
+
   },
   {
     ...base('rg2', '2026-08-19T20:42:00Z'),
@@ -719,6 +844,7 @@ export const REGISTRATIONS: ExhibitionRegistration[] = [
     reviewed_by: null,
     reviewed_at: null,
     client_uuid: null,
+
   },
   {
     ...base('rg3', '2026-07-22T09:25:00Z'),
@@ -732,6 +858,7 @@ export const REGISTRATIONS: ExhibitionRegistration[] = [
     reviewed_by: null,
     reviewed_at: '2026-07-22T09:25:00Z',
     client_uuid: null,
+
   },
   {
     ...base('rg4', '2026-08-20T18:03:00Z'),
@@ -745,6 +872,7 @@ export const REGISTRATIONS: ExhibitionRegistration[] = [
     reviewed_by: null,
     reviewed_at: null,
     client_uuid: null,
+
   },
   {
     ...base('rg5', '2026-04-14T12:40:00Z'),
@@ -758,6 +886,7 @@ export const REGISTRATIONS: ExhibitionRegistration[] = [
     reviewed_by: null,
     reviewed_at: '2026-04-14T12:40:00Z',
     client_uuid: null,
+
   },
   {
     ...base('rg6', '2026-03-04T08:55:00Z'),
@@ -771,6 +900,7 @@ export const REGISTRATIONS: ExhibitionRegistration[] = [
     reviewed_by: null,
     reviewed_at: '2026-03-04T08:55:00Z',
     client_uuid: null,
+
   },
 ]
 
@@ -829,6 +959,7 @@ export const SURVEYS: FollowupSurvey[] = [
     q40_income_change: null,
     q43_enumerator_notes: null,
     client_uuid: null,
+
   },
   {
     ...base('fu2', '2026-08-13T15:05:00Z'),
@@ -858,6 +989,7 @@ export const SURVEYS: FollowupSurvey[] = [
     q40_income_change: null,
     q43_enumerator_notes: null,
     client_uuid: null,
+
   },
   {
     ...base('fu3', '2026-08-14T10:35:00Z'),
@@ -887,6 +1019,7 @@ export const SURVEYS: FollowupSurvey[] = [
     q40_income_change: null,
     q43_enumerator_notes: null,
     client_uuid: null,
+
   },
   {
     ...base('fu4', '2026-08-14T16:50:00Z'),
@@ -916,6 +1049,7 @@ export const SURVEYS: FollowupSurvey[] = [
     q40_income_change: null,
     q43_enumerator_notes: null,
     client_uuid: null,
+
   },
 ]
 
