@@ -297,7 +297,7 @@ No crosswalk exists in any source document.
 | 🟠 Affects schema or forms | 8 | OQ-6, OQ-7, OQ-8, OQ-9, OQ-10, OQ-11, OQ-13, OQ-14 |
 | 🟡 Wording and policy | 4 | OQ-15, OQ-16, OQ-17, OQ-18 |
 | 🟡 Recorded during Phase 6 | 2 | OQ-19, OQ-20 |
-| 🟠 Public apply flow (Phase 6 step 4) | 2 | OQ-21, OQ-22 |
+| 🟠 Public apply flow (Phase 6 step 4) | 2 | OQ-21 *(approved)*, OQ-22 *(resolved)* |
 
 ## 🟡 OQ-19 · Cancellation reasons are required for training and advisory, not for exhibitions
 
@@ -351,11 +351,13 @@ No crosswalk exists in any source document.
 
 **What could change the answer.** If lookup attempts should be retained as a security log, this becomes an insert-only table with a retention policy rather than a purging one — a different design, not a tweak. Decide before the public form is live, because the choice is hard to reverse once real traffic has been discarded.
 
-**Decides.** Municipal Coordinator, with whoever owns data protection for the programme.
+**Approved 26 August 2026 by the project owner.** Rule 2 exists to protect programme data; these rows are not that. The reasoning is now written into the rule itself in `CLAUDE.md`, alongside the `audit_log` carve-out, so the exception is documented rather than looking like a lapse.
+
+**Decides.** Settled. Revisit only if a security-log retention requirement appears.
 
 ---
 
-## 🔴 OQ-22 · A person with no date of birth cannot be found by the public lookup
+## 🟢 OQ-22 · A person with no date of birth cannot be found by the public lookup — RESOLVED
 
 **The problem.** `applicant_prefill` (migration `0052`) verifies an applicant on **national ID + date of birth**. `person.date_of_birth` is **nullable**. A person whose DOB was never recorded cannot satisfy the check, receives the standard `{"found": false}`, and — unless the form stops them — registers again as a new person.
 
@@ -367,15 +369,36 @@ No crosswalk exists in any source document.
 
 **Interim behaviour.** The no-match branch of the public form does not offer "register as new" as its default action. It asks whether the applicant has taken part before; someone who says yes is directed to the Municipality office rather than allowed to self-register.
 
-**Options.**
+**Resolved 26 August 2026 by the project owner: options B and C together, not A.**
 
-| | Option | Cost |
-|---|---|---|
-| **A** | Make `date_of_birth` NOT NULL for new rows and backfill | Cleanest, but blocks staff entry when a participant genuinely does not know their DOB |
-| **B** | Require DOB only on the public path | Staff can still create people without it; those people can never self-serve |
-| **C** | Add phone as a recovery factor | More to type, and phone numbers change |
+`date_of_birth` stays nullable. Making it NOT NULL would block staff who genuinely do not know a participant's birth date, and a required field that cannot be answered honestly gets filled with garbage — 01/01/1980 for everyone — which is worse than a null because it looks like data.
 
-**Decides.** Municipal Coordinator. This is a form-and-fieldwork question, not a technical one.
+Three changes instead, in migration `0053`:
+
+1. **Public self-registration requires a date of birth.** Anyone created through the public path always has one, so the gap can never grow from that direction. *(Enforced by the registration RPC, which is built with the application form in step 4. Not yet in place — the only part of this resolution still outstanding.)*
+
+2. **The lookup accepts national ID + date of birth, OR national ID + phone when `date_of_birth` is null.** The rule is asymmetric on purpose:
+
+   | on file | accepted |
+   |---|---|
+   | `date_of_birth` present | DOB only. A phone number is refused. |
+   | `date_of_birth` null | phone only. |
+
+   **No downgrade.** A person who has a DOB on file cannot be verified by phone, because otherwise knowing someone's phone number would bypass the stronger factor entirely. Verified: offering the correct phone for a person who has a DOB returns `{"found": false}`.
+
+   Phones are matched on the **last nine digits** after stripping non-numerics, so `0791234567` and `+962791234567` are the same number. Storage is untouched.
+
+   Failure is still one shared `{"found": false}` on both paths, so the caller cannot learn which factor a person has on file by watching which request succeeds.
+
+3. **`v_person_missing_verification`** makes the existing gap visible to staff, with `verification_state`:
+   - `phone_only` — no DOB, but a phone is on file, so they can still self-serve.
+   - `cannot_self_serve` — neither factor. They must be helped at the office.
+
+**Someone with neither factor cannot self-serve, and that is the correct outcome** rather than a gap to engineer around.
+
+**Noted while implementing.** `person` carries `check (date_of_birth is not null or age_recorded is not null)`, so a person with no DOB always has a recorded age. Age is *not* usable as a verification factor — it changes every year and has roughly sixty possible values — so it does not help here, but it does mean the "no DOB" population is never entirely undated.
+
+**Current state of the data.** All 4 live people have a date of birth; `v_person_missing_verification` returns zero rows.
 
 ---
 
