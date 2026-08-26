@@ -129,11 +129,62 @@ Do not guess these.
 
 | # | Question | Recommendation |
 |---|---|---|
-| D-1 | Western digits `1234` or Arabic-Indic `١٢٣٤`? | **Western.** Jordan uses Western digits in official and administrative contexts. Arabic-Indic would make the dashboard harder for municipal staff, not easier. Confirm with the coordinator. |
+| D-1 | Western digits `1234` or Arabic-Indic `١٢٣٤`? | **RESOLVED 26 Aug 2026 — Western.** See section 4a below. |
 | D-2 | Gregorian or Hijri calendar? | **Gregorian**, since the plan's quarters are Gregorian. Optionally show Hijri underneath on participant-facing screens. |
 | D-3 | Who writes and reviews the Arabic? | Claude Code can draft, but a native speaker must review — especially M&E terms like *indicator*, *disaggregation*, *baseline*, *milestone*. Machine-translated M&E vocabulary reads wrong to a Jordanian civil servant. |
 | D-4 | Default language on first load? | **Arabic**, with an English toggle. The users are Jordanian. |
 | D-5 | Does the participant portal need English at all? | Probably not. Municipal staff may want it; producers will not. |
+
+### 4a. D-1 resolved — Western digits
+
+**Decision: Western digits (`1234`), both languages, everywhere.** Taken 26 August 2026.
+
+**Why**
+
+1. **Jordan's own convention.** Western digits are what Jordan uses on road signs,
+   price tags and government forms. Arabic-Indic is the Egyptian and Gulf
+   convention. Jordanians read both, so neither choice excludes anyone — but the
+   local convention is the one that makes a municipal system read as local rather
+   than imported.
+2. **The digits sit next to Latin codes that cannot change.** Reporting periods
+   are `27/Q4` and indicators are `A1.3`. Those are fixed identifiers in the donor
+   framework. Arabic-Indic figures beside them in the same table would look like
+   two systems glued together, and a reader would reasonably wonder which one is
+   broken.
+3. **National IDs are nine Western digits** in the source data and on the card
+   itself. A participant checking a screen against their own ID card should be
+   comparing like with like.
+
+**What it took to actually implement**
+
+The decision was already written above as a recommendation, and `format.ts`
+carried a `latn` constant that *looked* like it implemented it. It did not.
+Three code paths rendered digits and the constant reached only one:
+
+| path | before | after |
+|---|---|---|
+| `formatNumber` / `formatJOD` / `formatPercent` | `Intl.NumberFormat` with `ar-JO-u-nu-latn` — **Western** | unchanged |
+| `formatDate` / `formatShortDate` / `formatDateRange` | **date-fns** with the `ar` locale, which ignored the constant entirely — **Arabic-Indic** | `Intl.DateTimeFormat` with the same locale tag — **Western** |
+| ICU plurals, e.g. `{count, plural, ...}` with `#` | `i18next-icu` with bare `ar` — **Arabic-Indic** | `latnDigits` post-processor in `i18n/index.ts` — **Western** |
+
+date-fns was dropped rather than worked around: it has no numbering-system
+option, which is precisely why it was the odd one out, and it was imported in
+exactly one file. Dates and numbers now go through the same `INTL_LOCALE`
+constant.
+
+ICU is the exception. `i18next-icu` gives no way to pass a numbering system
+down to `intl-messageformat`, so plural output is rewritten on the way out by a
+global post-processor that maps U+0660–U+0669 only. Arabic letters, punctuation
+and anything a user typed into a free-text field are untouched.
+
+**How to reverse it.** Change `NUMBERING_SYSTEM` in `app/src/lib/format.ts` from
+`'latn'` to `'arab'`. Both paths read that one constant — Intl through the locale
+tag, ICU through the post-processor's early return.
+
+**Still open:** this was decided on Jordanian convention, not confirmed by the
+coordinator. If they prefer Arabic-Indic on participant-facing screens
+specifically, that is a split between public and staff pages, not a flip of this
+constant, and it needs a fresh decision.
 
 ---
 

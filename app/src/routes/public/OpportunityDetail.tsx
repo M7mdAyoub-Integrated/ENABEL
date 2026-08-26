@@ -31,7 +31,12 @@ function Fact({ label, children }: { label: string; children: React.ReactNode })
       <dt className="font-narrow text-[11px] font-bold uppercase tracking-[0.14em] text-muted">
         {label}
       </dt>
-      <dd className="mt-1 text-[15px] text-ink">{children}</dd>
+      {/* A venue or contact name may be English on an Arabic page, or the
+          reverse. dir="auto" resolves each value from its own first strong
+          character, so punctuation lands on the correct end. */}
+      <dd dir="auto" className="mt-1 text-[15px] text-ink">
+        {children}
+      </dd>
     </div>
   )
 }
@@ -102,6 +107,7 @@ export function OpportunityDetail() {
           {t(`type.${o.opportunity_type}`)}
         </span>
         <h1
+          dir="auto"
           className="mt-3 text-[26px] font-black uppercase leading-[1.05] tracking-[-0.03em] sm:text-[36px]"
           style={{ textWrap: 'balance' }}
         >
@@ -118,12 +124,20 @@ export function OpportunityDetail() {
         <AvailabilityLine o={o} />
         <div className="mt-3">
           {canApply ? (
-            <Link
-              to={`/apply/${o.id}`}
-              className="inline-flex min-h-12 w-full items-center justify-center bg-ink px-6 font-narrow text-[13px] font-bold uppercase tracking-[0.12em] text-bg no-underline hover:text-bg sm:w-auto"
-            >
-              {t('detail.apply')}
-            </Link>
+            // Inert until the application flow exists. A dead link on the
+            // primary action of a public page is worse than a disabled button:
+            // this way the page can be shown to anyone at any moment without a
+            // dead end. Swap for a Link to /apply/:id when that route lands.
+            <>
+              <button
+                type="button"
+                disabled
+                className="inline-flex min-h-12 w-full cursor-not-allowed items-center justify-center border-[1.5px] border-border-strong bg-sunken px-6 font-narrow text-[13px] font-bold uppercase tracking-[0.12em] text-faint sm:w-auto"
+              >
+                {t('detail.apply')}
+              </button>
+              <p className="mt-2 text-[14px] text-muted">{t('detail.applySoon')}</p>
+            </>
           ) : (
             <p className="m-0 text-[15px] text-body">
               {a.kind === 'full' ? t('detail.applyFull') : t('detail.applyClosed')}
@@ -136,7 +150,13 @@ export function OpportunityDetail() {
         <h2 className="m-0 border-b-[3px] border-ink pb-2 text-[14px] font-extrabold uppercase tracking-[0.1em]">
           {t('detail.about')}
         </h2>
-        <p className="mt-3 max-w-[60ch] whitespace-pre-line text-[15px] leading-[1.6] text-body">
+        {/* Descriptions are typed by staff and are not always in the page's
+            language. Without dir="auto" an English paragraph on the Arabic page
+            renders its full stop at the wrong end. */}
+        <p
+          dir="auto"
+          className="mt-3 max-w-[60ch] whitespace-pre-line text-[15px] leading-[1.6] text-body"
+        >
           {o.description ?? t('detail.noDescription')}
         </p>
       </section>

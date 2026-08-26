@@ -70,3 +70,6 @@ Thumbs.db
 # Local scratch
 scratch/
 tmp/
+
+# Local Claude Code tooling (dev server launch config, etc.)
+.claude/

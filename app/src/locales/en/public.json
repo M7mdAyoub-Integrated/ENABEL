@@ -44,6 +44,7 @@
     "applyClosed": "Applications are closed",
     "applyFull": "This is full",
     "notFound": "This is no longer listed",
-    "notFoundBody": "It may have closed, filled up, or finished. Go back to see what is open now."
+    "notFoundBody": "It may have closed, filled up, or finished. Go back to see what is open now.",
+    "applySoon": "Applications open shortly. Ask at the Municipality office in the meantime."
   }
 }

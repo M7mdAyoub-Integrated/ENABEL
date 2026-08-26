@@ -1,85 +1,130 @@
-import { format as formatDateFns } from 'date-fns'
-import { ar, enGB } from 'date-fns/locale'
-import type { Locale as DateFnsLocale } from 'date-fns'
-
 export type AppLocale = 'en' | 'ar'
 
 /**
- * D-1 (08_FRONTEND_BUILD_PLAN section 4): Western digits `1234` or
- * Arabic-Indic `١٢٣٤`?
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  D-1 RESOLVED (26 Aug 2026): WESTERN DIGITS — 1234, not ١٢٣٤.
  *
- * The plan recommends Western and says to confirm with the coordinator. That
- * confirmation has NOT happened, so the choice lives here as one named constant
- * rather than being scattered through the code. Flipping it to 'arab' switches
- * every number, date and currency in the app at once.
+ *  Jordan uses Western digits in administrative and commercial contexts: road
+ *  signs, prices, government forms. Arabic-Indic is the Egyptian and Gulf
+ *  convention. Jordanians read both, so nothing breaks either way, but a
+ *  municipal system showing "١٢ مكانًا" reads as imported rather than local.
+ *
+ *  It also has to match its neighbours. Reporting period codes (27/Q4) and
+ *  indicator codes (A1.3) are Latin and cannot sensibly be anything else, so
+ *  Arabic-Indic digits beside them in the same table would look like a bug.
+ *
+ *  ── WHY THIS CONSTANT NOW ACTUALLY GOVERNS ──
+ *
+ *  It used to govern one of three paths. `Intl.NumberFormat` honoured it;
+ *  date-fns and the ICU plural formatter did not, and both emitted
+ *  Arabic-Indic. The constant read as authoritative while reaching a third of
+ *  the output.
+ *
+ *  Now there are two paths and this constant governs both:
+ *    1. Everything in this file — numbers, currency, percentages AND dates, all
+ *       through Intl with the locale below. date-fns is gone; it has no
+ *       numbering-system option, which is what made it the odd one out.
+ *    2. ICU plurals inside translation files — see the `latnDigits`
+ *       post-processor in i18n/index.ts, which reads this same constant.
+ *
+ *  To reverse D-1, change this one line to 'arab' and the whole app follows.
+ * ─────────────────────────────────────────────────────────────────────────────
  */
-const ARABIC_NUMBERING_SYSTEM: 'latn' | 'arab' = 'latn'
+export const NUMBERING_SYSTEM: 'latn' | 'arab' = 'latn'
 
-/** BCP-47 tags used for Intl. Jordan regional formatting. */
+/**
+ * BCP-47 tags used for every Intl call.
+ *
+ * ── WHY EN IS `en-GB` AND NOT `en-JO` ──
+ *
+ * `en-JO` looks like the obvious pair for `ar-JO`, and
+ * `supportedLocalesOf(['en-JO'])` even returns `['en-JO']` — but that only means
+ * ICU recognises the tag, not that it has data for it. `resolvedOptions().locale`
+ * collapses it to bare `en`, which is US convention: dates come out
+ * `Sep 5, 2026`, month first.
+ *
+ * Jordan writes dates day first. `en-GB` gives `5 Sept 2026`, which matches both
+ * the Arabic side (`5 أيلول 2026`) and every date on a Jordanian form. So the
+ * English tag is chosen for its FORMATTING CONVENTIONS, not its country.
+ *
+ * `ar-JO` does have real data and resolves to itself, which is what gives the
+ * Levantine month names (أيلول, تشرين الأول) rather than the Egyptian ones
+ * (سبتمبر, أكتوبر) a bare `ar` would produce.
+ *
+ * Check `resolvedOptions().locale`, not `supportedLocalesOf`, before changing
+ * either of these.
+ */
 const INTL_LOCALE: Record<AppLocale, string> = {
-  en: 'en-JO',
-  ar: `ar-JO-u-nu-${ARABIC_NUMBERING_SYSTEM}`,
-}
-
-/** date-fns locales. D-2: Gregorian, matching the plan's Gregorian quarters. */
-const DATE_FNS_LOCALE: Record<AppLocale, DateFnsLocale> = {
-  en: enGB,
-  ar: ar,
+  en: `en-GB-u-nu-${NUMBERING_SYSTEM}`,
+  ar: `ar-JO-u-nu-${NUMBERING_SYSTEM}`,
 }
 
 function resolve(locale: string): AppLocale {
   return locale.startsWith('ar') ? 'ar' : 'en'
 }
 
-/** Gregorian date. `d MMMM yyyy` -> "24 August 2026" / "٢٤ أغسطس ٢٠٢٦". */
-export function formatDate(
-  value: Date | number,
-  locale: string,
-  pattern = 'd MMMM yyyy',
-): string {
-  const l = resolve(locale)
-  return formatDateFns(value, pattern, { locale: DATE_FNS_LOCALE[l] })
+export function intlLocale(locale: string): string {
+  return INTL_LOCALE[resolve(locale)]
 }
 
-/**
- * The compact date the prototype uses in tables: `11 Mar 2026`.
- *
- * Distinct from formatDate's long form, which is for detail screens where
- * there is room for "11 March 2026".
- */
+/* ── dates ───────────────────────────────────────────────────────────────────
+   D-2: Gregorian, matching the plan's Gregorian quarters. Intl defaults to the
+   Gregorian calendar for these locales; it is pinned anyway so a future locale
+   change cannot quietly switch it to Umm al-Qura.                             */
+
+const CAL = { calendar: 'gregory' } as const
+
+/** Long form: "24 August 2026" / "٢٤ أغسطس ٢٠٢٦" -> "24 أغسطس 2026". */
+export function formatDate(value: Date | number | string, locale: string): string {
+  const d = typeof value === 'string' ? new Date(value) : new Date(value)
+  return new Intl.DateTimeFormat(intlLocale(locale), {
+    ...CAL,
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(d)
+}
+
+/** Compact form for tables: "11 Mar 2026". */
 export function formatShortDate(value: Date | number | string, locale: string): string {
-  const d = typeof value === 'string' ? new Date(value) : value
-  return formatDate(d, locale, 'd MMM yyyy')
+  const d = typeof value === 'string' ? new Date(value) : new Date(value)
+  return new Intl.DateTimeFormat(intlLocale(locale), {
+    ...CAL,
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  }).format(d)
 }
 
 /**
- * A date range: `12—14 Mar 2026`, collapsing the month and year when both ends
+ * A date range: "12—14 Mar 2026", collapsing month and year when both ends
  * share them.
  *
- * The prototype ALWAYS prints the end month and year and never repeats the
- * start's, which reads as "30—2 Apr 2026" for a range crossing a month. That is
- * fine in a mock whose four events all sit inside one month; it would misstate
- * a real event on a donor return, so the cross-month case is spelled out in
- * full here. Same output as the prototype for every same-month range.
+ * `formatRange` is used rather than joining two formatted dates because it
+ * knows how each locale abbreviates a range, including which side the dash
+ * belongs on under RTL.
  */
 export function formatDateRange(start: string, end: string, locale: string): string {
   const a = new Date(start)
   const b = new Date(end)
-  const dash = '—'
-  const sameMonth = a.getUTCFullYear() === b.getUTCFullYear() && a.getUTCMonth() === b.getUTCMonth()
-  if (sameMonth) {
-    return `${formatDate(a, locale, 'd')}${dash}${formatShortDate(b, locale)}`
-  }
-  return `${formatShortDate(a, locale)} ${dash} ${formatShortDate(b, locale)}`
+  const fmt = new Intl.DateTimeFormat(intlLocale(locale), {
+    ...CAL,
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+  if (Number.isNaN(a.getTime()) || Number.isNaN(b.getTime())) return ''
+  return fmt.formatRange(a, b)
 }
 
-/** Plain number via Intl. */
+/* ── numbers ─────────────────────────────────────────────────────────────── */
+
 export function formatNumber(
   value: number,
   locale: string,
   options: Intl.NumberFormatOptions = {},
 ): string {
-  return new Intl.NumberFormat(INTL_LOCALE[resolve(locale)], options).format(value)
+  return new Intl.NumberFormat(intlLocale(locale), options).format(value)
 }
 
 /**
@@ -91,7 +136,7 @@ export function formatNumber(
  * donor-facing report.
  */
 export function formatJOD(value: number, locale: string): string {
-  return new Intl.NumberFormat(INTL_LOCALE[resolve(locale)], {
+  return new Intl.NumberFormat(intlLocale(locale), {
     style: 'currency',
     currency: 'JOD',
     minimumFractionDigits: 3,
@@ -100,14 +145,33 @@ export function formatJOD(value: number, locale: string): string {
 }
 
 /** Percentage. Pass 0.58 for 58%. */
-export function formatPercent(
-  value: number,
-  locale: string,
-  fractionDigits = 0,
-): string {
-  return new Intl.NumberFormat(INTL_LOCALE[resolve(locale)], {
+export function formatPercent(value: number, locale: string, fractionDigits = 0): string {
+  return new Intl.NumberFormat(intlLocale(locale), {
     style: 'percent',
     minimumFractionDigits: fractionDigits,
     maximumFractionDigits: fractionDigits,
   }).format(value)
+}
+
+/* ── the ICU escape hatch ────────────────────────────────────────────────── */
+
+const ARABIC_INDIC_START = 0x0660
+
+/**
+ * Rewrite Arabic-Indic digits to Western.
+ *
+ * ICU MessageFormat renders `#` inside a plural using the locale i18next hands
+ * it, which is bare `ar` — there is no way to pass a numbering system through
+ * i18next-icu. So the digits are corrected on the way out instead.
+ *
+ * Only U+0660–U+0669 are touched. Arabic letters, punctuation and any digits a
+ * user typed into a free-text field are left exactly as they are.
+ *
+ * A no-op when D-1 is set to 'arab'.
+ */
+export function toWesternDigits(text: string): string {
+  if (NUMBERING_SYSTEM !== 'latn') return text
+  return text.replace(/[٠-٩]/g, (d) =>
+    String(d.charCodeAt(0) - ARABIC_INDIC_START),
+  )
 }

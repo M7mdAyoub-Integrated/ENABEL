@@ -17,8 +17,9 @@ export const HOOK = '↳' // ↳
 export const EMPTY = '—' // — shown where a value is absent
 /** Remove / dismiss, on a filter chip. Not the letter x. */
 export const CROSS = '×' // ×
-/** Percent sign. Same in both locales; Arabic-Indic percent is not used here
-    because the figures themselves render in Western digits (see format.ts). */
+/** Percent sign. Same in both locales.
+    The Arabic percent sign U+066A is not used, because D-1 resolved to Western
+    digits and U+066A belongs with Arabic-Indic ones -- see lib/format.ts. */
 export const PERCENT = '%'
 /** Range separator between two period codes, e.g. 26/Q3 - 27/Q1. */
 export const RANGE = '–' // en dash

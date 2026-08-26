@@ -81,10 +81,15 @@ export function OpportunityCard({ o }: { o: PublicOpportunity }) {
           >
             {t(`type.${o.opportunity_type}`)}
           </span>
-          {topic ? <span className="text-[13px] text-muted">{topic}</span> : null}
+          {topic ? (
+            <span dir="auto" className="text-[13px] text-muted">
+              {topic}
+            </span>
+          ) : null}
         </div>
 
         <h2
+          dir="auto"
           className="mt-2.5 text-[19px] font-extrabold leading-[1.2] tracking-[-0.02em] sm:text-[22px]"
           style={{ textWrap: 'balance' }}
         >
@@ -94,12 +99,14 @@ export function OpportunityCard({ o }: { o: PublicOpportunity }) {
         <dl className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[14px] text-body">
           <div className="flex gap-1.5">
             <dt className="sr-only">{t('detail.dates')}</dt>
-            <dd>{formatDateRange(o.start_date, o.end_date, locale)}</dd>
+            <dd dir="auto">{formatDateRange(o.start_date, o.end_date, locale)}</dd>
           </div>
           {o.location ? (
             <div className="flex gap-1.5">
               <dt className="sr-only">{t('detail.location')}</dt>
-              <dd className="text-muted">{o.location}</dd>
+              <dd dir="auto" className="text-muted">
+                {o.location}
+              </dd>
             </div>
           ) : null}
         </dl>

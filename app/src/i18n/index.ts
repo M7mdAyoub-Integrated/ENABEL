@@ -2,6 +2,7 @@ import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
 import ICU from 'i18next-icu'
+import { toWesternDigits, NUMBERING_SYSTEM } from '../lib/format'
 
 import enCommon from '../locales/en/common.json'
 import enNav from '../locales/en/nav.json'
@@ -68,6 +69,11 @@ void i18n
   // (zero/one/two/few/many/other). A `count === 1 ? x : y` ternary is wrong in
   // Arabic and reads as broken -- see build plan section 3.
   .use(ICU)
+  .use({
+    type: 'postProcessor',
+    name: 'latnDigits',
+    process: (value: string) => toWesternDigits(value),
+  })
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
@@ -93,6 +99,16 @@ void i18n
       // React escapes for us.
       escapeValue: false,
     },
+
+    // ── D-1: Western digits, everywhere ───────────────────────────────────
+    // ICU renders `#` inside a plural using the locale i18next hands it, which
+    // is bare `ar`, and that defaults to Arabic-Indic. i18next-icu offers no
+    // way to pass a numbering system through, so the digits are corrected on
+    // the way out. See lib/format.ts for the decision and its reasoning.
+    //
+    // Applied globally rather than per-key: a plural that slipped through
+    // would show ١٢ next to a period code like 27/Q4, which reads as a bug.
+    postProcess: NUMBERING_SYSTEM === 'latn' ? ['latnDigits'] : [],
 
     // ── Never render blank ────────────────────────────────────────────────
     // A missing key must be loud in the console and still show something
