@@ -11,7 +11,6 @@ import {
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { isRole, type Role } from './permissions'
-import { AUTH_BYPASS, BYPASS_USERS, bypassRoleFromUrl, warnIfBypassing } from '../dev/authBypass'
 
 export type AuthStatus = 'loading' | 'signedOut' | 'signedIn'
 
@@ -103,47 +102,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let cancelled = false
 
-    /**
-     * Development bypass. See src/dev/authBypass.ts -- set VITE_AUTH_BYPASS to
-     * false in .env.local to turn all of this off.
-     *
-     * A REAL sign-in, not a stub. RLS gates every table, so a faked session
-     * would return empty arrays everywhere and show nothing useful about what a
-     * role can actually see. Signing in as the test user means `app_user.role`
-     * is real and RLS behaves exactly as it will in production.
-     *
-     * If a session for a DIFFERENT test user is already open -- because the
-     * `?as=` param just changed -- it is signed out first, so switching roles
-     * is clean rather than leaving the previous role's token in place.
-     */
-    const bootstrapBypass = async (existing: Session | null): Promise<Session | null> => {
-      const wanted = BYPASS_USERS[bypassRoleFromUrl()]
-      if (existing?.user.email === wanted.email) return existing
-      if (existing) await supabase.auth.signOut()
-      const { data, error } = await supabase.auth.signInWithPassword(wanted)
-      if (error) {
-        console.error(
-          `[auth-bypass] could not sign in as ${wanted.email}: ${error.message}. ` +
-            'The test users come from migrations 0030 and 0031 -- check they are applied.',
-        )
-        return null
-      }
-      return data.session
-    }
-
-    void supabase.auth.getSession().then(async ({ data }) => {
+    void supabase.auth.getSession().then(({ data }) => {
       if (cancelled) return
-
-      if (AUTH_BYPASS) {
-        warnIfBypassing()
-        const s = await bootstrapBypass(data.session)
-        if (cancelled) return
-        setSession(s)
-        setStatus(s ? 'signedIn' : 'signedOut')
-        void loadRoleFor(s)
-        return
-      }
-
       setSession(data.session)
       setStatus(data.session ? 'signedIn' : 'signedOut')
       void loadRoleFor(data.session)

@@ -2,7 +2,6 @@ import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LocaleSwitcher } from '../../components/LocaleSwitcher'
 import { useAuth } from '../../auth/AuthProvider'
-import { AUTH_BYPASS } from '../../dev/authBypass'
 
 /**
  * The producer portal's frame, copied from the prototype.
@@ -36,16 +35,13 @@ export function PortalShell({ children }: { children: ReactNode }) {
         </div>
         <div className="flex flex-none gap-2.5">
           <LocaleSwitcher tone="invert" />
-          {/* Hidden while the development bypass is on -- see authBypass.ts. */}
-          {AUTH_BYPASS ? null : (
-            <button
-              type="button"
-              onClick={() => void signOut()}
-              className="cursor-pointer border-[1.5px] border-bg px-[11px] py-[5px] font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-bg hover:bg-bg hover:text-teal"
-            >
-              {t('auth:signOut')}
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => void signOut()}
+            className="cursor-pointer border-[1.5px] border-bg px-[11px] py-[5px] font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-bg hover:bg-bg hover:text-teal"
+          >
+            {t('auth:signOut')}
+          </button>
         </div>
       </header>
       {children}

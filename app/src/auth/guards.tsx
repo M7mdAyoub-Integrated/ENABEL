@@ -10,7 +10,6 @@ import {
 } from './permissions'
 import { isModuleId } from '../modules'
 import { AuthShell } from '../routes/auth/AuthShell'
-import { AUTH_BYPASS } from '../dev/authBypass'
 import { PrimaryButton, SecondaryButton } from '../ui/primitives'
 import { Link } from 'react-router-dom'
 
@@ -38,10 +37,6 @@ export function RequireAuth({ children }: { children: ReactNode }) {
 
   if (status === 'loading' || (status === 'signedIn' && !roleResolved)) return <Resolving />
   if (status === 'signedOut') {
-    // With the bypass on there is nowhere to send anyone: the sign-in route is
-    // hidden and a session is on its way in. Hold the resolving screen instead
-    // of bouncing to a page that is not reachable.
-    if (AUTH_BYPASS) return <Resolving />
     const next = encodeURIComponent(location.pathname + location.search)
     return <Navigate to={`/signin?next=${next}`} replace />
   }
@@ -99,7 +94,6 @@ export function RequireCapability({
 
   if (status === 'loading' || !roleResolved) return <Resolving />
   if (status === 'signedOut') {
-    if (AUTH_BYPASS) return <Resolving />
     const next = encodeURIComponent(location.pathname + location.search)
     return <Navigate to={`/signin?next=${next}`} replace />
   }
@@ -140,7 +134,6 @@ export function RequirePortal({ children }: { children: ReactNode }) {
 
   if (status === 'loading' || !roleResolved) return <Resolving />
   if (status === 'signedOut') {
-    if (AUTH_BYPASS) return <Resolving />
     const next = encodeURIComponent(location.pathname + location.search)
     return <Navigate to={`/signin?next=${next}`} replace />
   }
