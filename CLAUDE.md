@@ -56,7 +56,16 @@ When a task touches indicators, open `03_INDICATORS.md`. When it touches a form 
 Eight of them have conflicts or gaps in the source workbook. They are listed in `06_OPEN_QUESTIONS.md`. If a value is missing, leave it `null` and surface it as "not set". Do not put a zero there — a zero reads as a real target in a donor report.
 
 **2. Never hard-delete.**
-Every table has `deleted_at timestamptz`. Deletion sets it. Every query, view and RLS policy filters `deleted_at is null`. There is one exception: `audit_log`, which is insert-only and cannot be modified by anyone, including a coordinator.
+Every table has `deleted_at timestamptz`. Deletion sets it. Every query, view and RLS policy filters `deleted_at is null`.
+
+There are exactly two exceptions, and both are written down here so neither looks like a lapse:
+
+- `audit_log` — insert-only. Cannot be modified by anyone, including a coordinator.
+- `applicant_lookup_throttle` — ephemeral rate-limit counters for the public applicant lookup. Rows are purged once their window has passed.
+
+The reason the second one is allowed: this rule exists to keep **programme data** auditable for the donor. Those rows hold no programme data and no personal data — a salted HMAC and an integer, nothing else. Keeping them forever would grow the table without bound *and* would build a permanent record of every lookup any member of the public ever attempted, which is worse for privacy than discarding them. See `06_OPEN_QUESTIONS.md` OQ-21.
+
+Anything else that wants to hard-delete is a defect until it is argued for here.
 
 **3. Row-level security on every table, no exceptions.**
 Including reference tables. A table without RLS in a project holding national ID numbers is a defect, not a shortcut.
@@ -64,8 +73,21 @@ Including reference tables. A table without RLS in a project holding national ID
 **4. Count unique people, not rows.**
 `A1.3`, `B1.2`, `D0.1` and `E0.2` all count **distinct `person_id`**. One person in three trainings is one person. This is the single most common way these numbers go wrong.
 
-**5. Migrations are append-only.**
+**5. Migrations are append-only, and a migration is not applied until its SQL is in the repo.**
 Never edit a migration that has been applied. Write a new one. Never `drop table` on anything holding data.
+
+**Applying SQL through the Supabase MCP and leaving a note in `supabase/migrations/` is not a migration.** It is an undocumented change to a production database.
+
+This happened: migrations 0034–0049 — sixteen consecutive — were applied through the MCP while the local file was a three-line pointer saying the remote held the authoritative text. For that stretch the repository could not rebuild the database, and the GitHub backup did not contain the schema it existed to back up. `advisory_session`, `linkage_request`, `v_opportunity` and `v_public_opportunity` lived in exactly one place.
+
+So, for every migration:
+
+1. Write the SQL into `supabase/migrations/<timestamp>_<nnnn>_<name>.sql` **first**.
+2. Apply that exact text — do not retype it, do not improve it on the way through.
+3. The filename timestamp must equal the `version` recorded in `supabase_migrations.schema_migrations`. Two of the recovered files had drifted, which silently breaks replay ordering.
+4. Verify with `bash supabase/check_migration_files.sh` (see that file's header for the one query it needs).
+
+The recovered files are byte-identical to what was applied, taken from the migration ledger — not reconstructed from the schema. `0030` and `0031` are deliberate exceptions and are listed in the check script: the applied text of `0030` contains a password literal, so repairing it from the ledger would put a credential back into git.
 
 **6. One person, one row.**
 `person.national_id` is unique and constrained to exactly nine digits. Nothing else stores a name or phone for a participant — everything references `person_id`.
@@ -135,6 +157,8 @@ When using the Supabase MCP, apply one migration at a time and run that step's v
 
 Before you say a migration is complete, all of these must be true:
 
+- [ ] **The SQL is in `supabase/migrations/`, byte-for-byte what was applied, under a filename whose timestamp matches the ledger `version`**
+- [ ] **`bash supabase/check_migration_files.sh` passes**
 - [ ] It runs on a clean database with `supabase db reset`
 - [ ] Every new table has RLS enabled and at least one policy
 - [ ] Every new table has the standard column block and both triggers

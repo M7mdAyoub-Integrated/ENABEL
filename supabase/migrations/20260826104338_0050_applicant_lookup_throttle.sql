@@ -18,10 +18,6 @@
 -- become a plaintext list of every national ID anyone ever typed, including
 -- wrong guesses. The salt lives in applicant_lookup_secret, which no role can
 -- read; only the security-definer functions below can.
---
--- NOTE: bump_lookup_throttle as written here calls hmac() unqualified, which
--- fails at runtime because pgcrypto lives in `extensions`. Fixed in 0051.
--- Kept as applied -- migrations are append-only.
 -- ─────────────────────────────────────────────────────────────────────────────
 
 create table applicant_lookup_secret (

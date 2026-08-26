@@ -321,6 +321,9 @@ Make the demo data **arithmetically honest** — the indicator views must produc
 
 ## After every migration
 
+- [ ] **The SQL is in `supabase/migrations/`, and it is the same text that was applied**
+- [ ] **The filename timestamp equals the `version` in `supabase_migrations.schema_migrations`**
+- [ ] **`bash supabase/check_migration_files.sh` passes**
 - [ ] Runs clean on `supabase db reset`
 - [ ] RLS enabled on every new table, with at least one policy
 - [ ] Standard column block present
@@ -328,6 +331,15 @@ Make the demo data **arithmetically honest** — the indicator views must produc
 - [ ] Every foreign key indexed
 - [ ] Verification query passes
 - [ ] Any assumption written into `06_OPEN_QUESTIONS.md`
+
+The first three are new, and they are first because skipping them is the only
+failure on this list that is invisible at the time. A missing index is slow; a
+missing policy fails a test. A migration applied with no SQL in the repo looks
+completely successful — the feature works, the verification query passes — and
+the loss only surfaces when someone tries to rebuild.
+
+It went unnoticed for sixteen consecutive migrations (0034–0049). See CLAUDE.md
+rule 5.
 
 ---
 

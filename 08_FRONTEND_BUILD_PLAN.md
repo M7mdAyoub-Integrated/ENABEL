@@ -115,11 +115,60 @@ Every such field gets `dir="ltr"` and `unicode-bidi: isolate`. Applies to displa
 
 ### Formatting
 
-- Dates via `date-fns` with the `ar` locale. Gregorian.
+All of it lives in `app/src/lib/format.ts`. Nothing formats a date or a number anywhere else.
+
+- **Dates via `Intl.DateTimeFormat`. Gregorian, pinned.** *(date-fns was removed — see below.)*
 - Numbers via `Intl.NumberFormat`.
 - **Currency: JOD has three decimal places**, not two. 1 dinar = 1000 fils. `12.500 JOD`, not `12.50`.
 - Percentages via `Intl.NumberFormat` percent style.
 - Pluralisation via ICU rules. **Arabic has six plural forms** — zero, one, two, few, many, other. `count === 1 ? 'item' : 'items'` is wrong in Arabic and will read as broken.
+- Digits: Western, both languages. See D-1 in section 4a.
+
+#### Three things found the hard way
+
+**1. `en-JO` looks supported and is not.**
+
+`Intl.DateTimeFormat.supportedLocalesOf(['en-JO'])` returns `['en-JO']`, which
+reads as confirmation. It is not: it only means ICU recognises the *tag*.
+`resolvedOptions().locale` collapses it to bare `en`, which formats US-style —
+`Sep 5, 2026`, month first. Jordan writes day first.
+
+So the English tag is **`en-GB`** (`5 Sept 2026`), chosen for its formatting
+conventions rather than its country. `ar-JO` does have real data and resolves to
+itself.
+
+> **Check `resolvedOptions().locale`, never `supportedLocalesOf`.** This is the
+> kind of defect that ships and is found by a user, not a test: nothing throws,
+> nothing logs, the date is simply wrong in a way only a local reader notices.
+
+**2. Removing a dependency improved the Arabic.**
+
+date-fns's `ar` locale produces Egyptian month names — سبتمبر، أكتوبر. `ar-JO`
+through `Intl` produces the **Levantine** ones — أيلول، تشرين الأول — which is
+what a Jordanian municipality actually writes.
+
+That was not the reason for the change (date-fns had no numbering-system option,
+which is why D-1 could not be implemented through it), but it is the more
+valuable outcome. Worth remembering that the platform's own i18n data was better
+than the library wrapped around it.
+
+**3. LTR text inside an RTL page needs `dir="auto"`.**
+
+An English description on the Arabic page rendered as `.anyone who makes food to
+sell` — the full stop resolved to the wrong end, because a neutral character at
+the boundary takes the *paragraph's* direction, not the sentence's.
+
+This affects **every free-text field the municipality types**: titles,
+descriptions, venues, contact names, and later participant names and initiative
+titles. Staff will mix languages; there is no setting that prevents it.
+
+> **Rule: any element rendering user-entered text gets `dir="auto"`.** It
+> resolves direction from the first strong character in that specific value, so
+> each field is correct independently. Do not set `dir` to a fixed value on
+> content — only on the document.
+>
+> This does *not* apply to translated UI strings, which are known-direction and
+> already match the page.
 
 ---
 

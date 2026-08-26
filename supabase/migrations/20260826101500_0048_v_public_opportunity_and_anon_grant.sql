@@ -1,3 +1,0 @@
--- Applied via the Supabase MCP; this file records that it ran and in what
--- order. The authoritative text is in supabase_migrations.schema_migrations on
--- the linked project, including the header comment explaining the reasoning.
