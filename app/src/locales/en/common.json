@@ -1,0 +1,118 @@
+{
+  "appName": "SHM M&E Platform",
+  "subtitle": "Sahel Horan Municipality",
+  "yes": "Yes",
+  "no": "No",
+  "optional": "Optional.",
+  "language": {
+    "label": "Language",
+    "switchTo": "العربية",
+    "current": "English"
+  },
+  "direction": {
+    "label": "Direction",
+    "ltr": "Left to right",
+    "rtl": "Right to left"
+  },
+  "actions": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "dismiss": "Dismiss",
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "retry": "Try again"
+  },
+  "toast": {
+    "saved": "Saved",
+    "updated": "Updated",
+    "deleted": "Deleted",
+    "exported": "Exported"
+  },
+  "chips": {
+    "metCriteria": "Met criteria",
+    "notMet": "Not met",
+    "held": "Held",
+    "upcoming": "Upcoming",
+    "firstTime": "First time",
+    "returning": "Returning",
+    "active": "Active",
+    "status": {
+      "submitted": "Pending approval",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "ended": "Ended"
+  },
+  "enums": {
+    "sex": {
+      "male": "Male",
+      "female": "Female",
+      "unknown": "Not recorded"
+    },
+    "round": {
+      "six_month": "Six-month",
+      "twelve_month": "Twelve-month",
+      "annual": "Annual check"
+    },
+    "mode": {
+      "telephone": "Telephone",
+      "site_visit": "Site visit",
+      "municipal_office": "Municipal office"
+    },
+    "respondent": {
+      "participant": "Yes, the registered participant",
+      "household_member": "No, spoke to a household member",
+      "not_reached": "No, could not reach"
+    },
+    "surveyStatus": {
+      "draft": "In progress",
+      "submitted": "Submitted",
+      "approved": "Complete",
+      "rejected": "Not reached"
+    },
+    "linkStatus": {
+      "proposed": "Proposed",
+      "under_review": "Under review",
+      "active": "Active",
+      "ended": "Ended"
+    }
+  },
+  "units": {
+    "days": "{count, plural, one {# day} other {# days}}",
+    "booths": "{count, plural, one {# booth} other {# booths}}"
+  },
+  "exhibition": {
+    "alreadyHeld": "Already held",
+    "full": "Full",
+    "boothsFree": "{count, plural, one {# booth free} other {# booths free}}"
+  },
+  "roles": {
+    "intro": "Choose how you are signing in. Authentication arrives in a later phase; for now both doors are open.",
+    "municipality": "Municipality",
+    "municipalityBody": "Record partnerships, completions, exhibitions and follow-up surveys. See every indicator.",
+    "participant": "Producer",
+    "participantBody": "Register for a rural market or exhibition, and track whether your request was approved."
+  },
+  "settings": {
+    "intro": "Visual placeholder. Nothing is configurable in this prototype.",
+    "languageHelp": "Switching language also flips the text direction.",
+    "emptyTitle": "Nothing to configure yet",
+    "emptyBody": "Indicator targets, roles and reporting periods will live here once the platform is built."
+  },
+  "appNameShort": "M&E Platform",
+  "orgShort": "Sahel Horan",
+  "orgName": "Sahel Horan Municipality",
+  "programmeLine": "Action Plan for Enhancing Local Economic Participation · Funded by the European Union · Implemented with Enabel",
+  "states": {
+    "loading": "Loading records",
+    "saving": "Saving…",
+    "queued": "Queued",
+    "pending": "Not sent yet",
+    "offline": "Offline",
+    "pendingCount": "{count, plural, one {# change waiting to send} other {# changes waiting to send}}",
+    "syncNow": "Send now",
+    "failedToSend": "Could not be sent",
+    "failedCount": "{count, plural, one {# change could not be sent} other {# changes could not be sent}}"
+  }
+}

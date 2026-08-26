@@ -1,0 +1,100 @@
+{
+  "quarterLine": "Quarter 3 · 2026 · plan period 2026—2029",
+  "whereThePlanStands": "أين وصلت الخطة",
+  "exportReturn": "تصدير التقرير الفصلي",
+  "exportDone": "Quarterly return generated",
+  "exportSub": "Q3 2026 · 20 indicators",
+  "kpiLandmark": "Headline indicators",
+  "tableLandmark": "All twenty indicators",
+  "theTwentyIndicators": "المؤشرات العشرون",
+  "haveAForm": "{count} have a form",
+  "enteredByHand": "{count} entered by hand",
+  "groupMeta": "{indicators} indicators · {without} without a form",
+  "ofTarget": "من {target}",
+  "slashTarget": "/{target}",
+  "deltaThisQuarter": "{count, plural, one {+# this quarter} other {+# this quarter}}",
+  "progressLabel": "Progress towards target for {code}",
+  "noFormYet": "لا يوجد نموذج",
+  "whoIsInTheData": "Who is in the data · {count} people",
+  "participantsOnly": "Training participants only. Producers are counted separately.",
+  "fieldNotCollected": "الحقل غير مجموع بعد",
+  "fieldNotCollectedDesc": "Completion and Registration forms need a {field} question.",
+  "theGap": "الفجوة",
+  "gapHeadline": "{count, plural, one {# indicator has} other {# indicators have}} no form behind them.",
+  "gapBody": "They are typed in by hand each quarter on the Manual entries page and cannot be traced to a record.",
+  "openManualEntries": "فتح الإدخالات اليدوية",
+  "sourceNote": "Figures come from the database views. Nothing on this screen is computed in the browser.",
+  "manualEntries": "الإدخالات اليدوية",
+  "manualBody": "These indicators have no data-collection form. Until one exists, the coordinator types the figure in each quarter and attaches the evidence by hand.",
+  "noSourceForm": "لا يوجد نموذج مصدر",
+  "indicatorCount": "{count, plural, one {# indicator} other {# indicators}}",
+  "targetIs": "المستهدف {target}",
+  "milestoneReached": "هل تحقق الإنجاز؟",
+  "thisQuarter": "هذا الفصل",
+  "onRecord": "On record: {value}",
+  "attach": "إرفاق",
+  "attachEvidence": "Attach supporting evidence",
+  "saveEntry": "حفظ الإدخال",
+  "entrySaved": "{code} saved",
+  "kpi": {
+    "participants": "المشاركون الذين أتموا تدريبًا",
+    "partnerships": "الشراكات النشطة",
+    "markets": "الأسواق والمعارض المقامة",
+    "producers": "المنتِجون الفريدون"
+  },
+  "group": {
+    "01": "المهارات والتدريب",
+    "02": "الإنتاج والتصنيع",
+    "03": "الأسواق والترويج",
+    "04": "التنسيق",
+    "05": "الأثر"
+  },
+  "disag": {
+    "sex": "الجنس",
+    "age": "الفئة العمرية",
+    "refugee": "حالة اللجوء",
+    "disability": "الإعاقة"
+  },
+  "disagLabel": {
+    "sex": {
+      "female": "أنثى",
+      "male": "ذكر"
+    },
+    "age": {
+      "a18": "١٨—٢٤",
+      "a25": "٢٥—٣٤",
+      "a35": "٣٥—٤٤",
+      "a45": "٤٥ فأكثر"
+    }
+  },
+  "name": {
+    "A1": "% of training participants applying knowledge",
+    "A1.2": "Technical partnerships established",
+    "A1.3": "Unique participants completing a training",
+    "B1": "% of farmers reporting benefit from advisory sessions",
+    "B1.1": "Technical coordination office established",
+    "B1.2": "Farmers reaching office services",
+    "C1": "% of production activities still operating at 6 months",
+    "C1.1": "Production-support partnerships",
+    "C1.2": "Pilot initiatives linked to market opportunity",
+    "C1.3": "Advisory mentorship sessions",
+    "D0.1": "Producers guided on food safety and licensing",
+    "D0.2": "Training sessions on food processing",
+    "E0.1": "Markets and exhibitions held",
+    "E0.2": "Unique producers participating",
+    "F0.1": "Promotional actions delivered",
+    "G0.1": "Coordination committee established",
+    "G0.2": "Coordination meetings held",
+    "G0.3": "Case studies documented",
+    "G0.4": "Active partnerships contributing",
+    "IMP-0": "% still engaged in an economic activity at 12 months"
+  },
+  "targetMet": "تحقّق الهدف",
+  "pctOfTarget": "{pct}٪",
+  "onRecordLabel": "المسجَّل",
+  "evidence": {
+    "milestone": "أرفق القرار الموقّع أو المحضر",
+    "count": "أرفق السجل أو كشف الحضور"
+  },
+  "zeroPlaceholder": "٠"
+}

@@ -1,0 +1,100 @@
+{
+  "quarterLine": "Quarter 3 · 2026 · plan period 2026—2029",
+  "whereThePlanStands": "Where the plan stands",
+  "exportReturn": "Export quarterly return",
+  "exportDone": "Quarterly return generated",
+  "exportSub": "Q3 2026 · 20 indicators",
+  "kpiLandmark": "Headline indicators",
+  "tableLandmark": "All twenty indicators",
+  "theTwentyIndicators": "The 20 indicators",
+  "haveAForm": "{count} have a form",
+  "enteredByHand": "{count} entered by hand",
+  "groupMeta": "{indicators} indicators · {without} without a form",
+  "ofTarget": "of {target}",
+  "slashTarget": "/{target}",
+  "deltaThisQuarter": "{count, plural, one {+# this quarter} other {+# this quarter}}",
+  "progressLabel": "Progress towards target for {code}",
+  "noFormYet": "No form yet",
+  "whoIsInTheData": "Who is in the data · {count} people",
+  "participantsOnly": "Training participants only. Producers are counted separately.",
+  "fieldNotCollected": "Field not yet collected",
+  "fieldNotCollectedDesc": "Completion and Registration forms need a {field} question.",
+  "theGap": "The gap",
+  "gapHeadline": "{count, plural, one {# indicator has} other {# indicators have}} no form behind them.",
+  "gapBody": "They are typed in by hand each quarter on the Manual entries page and cannot be traced to a record.",
+  "openManualEntries": "Open manual entries",
+  "sourceNote": "Figures come from the database views. Nothing on this screen is computed in the browser.",
+  "manualEntries": "Manual entries",
+  "manualBody": "These indicators have no data-collection form. Until one exists, the coordinator types the figure in each quarter and attaches the evidence by hand.",
+  "noSourceForm": "No source form",
+  "indicatorCount": "{count, plural, one {# indicator} other {# indicators}}",
+  "targetIs": "Target {target}",
+  "milestoneReached": "Milestone reached?",
+  "thisQuarter": "This quarter",
+  "onRecord": "On record: {value}",
+  "attach": "Attach",
+  "attachEvidence": "Attach supporting evidence",
+  "saveEntry": "Save entry",
+  "entrySaved": "{code} saved",
+  "kpi": {
+    "participants": "Participants who completed a training",
+    "partnerships": "Active partnerships",
+    "markets": "Markets and exhibitions held",
+    "producers": "Unique producers reached"
+  },
+  "group": {
+    "01": "Skills and training",
+    "02": "Production and processing",
+    "03": "Markets and promotion",
+    "04": "Coordination",
+    "05": "Impact"
+  },
+  "disag": {
+    "sex": "Sex",
+    "age": "Age group",
+    "refugee": "Refugee status",
+    "disability": "Disability"
+  },
+  "disagLabel": {
+    "sex": {
+      "female": "Female",
+      "male": "Male"
+    },
+    "age": {
+      "a18": "18—24",
+      "a25": "25—34",
+      "a35": "35—44",
+      "a45": "45 and over"
+    }
+  },
+  "name": {
+    "A1": "% of training participants applying knowledge",
+    "A1.2": "Technical partnerships established",
+    "A1.3": "Unique participants completing a training",
+    "B1": "% of farmers reporting benefit from advisory sessions",
+    "B1.1": "Technical coordination office established",
+    "B1.2": "Farmers reaching office services",
+    "C1": "% of production activities still operating at 6 months",
+    "C1.1": "Production-support partnerships",
+    "C1.2": "Pilot initiatives linked to market opportunity",
+    "C1.3": "Advisory mentorship sessions",
+    "D0.1": "Producers guided on food safety and licensing",
+    "D0.2": "Training sessions on food processing",
+    "E0.1": "Markets and exhibitions held",
+    "E0.2": "Unique producers participating",
+    "F0.1": "Promotional actions delivered",
+    "G0.1": "Coordination committee established",
+    "G0.2": "Coordination meetings held",
+    "G0.3": "Case studies documented",
+    "G0.4": "Active partnerships contributing",
+    "IMP-0": "% still engaged in an economic activity at 12 months"
+  },
+  "targetMet": "Target met",
+  "pctOfTarget": "{pct}%",
+  "onRecordLabel": "On record",
+  "evidence": {
+    "milestone": "Attach the signed decision or minutes",
+    "count": "Attach the register or attendance sheet"
+  },
+  "zeroPlaceholder": "0"
+}

@@ -1,0 +1,38 @@
+{
+  "landmark": "Main navigation",
+  "openMenu": "Open menu",
+  "more": "More",
+  "dashboard": "Dashboard",
+  "manualEntries": "Manual entries",
+  "settings": "Settings",
+  "skipToContent": "Skip to content",
+  "module": {
+    "tp": "Training partners",
+    "pp": "Support partners",
+    "tc": "Training completion",
+    "ln": "Market linkages",
+    "ex": "Exhibitions",
+    "rg": "Registrations",
+    "fu": "Post-intervention"
+  },
+  "objective": {
+    "tp": "Objective 1",
+    "pp": "Objective 2",
+    "tc": "Objective 1",
+    "ln": "Objective 2",
+    "ex": "Objective 3",
+    "rg": "Objective 3",
+    "fu": "Cross-cutting"
+  },
+  "group": {
+    "partnerships": "Partnerships",
+    "training": "Training",
+    "production": "Production",
+    "markets": "Markets",
+    "followup": "Follow-up",
+    "noForm": "No form yet"
+  },
+  "signedIn": "Signed in",
+  "municipality": "Municipality",
+  "participant": "Participant"
+}

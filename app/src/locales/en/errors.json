@@ -1,0 +1,41 @@
+{
+  "notFoundTitle": "Page not found",
+  "notFoundBody": "That address does not match any screen. It may have been renamed, or the record may have been deleted.",
+  "generic": "Something went wrong.",
+  "missingTranslation": "Translation missing",
+  "db": {
+    "forbidden": "Your role does not allow this change. Ask the Coordinator to make it.",
+    "sessionExpired": "Your session ended. Sign in again and try once more.",
+    "notVisible": "That record is not visible to your role.",
+    "duplicate": "A record like this already exists.",
+    "partnerDuplicate": "A partner with this name and unit is already registered.",
+    "partnershipDuplicate": "This partner already has a partnership of this kind.",
+    "personDuplicate": "That national ID already belongs to someone in the system.",
+    "nationalIdFormat": "A national ID is exactly nine digits, numbers only.",
+    "nationalIdImmutable": "A national ID cannot be changed once the record is saved.",
+    "enrolmentDuplicate": "This person is already recorded on that training.",
+    "registrationDuplicate": "This producer is already registered for that exhibition.",
+    "missingReference": "Something this record points at no longer exists. Reload and try again.",
+    "missingRequired": "A required field was left empty.",
+    "checkFailed": "The database rejected these values.",
+    "roleWrongType": "That role does not belong to this kind of partnership.",
+    "typeWrongType": "That partner type does not belong to this kind of partnership.",
+    "roleOtherRequired": "You chose “Other”, so the free-text box must be filled in.",
+    "typeOtherRequired": "You chose “Other”, so the free-text box must be filled in.",
+    "coordinatorOnly": "Only a Coordinator can do this.",
+    "exhibitionHeld": "That exhibition has already been held, so it cannot take registrations.",
+    "exhibitionFull": "That exhibition has no booths left.",
+    "rejected": "The database rejected this change.",
+    "unknown": "Something went wrong. Try again, and tell the Coordinator if it keeps happening.",
+    "roleRemovalUnsupported": "Everything else was saved, but a role cannot be removed once it is attached. The database has no way to detach one yet — tell the Coordinator."
+  },
+  "state": {
+    "failedTitle": "Could not load",
+    "refusedTitle": "Not permitted",
+    "code": "Code {code}"
+  },
+  "offline": {
+    "write": "You are offline. This has been saved on the device and will be sent when you reconnect.",
+    "read": "You are offline and this has not been loaded yet."
+  }
+}

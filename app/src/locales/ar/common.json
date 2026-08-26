@@ -1,0 +1,118 @@
+{
+  "appName": "منصة المتابعة والتقييم",
+  "subtitle": "بلدية سهل حوران",
+  "yes": "نعم",
+  "no": "لا",
+  "optional": "اختياري.",
+  "language": {
+    "label": "اللغة",
+    "switchTo": "English",
+    "current": "العربية"
+  },
+  "direction": {
+    "label": "الاتجاه",
+    "ltr": "من اليسار إلى اليمين",
+    "rtl": "من اليمين إلى اليسار"
+  },
+  "actions": {
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "delete": "حذف",
+    "dismiss": "إغلاق",
+    "expand": "توسيع",
+    "collapse": "طي",
+    "retry": "أعد المحاولة"
+  },
+  "toast": {
+    "saved": "تم الحفظ",
+    "updated": "تم التحديث",
+    "deleted": "تم الحذف",
+    "exported": "تم التصدير"
+  },
+  "chips": {
+    "metCriteria": "استوفى المعايير",
+    "notMet": "لم يستوفِ",
+    "held": "أُقيم",
+    "upcoming": "قادم",
+    "firstTime": "مشاركة أولى",
+    "returning": "مشاركة متكررة",
+    "active": "نشطة",
+    "status": {
+      "submitted": "بانتظار الموافقة",
+      "approved": "معتمد",
+      "rejected": "مرفوض"
+    },
+    "ended": "منتهية"
+  },
+  "enums": {
+    "sex": {
+      "male": "ذكر",
+      "female": "أنثى",
+      "unknown": "غير مسجل"
+    },
+    "round": {
+      "six_month": "بعد ستة أشهر",
+      "twelve_month": "بعد اثني عشر شهرًا",
+      "annual": "مراجعة سنوية"
+    },
+    "mode": {
+      "telephone": "هاتف",
+      "site_visit": "زيارة ميدانية",
+      "municipal_office": "مكتب البلدية"
+    },
+    "respondent": {
+      "participant": "نعم، المشارك المسجل",
+      "household_member": "لا، تحدثت مع أحد أفراد الأسرة",
+      "not_reached": "لا، تعذر الوصول"
+    },
+    "surveyStatus": {
+      "draft": "قيد التنفيذ",
+      "submitted": "مُرسل",
+      "approved": "مكتمل",
+      "rejected": "تعذر الوصول"
+    },
+    "linkStatus": {
+      "proposed": "مقترح",
+      "under_review": "قيد المراجعة",
+      "active": "نشط",
+      "ended": "منتهٍ"
+    }
+  },
+  "units": {
+    "days": "{count, plural, zero {لا أيام} one {يوم واحد} two {يومان} few {# أيام} many {# يومًا} other {# يوم}}",
+    "booths": "{count, plural, zero {لا أكشاك} one {كشك واحد} two {كشكان} few {# أكشاك} many {# كشكًا} other {# كشك}}"
+  },
+  "exhibition": {
+    "alreadyHeld": "أُقيم بالفعل",
+    "full": "مكتمل",
+    "boothsFree": "{count, plural, zero {لا أكشاك متاحة} one {كشك واحد متاح} two {كشكان متاحان} few {# أكشاك متاحة} many {# كشكًا متاحًا} other {# كشك متاح}}"
+  },
+  "roles": {
+    "intro": "اختر طريقة الدخول. المصادقة ستُضاف في مرحلة لاحقة؛ حاليًا كلا البابين مفتوح.",
+    "municipality": "البلدية",
+    "municipalityBody": "تسجيل الشراكات وإتمام التدريب والمعارض واستبيانات المتابعة. الاطلاع على كل المؤشرات.",
+    "participant": "المنتِج",
+    "participantBody": "التسجيل في سوق ريفي أو معرض، ومتابعة حالة الطلب."
+  },
+  "settings": {
+    "intro": "عنصر مرئي مؤقت. لا يوجد ما يمكن ضبطه في هذا النموذج.",
+    "languageHelp": "تغيير اللغة يغيّر اتجاه النص أيضًا.",
+    "emptyTitle": "لا توجد إعدادات بعد",
+    "emptyBody": "ستظهر هنا مستهدفات المؤشرات والأدوار وفترات التقارير عند اكتمال المنصة."
+  },
+  "appNameShort": "منصة المتابعة",
+  "orgShort": "سهل حوران",
+  "orgName": "بلدية سهل حوران",
+  "programmeLine": "خطة عمل تعزيز المشاركة الاقتصادية المحلية · بتمويل من الاتحاد الأوروبي · بالتنفيذ مع إنابل",
+  "states": {
+    "loading": "جارٍ تحميل السجلات",
+    "saving": "جارٍ الحفظ…",
+    "queued": "في قائمة الانتظار",
+    "pending": "لم يُرسل بعد",
+    "offline": "غير متصل",
+    "pendingCount": "{count, plural, zero {لا تغييرات بانتظار الإرسال} one {تغيير واحد بانتظار الإرسال} two {تغييران بانتظار الإرسال} few {# تغييرات بانتظار الإرسال} many {# تغييرًا بانتظار الإرسال} other {# تغيير بانتظار الإرسال}}",
+    "syncNow": "أرسل الآن",
+    "failedToSend": "تعذّر الإرسال",
+    "failedCount": "{count, plural, zero {لا تغييرات تعذّر إرسالها} one {تغيير واحد تعذّر إرساله} two {تغييران تعذّر إرسالهما} few {# تغييرات تعذّر إرسالها} many {# تغييرًا تعذّر إرساله} other {# تغيير تعذّر إرساله}}"
+  }
+}

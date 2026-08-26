@@ -1,0 +1,2 @@
+-- Body synced from the applied migration; see the remote for the
+-- authoritative text if this file and the database ever disagree.

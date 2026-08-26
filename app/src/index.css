@@ -1,0 +1,186 @@
+@import 'tailwindcss';
+
+/* Self-hosted, subset, font-display: swap -- via @fontsource, not base64.
+   Archivo covers Latin only; IBM Plex Sans Arabic carries the Arabic script.
+   Each @fontsource package ships per-script subsets and sets font-display:swap. */
+@import '@fontsource-variable/archivo/index.css';
+@import '@fontsource/archivo-narrow/400.css';
+@import '@fontsource/archivo-narrow/600.css';
+@import '@fontsource/archivo-narrow/700.css';
+@import '@fontsource/ibm-plex-sans-arabic/400.css';
+@import '@fontsource/ibm-plex-sans-arabic/500.css';
+@import '@fontsource/ibm-plex-sans-arabic/600.css';
+@import '@fontsource/ibm-plex-sans-arabic/700.css';
+
+/* ── Design tokens ───────────────────────────────────────────────────────────
+   Tailwind v4 is CSS-first: this @theme block IS the config. Every value the
+   app uses comes from here. Do not hardcode a hex in a component -- section 6
+   of the build plan forbids changing the palette without asking, and tokens are
+   what make that enforceable.
+   ────────────────────────────────────────────────────────────────────────── */
+  /* ── PALETTE PROVENANCE ────────────────────────────────────────────────────
+     These are the PROTOTYPE's values, not the cool blue-grey set specified in
+     the Phase 1 brief. Phase 2 requires the port to look identical to the demo
+     ("if it looks different, it is wrong"), and those two palettes were entirely
+     different -- warm cream vs cool blue-grey, every value. Confirmed with the
+     project owner before porting; the Phase 1 hexes are superseded.
+
+     Every component reads these tokens, never a literal hex, so re-skinning is
+     a change to this block alone.
+     ──────────────────────────────────────────────────────────────────────── */
+@theme {
+  /* surfaces */
+  --color-bg: #fbfaf7; /* page / card ground */
+  --color-sunken: #f5f3ed; /* muted row, disabled fill */
+  --color-raised: #f1eee6; /* KPI tile, inset panel */
+  --color-border-default: #e2dfd6;
+  --color-border-strong: #c9c5b8;
+  --color-border-muted: #b5b1a4;
+  --color-hairline: #dcd8cc; /* gap between checkbox blocks */
+  --color-track: #e7e4da; /* indicator bar track, completed wizard step */
+  --color-shade: #d6d2c6; /* third band in a disaggregation bar */
+  /* Inputs sit on pure white, NOT on the page cream. The contrast between
+     #fff and #fbfaf7 is what makes a field read as a field. */
+  --color-input: #ffffff;
+
+  /* text */
+  --color-ink: #111110;
+  --color-muted: #6e6c66;
+  --color-faint: #8c8880;
+  --color-ghost: #a8a49a;
+  --color-body: #4a473f;
+
+  /* brand + objective accents */
+  --color-navy: #111110;
+  --color-teal: #14606f; /* SO1 -- skills and training */
+  --color-green: #1f6e4e; /* SO2 -- production and processing */
+  --color-amber: #a66a17; /* SO3 -- markets and promotion */
+  --color-slate: #3f4a52; /* SO4 -- coordination */
+
+  /* semantic status -- separate from the objective accents on purpose */
+  --color-success: #1f6e4e;
+  --color-warning: #a66a17;
+  --color-error: #9e3b2c;
+
+  /* attention surfaces (gap cards, warnings) */
+  --color-attention-bg: #fbf5ea;
+  --color-attention-border: #d4b27a;
+  --color-attention-ink: #6e5433;
+
+  /* inverted surface (dark panels) */
+  --color-invert-bg: #111110;
+  --color-invert-ink: #fbfaf7;
+  --color-invert-accent: #c6a24a;
+  --color-invert-body: #b9b5aa; /* body copy on the dark panel */
+  --color-invert-chip: #ddd8cb; /* chip text on the dark panel */
+  --color-invert-rule: #4e4b44; /* dashed chip border on the dark panel */
+  --color-dim: #9b978c; /* nav numerals, nav counts, toast sub */
+  /* Toast tag colours: light enough to read on the near-black bar. */
+  --color-invert-ok: #8fd3b8;
+  --color-invert-alarm: #e0a79a;
+
+  /* radius
+     ZERO, and that is the design, not an oversight. The prototype sets
+     `border-radius:0` on every control explicitly. Structure in this design
+     comes from rules -- 1.5px borders, 3px section underlines, 6px accent
+     bars -- not from rounded corners. A radius here reads as a different
+     product. */
+  --radius-card: 0px;
+
+  /* type */
+  --font-sans: 'Archivo Variable', 'Archivo', system-ui, sans-serif;
+  --font-narrow: 'Archivo Narrow', 'Archivo Variable', system-ui, sans-serif;
+  --font-arabic: 'IBM Plex Sans Arabic', 'Noto Sans Arabic', system-ui, sans-serif;
+
+  /* Two target devices sit below Tailwind's sm (640px). */
+  --breakpoint-xs: 360px;
+}
+
+/* Font switches by locale, driven by the lang attribute that useDirection sets
+   on <html>. Not by a class, so it cannot drift out of sync with the locale. */
+html {
+  font-family: var(--font-sans);
+}
+html:lang(ar) {
+  font-family: var(--font-arabic);
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.45;
+}
+
+/* ── Base control styles, copied from the prototype ──────────────────────────
+   The prototype's own reset. `border-radius:0` is repeated on controls because
+   browsers round inputs, selects and buttons by default and the design is
+   square. The focus ring is a 2px INSET black outline, not a coloured halo.
+
+   These MUST stay inside `@layer base`. Written bare after `@import
+   "tailwindcss"` they are unlayered, and unlayered CSS outranks every layered
+   utility -- `color: inherit` then beats `text-bg` and every button renders
+   black-on-black. */
+@layer base {
+  input,
+  select,
+  textarea,
+  button {
+    font-family: inherit;
+    color: inherit;
+    border-radius: 0;
+  }
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-ghost);
+  }
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: 2px solid var(--color-ink);
+    outline-offset: -2px;
+  }
+  a {
+    color: var(--color-teal);
+  }
+  a:hover {
+    color: var(--color-ink);
+  }
+  ::selection {
+    background: var(--color-ink);
+    color: var(--color-bg);
+  }
+}
+
+/* Toast rises from the bottom edge; overlays and dropdowns just fade. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 14px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+@keyframes fin {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Section 2: prefers-reduced-motion respected on every transition. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

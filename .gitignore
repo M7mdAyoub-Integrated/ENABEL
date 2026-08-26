@@ -1,0 +1,66 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  SHM M&E Platform — repository ignores
+#
+#  app/.gitignore covers the Vite app's own output. This root file covers the
+#  whole repository, including the docs and the supabase directory.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+dist/
+dist-ssr/
+**/dist/
+build/
+*.tsbuildinfo
+
+# ── Secrets ──────────────────────────────────────────────────────────────────
+# The anon key is public by design and lives in .env.local, which is still not
+# committed: the file also carries the project URL and is per-developer.
+# .env.example IS committed — placeholders only.
+# The service_role key must never appear in this repository at all.
+.env
+.env.local
+.env*.local
+!.env.example
+
+# Supabase CLI local state. The migrations themselves ARE committed.
+supabase/.branches/
+supabase/.temp/
+.branches/
+.temp/
+
+# ── The prototype ────────────────────────────────────────────────────────────
+# "SHM M&E Platform (standalone).html" IS committed — it is the design source
+# of record and the front end is a copy of it. Its .bak is not: it is a byte
+# duplicate of the same file and only existed as a safety copy while the
+# extraction was being worked out.
+*.bak
+*.html.bak
+
+# Office lock files, created when a workbook is open
+~$*
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editors and OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.swp
+*.sw?
+
+# Local scratch
+scratch/
+tmp/
