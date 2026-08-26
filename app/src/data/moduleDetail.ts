@@ -6,6 +6,8 @@ import { usePartnership, type PartnershipType } from './partnerships'
 import { refLabel, useRef } from './refTables'
 import { formatDate, formatDateRange } from '../lib/format'
 import { useExhibition, durationDays } from './exhibitions'
+import { useCompletion } from './completions'
+import { formatShortDate } from '../lib/format'
 
 /**
  * The detail-screen half of the migration seam. Same rules as `moduleRows`:
@@ -134,6 +136,60 @@ function useExhibitionDetail(
   }
 }
 
+/** Training completion — module 3. */
+function useCompletionDetail(
+  id: string | undefined,
+  enabled: boolean,
+  t: Translate,
+  locale: string,
+): ModuleDetail {
+  const q = useCompletion(enabled ? id : undefined)
+  const topics = useRef('training_topic')
+
+  const record = useMemo((): DetailRecord | null => {
+    const c = q.data
+    if (!c) return null
+    return {
+      id: c.id,
+      title: c.fullName,
+      subtitle: c.nationalId,
+      status:
+        c.metCriteria === null
+          ? { text: t('common:chips.pending'), tone: 'pending' }
+          : c.metCriteria
+            ? { text: t('common:chips.metCriteria'), tone: 'ok' }
+            : { text: t('common:chips.notMet'), tone: 'err' },
+      fields: [
+        { labelKey: 'columns.tc.0', value: c.nationalId, ltr: true },
+        { labelKey: 'columns.tc.1', value: c.fullName },
+        { labelKey: 'columns.tc.2', value: c.sex ? t(`common:enums.sex.${c.sex}`) : '' },
+        { labelKey: 'columns.tc.3', value: c.ageRecorded == null ? '' : String(c.ageRecorded) },
+        {
+          labelKey: 'columns.tc.4',
+          value: refLabel(topics.find((r) => r.id === c.topicId), locale),
+        },
+        { labelKey: 'columns.tc.5', value: formatShortDate(c.startDate, locale) },
+        {
+          labelKey: 'completion.decidedOn',
+          value: c.decidedOn ? formatShortDate(c.decidedOn, locale) : '',
+        },
+        { labelKey: 'completion.phone', value: c.phone ?? '', ltr: true },
+      ],
+      by: t('forms:detail.coordinator'),
+      at: c.createdAt,
+    }
+  }, [q.data, topics, t, locale])
+
+  return {
+    record,
+    isLoading: q.isLoading,
+    isError: q.isError,
+    error: q.error,
+    refetch: () => void q.refetch(),
+    isLive: true,
+  }
+}
+
 export function useModuleDetail(
   module: ModuleId,
   id: string,
@@ -144,10 +200,12 @@ export function useModuleDetail(
   const tp = usePartnershipDetail('tp', id, module === 'tp', t, locale)
   const pp = usePartnershipDetail('pp', id, module === 'pp', t, locale)
   const ex = useExhibitionDetail(id, module === 'ex', t, locale)
+  const tc = useCompletionDetail(id, module === 'tc', t, locale)
 
   if (module === 'tp') return tp
   if (module === 'pp') return pp
   if (module === 'ex') return ex
+  if (module === 'tc') return tc
   return {
     record: mock,
     isLoading: false,

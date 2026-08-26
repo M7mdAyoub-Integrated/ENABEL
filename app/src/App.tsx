@@ -7,7 +7,7 @@ import { queryClient } from './data/queryClient'
 import { DEMO_MODE } from './demo/demoMode'
 import { useQueueSync } from './data/useOffline'
 import { useDirection } from './hooks/useDirection'
-import { RequireCapability, RequireModule, RequirePortal } from './auth/guards'
+import { RequireCapability, RequireModule, RequirePortal, RequireSession } from './auth/guards'
 import Landing from './routes/Landing'
 import Dashboard from './routes/Dashboard'
 import ListScreen from './routes/ListScreen'
@@ -35,13 +35,16 @@ function ShellLayout() {
       <Outlet />
     </Shell>
   )
-  if (DEMO_MODE) return inner
+  // Demo mode drops the capability check but still waits for the silent
+  // sign-in, or the first queries go out unauthenticated. See RequireSession.
+  if (DEMO_MODE) return <RequireSession>{inner}</RequireSession>
   return <RequireCapability capability="app.access">{inner}</RequireCapability>
 }
 
 /** Wraps a route in a guard, or passes it through untouched in demo mode. */
 function guard(node: React.ReactElement, wrap: (n: React.ReactElement) => React.ReactElement) {
-  return DEMO_MODE ? node : wrap(node)
+  // In demo mode the role guard goes, but the session wait stays.
+  return DEMO_MODE ? <RequireSession>{node}</RequireSession> : wrap(node)
 }
 
 /**

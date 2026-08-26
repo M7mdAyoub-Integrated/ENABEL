@@ -172,7 +172,8 @@
     "decision": "قرار الإتمام",
     "countsToward": "Counts towards {code}",
     "decisionNote": "This one answer decides whether the participant is counted. Only “Yes” adds to the 120-person target.",
-    "metCriteria": "Did this person meet the completion criteria?"
+    "metCriteria": "Did this person meet the completion criteria?",
+    "decidedOn": "تاريخ القرار"
   },
   "linkage": {
     "farmer": "المزارع",

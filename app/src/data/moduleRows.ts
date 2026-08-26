@@ -6,6 +6,8 @@ import type { Translate } from '../i18n/tx'
 import { usePartnerships, type PartnershipType } from './partnerships'
 import { refLabel, useRef } from './refTables'
 import { useExhibitions, durationDays } from './exhibitions'
+import { useCompletions } from './completions'
+import { formatShortDate } from '../lib/format'
 import { formatDateRange } from '../lib/format'
 
 /**
@@ -22,7 +24,7 @@ import { formatDateRange } from '../lib/format'
  *      MODULE                      STATUS
  *      tp / pp  Partnerships       LIVE     module 1
  *      ex       Exhibitions        LIVE     module 2
- *      tc       Training completion mock    module 3
+ *      tc       Training completion LIVE     module 3
  *      rg       Registrations      mock     module 4
  *      ln       Market linkages    mock     module 5
  *      fu       Follow-up          mock     module 7
@@ -143,6 +145,52 @@ function useExhibitionRows(t: Translate, locale: string, enabled: boolean): Modu
   }
 }
 
+/** Training completion (tc) — module 3. */
+function useCompletionRows(t: Translate, locale: string, enabled: boolean): ModuleRows {
+  const q = useCompletions(enabled)
+  const topics = useRef('training_topic')
+
+  const rows = useMemo(
+    () =>
+      (q.data ?? []).map((c): ListRow => {
+        const topic = refLabel(
+          topics.find((r) => r.id === c.topicId),
+          locale,
+        )
+        const met = c.metCriteria === true
+        const cells: Cell[] = [
+          { kind: 'ltr', text: c.nationalId },
+          { kind: 'text', text: c.fullName },
+          { kind: 'text', text: c.sex ? t(`common:enums.sex.${c.sex}`) : '' },
+          { kind: 'text', text: c.ageRecorded == null ? '' : String(c.ageRecorded) },
+          { kind: 'text', text: topic },
+          { kind: 'text', text: formatShortDate(c.startDate, locale) },
+          c.metCriteria === null
+            ? { kind: 'chip', text: t('common:chips.pending'), tone: 'pending' }
+            : met
+              ? { kind: 'chip', text: t('common:chips.metCriteria'), tone: 'ok' }
+              : { kind: 'chip', text: t('common:chips.notMet'), tone: 'err' },
+        ]
+        return {
+          id: c.id,
+          filterValue: topic,
+          search: `${c.nationalId} ${c.fullName}`,
+          cells,
+        }
+      }),
+    [q.data, topics, t, locale],
+  )
+
+  return {
+    rows,
+    isLoading: q.isLoading,
+    isError: q.isError,
+    error: q.error,
+    refetch: () => void q.refetch(),
+    isLive: true,
+  }
+}
+
 /**
  * Rows for a module's list screen.
  *
@@ -157,9 +205,11 @@ export function useModuleRows(module: ModuleId, t: Translate, locale: string): M
   const training = usePartnershipRows('training', locale, module === 'tp')
   const production = usePartnershipRows('production_support', locale, module === 'pp')
   const exhibitions = useExhibitionRows(t, locale, module === 'ex')
+  const completions = useCompletionRows(t, locale, module === 'tc')
 
   if (module === 'tp') return training
   if (module === 'pp') return production
   if (module === 'ex') return exhibitions
+  if (module === 'tc') return completions
   return { ...MOCK, rows: mockRows }
 }

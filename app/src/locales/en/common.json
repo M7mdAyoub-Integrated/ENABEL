@@ -42,7 +42,8 @@
       "approved": "Approved",
       "rejected": "Rejected"
     },
-    "ended": "Ended"
+    "ended": "Ended",
+    "pending": "Not yet decided"
   },
   "enums": {
     "sex": {

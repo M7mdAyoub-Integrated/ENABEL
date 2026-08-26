@@ -9,6 +9,7 @@ import { useMutations } from '../hooks/useData'
 import { useModuleDetail } from '../data/moduleDetail'
 import { useDeletePartnership } from '../data/partnerships'
 import { useDeleteExhibition } from '../data/exhibitions'
+import { useDeleteCompletion } from '../data/completions'
 import { DetailSkeleton, ErrorState, WriteError } from '../ui/states'
 import { BidiIsolate } from '../components/BidiIsolate'
 import {
@@ -58,6 +59,7 @@ export function DetailScreen() {
   const delTraining = useDeletePartnership('training')
   const delProduction = useDeletePartnership('production_support')
   const delExhibition = useDeleteExhibition()
+  const delCompletion = useDeleteCompletion()
   const liveDelete =
     module === 'tp'
       ? delTraining
@@ -65,7 +67,9 @@ export function DetailScreen() {
         ? delProduction
         : module === 'ex'
           ? delExhibition
-          : null
+          : module === 'tc'
+            ? delCompletion
+            : null
 
   if (!valid) return <NotFound />
   if (detail.isLoading) {

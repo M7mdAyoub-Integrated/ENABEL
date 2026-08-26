@@ -22,8 +22,14 @@ build/
 # .env.example IS committed — placeholders only.
 # The service_role key must never appear in this repository at all.
 .env
+.env.*
 .env.local
 .env*.local
+# .env.production is NOT covered by `.env*.local` -- that pattern only catches
+# `.env.production.local`. It is spelled out because a production env file is
+# the single most likely place for a real key to be sitting.
+.env.production
+.env.production.local
 !.env.example
 
 # Supabase CLI local state. The migrations themselves ARE committed.

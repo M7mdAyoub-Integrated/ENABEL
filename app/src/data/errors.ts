@@ -53,8 +53,13 @@ const CONSTRAINT_MESSAGES: Record<string, string> = {
   partner_name_unique: 'errors:db.partnerDuplicate',
   partnership_partner_id_partnership_type_key: 'errors:db.partnershipDuplicate',
   person_national_id_key: 'errors:db.personDuplicate',
-  person_national_id_format: 'errors:db.nationalIdFormat',
-  training_enrolment_unique: 'errors:db.enrolmentDuplicate',
+  // The real constraint names, read from the migrations. The two guesses that
+  // were here before ("person_national_id_format", "training_enrolment_unique")
+  // matched nothing, so both fell through to the generic message.
+  national_id_format: 'errors:db.nationalIdFormat',
+  age_or_dob: 'errors:db.ageOrDobRequired',
+  training_enrolment_person_id_session_id_key: 'errors:db.enrolmentDuplicate',
+  decision_needs_date: 'errors:db.decisionNeedsDate',
   exhibition_registration_unique: 'errors:db.registrationDuplicate',
   exhibition_booth_capacity_check: 'errors:db.boothCapacityPositive',
   exhibition_dates: 'errors:db.exhibitionDateOrder',

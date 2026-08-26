@@ -112,12 +112,14 @@ function SectionView({
 export function FormScreen({ mode }: { mode: 'new' | 'edit' }) {
   const { module, id } = useParams()
   const navigate = useNavigate()
-  const { t } = useTranslation(['forms', 'common', 'survey', 'nav'])
+  const { t, i18n } = useTranslation(['forms', 'common', 'survey', 'nav'])
+  const locale = i18n.resolvedLanguage ?? 'en'
   const toast = useToast()
 
   const write = useModuleWrite(
     isModuleId(module) ? module : 'tp',
     mode === 'edit' ? id : undefined,
+    locale,
   )
   const [values, setValues] = useState<FormValues>(
     () =>

@@ -14,7 +14,7 @@ import { PrimaryButton, SecondaryButton } from '../ui/primitives'
 import { Link } from 'react-router-dom'
 
 /** Shown while the session and role are still resolving. */
-function Resolving() {
+export function Resolving() {
   const { t } = useTranslation('auth')
   return (
     <AuthShell title={t('checking')}>
@@ -23,6 +23,24 @@ function Resolving() {
       </p>
     </AuthShell>
   )
+}
+
+/**
+ * Holds rendering until the session exists.
+ *
+ * Demo mode removes every guard, and the guards were also what kept the screen
+ * from rendering before auth had settled. Without this, TanStack Query fires
+ * its first requests as `anon`, PostgREST answers 401, and the retry policy
+ * classifies that as a permanent refusal and caches it -- so a correctly
+ * configured app shows "Not permitted" on a cold load and never recovers.
+ *
+ * This gates on the SESSION only, never on a role or a capability, so it is a
+ * loading state rather than a permission check.
+ */
+export function RequireSession({ children }: { children: ReactNode }) {
+  const { status } = useAuth()
+  if (status !== 'signedIn') return <Resolving />
+  return <>{children}</>
 }
 
 /**

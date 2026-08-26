@@ -42,7 +42,8 @@
       "approved": "معتمد",
       "rejected": "مرفوض"
     },
-    "ended": "منتهية"
+    "ended": "منتهية",
+    "pending": "لم يُقرَّر بعد"
   },
   "enums": {
     "sex": {

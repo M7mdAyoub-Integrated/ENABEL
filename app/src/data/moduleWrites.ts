@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import type { ModuleId } from '../modules'
 import type { FormValues } from '../forms/useFormSchema'
 import { useEditValues } from '../hooks/useData'
+import { refLabel, useRef } from './refTables'
 import {
   usePartnership,
   useCreatePartnership,
@@ -14,6 +15,12 @@ import {
   useUpdateExhibition,
   type ExhibitionInput,
 } from './exhibitions'
+import {
+  useCompletion,
+  useCreateCompletion,
+  useUpdateCompletion,
+  type CompletionInput,
+} from './completions'
 
 /**
  * The form half of the migration seam.
@@ -182,14 +189,94 @@ function useExhibitionWrite(id: string | undefined, enabled: boolean): ModuleWri
   }
 }
 
-export function useModuleWrite(module: ModuleId, id: string | undefined): ModuleWrite {
+/**
+ * Training completion — module 3.
+ *
+ * `met` on the form is a three-state answer: yes, no, or unanswered. It maps
+ * straight through, because `met_criteria` is nullable and "not yet decided" is
+ * a real state that A1.3 must not count either way.
+ */
+function useCompletionWrite(
+  id: string | undefined,
+  enabled: boolean,
+  locale: string,
+): ModuleWrite {
+  const existing = useCompletion(enabled && id ? id : undefined)
+  const create = useCreateCompletion()
+  const update = useUpdateCompletion()
+  const topics = useRef('training_topic')
+
+  const initialValues = useMemo((): FormValues | null => {
+    const c = existing.data
+    if (!c) return null
+    return {
+      nid: c.nationalId,
+      nid2: c.nationalId,
+      name: c.fullName,
+      sex: c.sex ?? '',
+      age: c.ageRecorded == null ? '' : String(c.ageRecorded),
+      phone: c.phone ?? '',
+      topic: c.topicId,
+      date: c.startDate,
+      met: c.metCriteria === null ? '' : c.metCriteria ? 'yes' : 'no',
+    }
+  }, [existing.data])
+
+  const toInput = (v: FormValues): CompletionInput => {
+    const ageText = str(v, 'age')
+    return {
+      nationalId: str(v, 'nid'),
+      fullName: str(v, 'name'),
+      sex: str(v, 'sex') || null,
+      // Left blank stays null, and `age_or_dob` refuses the insert with a
+      // readable message rather than writing a person nobody can age-band.
+      age: ageText ? Number(ageText) : null,
+      phone: str(v, 'phone') || null,
+      topicId: str(v, 'topic'),
+      topicLabel: refLabel(
+        topics.find((r) => r.id === str(v, 'topic')),
+        locale,
+      ),
+      trainingDate: str(v, 'date'),
+      metCriteria: str(v, 'met') === 'yes' ? true : str(v, 'met') === 'no' ? false : null,
+    }
+  }
+
+  const save = async (v: FormValues) => {
+    if (id && existing.data) {
+      return update.mutateAsync({ id, personId: existing.data.personId, input: toInput(v) })
+    }
+    return create.mutateAsync(toInput(v))
+  }
+
+  return {
+    initialValues,
+    isLoadingInitial: existing.isLoading,
+    save,
+    isSaving: create.isPending || update.isPending,
+    error: create.error ?? update.error,
+    reset: () => {
+      create.reset()
+      update.reset()
+    },
+    isLive: true,
+  }
+}
+
+export function useModuleWrite(
+  module: ModuleId,
+  id: string | undefined,
+  locale: string,
+): ModuleWrite {
   const mockValues = useEditValues(module, id)
   const tp = usePartnershipWrite('tp', id, module === 'tp')
   const pp = usePartnershipWrite('pp', id, module === 'pp')
   const ex = useExhibitionWrite(id, module === 'ex')
+  const tc = useCompletionWrite(id, module === 'tc', locale)
 
   if (module === 'tp') return tp
   if (module === 'pp') return pp
   if (module === 'ex') return ex
+  if (module === 'tc') return tc
   return { ...IDLE, initialValues: mockValues }
 }

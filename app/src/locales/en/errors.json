@@ -13,7 +13,7 @@
     "personDuplicate": "That national ID already belongs to someone in the system.",
     "nationalIdFormat": "A national ID is exactly nine digits, numbers only.",
     "nationalIdImmutable": "A national ID cannot be changed once the record is saved.",
-    "enrolmentDuplicate": "This person is already recorded on that training.",
+    "enrolmentDuplicate": "This person is already recorded on that training. One person cannot be enrolled twice in the same session.",
     "registrationDuplicate": "This producer is already registered for that exhibition.",
     "missingReference": "Something this record points at no longer exists. Reload and try again.",
     "missingRequired": "A required field was left empty.",
@@ -29,7 +29,9 @@
     "unknown": "Something went wrong. Try again, and tell the Coordinator if it keeps happening.",
     "roleRemovalUnsupported": "Everything else was saved, but a role cannot be removed once it is attached. The database has no way to detach one yet — tell the Coordinator.",
     "boothCapacityPositive": "Capacity must be at least one booth.",
-    "exhibitionDateOrder": "The end date cannot be before the start date."
+    "exhibitionDateOrder": "The end date cannot be before the start date.",
+    "ageOrDobRequired": "A date of birth or an age is needed. Without one the person cannot be counted in any age breakdown.",
+    "decisionNeedsDate": "The completion decision needs a decision date. Both are saved together."
   },
   "state": {
     "failedTitle": "Could not load",
