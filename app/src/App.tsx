@@ -1,9 +1,10 @@
-import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, Outlet, Navigate } from 'react-router-dom'
 import { Shell } from './layout/Shell'
 import { ToastProvider } from './ui/Toast'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider } from './auth/AuthProvider'
 import { queryClient } from './data/queryClient'
+import { AUTH_BYPASS } from './dev/authBypass'
 import { useQueueSync } from './data/useOffline'
 import { useDirection } from './hooks/useDirection'
 import { RequireCapability, RequireModule, RequirePortal } from './auth/guards'
@@ -43,10 +44,28 @@ function ShellLayout() {
  * gives a participant their own record and registrations and nothing else, so
  * municipal navigation would be misleading as well as useless.
  */
+/**
+ * The three unauthenticated routes.
+ *
+ * With the development bypass on they are made UNREACHABLE, not removed: the
+ * paths stay registered and redirect to the root, so nothing about the route
+ * table changes shape and flipping VITE_AUTH_BYPASS back to false restores them
+ * exactly. See src/dev/authBypass.ts.
+ */
+const authRoutes = AUTH_BYPASS
+  ? [
+      { path: '/signin', element: <Navigate to="/" replace /> },
+      { path: '/forgot', element: <Navigate to="/" replace /> },
+      { path: '/reset', element: <Navigate to="/" replace /> },
+    ]
+  : [
+      { path: '/signin', element: <SignIn /> },
+      { path: '/forgot', element: <ForgotPassword /> },
+      { path: '/reset', element: <ResetPassword /> },
+    ]
+
 const router = createBrowserRouter([
-  { path: '/signin', element: <SignIn /> },
-  { path: '/forgot', element: <ForgotPassword /> },
-  { path: '/reset', element: <ResetPassword /> },
+  ...authRoutes,
 
   // Landing decides where a signed-in user belongs.
   { path: '/', element: <Landing /> },

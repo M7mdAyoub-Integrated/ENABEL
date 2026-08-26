@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && eslint . --max-warnings=0 && vite build",
+    "build": "node scripts/check-no-bypass.mjs && tsc -b && eslint . --max-warnings=0 && vite build",
     "lint": "eslint . --max-warnings=0",
     "preview": "vite preview",
-    "typecheck": "tsc -b --noEmit"
+    "typecheck": "tsc -b --noEmit",
+    "check:bypass": "node scripts/check-no-bypass.mjs"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",

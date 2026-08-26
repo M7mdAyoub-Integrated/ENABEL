@@ -7,6 +7,7 @@ import { LocaleSwitcher } from '../components/LocaleSwitcher'
 import { OfflineBar } from '../components/OfflineBar'
 import { useAuth } from '../auth/AuthProvider'
 import { can, modulesFor } from '../auth/permissions'
+import { AUTH_BYPASS } from '../dev/authBypass'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -142,6 +143,11 @@ function NavGroups({
 function SignedInAs({ compact = false }: { compact?: boolean }) {
   const { t } = useTranslation(['auth', 'nav'])
   const { email, role, signOut } = useAuth()
+  // Development bypass: there is no real account behind this session and no
+  // sign-in screen to return to, so the account chip and its sign-out are
+  // hidden. Hidden, not deleted -- flip VITE_AUTH_BYPASS to false and the whole
+  // block comes back. See src/dev/authBypass.ts.
+  if (AUTH_BYPASS) return null
   if (!email) return null
   return (
     <div className={`border-t-2 border-ink px-[18px] py-[14px] ${compact ? '' : 'mt-auto'}`}>
