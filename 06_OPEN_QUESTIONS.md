@@ -296,6 +296,8 @@ No crosswalk exists in any source document.
 | 🔴 Blocks a reported number | 6 | OQ-1, OQ-2, OQ-3, OQ-4, OQ-5, OQ-12 |
 | 🟠 Affects schema or forms | 8 | OQ-6, OQ-7, OQ-8, OQ-9, OQ-10, OQ-11, OQ-13, OQ-14 |
 | 🟡 Wording and policy | 4 | OQ-15, OQ-16, OQ-17, OQ-18 |
+| 🟡 Recorded during Phase 6 | 2 | OQ-19, OQ-20 |
+| 🟠 Public apply flow (Phase 6 step 4) | 2 | OQ-21, OQ-22 |
 
 ## 🟡 OQ-19 · Cancellation reasons are required for training and advisory, not for exhibitions
 
@@ -333,6 +335,47 @@ No crosswalk exists in any source document.
 **Decides.** Municipal Coordinator, from what the front desk actually sees.
 
 **Needed.** The real list. Once it exists, `is_active = false` retires a category without breaking rows that already reference it — never delete one.
+
+---
+
+## 🟠 OQ-21 · Throttle counters are hard-deleted, which departs from the no-delete rule
+
+**What was built.** `applicant_lookup_throttle` (migration `0050`) counts attempts against the public applicant lookup in two scopes — per national ID, and per calling client. Rows are keyed by a **salted HMAC**, never the identifier itself.
+
+**Where it departs from the standing rules.** Two places, both deliberate:
+
+1. **No standard column block.** No `id`, no `created_by`, no `deleted_at`. The primary key is `(scope, key_hash, minute_bucket)`, because the row *is* the counter.
+2. **Rows are hard-deleted.** Each call purges buckets older than the window plus five minutes.
+
+**Why.** Rule 2 exists so programme data stays auditable for the donor. These rows are not programme data — no name, no national ID, no indicator input; only a hash and an integer. Retaining them forever would grow the table without bound **and** would build a permanent record of every lookup any member of the public ever attempted, which is worse for privacy than discarding it. `audit_log` is already an explicit carve-out from the deletion rule; this is a second one.
+
+**What could change the answer.** If lookup attempts should be retained as a security log, this becomes an insert-only table with a retention policy rather than a purging one — a different design, not a tweak. Decide before the public form is live, because the choice is hard to reverse once real traffic has been discarded.
+
+**Decides.** Municipal Coordinator, with whoever owns data protection for the programme.
+
+---
+
+## 🔴 OQ-22 · A person with no date of birth cannot be found by the public lookup
+
+**The problem.** `applicant_prefill` (migration `0052`) verifies an applicant on **national ID + date of birth**. `person.date_of_birth` is **nullable**. A person whose DOB was never recorded cannot satisfy the check, receives the standard `{"found": false}`, and — unless the form stops them — registers again as a new person.
+
+**Why it is expensive.** A duplicate `person` row inflates **A1.3**, **B1.2**, **D0.1** and **E0.2** permanently, because all four count distinct `person_id`. Merging duplicates afterwards means rewriting every enrolment that references the wrong row.
+
+**Current state of the data.** All 4 people on file have a DOB, so nothing is broken today. The risk arrives with staff-entered records: the module 3 completion form creates people via find-or-create and does not require a DOB.
+
+**What was NOT done, and why.** The lookup was not weakened to fall back on name matching — two people share a name, and that is how the `overview_counts` defect happened. Nor is the applicant told *why* the lookup failed, because "this ID exists but the date is wrong" is precisely the oracle the fixed `{"found": false}` exists to prevent.
+
+**Interim behaviour.** The no-match branch of the public form does not offer "register as new" as its default action. It asks whether the applicant has taken part before; someone who says yes is directed to the Municipality office rather than allowed to self-register.
+
+**Options.**
+
+| | Option | Cost |
+|---|---|---|
+| **A** | Make `date_of_birth` NOT NULL for new rows and backfill | Cleanest, but blocks staff entry when a participant genuinely does not know their DOB |
+| **B** | Require DOB only on the public path | Staff can still create people without it; those people can never self-serve |
+| **C** | Add phone as a recovery factor | More to type, and phone numbers change |
+
+**Decides.** Municipal Coordinator. This is a form-and-fieldwork question, not a technical one.
 
 ---
 
