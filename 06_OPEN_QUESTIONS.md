@@ -297,6 +297,45 @@ No crosswalk exists in any source document.
 | 🟠 Affects schema or forms | 8 | OQ-6, OQ-7, OQ-8, OQ-9, OQ-10, OQ-11, OQ-13, OQ-14 |
 | 🟡 Wording and policy | 4 | OQ-15, OQ-16, OQ-17, OQ-18 |
 
+## 🟡 OQ-19 · Cancellation reasons are required for training and advisory, not for exhibitions
+
+**What the code does.** `training_session` and `advisory_session` both carry `cancellation_reason` with a `check (not is_cancelled or cancellation_reason is not null)`. `exhibition` carries `is_cancelled` with **no** reason column and no such constraint.
+
+**Why it looks like an oversight and is not.** Migration `0027` added `cancellation_reason` to `exhibition` with exactly that constraint. Migration `0029` removed it, with the rest of `0027`, at the project owner's explicit request — a scope decision, not a defect. When `0043` built the pattern for training and advisory it deliberately did **not** reinstate it on `exhibition`, because quietly reversing a deliberate removal inside an unrelated migration would hide the change.
+
+**The consequence.** A cancelled training or advisory session states why. A cancelled exhibition does not, so E0.1 excludes it with no record of the reason.
+
+**Decides.** Project owner.
+
+**Needed.** Either reinstate `cancellation_reason` on `exhibition` for symmetry, or confirm the asymmetry is intended and close this.
+
+---
+
+## 🟡 OQ-20 · `ref_office_service_type` was invented, not taken from the workbook
+
+**What the source says.** Nothing. The six categories seeded in `0016` were written by the project owner as a placeholder, not drawn from the Action Plan or the framework workbook:
+
+| code | label |
+|---|---|
+| `technical_advice` | Technical advice |
+| `input_guidance` | Input or equipment guidance |
+| `licensing_help` | Licensing and paperwork help |
+| `market_info` | Market or buyer information |
+| `referral` | Referral to another entity |
+| `other` | Other *(free text)* |
+
+**Why it matters.** These are the categories the coordination office form will offer, and `office_service` is the sole source for **B1.2** — farmers and productive households reaching technical coordination office services. If a common reason for walking in has no category it lands under "Other", and the breakdown stops being useful. The count itself is unaffected: B1.2 counts distinct people, not categories.
+
+**Gaps that stand out.** Nothing covers **licensing inspections**, **cooperative or association registration**, or **subsidy and grant applications** — all plausible reasons to visit an agricultural office, none a natural fit for the five named options.
+
+**Interim behaviour.** The list is used as seeded. `other` allows free text, so nothing is lost — it accumulates in a free-text field instead of being categorised.
+
+**Decides.** Municipal Coordinator, from what the front desk actually sees.
+
+**Needed.** The real list. Once it exists, `is_active = false` retires a category without breaking rows that already reference it — never delete one.
+
+---
+
 **Take OQ-12 to the Coordinator first.** It is the one that undermines the purpose of the programme, and it is a form change, not a database change.
 
 Note: OQ-12 and OQ-13 were briefly marked resolved on 2026-08-24 when the form fields were built, then set back to open when that work was reverted the same day at the project owner's instruction. Each carries a **History** line recording what was built and what survived. Nothing about the underlying questions has changed.
