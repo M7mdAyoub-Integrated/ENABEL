@@ -9,6 +9,9 @@ import {
   isCompleteNationalId,
   isUsablePhone,
   normaliseNationalId,
+  useProducerTypes,
+  useProducts,
+  labelOf,
   type ApplyOutcome,
 } from '../../data/apply'
 import { PublicShell } from './PublicShell'
@@ -62,6 +65,8 @@ type Step =
   | 'phone'
   | 'confirm'
   | 'register'
+  /** Exhibitions only: what kind of producer, and what do you make. */
+  | 'stall'
   | 'done'
 
 function Field({
@@ -105,6 +110,13 @@ export function ApplyForm() {
   const lookup = useApplicantLookup()
   const apply = useApplyForOpportunity()
 
+  // Hooks run unconditionally; the `enabled` flag is what keeps the two
+  // reference lists from being fetched on the training and advisory branches,
+  // which never ask for them.
+  const wantsStall = q.data?.opportunity_type === 'exhibition'
+  const producerTypes = useProducerTypes(wantsStall)
+  const products = useProducts(wantsStall)
+
   const [step, setStep] = useState<Step>('identify')
   const [nid, setNid] = useState('')
   const [nid2, setNid2] = useState('')
@@ -116,6 +128,9 @@ export function ApplyForm() {
   const [foundName, setFoundName] = useState<string | null>(null)
   const [outcome, setOutcome] = useState<ApplyOutcome | null>(null)
   const [touched, setTouched] = useState(false)
+  const [producerTypeId, setProducerTypeId] = useState('')
+  const [productIds, setProductIds] = useState<string[]>([])
+  const [registeringNew, setRegisteringNew] = useState(false)
 
   // One id per attempt, reused across retries. If the network drops after the
   // write but before the response, resending this returns already_applied
@@ -177,9 +192,7 @@ export function ApplyForm() {
     )
   }
 
-  // Exhibitions need a producer type, which is not public reference data yet.
-  // Rather than show a form that cannot be submitted, say so plainly.
-  const exhibitionBlocked = o.opportunity_type === 'exhibition'
+  const isExhibition = o.opportunity_type === 'exhibition'
 
   async function runLookup(withPhone: boolean) {
     const res = await lookup.mutateAsync({
@@ -204,10 +217,26 @@ export function ApplyForm() {
       dateOfBirth: dob || null,
       phone: phone || null,
       ...(isNew ? { fullName, sex, village } : {}),
+      ...(isExhibition ? { producerTypeId, productIds } : {}),
       clientUuid,
     })
     setOutcome(res.result)
     setStep('done')
+  }
+
+  /**
+   * Exhibitions collect two more things before they can be written:
+   * `producer_type_id` is NOT NULL on exhibition_registration, and the products
+   * feed the exhibition_registration_product junction. So the confirm and
+   * register steps hand off to a stall step rather than submitting directly.
+   */
+  function goToStallOrSubmit(isNew: boolean) {
+    if (isExhibition) {
+      setRegisteringNew(isNew)
+      setStep('stall')
+      return
+    }
+    void submit(isNew)
   }
 
   return (
@@ -231,14 +260,8 @@ export function ApplyForm() {
         {o.title}
       </p>
 
-      {exhibitionBlocked ? (
-        <div className="mt-6 border-[1.5px] border-dashed border-border-strong bg-sunken p-5">
-          <p className="m-0 text-[15px] leading-[1.55] text-body">{t('apply.exhibitionSoon')}</p>
-        </div>
-      ) : null}
-
       {/* ── step 1 ─────────────────────────────────────────────────────── */}
-      {!exhibitionBlocked && step === 'identify' ? (
+      {step === 'identify' ? (
         <form
           className="mt-6 border-[1.5px] border-ink p-4 sm:p-5"
           onSubmit={(e) => {
@@ -340,7 +363,7 @@ export function ApplyForm() {
             <button
               type="button"
               disabled={apply.isPending}
-              onClick={() => void submit(false)}
+              onClick={() => goToStallOrSubmit(false)}
               className="inline-flex min-h-12 items-center justify-center bg-ink px-6 font-narrow text-[13px] font-bold uppercase tracking-[0.12em] text-bg disabled:bg-track disabled:text-faint"
             >
               {apply.isPending ? t('apply.sending') : t('apply.yesApply')}
@@ -449,7 +472,7 @@ export function ApplyForm() {
           className="mt-6 border-[1.5px] border-ink p-4 sm:p-5"
           onSubmit={(e) => {
             e.preventDefault()
-            if (fullName.trim() && dob) void submit(true)
+            if (fullName.trim() && dob) goToStallOrSubmit(true)
           }}
         >
           <p className="m-0 text-[15px] leading-[1.55] text-body">{t('apply.registerIntro')}</p>
@@ -509,6 +532,82 @@ export function ApplyForm() {
             type="submit"
             disabled={!fullName.trim() || !dob || apply.isPending}
             className="mt-5 inline-flex min-h-12 w-full items-center justify-center bg-ink px-6 font-narrow text-[13px] font-bold uppercase tracking-[0.12em] text-bg disabled:bg-track disabled:text-faint sm:w-auto"
+          >
+            {apply.isPending ? t('apply.sending') : t('apply.submit')}
+          </button>
+        </form>
+      ) : null}
+
+      {/* ── exhibitions: the stall ─────────────────────────────────────── */}
+      {step === 'stall' ? (
+        <form
+          className="mt-6 border-[1.5px] border-ink p-4 sm:p-5"
+          onSubmit={(e) => {
+            e.preventDefault()
+            if (producerTypeId) void submit(registeringNew)
+          }}
+        >
+          <p className="m-0 text-[15px] leading-[1.55] text-body">{t('apply.stallIntro')}</p>
+
+          <Field label={t('apply.producerType')} hint={t('apply.producerTypeHint')}>
+            <select
+              className={INPUT}
+              value={producerTypeId}
+              disabled={producerTypes.isLoading}
+              onChange={(e) => setProducerTypeId(e.target.value)}
+            >
+              <option value="">{t('apply.choose')}</option>
+              {(producerTypes.data ?? []).map((pt) => (
+                <option key={pt.id} value={pt.id}>
+                  {labelOf(pt, locale)}
+                </option>
+              ))}
+            </select>
+          </Field>
+
+          {/* A junction table, not a text field: the market team plans stalls
+              by product, and E0.2's breakdowns need values that can be joined. */}
+          <fieldset className="mt-4 border-0 p-0">
+            <legend className="font-narrow text-[12px] font-bold uppercase tracking-[0.12em] text-muted">
+              {t('apply.products')}
+            </legend>
+            <p className="mt-0.5 text-[13px] text-muted">{t('apply.productsHint')}</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {(products.data ?? []).map((pr) => {
+                const on = productIds.includes(pr.id)
+                return (
+                  <button
+                    key={pr.id}
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() =>
+                      setProductIds((cur) =>
+                        cur.includes(pr.id) ? cur.filter((x) => x !== pr.id) : [...cur, pr.id],
+                      )
+                    }
+                    className={`min-h-11 border-[1.5px] px-3 text-[14px] ${
+                      on
+                        ? 'border-ink bg-ink text-bg'
+                        : 'border-border-strong bg-bg text-ink hover:bg-sunken'
+                    }`}
+                  >
+                    {labelOf(pr, locale)}
+                  </button>
+                )
+              })}
+            </div>
+          </fieldset>
+
+          {apply.isError ? (
+            <p role="alert" className="mt-3 text-[14px] font-semibold text-error">
+              {t('apply.errNetwork')}
+            </p>
+          ) : null}
+
+          <button
+            type="submit"
+            disabled={!producerTypeId || apply.isPending}
+            className="mt-5 inline-flex min-h-12 w-full items-center justify-center bg-ink px-6 font-narrow text-[13px] font-bold uppercase tracking-[0.12em] text-bg disabled:cursor-not-allowed disabled:bg-track disabled:text-faint sm:w-auto"
           >
             {apply.isPending ? t('apply.sending') : t('apply.submit')}
           </button>

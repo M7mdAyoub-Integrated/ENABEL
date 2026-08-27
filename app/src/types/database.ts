@@ -701,6 +701,13 @@ export type Database = {
             referencedRelation: "ref_producer_type"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "exhibition_registration_producer_type_id_fkey"
+            columns: ["producer_type_id"]
+            isOneToOne: false
+            referencedRelation: "v_public_producer_type"
+            referencedColumns: ["id"]
+          },
         ]
       }
       exhibition_registration_product: {
@@ -728,6 +735,13 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "ref_product"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_product_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "v_public_product"
             referencedColumns: ["id"]
           },
           {
@@ -3350,6 +3364,42 @@ export type Database = {
         }
         Relationships: []
       }
+      v_public_producer_type: {
+        Row: {
+          id: string | null
+          label_ar: string | null
+          label_en: string | null
+        }
+        Insert: {
+          id?: string | null
+          label_ar?: string | null
+          label_en?: string | null
+        }
+        Update: {
+          id?: string | null
+          label_ar?: string | null
+          label_en?: string | null
+        }
+        Relationships: []
+      }
+      v_public_product: {
+        Row: {
+          id: string | null
+          label_ar: string | null
+          label_en: string | null
+        }
+        Insert: {
+          id?: string | null
+          label_ar?: string | null
+          label_en?: string | null
+        }
+        Update: {
+          id?: string | null
+          label_ar?: string | null
+          label_en?: string | null
+        }
+        Relationships: []
+      }
       v_recent_activity: {
         Row: {
           detail: string | null
@@ -3401,6 +3451,7 @@ export type Database = {
           p_opportunity_type: string
           p_phone?: string
           p_producer_type_id?: string
+          p_product_ids?: string[]
           p_sex?: string
           p_village?: string
         }

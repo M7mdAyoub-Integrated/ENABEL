@@ -90,7 +90,6 @@
     "village": "Village",
     "backToList": "See what else is open",
     "tryAgain": "Try again",
-    "exhibitionSoon": "Market applications are not open online yet. Please apply at the Municipality office.",
     "privacyNote": "The Municipality uses these details to run the programme and to report totals to the donor. Reports never name anyone.",
     "outcome": {
       "applied": {
@@ -117,6 +116,12 @@
         "title": "A completed training comes first",
         "body": "Market advice is for people who have finished a Municipality training. Apply for a training first — once you have completed one, this opens up."
       }
-    }
+    },
+    "stallIntro": "One more step. This helps the market team plan the stalls.",
+    "producerType": "What kind of producer are you?",
+    "producerTypeHint": "Choose the closest match.",
+    "choose": "Choose…",
+    "products": "What do you make or sell?",
+    "productsHint": "Tap all that apply. You can leave this blank if you are not sure yet."
   }
 }

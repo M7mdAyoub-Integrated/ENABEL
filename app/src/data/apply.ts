@@ -1,6 +1,6 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
-import { toAppError } from './errors'
+import { toAppError, unwrapList } from './errors'
 import type { OpportunityType } from './publicOpportunities'
 
 /**
@@ -144,6 +144,8 @@ export type ApplyInput = {
   village?: string
   /** Exhibitions only, and required by the database for them. */
   producerTypeId?: string
+  /** Exhibitions only. Optional -- a producer may not have decided yet. */
+  productIds?: string[]
   clientUuid: string
 }
 
@@ -182,6 +184,7 @@ export function useApplyForOpportunity() {
         ...(input.sex ? { p_sex: input.sex } : {}),
         ...(input.village?.trim() ? { p_village: input.village.trim() } : {}),
         ...(input.producerTypeId ? { p_producer_type_id: input.producerTypeId } : {}),
+        ...(input.productIds?.length ? { p_product_ids: input.productIds } : {}),
       })
       if (error) throw toAppError(error)
       return data as ApplyResult
@@ -196,5 +199,43 @@ export function useApplyForOpportunity() {
   })
 }
 
-/** Producer types, for the exhibition branch. Public reference data. */
-export type ProducerType = { id: string; label_en: string; label_ar: string }
+/* ── public reference lists ───────────────────────────────────────────────── */
+
+/**
+ * The two lists the exhibition application needs.
+ *
+ * They come from `v_public_producer_type` and `v_public_product` -- views that
+ * publish an id and two labels and nothing else. The underlying `ref_*` tables
+ * are NOT granted to anon, so `sort_order`, `is_active`, `created_by` and
+ * `deleted_at` never reach a browser. See migration 0056.
+ *
+ * Both filter `is_active` in SQL, so a retired option disappears from the form
+ * on its own while rows that already reference it keep working.
+ */
+export type RefOption = { id: string; label_en: string; label_ar: string }
+
+export function labelOf(o: RefOption, locale: string): string {
+  return locale.startsWith('ar') ? o.label_ar || o.label_en : o.label_en
+}
+
+function useRefList(view: 'v_public_producer_type' | 'v_public_product', enabled: boolean) {
+  return useQuery({
+    queryKey: ['public', view],
+    enabled,
+    // Reference data changes about never. Do not refetch it on every step.
+    staleTime: 30 * 60_000,
+    queryFn: async (): Promise<RefOption[]> => {
+      const res = await supabase.from(view).select('id, label_en, label_ar')
+      return unwrapList(res as unknown as { data: RefOption[] | null; error: unknown })
+    },
+  })
+}
+
+/** Only fetched on the exhibition branch -- nothing else asks for them. */
+export function useProducerTypes(enabled: boolean) {
+  return useRefList('v_public_producer_type', enabled)
+}
+
+export function useProducts(enabled: boolean) {
+  return useRefList('v_public_product', enabled)
+}
