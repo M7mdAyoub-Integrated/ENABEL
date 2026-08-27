@@ -154,6 +154,12 @@ const router = createBrowserRouter([
         )),
       },
       {
+        path: '/sessions/:id/edit',
+        element: guard(<SessionNew mode="edit" />, (n) => (
+          <RequireCapability capability="record.edit">{n}</RequireCapability>
+        )),
+      },
+      {
         path: '/sessions/:id',
         element: guard(<SessionDetail />, (n) => (
           <RequireCapability capability="record.edit">{n}</RequireCapability>

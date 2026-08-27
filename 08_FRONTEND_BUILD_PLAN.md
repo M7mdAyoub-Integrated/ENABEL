@@ -152,6 +152,16 @@ which is why D-1 could not be implemented through it), but it is the more
 valuable outcome. Worth remembering that the platform's own i18n data was better
 than the library wrapped around it.
 
+**4. A new capability creates states the old data never had.**
+
+The public card read **"Applications closed"** for a training whose window opened in five days. Both states are `applications_open = false` in SQL, and the UI had one word for them.
+
+It had always been wrong. It could not surface, because every seeded training had `application_opens_on` null — until the create-training form let a coordinator set a future opening date. The form was correct; it simply produced a shape the screens had never been shown.
+
+> **When a form starts allowing a field that was always null, check every screen that reads it.** Grep the column, not the feature. The bug is never in the new code — it is in the old code that assumed the field would stay empty.
+
+"Applications closed" tells someone to give up. Getting that wrong for five days costs a participant, silently, and nobody ever reports it.
+
 **3. LTR text inside an RTL page needs `dir="auto"`.**
 
 An English description on the Arabic page rendered as `.anyone who makes food to

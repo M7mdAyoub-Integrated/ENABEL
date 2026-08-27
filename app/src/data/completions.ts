@@ -279,7 +279,19 @@ async function resolveSession(topicId: string, date: string, topicLabel: string)
       topic_id: topicId,
       start_date: date,
       end_date: date,
-      is_delivered: true,
+      // NOT is_delivered. This used to be true, and it silently moved D0.2:
+      // v_ind_d0_2 counts delivered sessions with a food-processing topic, so
+      // recording one completion for a food-safety course added one to a donor
+      // indicator with no form filled in and nothing on screen saying so.
+      // Measured at 2 -> 3 -> 4 across two completions of the same course.
+      //
+      // The coordinator recording a completion is not asserting that a
+      // countable session was delivered. They are saying a person finished
+      // something. Delivery is recorded deliberately, later, from the session
+      // screen -- which is also where the missing details get filled in.
+      is_delivered: false,
+      // Provenance, stored rather than inferred. See migration 0063.
+      origin: 'completion',
     })
     .select('id')
     .single()

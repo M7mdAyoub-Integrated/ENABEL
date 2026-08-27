@@ -437,6 +437,7 @@ export const TRAINING_SESSIONS: TrainingSession[] = [
     venue: null,
     delivered_by_partnership_id: 'ps1',
     is_delivered: true,
+    origin: 'created',
     planned_seats: 20,
     // Added by migration 0043. Mock rows predate it and carry the values a
     // pre-existing row received: unpublished, uncancelled, nothing to describe.
@@ -459,6 +460,7 @@ export const TRAINING_SESSIONS: TrainingSession[] = [
     venue: null,
     delivered_by_partnership_id: 'ps2',
     is_delivered: true,
+    origin: 'created',
     planned_seats: 20,
     // Added by migration 0043. Mock rows predate it and carry the values a
     // pre-existing row received: unpublished, uncancelled, nothing to describe.
@@ -481,6 +483,7 @@ export const TRAINING_SESSIONS: TrainingSession[] = [
     venue: null,
     delivered_by_partnership_id: 'ps1',
     is_delivered: true,
+    origin: 'created',
     planned_seats: 20,
     // Added by migration 0043. Mock rows predate it and carry the values a
     // pre-existing row received: unpublished, uncancelled, nothing to describe.
@@ -503,6 +506,7 @@ export const TRAINING_SESSIONS: TrainingSession[] = [
     venue: null,
     delivered_by_partnership_id: 'ps2',
     is_delivered: true,
+    origin: 'created',
     planned_seats: 20,
     // Added by migration 0043. Mock rows predate it and carry the values a
     // pre-existing row received: unpublished, uncancelled, nothing to describe.
@@ -525,6 +529,7 @@ export const TRAINING_SESSIONS: TrainingSession[] = [
     venue: null,
     delivered_by_partnership_id: 'ps3',
     is_delivered: true,
+    origin: 'created',
     planned_seats: 20,
     // Added by migration 0043. Mock rows predate it and carry the values a
     // pre-existing row received: unpublished, uncancelled, nothing to describe.
@@ -547,6 +552,7 @@ export const TRAINING_SESSIONS: TrainingSession[] = [
     venue: null,
     delivered_by_partnership_id: 'ps3',
     is_delivered: true,
+    origin: 'created',
     planned_seats: 20,
     // Added by migration 0043. Mock rows predate it and carry the values a
     // pre-existing row received: unpublished, uncancelled, nothing to describe.

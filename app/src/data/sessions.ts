@@ -52,6 +52,9 @@ export const sessionKeys = {
 export type ManagedSession = {
   id: string
   title: string
+  /** Provenance. See migration 0063. */
+  origin: 'created' | 'completion'
+  topic_id: string
   start_date: string
   end_date: string
   venue: string | null
@@ -60,14 +63,40 @@ export type ManagedSession = {
   is_delivered: boolean
   is_cancelled: boolean
   cancellation_reason: string | null
+  application_opens_on: string | null
   application_closes_on: string | null
   focal_point: string | null
   description: string | null
+  duration_hours: number | null
+  delivered_by_partnership_id: string | null
 }
 
 const SESSION_COLS =
-  'id, title, start_date, end_date, venue, planned_seats, is_published, is_delivered, ' +
-  'is_cancelled, cancellation_reason, application_closes_on, focal_point, description'
+  'id, title, origin, topic_id, start_date, end_date, venue, planned_seats, is_published, ' +
+  'is_delivered, is_cancelled, cancellation_reason, application_opens_on, ' +
+  'application_closes_on, focal_point, description, duration_hours, ' +
+  'delivered_by_partnership_id'
+
+/**
+ * Can this be published, and if not, what is missing?
+ *
+ * A DIRECT STATEMENT ABOUT THE ROW, not a guess about where it came from.
+ * `origin` says how the row was made; this says whether it is finished. They
+ * are separate on purpose -- a completion-origin session a coordinator has
+ * filled in is complete, and a hand-created one left half-done is not.
+ *
+ * These four are the fields a member of the public needs in order to decide
+ * whether to turn up: what it is about, where to go, how long it takes, and who
+ * to ask.
+ */
+export function missingForPublish(s: ManagedSession): string[] {
+  const gaps: string[] = []
+  if (!s.venue) gaps.push('venue')
+  if (!s.focal_point) gaps.push('focalPoint')
+  if (s.duration_hours === null) gaps.push('durationHours')
+  if (!s.description) gaps.push('description')
+  return gaps
+}
 
 export function useManagedSessions() {
   return useQuery({
@@ -285,6 +314,44 @@ export type NewSession = {
   plannedSeats: number | null
   applicationOpensOn: string | null
   applicationClosesOn: string | null
+}
+
+export function useUpdateSession() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationKey: ['sessions', 'update'],
+    mutationFn: async (v: NewSession & { id: string }) => {
+      const res = await supabase
+        .from('training_session')
+        .update({
+          title: v.title.trim(),
+          topic_id: v.topicId,
+          start_date: v.startDate,
+          end_date: v.endDate,
+          duration_hours: v.durationHours,
+          venue: v.venue.trim(),
+          focal_point: v.focalPoint.trim(),
+          description: v.description.trim(),
+          delivered_by_partnership_id: v.partnershipId,
+          planned_seats: v.plannedSeats,
+          application_opens_on: v.applicationOpensOn,
+          application_closes_on: v.applicationClosesOn,
+          // origin is NOT touched. It records how the row came to exist, which
+          // does not change because someone filled in the gaps afterwards.
+        })
+        .eq('id', v.id)
+        .is('deleted_at', null)
+        .select('id')
+        .single()
+      if (res.error) throw toAppError(res.error)
+      return res.data
+    },
+    onSuccess: (_d, v) => {
+      void qc.invalidateQueries({ queryKey: sessionKeys.one(v.id) })
+      void qc.invalidateQueries({ queryKey: sessionKeys.list() })
+      void qc.invalidateQueries({ queryKey: ['public', 'opportunities'] })
+    },
+  })
 }
 
 export function useCreateSession() {

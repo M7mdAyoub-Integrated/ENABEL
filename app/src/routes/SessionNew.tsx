@@ -1,7 +1,12 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useCreateSession } from '../data/sessions'
+import {
+  useCreateSession,
+  useUpdateSession,
+  useManagedSession,
+  type ManagedSession,
+} from '../data/sessions'
 import { usePartnerships } from '../data/partnerships'
 import { useRef as useRefTable } from '../data/refTables'
 import { ARROW_START } from '../ui/glyphs'
@@ -76,27 +81,89 @@ function Warning({ children }: { children: React.ReactNode }) {
   )
 }
 
-export function SessionNew() {
+/**
+ * One form, two modes.
+ *
+ * Editing exists because of migration 0063: a session created as a by-product
+ * of a completion arrives with a title, a topic and dates and nothing else, and
+ * marking it "needs details" without a way to supply them would be worse than
+ * not marking it at all.
+ *
+ * The same form serves both so a coordinator learns one screen, and so the
+ * rules -- duration asked not derived, the three warnings, what goes public --
+ * cannot drift between creating and fixing.
+ */
+export function SessionNew({ mode = 'new' }: { mode?: 'new' | 'edit' }) {
+  const { t } = useTranslation('forms')
+  const { id } = useParams()
+  const existing = useManagedSession(mode === 'edit' ? id : undefined)
+
+  if (mode === 'edit') {
+    if (existing.isLoading) {
+      return (
+        <div aria-hidden="true" className="pt-6">
+          <div className="h-8 w-64 animate-pulse bg-track" />
+          <div className="mt-6 h-96 animate-pulse bg-track" />
+        </div>
+      )
+    }
+    if (existing.isError || !existing.data) {
+      return (
+        <div role="alert" className="mt-6 border-[1.5px] border-error p-5">
+          <p className="m-0 text-[15px]">{t('session.loadFailed')}</p>
+        </div>
+      )
+    }
+  }
+
+  // Keyed on the row so the form MOUNTS with its values already in state.
+  // Filling them in an effect instead would mean rendering an empty form and
+  // then overwriting it, which cascades renders and can clobber typing when a
+  // refetch lands mid-edit.
+  return (
+    <SessionForm
+      key={existing.data?.id ?? 'new'}
+      mode={mode}
+      {...(id ? { id } : {})}
+      {...(existing.data ? { initial: existing.data } : {})}
+    />
+  )
+}
+
+function SessionForm({
+  mode,
+  id,
+  initial,
+}: {
+  mode: 'new' | 'edit'
+  id?: string
+  initial?: ManagedSession
+}) {
   const { t, i18n } = useTranslation(['forms', 'nav'])
   const locale = i18n.resolvedLanguage ?? 'en'
   const nav = useNavigate()
   const create = useCreateSession()
+  const update = useUpdateSession()
 
   const topics = useRefTable('training_topic')
   const partnerships = usePartnerships('training')
 
-  const [title, setTitle] = useState('')
-  const [topicId, setTopicId] = useState('')
-  const [startDate, setStartDate] = useState('')
-  const [endDate, setEndDate] = useState('')
-  const [hours, setHours] = useState('')
-  const [venue, setVenue] = useState('')
-  const [partnershipId, setPartnershipId] = useState('')
-  const [focalPoint, setFocalPoint] = useState('')
-  const [description, setDescription] = useState('')
-  const [seats, setSeats] = useState('')
-  const [opensOn, setOpensOn] = useState('')
-  const [closesOn, setClosesOn] = useState('')
+  const [title, setTitle] = useState(initial?.title ?? '')
+  const [topicId, setTopicId] = useState(initial?.topic_id ?? '')
+  const [startDate, setStartDate] = useState(initial?.start_date ?? '')
+  const [endDate, setEndDate] = useState(initial?.end_date ?? '')
+  const [hours, setHours] = useState(
+    initial?.duration_hours == null ? '' : String(initial.duration_hours),
+  )
+  const [venue, setVenue] = useState(initial?.venue ?? '')
+  const [partnershipId, setPartnershipId] = useState(initial?.delivered_by_partnership_id ?? '')
+  const [focalPoint, setFocalPoint] = useState(initial?.focal_point ?? '')
+  const [description, setDescription] = useState(initial?.description ?? '')
+  const [seats, setSeats] = useState(
+    initial?.planned_seats == null ? '' : String(initial.planned_seats),
+  )
+  const [opensOn, setOpensOn] = useState(initial?.application_opens_on ?? '')
+  const [closesOn, setClosesOn] = useState(initial?.application_closes_on ?? '')
 
   const today = new Date().toISOString().slice(0, 10)
 
@@ -111,8 +178,11 @@ export function SessionNew() {
   const noPartners = !partnerships.isLoading && (partnerships.data ?? []).length === 0
   const endBeforeStart = !!startDate && !!endDate && endDate < startDate
 
+  const busy = create.isPending || update.isPending
+  const failed = create.isError || update.isError
+
   async function submit() {
-    const row = await create.mutateAsync({
+    const values = {
       title,
       topicId,
       startDate,
@@ -125,7 +195,13 @@ export function SessionNew() {
       plannedSeats: seats === '' ? null : Number(seats),
       applicationOpensOn: opensOn || null,
       applicationClosesOn: closesOn || null,
-    })
+    }
+    if (mode === 'edit' && id) {
+      await update.mutateAsync({ ...values, id })
+      nav(`/sessions/${id}`)
+      return
+    }
+    const row = await create.mutateAsync(values)
     // Straight to the session, which is where publishing happens. The form
     // deliberately does not offer to publish.
     nav(`/sessions/${row.id}`)
@@ -134,7 +210,7 @@ export function SessionNew() {
   return (
     <div className="pb-16">
       <Link
-        to="/sessions"
+        to={mode === 'edit' && id ? `/sessions/${id}` : '/sessions'}
         className="mt-4 inline-flex min-h-11 items-center font-narrow text-[12px] font-bold uppercase tracking-[0.14em] text-muted no-underline hover:text-ink"
       >
         <span aria-hidden="true" className="inline-block mirror-rtl">
@@ -144,7 +220,7 @@ export function SessionNew() {
       </Link>
 
       <h1 className="mt-1 text-[24px] font-black uppercase leading-[1.08] tracking-[-0.03em] sm:text-[30px]">
-        {t('forms:newSession.heading')}
+        {mode === 'edit' ? t('forms:newSession.headingEdit') : t('forms:newSession.heading')}
       </h1>
       <p className="mt-1 max-w-[62ch] text-[14px] leading-[1.5] text-muted">
         {t('forms:newSession.intro')}
@@ -154,7 +230,7 @@ export function SessionNew() {
         className="mt-6 flex max-w-[760px] flex-col gap-5"
         onSubmit={(e) => {
           e.preventDefault()
-          if (ready && !create.isPending) void submit()
+          if (ready && !busy) void submit()
         }}
       >
         {/* ── what it is ─────────────────────────────────────────────── */}
@@ -313,7 +389,7 @@ export function SessionNew() {
           </div>
         ) : null}
 
-        {create.isError ? (
+        {failed ? (
           <p role="alert" className="text-[14px] font-semibold text-error">
             {t('forms:newSession.saveFailed')}
           </p>
@@ -322,13 +398,17 @@ export function SessionNew() {
         <div className="flex flex-col gap-2 sm:flex-row">
           <button
             type="submit"
-            disabled={!ready || create.isPending}
+            disabled={!ready || busy}
             className="min-h-12 bg-ink px-6 font-narrow text-[13px] font-bold uppercase tracking-[0.12em] text-bg disabled:cursor-not-allowed disabled:bg-track disabled:text-faint"
           >
-            {create.isPending ? t('forms:newSession.saving') : t('forms:newSession.save')}
+            {busy
+              ? t('forms:newSession.saving')
+              : mode === 'edit'
+                ? t('forms:newSession.saveChanges')
+                : t('forms:newSession.save')}
           </button>
           <Link
-            to="/sessions"
+            to={mode === 'edit' && id ? `/sessions/${id}` : '/sessions'}
             className="inline-flex min-h-12 items-center justify-center border-[1.5px] border-border-strong px-6 font-narrow text-[13px] font-bold uppercase tracking-[0.12em] text-ink no-underline hover:text-ink"
           >
             {t('forms:newSession.cancel')}

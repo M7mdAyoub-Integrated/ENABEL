@@ -2975,6 +2975,7 @@ export type Database = {
           is_cancelled: boolean
           is_delivered: boolean
           is_published: boolean
+          origin: string
           planned_seats: number | null
           start_date: string
           title: string
@@ -2998,6 +2999,7 @@ export type Database = {
           is_cancelled?: boolean
           is_delivered?: boolean
           is_published?: boolean
+          origin?: string
           planned_seats?: number | null
           start_date: string
           title: string
@@ -3021,6 +3023,7 @@ export type Database = {
           is_cancelled?: boolean
           is_delivered?: boolean
           is_published?: boolean
+          origin?: string
           planned_seats?: number | null
           start_date?: string
           title?: string

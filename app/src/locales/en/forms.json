@@ -356,7 +356,18 @@
     "deleteCancel": "Keep this session",
     "deleteConfirm": "Delete anyway",
     "publicFocalPointValue": "— “{value}”",
-    "newSession": "New training session"
+    "newSession": "New training session",
+    "needsDetails": "Needs details",
+    "needsDetailsBody": "This session cannot be published until these are filled in. The public page needs them to be worth reading.",
+    "needsDetailsFromCompletion": "This session was created automatically when someone recorded a completion for a course that was not set up in the system. It has a title, a subject and dates, and nothing else. Fill in the rest before publishing it, or leave it as an internal record.",
+    "fillInDetails": "Fill in the details",
+    "editDetails": "Edit details",
+    "missing": {
+      "venue": "Location — where people should go",
+      "focalPoint": "Focal point — who to contact",
+      "durationHours": "Duration in hours",
+      "description": "Description"
+    }
   },
   "newSession": {
     "heading": "New training session",
@@ -396,6 +407,8 @@
     "saving": "Creating…",
     "cancel": "Cancel",
     "saveFailed": "Could not save this session. Check your connection and try again.",
-    "notPublishedYet": "Once created, the session is a draft. It is not on the public site until you publish it from the session page."
+    "notPublishedYet": "Once created, the session is a draft. It is not on the public site until you publish it from the session page.",
+    "headingEdit": "Edit training session",
+    "saveChanges": "Save changes"
   }
 }

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useManagedSessions } from '../data/sessions'
+import { useManagedSessions, missingForPublish } from '../data/sessions'
 import { formatDateRange } from '../lib/format'
 import { SEP } from '../ui/glyphs'
 
@@ -74,6 +74,13 @@ export function SessionList() {
                   {s.is_cancelled ? (
                     <span className="bg-error px-2 py-[2px] font-narrow text-[10.5px] font-bold uppercase tracking-[0.12em] text-bg">
                       {t('session.cancelled')}
+                    </span>
+                  ) : null}
+                  {/* A direct statement about the row, not a guess about where
+                      it came from -- see missingForPublish. */}
+                  {missingForPublish(s).length > 0 ? (
+                    <span className="border-[1.5px] border-dashed border-amber px-2 py-[2px] font-narrow text-[10.5px] font-bold uppercase tracking-[0.12em] text-amber">
+                      {t('session.needsDetails')}
                     </span>
                   ) : null}
                 </div>

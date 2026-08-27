@@ -11,6 +11,7 @@ import {
   useSetDelivered,
   useSessionDeleteImpact,
   useSoftDeleteSession,
+  missingForPublish,
   type Participant,
 } from '../data/sessions'
 import { formatShortDate, formatDateRange } from '../lib/format'
@@ -188,6 +189,12 @@ export function SessionDetail() {
       >
         {s.title}
       </h1>
+      <Link
+        to={`/sessions/${s.id}/edit`}
+        className="mt-1 inline-block font-narrow text-[12px] font-bold uppercase tracking-[0.12em] text-muted underline hover:text-ink"
+      >
+        {t('session.editDetails')}
+      </Link>
       <p className="mt-1 text-[14px] text-muted">
         {formatDateRange(s.start_date, s.end_date, locale)}
         {s.venue ? (
@@ -197,6 +204,34 @@ export function SessionDetail() {
           </span>
         ) : null}
       </p>
+
+      {/* Publishing needs things a completion-created session never had. Name
+          them, say where they came from, and offer the way to fix it -- a
+          "needs details" state with no way to supply the details would be
+          worse than not marking it. */}
+      {missingForPublish(s).length > 0 ? (
+        <section className="mt-5 border-[1.5px] border-amber bg-sunken p-4">
+          <h2 className="m-0 font-narrow text-[12px] font-bold uppercase tracking-[0.14em] text-amber">
+            {t('session.needsDetails')}
+          </h2>
+          <p className="mt-1 max-w-[62ch] text-[14px] leading-[1.5] text-body">
+            {s.origin === 'completion'
+              ? t('session.needsDetailsFromCompletion')
+              : t('session.needsDetailsBody')}
+          </p>
+          <ul className="mt-2 list-disc space-y-0.5 ps-5 text-[14px] text-body">
+            {missingForPublish(s).map((f) => (
+              <li key={f}>{t(`session.missing.${f}`)}</li>
+            ))}
+          </ul>
+          <Link
+            to={`/sessions/${s.id}/edit`}
+            className="mt-3 inline-flex min-h-11 items-center bg-ink px-4 font-narrow text-[12px] font-bold uppercase tracking-[0.12em] text-bg no-underline hover:text-bg"
+          >
+            {t('session.fillInDetails')}
+          </Link>
+        </section>
+      ) : null}
 
       {/* ── PUBLISH. About the public. ─────────────────────────────────── */}
       <section className="mt-6 border-[1.5px] border-teal bg-sunken p-4">
@@ -234,7 +269,11 @@ export function SessionDetail() {
 
         <button
           type="button"
-          disabled={publish.isPending || s.is_cancelled}
+          disabled={
+            publish.isPending ||
+            s.is_cancelled ||
+            (!s.is_published && missingForPublish(s).length > 0)
+          }
           onClick={() => publish.mutate({ id: s.id, on: !s.is_published })}
           className={`mt-4 inline-flex min-h-11 items-center justify-center px-5 font-narrow text-[12.5px] font-bold uppercase tracking-[0.12em] disabled:bg-track disabled:text-faint ${
             s.is_published

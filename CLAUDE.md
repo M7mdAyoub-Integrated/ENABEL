@@ -233,5 +233,8 @@ Before you say a migration is complete, all of these must be true:
   This has now happened twice. `format.ts` carried a constant that read as authoritative about Western digits while two of three code paths ignored it. `glyphs.ts` said the back arrow was "mirrored under RTL by the `scale-x-[-1]` on the span that renders it" — and not one of the four call sites did that. Both comments were written in good faith, described a real intention, and were false.
 
   A comment that asserts is a comment that will eventually lie, and it lies most convincingly to whoever reads it next — including to whoever wrote it, six weeks later, deciding they do not need to check. Describe what *this* code does and why. If the behaviour lives elsewhere, point at it (`see 0053`) rather than vouching for it.
+- **A value generated as a side effect, in a field nobody is looking at, will be wrong.** `resolveSession()` has produced exactly two rows in this project's life. One is titled **"Phase4 test — New Trainee"** — a person's name where a course title belongs — and the other set `is_delivered = true`, which silently moved D0.2 every time a coordinator recorded a completion. Neither was noticed at the time, because nobody was looking at a field they had not typed into.
+
+  That is the argument for recording provenance (migration `0063`) in one sentence: if a row can be created as a by-product, the row should say so, and the fields it could not know should stay empty rather than being guessed.
 - When a business rule and a technical convenience conflict, the business rule wins. If a trigger has to be slow to stop double counting, it is slow.
 - Report conflicts you find in the source data. There are already eight known ones; there may be more.
