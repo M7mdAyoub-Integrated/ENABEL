@@ -1286,6 +1286,7 @@ export type Database = {
         Row: {
           activity_type_id: string
           client_uuid: string | null
+          closed_reason: string | null
           created_at: string
           created_by: string | null
           deleted_at: string | null
@@ -1300,12 +1301,13 @@ export type Database = {
           review_note: string | null
           reviewed_at: string | null
           reviewed_by: string | null
-          status: Database["public"]["Enums"]["record_status_t"]
+          status: Database["public"]["Enums"]["linkage_request_status_t"]
           updated_at: string
         }
         Insert: {
           activity_type_id: string
           client_uuid?: string | null
+          closed_reason?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
@@ -1320,12 +1322,13 @@ export type Database = {
           review_note?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
-          status?: Database["public"]["Enums"]["record_status_t"]
+          status?: Database["public"]["Enums"]["linkage_request_status_t"]
           updated_at?: string
         }
         Update: {
           activity_type_id?: string
           client_uuid?: string | null
+          closed_reason?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
@@ -1340,7 +1343,7 @@ export type Database = {
           review_note?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
-          status?: Database["public"]["Enums"]["record_status_t"]
+          status?: Database["public"]["Enums"]["linkage_request_status_t"]
           updated_at?: string
         }
         Relationships: [
@@ -1349,6 +1352,13 @@ export type Database = {
             columns: ["activity_type_id"]
             isOneToOne: false
             referencedRelation: "ref_activity_type"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "linkage_request_activity_type_id_fkey"
+            columns: ["activity_type_id"]
+            isOneToOne: false
+            referencedRelation: "v_public_activity_type"
             referencedColumns: ["id"]
           },
           {
@@ -1934,6 +1944,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "person_activity_type_activity_type_id_fkey"
+            columns: ["activity_type_id"]
+            isOneToOne: false
+            referencedRelation: "v_public_activity_type"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "person_activity_type_person_id_fkey"
             columns: ["person_id"]
             isOneToOne: false
@@ -2011,6 +2028,13 @@ export type Database = {
             columns: ["activity_type_id"]
             isOneToOne: false
             referencedRelation: "ref_activity_type"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "production_initiative_activity_type_id_fkey"
+            columns: ["activity_type_id"]
+            isOneToOne: false
+            referencedRelation: "v_public_activity_type"
             referencedColumns: ["id"]
           },
           {
@@ -3345,6 +3369,24 @@ export type Database = {
         }
         Relationships: []
       }
+      v_public_activity_type: {
+        Row: {
+          id: string | null
+          label_ar: string | null
+          label_en: string | null
+        }
+        Insert: {
+          id?: string | null
+          label_ar?: string | null
+          label_en?: string | null
+        }
+        Update: {
+          id?: string | null
+          label_ar?: string | null
+          label_en?: string | null
+        }
+        Relationships: []
+      }
       v_public_opportunity: {
         Row: {
           application_closes_on: string | null
@@ -3511,6 +3553,18 @@ export type Database = {
       }
       is_coordinator: { Args: never; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
+      match_linkage_request: {
+        Args: {
+          p_create_new_initiative?: boolean
+          p_initiative_id?: string
+          p_linked_on?: string
+          p_partnership_id: string
+          p_request_id: string
+          p_review_note?: string
+          p_scope: string
+        }
+        Returns: Json
+      }
       my_person_id: { Args: never; Returns: string }
       overview_counts: {
         Args: {
@@ -3534,6 +3588,19 @@ export type Database = {
           villages_reached: number
         }[]
       }
+      request_linkage: {
+        Args: {
+          p_activity_type_id: string
+          p_client_uuid?: string
+          p_date_of_birth?: string
+          p_initiative_title: string
+          p_main_product?: string
+          p_national_id: string
+          p_phone?: string
+          p_request: string
+        }
+        Returns: Json
+      }
       snapshot_period: { Args: { p_period_code: string }; Returns: number }
       training_session_delete_impact: {
         Args: { p_session_id: string }
@@ -3556,6 +3623,11 @@ export type Database = {
       followup_round_t: "six_month" | "twelve_month" | "annual"
       initiative_status_t: "planned" | "operating" | "paused" | "stopped"
       link_status_t: "proposed" | "under_review" | "active" | "ended"
+      linkage_request_status_t:
+        | "submitted"
+        | "under_review"
+        | "matched"
+        | "closed"
       partnership_type_t: "training" | "production_support"
       record_status_t: "draft" | "submitted" | "approved" | "rejected"
       respondent_t: "participant" | "household_member" | "not_reached"
@@ -3699,6 +3771,12 @@ export const Constants = {
       followup_round_t: ["six_month", "twelve_month", "annual"],
       initiative_status_t: ["planned", "operating", "paused", "stopped"],
       link_status_t: ["proposed", "under_review", "active", "ended"],
+      linkage_request_status_t: [
+        "submitted",
+        "under_review",
+        "matched",
+        "closed",
+      ],
       partnership_type_t: ["training", "production_support"],
       record_status_t: ["draft", "submitted", "approved", "rejected"],
       respondent_t: ["participant", "household_member", "not_reached"],

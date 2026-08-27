@@ -300,6 +300,7 @@ No crosswalk exists in any source document.
 | 🟠 Public apply flow (Phase 6 step 4) | 2 | OQ-21 *(approved)*, OQ-22 *(resolved)* |
 | 🟢 Eligibility (Phase 6 step 5) | 2 | OQ-23 *(resolved)*, OQ-24 *(fixed)* |
 | 🔴 Reporting integrity | 2 | OQ-25, OQ-26 |
+| 🟠 Linkage (Phase 6 step 6) | 2 | OQ-28, OQ-29 |
 
 ## 🟡 OQ-19 · Cancellation reasons are required for training and advisory, not for exhibitions
 
@@ -542,6 +543,36 @@ This surfaced while working out whether *restoring a person* should warn about c
 **Not built.** Recorded so it is not discovered by a farmer arriving at a market that is not happening.
 
 **Decides.** Municipal Coordinator — is contacting applicants a phone-call job from a printed list, or should the system record that they were told?
+
+---
+
+## 🟠 OQ-28 · `ref_activity_type` allows free text, and there is nowhere to put it
+
+**What the reference data says.** `ref_activity_type` carries `allows_free_text`, and the **Other** row has it set to true. By the project's own convention that means the owning table should carry a matching `activity_type_other` column, with a check constraint requiring it when Other is chosen.
+
+**What the schema has.** Neither `production_initiative` nor `linkage_request` has that column. Both have `activity_type_id` and nothing else.
+
+**Why it matters now.** The public linkage request asks what someone produces, and `activity_type_id` is `not null`. A producer whose work is not crop production, livestock, greenhouse farming or food processing has to choose **Other**, and there is no way to say what Other means. The row records that they do something unlisted, and nothing more.
+
+**What was done instead of guessing.** The form does not offer a "please specify" box. `v_public_activity_type` does not publish `allows_free_text`, so the browser cannot render one by accident. Offering a field whose contents are discarded on submit is worse than not offering it — the producer would believe they had told us.
+
+**Not fixed here.** Adding the column is a schema decision about `production_initiative`, which feeds C1.2 and C1.3, not a detail of one public form. It also needs an answer to whether the five options are the intended list at all.
+
+**Decides.** Municipal Coordinator — either the five activity types are complete and **Other** should be retired, or Other is real and both tables need `activity_type_other`.
+
+---
+
+## 🟠 OQ-29 · Nothing says which kind of partnership a market linkage may point at
+
+**What exists.** `partnership_type_t` is `(training, production_support)`. `market_linkage.partnership_id` references `partnership` with no restriction on its type, so a market linkage can be made against a training partnership.
+
+**Why that looks wrong.** A university that delivers a course is not a buyer. Connecting a producer to it as a market outlet is, on the face of it, a category error.
+
+**Why it was not refused.** Nothing in the workbook says so. A1.2 counts training partnerships, C1.1 counts production-support ones, and **G0.4 counts distinct partners with a contribution in the period regardless of type** — so a partner that both trains and buys is a real shape the schema already anticipates. Refusing the combination in SQL would be a rule invented by us, and it would be invisible until it wrongly blocked something.
+
+**What was done instead.** `match_linkage_request` (0067) does not filter. The matching screen shows the partnership type beside every option, so a coordinator choosing a training partner can see that is what they are doing.
+
+**Decides.** Municipal Coordinator — should a market linkage be restricted to production-support partnerships, or is a training partner that also buys a legitimate case?
 
 ---
 

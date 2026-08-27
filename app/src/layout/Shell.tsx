@@ -72,6 +72,11 @@ function useNavGroups(): Group[] {
         ...(can(role, 'record.edit')
           ? [{ to: '/advisory', labelKey: 'nav:advisory', num: '05' } as Dest]
           : []),
+        // The queue the public linkage form feeds. Without a link here it
+        // would be URL-only, which is exactly how /sessions was missed.
+        ...(can(role, 'record.edit')
+          ? [{ to: '/linkage-requests', labelKey: 'nav:linkageRequests', num: '06' } as Dest]
+          : []),
         ...mod('ln', '06'),
       ],
     },

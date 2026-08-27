@@ -36,5 +36,6 @@
   "municipality": "Municipality",
   "participant": "Participant",
   "sessions": "Sessions",
-  "advisory": "Market advisory"
+  "advisory": "Market advisory",
+  "linkageRequests": "Linkage requests"
 }

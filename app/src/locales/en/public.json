@@ -9,7 +9,10 @@
     "emptyTitle": "Nothing open right now",
     "emptyBody": "There are no courses or markets taking applications today. New ones are added through the year — check back, or ask at the Municipality office.",
     "myApplications": "Check an application I made",
-    "loadFailed": "The list could not be loaded. Check your connection and try again."
+    "loadFailed": "The list could not be loaded. Check your connection and try again.",
+    "linkageCta": "Finished a market advisory session?",
+    "linkageCtaBody": "Ask the Municipality to connect you with a buyer, a processor or a market.",
+    "linkageCtaAction": "Ask to be connected"
   },
   "type": {
     "training": "Training course",
@@ -130,5 +133,50 @@
     "products": "What do you make or sell?",
     "productsHint": "Tap all that apply. You can leave this blank if you are not sure yet.",
     "alreadyKnown": "We already have these details, so you will not be asked for them again."
+  },
+  "linkage": {
+    "backHome": "Home",
+    "heading": "Ask to be connected to a buyer",
+    "intro": "If you have finished a market advisory session with the Municipality, you can ask us to connect you with a buyer, a processor, a supplier or a market.",
+    "whoCanAsk": "This is only for people who have completed a market advisory session. If you have not, speak to the Municipality about joining one first.",
+    "identifyIntro": "First, tell us who you are so we can find your record.",
+    "noRecordWhy": "You cannot register on this page. Market linkage is for people who have already completed a Municipality training and then a market advisory session, so everyone who can use it is already on our records. If you have taken part before, check the number or contact the Municipality.",
+    "yesContinue": "Yes, that is me",
+    "detailsIntro": "Now tell us what you produce and what you are looking for.",
+    "title": "What you produce",
+    "titleHint": "A short name for your work — for example, Umm Ali's home preserves.",
+    "activityType": "Type of activity",
+    "activityTypeHint": "Choose the one closest to what you do.",
+    "mainProduct": "Main product",
+    "mainProductHint": "Optional. For example, tomatoes, olive oil, jam.",
+    "request": "What are you looking for?",
+    "requestHint": "A buyer, a processor, someone to supply seed or feed, a place to sell. Say as much as you can — it helps us find the right partner.",
+    "backToForm": "Back to the form",
+    "outcome": {
+      "requested": {
+        "title": "Your request has been sent",
+        "body": "The Municipality will look at it and get in touch. This may take some time — we look for a partner that fits what you produce, and that is not always quick."
+      },
+      "already_requested": {
+        "title": "We already have this request",
+        "body": "This request reached us before, so we have not created a second one. There is nothing more for you to do."
+      },
+      "cannot_verify": {
+        "title": "We could not confirm who you are",
+        "body": "The details you gave do not match a record we hold. Check the national ID number and the date of birth, or contact the Municipality."
+      },
+      "ineligible": {
+        "title": "A market advisory session comes first",
+        "body": "Market linkage is for people who have completed a market advisory session with the Municipality. Our records do not show one for you. If you think this is wrong, contact the Municipality."
+      },
+      "withdrawn": {
+        "title": "This request was withdrawn",
+        "body": "We received this request before and the Municipality has since withdrawn it. Contact us before sending it again."
+      },
+      "failed": {
+        "title": "Something went wrong",
+        "body": "Your request was not sent. This is a problem on our side, not with your details. Please try again."
+      }
+    }
   }
 }

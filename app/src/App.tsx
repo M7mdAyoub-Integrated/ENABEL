@@ -18,6 +18,9 @@ import Settings from './routes/Settings'
 import NotFound from './routes/NotFound'
 import PublicHome from './routes/public/PublicHome'
 import ApplyForm from './routes/public/ApplyForm'
+import LinkageRequest from './routes/public/LinkageRequest'
+import LinkageQueue from './routes/LinkageQueue'
+import LinkageMatch from './routes/LinkageMatch'
 import SessionList from './routes/SessionList'
 import SessionNew from './routes/SessionNew'
 import ExhibitionDetail from './routes/ExhibitionDetail'
@@ -96,6 +99,10 @@ const router = createBrowserRouter([
   { path: '/', element: <PublicHome /> },
   { path: '/opportunity/:id', element: <OpportunityDetail /> },
   { path: '/apply/:id', element: <ApplyForm /> },
+  // Linkage has no opportunity to hang off -- it is not something the
+  // Municipality publishes and people apply to, it is a standing offer to
+  // anyone who has finished an advisory. So it is a page, not a /apply/:id.
+  { path: '/linkage', element: <LinkageRequest /> },
 
   // Where staff used to land. Kept so an existing bookmark still works.
   { path: '/home', element: <Landing /> },
@@ -174,6 +181,21 @@ const router = createBrowserRouter([
       {
         path: '/advisory/:id',
         element: guard(<SessionDetail kind="advisory" />, (n) => (
+          <RequireCapability capability="record.edit">{n}</RequireCapability>
+        )),
+      },
+      // The municipal end of the public linkage request. Matching creates a
+      // production_initiative and a market_linkage together, which is why it
+      // is not part of the generic /forms/ln editor.
+      {
+        path: '/linkage-requests',
+        element: guard(<LinkageQueue />, (n) => (
+          <RequireCapability capability="record.edit">{n}</RequireCapability>
+        )),
+      },
+      {
+        path: '/linkage-requests/:id',
+        element: guard(<LinkageMatch />, (n) => (
           <RequireCapability capability="record.edit">{n}</RequireCapability>
         )),
       },

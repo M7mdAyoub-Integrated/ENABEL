@@ -213,12 +213,13 @@ export function useApplyForOpportunity() {
 /* ── public reference lists ───────────────────────────────────────────────── */
 
 /**
- * The two lists the exhibition application needs.
+ * The reference lists the public forms need.
  *
- * They come from `v_public_producer_type` and `v_public_product` -- views that
- * publish an id and two labels and nothing else. The underlying `ref_*` tables
- * are NOT granted to anon, so `sort_order`, `is_active`, `created_by` and
- * `deleted_at` never reach a browser. See migration 0056.
+ * They come from `v_public_producer_type`, `v_public_product` and
+ * `v_public_activity_type` -- views that publish an id and two labels and
+ * nothing else. The underlying `ref_*` tables are NOT granted to anon, so
+ * `sort_order`, `is_active`, `created_by` and `deleted_at` never reach a
+ * browser. See migrations 0056 and 0065.
  *
  * Both filter `is_active` in SQL, so a retired option disappears from the form
  * on its own while rows that already reference it keep working.
@@ -229,7 +230,10 @@ export function labelOf(o: RefOption, locale: string): string {
   return locale.startsWith('ar') ? o.label_ar || o.label_en : o.label_en
 }
 
-function useRefList(view: 'v_public_producer_type' | 'v_public_product', enabled: boolean) {
+function useRefList(
+  view: 'v_public_producer_type' | 'v_public_product' | 'v_public_activity_type',
+  enabled: boolean,
+) {
   return useQuery({
     queryKey: ['public', view],
     enabled,
@@ -249,4 +253,18 @@ export function useProducerTypes(enabled: boolean) {
 
 export function useProducts(enabled: boolean) {
   return useRefList('v_public_product', enabled)
+}
+
+/**
+ * What someone produces, for the public linkage request.
+ *
+ * `linkage_request.activity_type_id` is NOT NULL, so this list is required
+ * rather than optional. The view does not publish `allows_free_text`, and the
+ * form does not offer "please specify" against Other: there is no
+ * `activity_type_other` column on `linkage_request` or on
+ * `production_initiative` to receive it, so anything typed would be discarded
+ * on submit. See OQ-28.
+ */
+export function useActivityTypes(enabled: boolean) {
+  return useRefList('v_public_activity_type', enabled)
 }

@@ -162,6 +162,33 @@ It had always been wrong. It could not surface, because every seeded training ha
 
 "Applications closed" tells someone to give up. Getting that wrong for five days costs a participant, silently, and nobody ever reports it.
 
+**5. When a screen is parameterised, the copy is a separate surface.**
+
+Item 5 turned the three session screens into one set taking `kind`. The logic
+became right and the words became wrong: the advisory screen told a coordinator
+a completion was "counted in indicator D0.2" and that a participant "counts
+towards indicator A1.3". Neither is true of advisory — it feeds no indicator at
+all, which is OQ-11.
+
+Parameterising moves the table names into a lookup and leaves every string
+exactly where it was. Nothing fails, nothing warns, and the screen states an
+indicator relationship the database does not have — on the screen a coordinator
+would use to justify a figure.
+
+> **Parameterising a screen is two jobs, not one.** After the logic is shared,
+> read every string on the new branch as that branch's user. A test cannot catch
+> this: both branches render, both pass, and only one of them is lying.
+
+The same run produced the better half of the lesson. The first soft-delete test
+passed for the wrong reason — the person used happened to qualify through a
+second training — and it only came apart because the retest carried a
+**control**: someone who *should* still be accepted, run in the same pass. A
+gate that refuses everything and a gate that refuses the right thing look
+identical from one test.
+
+> **A refusal test needs a control that is not refused.** Otherwise it proves
+> the feature is off, not that it is right.
+
 **3. LTR text inside an RTL page needs `dir="auto"`.**
 
 An English description on the Arabic page rendered as `.anyone who makes food to

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { usePublicOpportunities } from '../../data/publicOpportunities'
 import { PublicShell } from './PublicShell'
@@ -86,6 +87,28 @@ export function PublicHome() {
             ))}
           </ul>
         )}
+      </section>
+
+      {/* Market linkage, which is not an opportunity and cannot be a card.
+          A course or a market is a thing with dates that opens and closes;
+          linkage is a standing offer to anyone who has finished an advisory,
+          so it sits below the list with its condition stated rather than
+          pretending to be another item in it. It stays visible when the list
+          is empty -- that is exactly when someone still has a reason to be
+          here. */}
+      <section className="mt-8 border-[1.5px] border-ink p-5 sm:mt-10 sm:p-6">
+        <h2 className="m-0 text-[19px] font-extrabold tracking-[-0.02em] sm:text-[22px]">
+          {t('home.linkageCta')}
+        </h2>
+        <p className="mt-2 max-w-[46ch] text-[15px] leading-[1.55] text-body">
+          {t('home.linkageCtaBody')}
+        </p>
+        <Link
+          to="/linkage"
+          className="mt-4 inline-flex min-h-12 items-center bg-ink px-5 font-narrow text-[12.5px] font-bold uppercase tracking-[0.12em] text-bg no-underline hover:text-bg"
+        >
+          {t('home.linkageCtaAction')}
+        </Link>
       </section>
     </PublicShell>
   )

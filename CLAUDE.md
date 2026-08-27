@@ -101,6 +101,17 @@ So, for every migration:
 3. The filename timestamp must equal the `version` recorded in `supabase_migrations.schema_migrations`. **A file whose name disagrees with the ledger is not the same migration, even when the bytes match.** `supabase db reset` orders by filename and the CLI identifies migrations by version, so a mismatch replays a migration the ledger has never heard of, in a position it never occupied. Two of the recovered files had drifted this way; the ordering happened to survive, which is luck, not a margin.
 4. Verify with `bash supabase/check_migration_files.sh` (see that file's header for the one query it needs).
 
+**Steps 1 and 3 conflict when you apply through the MCP, and the way out is not to skip step 1.** `apply_migration` chooses the `version` itself, so you cannot know the filename until after it has run — which reads like permission to apply first and write the file afterwards. That is exactly the order that produced 0034–0049.
+
+Do this instead:
+
+1. Write the SQL to `supabase/migrations/PENDING_<nnnn>_<name>.sql`. The SQL is now in the repository, which is the substance of the rule.
+2. Apply that text.
+3. Read the `version` back out of the ledger and rename the file to match.
+4. Append the ledger line to `supabase/.ledger_manifest`, then run the check.
+
+The manifest is a saved snapshot, so a migration applied after it was last generated shows up as `NOT APPLIED` — the check is comparing against a stale list, not reporting a real problem. Append the new line rather than concluding the file is wrong.
+
 The recovered files are byte-identical to what was applied, taken from the migration ledger — not reconstructed from the schema. `0030` and `0031` are deliberate exceptions and are listed in the check script: the applied text of `0030` contains a password literal, so repairing it from the ledger would put a credential back into git.
 
 **A secret written into a migration survives a git history rewrite.** `supabase_migrations.schema_migrations` stores the applied SQL verbatim, so anything that has ever been in a migration exists in *two* places. Scrubbing the repository — even with `git-filter-repo`, even verified against the remote — does not touch the ledger copy. That is exactly what happened here: the test-account password was removed from git history, and its original text sat in the ledger unnoticed until the recovery work went looking.
