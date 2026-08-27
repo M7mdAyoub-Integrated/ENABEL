@@ -281,6 +281,20 @@ export function useFormSchema(
             { key: 'sponsor', label: t('forms:exhibition.sponsor'), type: 'text', placeholder: t('forms:exhibition.sponsorPh'), help: t('common:optional') },
           ],
         },
+        // Same shape and same wording as the training form, so a coordinator
+        // learns one form rather than two. NO duration field: for a market the
+        // days come from the dates -- see the note in data/exhibitions.ts.
+        {
+          id: 'public',
+          title: t('forms:exhibition.publicSection'),
+          note: t('forms:exhibition.publicNote'),
+          fields: [
+            { key: 'description', label: t('forms:newSession.description'), type: 'area', help: t('forms:newSession.goesPublic') },
+            { key: 'focal', label: t('forms:newSession.focalPoint'), type: 'text', help: t('forms:newSession.goesPublic') },
+            { key: 'opensOn', label: t('forms:newSession.opensOn'), type: 'date', half: true },
+            { key: 'closesOn', label: t('forms:newSession.closesOn'), type: 'date', half: true },
+          ],
+        },
       ]
     }
 

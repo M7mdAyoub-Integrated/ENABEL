@@ -157,6 +157,11 @@ function useExhibitionWrite(id: string | undefined, enabled: boolean): ModuleWri
       location: e.location,
       capacity: String(e.boothCapacity),
       sponsor: e.externalSponsor ?? '',
+      // Read back so an edit does not write emptiness over them.
+      description: e.description ?? '',
+      focal: e.focalPoint ?? '',
+      opensOn: e.applicationOpensOn ?? '',
+      closesOn: e.applicationClosesOn ?? '',
     }
   }, [existing.data])
 
@@ -169,6 +174,10 @@ function useExhibitionWrite(id: string | undefined, enabled: boolean): ModuleWri
     // message rather than silently writing a bad row.
     boothCapacity: Number(str(v, 'capacity') || '0'),
     externalSponsor: str(v, 'sponsor') || null,
+    description: str(v, 'description') || null,
+    focalPoint: str(v, 'focal') || null,
+    applicationOpensOn: str(v, 'opensOn') || null,
+    applicationClosesOn: str(v, 'closesOn') || null,
   })
 
   const save = async (v: FormValues) => {

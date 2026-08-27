@@ -213,7 +213,9 @@
     "capacityHelp": "Number of booths available.",
     "sponsor": "External sponsor",
     "sponsorPh": "Leave blank if none",
-    "boothsTaken": "Booths taken"
+    "boothsTaken": "Booths taken",
+    "publicSection": "The public page",
+    "publicNote": "These appear on the public site once this market is published. Publishing is a separate step. The contact is shown exactly as typed, so use an office contact rather than a personal mobile."
   },
   "registration": {
     "exhibition": "Exhibition",

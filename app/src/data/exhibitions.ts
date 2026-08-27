@@ -43,6 +43,12 @@ export type ExhibitionRow = {
   location: string
   boothCapacity: number
   externalSponsor: string | null
+  /** Goes public exactly as typed. See 0043. */
+  description: string | null
+  focalPoint: string | null
+  applicationOpensOn: string | null
+  applicationClosesOn: string | null
+  isPublished: boolean
   isCancelled: boolean
   createdAt: string
   /** Derived, not stored. */
@@ -59,6 +65,12 @@ type ExhibitionSelect = {
   location: string
   booth_capacity: number
   external_sponsor: string | null
+  /** Table-only. v_upcoming_exhibitions does not select these. */
+  description?: string | null
+  focal_point?: string | null
+  application_opens_on?: string | null
+  application_closes_on?: string | null
+  is_published?: boolean
   is_cancelled: boolean
   created_at: string
   booths_taken: number
@@ -100,6 +112,11 @@ function toRow(r: ExhibitionSelect): ExhibitionRow {
     location: r.location,
     boothCapacity: r.booth_capacity,
     externalSponsor: r.external_sponsor ?? null,
+    description: r.description ?? null,
+    focalPoint: r.focal_point ?? null,
+    applicationOpensOn: r.application_opens_on ?? null,
+    applicationClosesOn: r.application_closes_on ?? null,
+    isPublished: r.is_published ?? false,
     isCancelled: r.is_cancelled ?? false,
     createdAt: r.created_at ?? '',
     boothsTaken: r.booths_taken ?? 0,
@@ -119,7 +136,14 @@ export function useExhibition(id: string | undefined) {
         supabase.from('v_upcoming_exhibitions').select('*').eq('id', id!).maybeSingle(),
         supabase
           .from('exhibition')
-          .select('external_sponsor, is_cancelled, created_at')
+          // These live on the table, not the view. Every one of them has to be
+          // read here or the edit form loads them empty and the next save
+          // writes that emptiness back -- silently stripping a published
+          // exhibition's description and contact.
+          .select(
+            'external_sponsor, description, focal_point, application_opens_on, ' +
+              'application_closes_on, is_published, is_cancelled, created_at',
+          )
           .eq('id', id!)
           .is('deleted_at', null)
           .maybeSingle(),
@@ -127,10 +151,24 @@ export function useExhibition(id: string | undefined) {
       const v = unwrap(viewRes as unknown as { data: ExhibitionSelect | null; error: unknown })
       const extra = rowRes.error
         ? null
-        : (rowRes.data as { external_sponsor: string | null; is_cancelled: boolean; created_at: string } | null)
+        : (rowRes.data as {
+            external_sponsor: string | null
+            description: string | null
+            focal_point: string | null
+            application_opens_on: string | null
+            application_closes_on: string | null
+            is_published: boolean
+            is_cancelled: boolean
+            created_at: string
+          } | null)
       return toRow({
         ...v,
         external_sponsor: extra?.external_sponsor ?? null,
+        description: extra?.description ?? null,
+        focal_point: extra?.focal_point ?? null,
+        application_opens_on: extra?.application_opens_on ?? null,
+        application_closes_on: extra?.application_closes_on ?? null,
+        is_published: extra?.is_published ?? false,
         is_cancelled: extra?.is_cancelled ?? false,
         created_at: extra?.created_at ?? '',
       })
@@ -155,7 +193,23 @@ export type ExhibitionInput = {
   location: string
   boothCapacity: number
   externalSponsor: string | null
+  description: string | null
+  focalPoint: string | null
+  applicationOpensOn: string | null
+  applicationClosesOn: string | null
 }
+
+/**
+ * NO DURATION FIELD, and that is deliberate.
+ *
+ * A training asks for hours because a three-day course may be twelve hours of
+ * teaching -- the dates say when, the hours say how much. A market runs for its
+ * dates; days derived from them (durationDays) is the real unit, and an hours
+ * field would be a number nobody could answer and nothing would read.
+ *
+ * `is_published` is also absent, as it is on the training form. Publishing is a
+ * separate deliberate action.
+ */
 
 function payload(input: ExhibitionInput) {
   return {
@@ -165,6 +219,10 @@ function payload(input: ExhibitionInput) {
     location: input.location.trim(),
     booth_capacity: input.boothCapacity,
     external_sponsor: input.externalSponsor?.trim() || null,
+    description: input.description?.trim() || null,
+    focal_point: input.focalPoint?.trim() || null,
+    application_opens_on: input.applicationOpensOn,
+    application_closes_on: input.applicationClosesOn,
   }
 }
 
