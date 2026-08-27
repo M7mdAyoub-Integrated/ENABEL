@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/check-no-demo-credential.mjs && tsc -b && eslint . --max-warnings=0 && vite build",
+    "build": "node scripts/check-no-demo-credential.mjs && node scripts/check-constraint-names.mjs && tsc -b && eslint . --max-warnings=0 && vite build",
     "lint": "eslint . --max-warnings=0",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
-    "check:demo": "node scripts/check-no-demo-credential.mjs"
+    "check:demo": "node scripts/check-no-demo-credential.mjs",
+    "check:constraints": "node scripts/check-constraint-names.mjs"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",
