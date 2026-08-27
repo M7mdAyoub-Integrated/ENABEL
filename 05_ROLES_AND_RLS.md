@@ -428,3 +428,40 @@ reset role;
 
 Every anon-facing object gets this before it ships.
 
+---
+
+## 11. Trigger functions are granted to nobody
+
+**A trigger fires as part of the statement that fired it. It does not consult `EXECUTE` privilege on its function.**
+
+So a grant on a trigger function buys the trigger nothing. All it does is create a second way to reach a guard — by calling it directly, outside the context it was written for, with arguments it never expected.
+
+### The rule
+
+> Every function in `public` that `returns trigger` is revoked from `public`, `anon` and `authenticated`. No exceptions. If a routine genuinely needs to be callable *and* used as a trigger, that is two functions: a granted one that takes explicit arguments, and a trigger wrapper that is granted to nobody.
+
+### How it was missed
+
+`check_delivery_not_future` arrived with migration `0043` and was executable by `public`, `anon` and `authenticated`. Every other trigger function in the schema — `audit_row`, `guard_registration_status`, `guard_person_national_id`, `handle_new_user`, `set_updated_at` and the rest — was already locked to nobody. One function missed the pattern, and nothing was checking.
+
+What it exposed was small: the function reads `NEW` and raises, so calling it by hand achieves nothing. **It was closed anyway.** An unnecessary grant on a security boundary is a defect regardless of whether today's version of the function happens to be harmless — the next edit is the one that isn't, and by then nobody remembers the grant is there.
+
+### Verifying it
+
+`0055` swept the whole schema rather than fixing the one. To check it has stayed swept:
+
+```sql
+select p.proname
+from pg_proc p
+join pg_namespace s on s.oid = p.pronamespace
+join pg_type t on t.oid = p.prorettype
+where s.nspname = 'public' and t.typname = 'trigger'
+  and (has_function_privilege('public', p.oid, 'EXECUTE')
+       or has_function_privilege('anon', p.oid, 'EXECUTE')
+       or has_function_privilege('authenticated', p.oid, 'EXECUTE'));
+```
+
+**Expected: zero rows.**
+
+And confirm the triggers still fire afterwards, rather than assuming they do — inserting a `training_session` with `is_delivered = true` and a future `end_date` must still be refused. It was, with zero grants in place.
+

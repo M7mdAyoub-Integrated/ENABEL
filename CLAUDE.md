@@ -93,6 +93,8 @@ The recovered files are byte-identical to what was applied, taken from the migra
 
 So: **never put a credential in a migration.** If one gets in, rotating it is the fix that actually works, because the ledger copy cannot be assumed gone. Scrubbing git is necessary but not sufficient, and treating it as sufficient is how a live secret gets left behind.
 
+The ledger row *can* be edited — `version` is the primary key and the only thing the tooling matches on, and nothing ever replays from `statements`. But editing it to match a file weakens the check that file equals ledger, which is the thing standing between us and a repeat. So: **rotate first, edit only if a live secret lands there, and treat the edit as cleanup rather than containment.**
+
 **6. One person, one row.**
 `person.national_id` is unique and constrained to exactly nine digits. Nothing else stores a name or phone for a participant — everything references `person_id`.
 
@@ -176,5 +178,10 @@ Before you say a migration is complete, all of these must be true:
 
 - Small migrations. One concern each. Do not combine "create the markets tables" with "write the market indicator views".
 - Comment the *why* in SQL, not the *what*. `-- E0.2 counts distinct people, so this must not be per-registration` is useful. `-- create table` is not.
+- **Never write a comment claiming a behaviour is implemented somewhere else.** Comments explain reasoning. Behaviour is proven by a test or by running it.
+
+  This has now happened twice. `format.ts` carried a constant that read as authoritative about Western digits while two of three code paths ignored it. `glyphs.ts` said the back arrow was "mirrored under RTL by the `scale-x-[-1]` on the span that renders it" — and not one of the four call sites did that. Both comments were written in good faith, described a real intention, and were false.
+
+  A comment that asserts is a comment that will eventually lie, and it lies most convincingly to whoever reads it next — including to whoever wrote it, six weeks later, deciding they do not need to check. Describe what *this* code does and why. If the behaviour lives elsewhere, point at it (`see 0053`) rather than vouching for it.
 - When a business rule and a technical convenience conflict, the business rule wins. If a trigger has to be slow to stop double counting, it is slow.
 - Report conflicts you find in the source data. There are already eight known ones; there may be more.

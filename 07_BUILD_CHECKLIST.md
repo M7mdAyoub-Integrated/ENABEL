@@ -428,6 +428,14 @@ problems:**
   That is correct, and it means role testing needs accounts created another way.
 - `0038` recreates the corrupted `as已held` column on purpose; `0039` renames it.
   A rebuild passing through that state is the history working, not a fault.
+- **Every trigger will look unaccounted for.** If you check which live objects no
+  migration creates, all 118 triggers come back as orphans. They are not:
+  `attach_updated_at` and the audit attach loop build their names with
+  `format()`, so `trg_person_updated` appears nowhere literally in any
+  migration. The first orphan sweep hit exactly this and reported 118 phantom
+  problems before the cause was found. A trigger is accounted for when its name
+  matches `trg_<table>_updated` or `trg_<table>_audit` **and** both its table and
+  its trigger function are ledger-created.
 
 Until this passes, "the repository can rebuild the database" is an inference
 from the ledger, not a demonstrated fact. Say so that way in any handover.

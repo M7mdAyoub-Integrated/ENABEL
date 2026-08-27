@@ -297,7 +297,8 @@ No crosswalk exists in any source document.
 | 🟠 Affects schema or forms | 8 | OQ-6, OQ-7, OQ-8, OQ-9, OQ-10, OQ-11, OQ-13, OQ-14 |
 | 🟡 Wording and policy | 4 | OQ-15, OQ-16, OQ-17, OQ-18 |
 | 🟡 Recorded during Phase 6 | 2 | OQ-19, OQ-20 |
-| 🟠 Public apply flow (Phase 6 step 4) | 2 | OQ-21 *(approved)*, OQ-22 *(half open)* |
+| 🟠 Public apply flow (Phase 6 step 4) | 2 | OQ-21 *(approved)*, OQ-22 *(resolved)* |
+| 🟠 Eligibility (Phase 6 step 5) | 2 | OQ-23, OQ-24 |
 
 ## 🟡 OQ-19 · Cancellation reasons are required for training and advisory, not for exhibitions
 
@@ -357,7 +358,7 @@ No crosswalk exists in any source document.
 
 ---
 
-## 🟠 OQ-22 · A person with no date of birth cannot be found by the public lookup — RESOLVED, ONE HALF STILL OPEN
+## 🟢 OQ-22 · A person with no date of birth cannot be found by the public lookup — RESOLVED
 
 **The problem.** `applicant_prefill` (migration `0052`) verifies an applicant on **national ID + date of birth**. `person.date_of_birth` is **nullable**. A person whose DOB was never recorded cannot satisfy the check, receives the standard `{"found": false}`, and — unless the form stops them — registers again as a new person.
 
@@ -400,13 +401,63 @@ Three changes instead, in migration `0053`:
 
 **Current state of the data.** All 4 live people have a date of birth; `v_person_missing_verification` returns zero rows.
 
-### ⚠ Still open: public self-registration does not yet require a date of birth
+### Closed 27 August 2026 — the loop is complete
 
-Point 1 above is **not implemented**. It cannot be, until the registration RPC exists — that arrives with the application form in Phase 6 step 4.
+Point 1 is implemented. `apply_for_opportunity` (migration `0054`) refuses to create a person without a date of birth:
 
-**Until then this loop is not closed.** Migration `0053` stops an existing no-DOB person from being pushed into re-registering, but nothing yet stops a *new* person being created through the public path with no date of birth, which would grow the very gap `0053` exists to contain.
+```sql
+if coalesce(btrim(p_full_name), '') = '' or p_date_of_birth is null then
+  return c_fail;
+end if;
+```
 
-**Do not treat OQ-22 as done until the registration RPC requires `date_of_birth` as a NOT NULL argument on the public path**, and a test confirms a registration attempt without one is refused by the database rather than only by the form.
+Verified as `anon`: a registration attempt with no date of birth returned `cannot_verify` and **created no person row**. So the no-DOB population cannot grow through the public path, and `0053`'s phone fallback covers the people already in it.
+
+Refused by the database, not by the form — the check is inside the security-definer RPC, which is the only way anon can write a person at all. Staff entry is unaffected and may still record an age instead of a birth date.
+
+---
+
+## 🟠 OQ-23 · Soft-deleting a training session silently removes a cohort's eligibility
+
+**What the code does.** `check_advisory_eligibility` (migration `0057`) copies the four conditions from `v_ind_a1_3`, one of which is `training_session.deleted_at is null`. So eligibility for market advisory depends on the SESSION still being live, not only the person's enrolment.
+
+**The hazard.** A coordinator tidying up a duplicate or mistakenly-created `training_session` would remove advisory eligibility from **everyone who completed it**, with no warning and no visible connection between the two actions. The soft delete looks like housekeeping; the consequence lands weeks later when someone is refused.
+
+**Why it is built this way anyway.** The alternative is worse: if the gate ignored the session filter, a person could be refused by A1.3 (not counted as trained) while the gate still treated them as trained. Two definitions of "completed a training", drifting apart, with the donor-facing one losing. That is the failure this project has already seen in `overview_counts`.
+
+**What is NOT affected.** Advisory places already granted. The trigger fires at insert only and is never re-evaluated, so a later soft delete does not revoke anyone's existing enrolment. Verified.
+
+**Options.**
+
+| | Option | Cost |
+|---|---|---|
+| **A** | Warn in the staff UI before soft-deleting a session that has completions | Needs a count and a confirm step on the delete path |
+| **B** | Refuse to soft-delete a session that has any `met_criteria = true` enrolment | Safest, but blocks legitimate correction of a duplicate |
+| **C** | Leave it; rely on the session-delete path being rare | Free, and silent when it does happen |
+
+**Decides.** Municipal Coordinator. This is about what staff should be stopped from doing by accident.
+
+---
+
+## 🟠 OQ-24 · Unique constraints do not exclude soft-deleted rows
+
+**What was found.** `advisory_enrolment` has `unique (person_id, session_id)`, and `training_enrolment` has the equivalent. Neither excludes soft-deleted rows.
+
+So **a soft-deleted enrolment permanently blocks that person from re-enrolling in that session.** Withdrawing someone and then re-adding them is impossible through any normal path; the insert fails on a row nobody can see. Found while testing `0057`, where a soft-deleted test enrolment blocked a legitimate re-insert.
+
+**Why this matters beyond the annoyance.** The public form maps a unique violation to `already_applied` and reports success. Someone whose application was withdrawn would be told they had already applied, forever, and no screen would explain why.
+
+**The fix, if wanted.** Replace each with a partial unique index:
+
+```sql
+create unique index <table>_person_session_live
+  on <table> (person_id, session_id)
+  where deleted_at is null;
+```
+
+**Not applied.** It is a constraint change on tables holding live rows, it affects the staff-entry path as much as the public one, and "withdraw then re-add" may or may not be something the Municipality actually wants to allow. That is a policy question, not a technical one.
+
+**Decides.** Municipal Coordinator — should a withdrawn participant be able to re-enrol in the same session?
 
 ---
 
