@@ -20,6 +20,7 @@ import {
   useCreateCompletion,
   useUpdateCompletion,
   type CompletionInput,
+  NEW_SESSION,
 } from './completions'
 
 /**
@@ -238,6 +239,9 @@ function useCompletionWrite(
         locale,
       ),
       trainingDate: str(v, 'date'),
+      // null means "none of these -- create one", chosen explicitly from the
+      // picker. Never an omission.
+      sessionId: str(v, 'session') === NEW_SESSION ? null : str(v, 'session') || null,
       metCriteria: str(v, 'met') === 'yes' ? true : str(v, 'met') === 'no' ? false : null,
     }
   }

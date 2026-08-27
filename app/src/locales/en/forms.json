@@ -173,7 +173,13 @@
     "countsToward": "Counts towards {code}",
     "decisionNote": "This one answer decides whether the participant is counted. Only “Yes” adds to the 120-person target.",
     "metCriteria": "Did this person meet the completion criteria?",
-    "decidedOn": "Decision date"
+    "decidedOn": "Decision date",
+    "session": "Which session?",
+    "sessionHelp": "Pick the session this person attended. Sessions covering the date you entered are listed first.",
+    "sessionHelpNone": "No session on this topic matches that date. Choosing to create one records the completion and leaves the session details to be filled in later.",
+    "coversThisDate": "covers this date",
+    "createNewSession": "None of these — create a new session",
+    "willCreateSession": "A new session will be created with just the title, topic and dates. It will show as needing details, and will not count towards D0.2 until someone records that it was delivered."
   },
   "linkage": {
     "farmer": "Farmer",

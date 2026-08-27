@@ -173,7 +173,13 @@
     "countsToward": "Counts towards {code}",
     "decisionNote": "This one answer decides whether the participant is counted. Only “Yes” adds to the 120-person target.",
     "metCriteria": "Did this person meet the completion criteria?",
-    "decidedOn": "تاريخ القرار"
+    "decidedOn": "تاريخ القرار",
+    "session": "أي جلسة؟",
+    "sessionHelp": "اختر الدورة التي حضرها هذا الشخص. الدورات التي تشمل التاريخ المُدخل تظهر أولًا.",
+    "sessionHelpNone": "لا توجد دورة بهذا الموضوع تطابق ذلك التاريخ. اختيار الإنشاء يسجّل الإتمام ويترك تفاصيل الدورة لاستكمالها لاحقًا.",
+    "coversThisDate": "تشمل هذا التاريخ",
+    "createNewSession": "لا شيء مما سبق — أنشئ دورة جديدة",
+    "willCreateSession": "ستُنشأ دورة جديدة بالعنوان والموضوع والتواريخ فقط. ستظهر بحاجة إلى تفاصيل، ولن تُحتسب في D0.2 حتى يسجّل أحدهم أنها نُفّذت."
   },
   "linkage": {
     "farmer": "المزارع",

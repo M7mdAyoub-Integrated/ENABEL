@@ -210,6 +210,90 @@ export type CompletionInput = {
   topicLabel: string
   trainingDate: string
   metCriteria: boolean | null
+  /**
+   * The session this completion belongs to, chosen from the picker.
+   *
+   * `null` means the coordinator explicitly said none of the existing sessions
+   * matched, and a new one should be created. It is not a default and never
+   * arrives by omission -- the form makes creating a choice with a label on it,
+   * because creating a session as a silent fallback is what produced three rows
+   * for one three-day course.
+   */
+  sessionId: string | null
+}
+
+/** The picker's value for "none of these -- create a new session". */
+export const NEW_SESSION = '__new__'
+
+export type SessionOption = {
+  id: string
+  title: string
+  start_date: string
+  end_date: string
+  venue: string | null
+  /** True when the completion date falls inside this session's own dates. */
+  containsDate: boolean
+}
+
+/**
+ * Sessions a completion on this topic and date could plausibly belong to.
+ *
+ * ── WHY THE DATE RANGE MATTERS MORE THAN THE START DATE ──
+ *
+ * A three-day course entered against its second day used to match nothing,
+ * because resolveSession compares `start_date` exactly. So each day produced
+ * its own session and one course counted three times.
+ *
+ * Here a session matches when the completion date falls anywhere inside
+ * start_date..end_date. Those come first and are marked, so a clerk entering
+ * day two sees the course they mean at the top of the list.
+ *
+ * Nearby sessions on the same topic follow, because a date can be mistyped and
+ * because a course may be recorded slightly after it ran. Two courses on one
+ * topic in one month is ordinary, so the option text carries title, dates and
+ * venue -- enough to tell them apart without opening anything.
+ */
+export function useSessionsForTopic(topicId: string, date: string) {
+  return useQuery({
+    queryKey: ['completions', 'sessions-for-topic', topicId, date],
+    enabled: !!topicId,
+    staleTime: 60_000,
+    queryFn: async (): Promise<SessionOption[]> => {
+      const res = await supabase
+        .from('training_session')
+        .select('id, title, start_date, end_date, venue')
+        .eq('topic_id', topicId)
+        .is('deleted_at', null)
+        .order('start_date', { ascending: false })
+        .limit(50)
+      const rows = unwrapList(
+        res as unknown as { data: Omit<SessionOption, 'containsDate'>[] | null; error: unknown },
+      )
+      if (!date) return rows.map((r) => ({ ...r, containsDate: false }))
+
+      const target = new Date(date).getTime()
+      const DAY = 86_400_000
+      return rows
+        .map((r) => ({
+          ...r,
+          containsDate: r.start_date <= date && date <= r.end_date,
+        }))
+        // Within two months either side. Wider than that and the list stops
+        // being a shortlist and starts being a haystack.
+        .filter(
+          (r) =>
+            r.containsDate ||
+            Math.abs(new Date(r.start_date).getTime() - target) <= 60 * DAY,
+        )
+        .sort((a, b) => {
+          if (a.containsDate !== b.containsDate) return a.containsDate ? -1 : 1
+          return (
+            Math.abs(new Date(a.start_date).getTime() - target) -
+            Math.abs(new Date(b.start_date).getTime() - target)
+          )
+        })
+    },
+  })
 }
 
 /**
@@ -327,7 +411,11 @@ export function useCreateCompletion() {
   return useMutation({
     mutationFn: async (input: CompletionInput) => {
       const person = await resolvePerson(input)
-      const sessionId = await resolveSession(input.topicId, input.trainingDate, input.topicLabel)
+      // Picked from the list, or created because the coordinator said none
+      // matched. Creating is the exception now, not the default.
+      const sessionId =
+        input.sessionId ??
+        (await resolveSession(input.topicId, input.trainingDate, input.topicLabel))
       const uid = await currentUserId()
 
       const res = await supabase

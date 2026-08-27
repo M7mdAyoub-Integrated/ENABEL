@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSessionsForTopic, NEW_SESSION } from '../data/completions'
 import type { FieldSpec } from '../ui/Field'
 import type { ModuleId } from '../modules'
 import { makeTranslate, type Translate } from '../i18n/tx'
@@ -51,6 +52,11 @@ export function useFormSchema(
   const exhibitionOptions = useExhibitionOptions(tx, locale)
   const productionPartners = usePartnerOptions('production_support')
   const completionPeople = useCompletionPeople()
+  // Sessions this completion could belong to. Fetched here so the picker can
+  // narrow as soon as a topic and date are chosen.
+  const tcTopic = typeof values['topic'] === 'string' ? (values['topic'] as string) : ''
+  const tcDate = typeof values['date'] === 'string' ? (values['date'] as string) : ''
+  const matchingSessions = useSessionsForTopic(tcTopic, tcDate)
   const partnerTypeTraining = useRef('partner_type_training')
   const partnerTypeProduction = useRef('partner_type_production')
   const partnerRoleTraining = useRef('partner_role_training')
@@ -75,6 +81,16 @@ export function useFormSchema(
     const opts = (rows: RefRow[]) =>
       rows.map((r) => ({ value: r.id, label: refLabel(r, locale) }))
     const str = (k: string) => (typeof values[k] === 'string' ? (values[k] as string) : '')
+
+    // Sessions first, "create a new one" last and labelled. The fallback is a
+    // deliberate choice with words on it, never a silent default.
+    const sessionOpts = [
+      ...(matchingSessions.data ?? []).map((s) => ({
+        value: s.id,
+        label: `${s.title} · ${s.start_date}${s.end_date !== s.start_date ? ` – ${s.end_date}` : ''}${s.venue ? ` · ${s.venue}` : ''}${s.containsDate ? ` — ${t('forms:completion.coversThisDate')}` : ''}`,
+      })),
+      { value: NEW_SESSION, label: t('forms:completion.createNewSession') },
+    ]
 
     if (module === 'tp' || module === 'pp') {
       const training = module === 'tp'
@@ -148,6 +164,23 @@ export function useFormSchema(
           fields: [
             { key: 'topic', label: t('forms:completion.trainingTitle'), type: 'select', half: true, options: opts(refs.trainingTopic) },
             { key: 'date', label: t('forms:completion.trainingDate'), type: 'date', half: true },
+            // PICK THE SESSION, do not create one silently. Creating a session
+            // as a by-product is what produced three rows for one three-day
+            // course: resolveSession matched on start_date, so each day was a
+            // new session. The picker matches on the whole date range instead.
+            {
+              key: 'session',
+              label: t('forms:completion.session'),
+              type: 'select',
+              required: true,
+              help: sessionOpts.length > 1
+                ? t('forms:completion.sessionHelp')
+                : t('forms:completion.sessionHelpNone'),
+              options: sessionOpts,
+              ...(str('session') === NEW_SESSION
+                ? { warn: t('forms:completion.willCreateSession') }
+                : {}),
+            },
           ],
         },
         {
@@ -344,7 +377,14 @@ export function useFormSchema(
 
     // fu handled by useWizardSteps
     return []
-  }, [module, values, touched, t, tx, locale, exhibitionOptions, productionPartners, completionPeople, refs])
+  }, [
+    module, values, touched, t, tx, locale,
+    exhibitionOptions, productionPartners, completionPeople, refs,
+    // The session picker's options come from this query, so the schema has to
+    // rebuild when it resolves -- otherwise the field renders with only
+    // "create a new session" and a coordinator creates one that already exists.
+    matchingSessions.data,
+  ])
 }
 
 /* ── the six-step follow-up wizard ──────────────────────────────────────── */
@@ -360,6 +400,7 @@ export function useWizardSteps(values: FormValues, step: number): FormSection[] 
 
   return useMemo(() => {
     const str = (k: string) => (typeof values[k] === 'string' ? (values[k] as string) : '')
+
     const opts = (rows: RefRow[]) => rows.map((r) => ({ value: r.id, label: refLabel(r, locale) }))
     const person = completionPeople.find((p) => p.personId === str('person'))
     const isTwelveMonth = str('round') === 'twelve_month'
