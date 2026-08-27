@@ -375,7 +375,8 @@
       "focalPoint": "Focal point — who to contact",
       "durationHours": "Duration in hours",
       "description": "Description"
-    }
+    },
+    "endedNoPublish": "This session has already ended, so it cannot be published. The public site only lists what is still to come — publishing it would change nothing anyone could see."
   },
   "newSession": {
     "heading": "New training session",
@@ -418,5 +419,44 @@
     "notPublishedYet": "Once created, the session is a draft. It is not on the public site until you publish it from the session page.",
     "headingEdit": "Edit training session",
     "saveChanges": "Save changes"
+  },
+  "exhibitionAdmin": {
+    "backToList": "All markets",
+    "loadFailed": "Could not load this market. Check your connection and try again.",
+    "days": "{count, plural, one {# day} other {# days}}",
+    "booths": "Booths",
+    "boothsTaken": "{taken} of {capacity} approved",
+    "atCapacity": "Every booth is taken. The database will refuse another approval until one is withdrawn.",
+    "publicHeading": "The public website",
+    "publishedBody": "This market is on the public site now. Anyone can see it and apply for a booth.",
+    "notPublishedBody": "This market is not on the public site. Nobody outside the Municipality can see it.",
+    "endedNoPublish": "This market has already ended, so it cannot be published. The public site only lists what is still to come — publishing it would change nothing anyone could see. It still counts towards E0.1, which does not depend on publication.",
+    "cannotPublishYet": "It cannot be published until these are filled in:",
+    "missing": {
+      "description": "Description — what the market is",
+      "focalPoint": "Focal point — who to contact"
+    },
+    "fillInDetails": "Fill in the details",
+    "publish": "Publish to the public site",
+    "unpublish": "Remove from the public site",
+    "registrations": "Registrations",
+    "pendingCount": "{count, plural, =0 {nothing awaiting review} one {# awaiting review} other {# awaiting review}}",
+    "approvalNote": "Approving is what counts. Indicator E0.2 counts distinct producers with an approved registration — a registration awaiting review counts for nothing, and approving the same producer on a second market does not count them twice.",
+    "noRegistrations": "Nobody has registered yet.",
+    "colProducer": "Producer",
+    "colSells": "Type and products",
+    "colDecision": "Decision",
+    "firstTime": "First market",
+    "status": {
+      "draft": "Draft",
+      "submitted": "Awaiting review",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "approve": "Approve",
+    "reject": "Reject",
+    "undoDecision": "Undo this decision",
+    "decisionRefused": "The database refused that. Approving is a coordinator's decision, and it is refused once every booth is taken or after the market has ended.",
+    "manageThisMarket": "Publishing and booths"
   }
 }

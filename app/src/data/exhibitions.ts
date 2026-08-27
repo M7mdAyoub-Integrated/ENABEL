@@ -315,3 +315,163 @@ export function useDeleteExhibition() {
     },
   })
 }
+
+/* ── the municipality side: publishing and registrations ─────────────────── */
+
+/**
+ * Registrations for one market, with everything the approval decision needs.
+ *
+ * ── APPROVAL IS THE ACTION THAT MOVES E0.2 ──
+ *
+ * `v_ind_e0_2` counts DISTINCT people with `status = 'approved'`. A
+ * registration sitting at `submitted` counts for nothing, so approving is not
+ * tidying a queue -- it is the moment a figure in the donor return changes.
+ * The screen says so rather than letting a coordinator assume that applying
+ * was enough.
+ *
+ * `is_first_time` is DERIVED by trg_exhibition_registration_check from prior
+ * approved registrations. It is displayed and never offered as a field: asking
+ * someone to remember would produce a worse answer than the database already
+ * has.
+ */
+export type RegistrationRow = {
+  id: string
+  personId: string
+  fullName: string
+  nationalId: string
+  village: string | null
+  status: 'draft' | 'submitted' | 'approved' | 'rejected'
+  isFirstTime: boolean
+  submittedByParticipant: boolean
+  producerType: string | null
+  products: string[]
+}
+
+export function useExhibitionRegistrations(exhibitionId: string | undefined, locale: string) {
+  return useQuery({
+    queryKey: qk.exhibitions.detail(exhibitionId ?? '').concat('registrations'),
+    enabled: !!exhibitionId,
+    queryFn: async (): Promise<RegistrationRow[]> => {
+      const res = await supabase
+        .from('exhibition_registration')
+        .select(
+          'id, person_id, status, is_first_time, submitted_by_participant, ' +
+            'person:person_id (full_name, national_id, village), ' +
+            'producer:producer_type_id (label_en, label_ar), ' +
+            'exhibition_registration_product (ref_product (label_en, label_ar))',
+        )
+        .eq('exhibition_id', exhibitionId!)
+        .is('deleted_at', null)
+        .order('created_at', { ascending: true })
+      type Raw = {
+        id: string
+        person_id: string
+        status: RegistrationRow['status']
+        is_first_time: boolean
+        submitted_by_participant: boolean
+        person: { full_name: string; national_id: string; village: string | null } | null
+        producer: { label_en: string; label_ar: string | null } | null
+        exhibition_registration_product: {
+          ref_product: { label_en: string; label_ar: string | null } | null
+        }[]
+      }
+      const rows = unwrapList(res as unknown as { data: Raw[] | null; error: unknown })
+      const lbl = (r: { label_en: string; label_ar: string | null } | null) =>
+        r ? (locale.startsWith('ar') ? r.label_ar || r.label_en : r.label_en) : null
+      return rows.map((r) => ({
+        id: r.id,
+        personId: r.person_id,
+        fullName: r.person?.full_name ?? '',
+        nationalId: r.person?.national_id ?? '',
+        village: r.person?.village ?? null,
+        status: r.status,
+        isFirstTime: r.is_first_time,
+        submittedByParticipant: r.submitted_by_participant,
+        producerType: lbl(r.producer),
+        products: r.exhibition_registration_product
+          .map((p) => lbl(p.ref_product))
+          .filter((x): x is string => !!x),
+      }))
+    },
+  })
+}
+
+/**
+ * Approve or reject.
+ *
+ * The database refuses this for anyone but a coordinator
+ * (guard_registration_status), and refuses an approval that would exceed booth
+ * capacity or land on an ended market (trg_exhibition_registration_check).
+ * None of that is re-implemented here -- the screen surfaces the refusal in
+ * plain language and does not try to predict it.
+ */
+export function useDecideRegistration() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (v: {
+      id: string
+      exhibitionId: string
+      status: 'approved' | 'rejected' | 'submitted'
+    }) => {
+      const res = await supabase
+        .from('exhibition_registration')
+        .update({ status: v.status })
+        .eq('id', v.id)
+        .is('deleted_at', null)
+        .select('id')
+      if (res.error) throw toAppError(res.error)
+      if (!res.data || res.data.length === 0) {
+        throw toAppError({ code: '42501', message: 'update matched no visible row' })
+      }
+      return v.id
+    },
+    onSuccess: (_d, v) => {
+      void qc.invalidateQueries({ queryKey: qk.exhibitions.detail(v.exhibitionId) })
+      void qc.invalidateQueries({ queryKey: qk.exhibitions.list() })
+      // Approving moves E0.2.
+      void qc.invalidateQueries({ queryKey: ['indicators'] })
+      void qc.invalidateQueries({ queryKey: ['overview'] })
+    },
+  })
+}
+
+/**
+ * What is missing before this market can go public.
+ *
+ * The GATE is shared with training; the "needs details" badge deliberately is
+ * not. A training created from a completion is incomplete by construction and
+ * belongs in a queue to clear. Most incomplete exhibitions are past markets
+ * recorded for E0.1 that were never meant to have a public page -- badging
+ * those would flag rows that are fine forever, and a badge that is usually
+ * wrong is one people learn to ignore.
+ */
+export function missingForExhibitionPublish(e: ExhibitionRow): string[] {
+  const gaps: string[] = []
+  if (!e.description) gaps.push('description')
+  if (!e.focalPoint) gaps.push('focalPoint')
+  return gaps
+}
+
+export function usePublishExhibition() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (v: { id: string; on: boolean }) => {
+      const res = await supabase
+        .from('exhibition')
+        .update({ is_published: v.on })
+        .eq('id', v.id)
+        .is('deleted_at', null)
+        .select('id')
+      if (res.error) throw toAppError(res.error)
+      if (!res.data || res.data.length === 0) {
+        throw toAppError({ code: '42501', message: 'update matched no visible row' })
+      }
+      return v.id
+    },
+    onSuccess: (_d, v) => {
+      void qc.invalidateQueries({ queryKey: qk.exhibitions.detail(v.id) })
+      void qc.invalidateQueries({ queryKey: qk.exhibitions.list() })
+      void qc.invalidateQueries({ queryKey: ['public', 'opportunities'] })
+    },
+  })
+}

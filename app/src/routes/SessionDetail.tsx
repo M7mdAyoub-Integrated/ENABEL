@@ -239,7 +239,11 @@ export function SessionDetail() {
           {t('session.publishHeading')}
         </h2>
         <p className="mt-1 max-w-[60ch] text-[14px] leading-[1.5] text-body">
-          {s.is_published ? t('session.publishedBody') : t('session.notPublishedBody')}
+          {ended
+            ? t('session.endedNoPublish')
+            : s.is_published
+              ? t('session.publishedBody')
+              : t('session.notPublishedBody')}
         </p>
 
         {/* What actually becomes public, named. focal_point especially: it is
@@ -272,6 +276,7 @@ export function SessionDetail() {
           disabled={
             publish.isPending ||
             s.is_cancelled ||
+            ended ||
             (!s.is_published && missingForPublish(s).length > 0)
           }
           onClick={() => publish.mutate({ id: s.id, on: !s.is_published })}

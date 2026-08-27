@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { makeTranslate } from '../i18n/tx'
 import { isModuleId, MODULES, ACCENT_BG } from '../modules'
@@ -132,6 +132,18 @@ export function DetailScreen() {
         </p>
       ) : null}
       <AccentRule className={ACCENT_BG[meta.accent]} />
+
+      {/* Publishing and the booth decisions live on their own screen, the way
+          training sessions do. Without this link it is reachable only by
+          typing the URL -- which is exactly how /sessions was missed. */}
+      {module === 'ex' && can(role, 'record.edit') ? (
+        <Link
+          to={`/exhibitions/${id}`}
+          className="mt-4 inline-flex min-h-11 items-center bg-amber px-5 font-narrow text-[12.5px] font-bold uppercase tracking-[0.12em] text-bg no-underline hover:text-bg"
+        >
+          {t('forms:exhibitionAdmin.manageThisMarket')}
+        </Link>
+      ) : null}
 
       {/* Coordinator approve / reject, registrations only, pending only. */}
       {isRegistration && pending && can(role, 'registration.review') ? (

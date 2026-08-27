@@ -20,6 +20,7 @@ import PublicHome from './routes/public/PublicHome'
 import ApplyForm from './routes/public/ApplyForm'
 import SessionList from './routes/SessionList'
 import SessionNew from './routes/SessionNew'
+import ExhibitionDetail from './routes/ExhibitionDetail'
 import SessionDetail from './routes/SessionDetail'
 import OpportunityDetail from './routes/public/OpportunityDetail'
 import SignIn from './routes/auth/SignIn'
@@ -141,6 +142,15 @@ const router = createBrowserRouter([
       // Municipality side of the public flow: publish an opportunity, then
       // decide who took part. Kept out of /forms/:module because a participant
       // list is a different shape from the seven record forms.
+      // The market equivalent of /sessions/:id -- publishing and the
+      // registration decisions, which are a different shape from the generic
+      // record detail screen.
+      {
+        path: '/exhibitions/:id',
+        element: guard(<ExhibitionDetail />, (n) => (
+          <RequireCapability capability="record.edit">{n}</RequireCapability>
+        )),
+      },
       {
         path: '/sessions/new',
         element: guard(<SessionNew />, (n) => (
