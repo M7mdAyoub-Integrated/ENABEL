@@ -60,6 +60,12 @@ export function isUsablePhone(raw: string): boolean {
  * `has_disability`, `disability_type_id`, and `person_id`. The first three are
  * why the registry is sensitive; the fourth would be a durable handle to a
  * person row sitting in a browser. See migration 0052.
+ *
+ * `nationality_id` and `agri_involvement_id` were removed in 0062. They were
+ * fetched and never rendered -- uuids the browser cannot turn into words
+ * without granting anon two more reference tables. Personal data crossing into
+ * an anonymous browser and being dropped is the exposure with none of the
+ * benefit. Every field here is one the form shows back.
  */
 export type PrefillResult =
   | { found: false }
@@ -69,8 +75,6 @@ export type PrefillResult =
       sex: string | null
       village: string | null
       phone: string | null
-      nationality_id: string | null
-      agri_involvement_id: string | null
     }
 
 export type LookupInput = {

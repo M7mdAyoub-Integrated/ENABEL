@@ -7,7 +7,7 @@ import { queryClient } from './data/queryClient'
 import { DEMO_MODE } from './demo/demoMode'
 import { useQueueSync } from './data/useOffline'
 import { useDirection } from './hooks/useDirection'
-import { RequireCapability, RequireModule, RequirePortal, RequireSession } from './auth/guards'
+import { RequireCapability, RequireModule, RequireSession } from './auth/guards'
 import Landing from './routes/Landing'
 import Dashboard from './routes/Dashboard'
 import ListScreen from './routes/ListScreen'
@@ -16,11 +16,10 @@ import DetailScreen from './routes/DetailScreen'
 import ManualEntries from './routes/ManualEntries'
 import Settings from './routes/Settings'
 import NotFound from './routes/NotFound'
-import PortalDashboard from './routes/portal/PortalDashboard'
-import PortalRegister from './routes/portal/PortalRegister'
 import PublicHome from './routes/public/PublicHome'
 import ApplyForm from './routes/public/ApplyForm'
 import SessionList from './routes/SessionList'
+import SessionNew from './routes/SessionNew'
 import SessionDetail from './routes/SessionDetail'
 import OpportunityDetail from './routes/public/OpportunityDetail'
 import SignIn from './routes/auth/SignIn'
@@ -100,14 +99,11 @@ const router = createBrowserRouter([
   // Where staff used to land. Kept so an existing bookmark still works.
   { path: '/home', element: <Landing /> },
 
-  {
-    path: '/portal',
-    element: guard(<PortalDashboard />, (n) => <RequirePortal>{n}</RequirePortal>),
-  },
-  {
-    path: '/portal/register',
-    element: guard(<PortalRegister />, (n) => <RequirePortal>{n}</RequirePortal>),
-  },
+  // THE PARTICIPANT PORTAL IS RETIRED. `/` is a global home page now, so there
+  // is no tailored personal page and no account to sign in to. PortalDashboard,
+  // PortalRegister and PortalShell stay on disk, dormant and unimported, the
+  // same treatment the auth screens get -- restoring them is adding the routes
+  // back. See src/demo/demoMode.ts.
 
   {
     element: <ShellLayout />,
@@ -145,6 +141,12 @@ const router = createBrowserRouter([
       // Municipality side of the public flow: publish an opportunity, then
       // decide who took part. Kept out of /forms/:module because a participant
       // list is a different shape from the seven record forms.
+      {
+        path: '/sessions/new',
+        element: guard(<SessionNew />, (n) => (
+          <RequireCapability capability="record.create">{n}</RequireCapability>
+        )),
+      },
       {
         path: '/sessions',
         element: guard(<SessionList />, (n) => (

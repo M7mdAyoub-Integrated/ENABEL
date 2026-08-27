@@ -25,6 +25,13 @@ export function SessionList() {
       </h1>
       <p className="mt-1 max-w-[60ch] text-[14px] text-muted">{t('session.listIntro')}</p>
 
+      <Link
+        to="/sessions/new"
+        className="mt-4 inline-flex min-h-11 items-center bg-ink px-5 font-narrow text-[12.5px] font-bold uppercase tracking-[0.12em] text-bg no-underline hover:text-bg"
+      >
+        {t('session.newSession')}
+      </Link>
+
       {q.isLoading ? (
         <ul className="mt-5 flex list-none flex-col gap-2 p-0" aria-hidden="true">
           {[0, 1, 2].map((i) => (

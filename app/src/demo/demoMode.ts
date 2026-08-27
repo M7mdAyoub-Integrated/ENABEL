@@ -132,3 +132,20 @@ export function warnIfDemo(): void {
     'background:#A66A17;color:#FBFAF7;padding:2px 6px;font-weight:bold',
   )
 }
+
+/**
+ * ── THE PARTICIPANT PORTAL IS RETIRED ─────────────────────────────────────
+ *
+ * `/portal` and `/portal/register` were removed from the router when `/` became
+ * a GLOBAL home page. The requirement is one page everyone sees: no accounts,
+ * no sign-in for the public, no tailored personal page.
+ *
+ * PortalDashboard, PortalRegister and PortalShell are still on disk and still
+ * compile. They are simply not routed. DEMO_PORTAL_NATIONAL_ID below is kept
+ * for the same reason -- it costs nothing and it is the only record of which
+ * demo identity the portal used.
+ *
+ * Looking up your own applications is NOT the portal returning: that is a
+ * public lookup keyed on national ID plus date of birth, with no session and no
+ * account behind it.
+ */

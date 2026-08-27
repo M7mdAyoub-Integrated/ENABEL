@@ -257,6 +257,75 @@ export function useSetDelivered() {
   return useSessionFlag('delivered', (on) => ({ is_delivered: on }))
 }
 
+/* ── creating a session ───────────────────────────────────────────────────── */
+
+/**
+ * What the create form writes.
+ *
+ * `is_published` and `is_delivered` are ABSENT on purpose and must stay absent.
+ * Publishing makes something public; delivery asserts it happened and feeds
+ * D0.2. Both are separate deliberate actions taken later, from the session
+ * screen, and a create form that could set either would let a coordinator make
+ * a draft public, or move a donor figure, without meaning to.
+ *
+ * `duration_hours` is asked for rather than derived from the dates: a
+ * three-day course may be twelve hours, and D0.2 and the public page both
+ * report what was actually taught.
+ */
+export type NewSession = {
+  title: string
+  topicId: string
+  startDate: string
+  endDate: string
+  durationHours: number
+  venue: string
+  partnershipId: string | null
+  focalPoint: string
+  description: string
+  plannedSeats: number | null
+  applicationOpensOn: string | null
+  applicationClosesOn: string | null
+}
+
+export function useCreateSession() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationKey: ['sessions', 'create'],
+    mutationFn: async (v: NewSession) => {
+      const res = await supabase
+        .from('training_session')
+        .insert({
+          title: v.title.trim(),
+          topic_id: v.topicId,
+          start_date: v.startDate,
+          end_date: v.endDate,
+          duration_hours: v.durationHours,
+          venue: v.venue.trim(),
+          focal_point: v.focalPoint.trim(),
+          description: v.description.trim(),
+          // Nullable on purpose: there may be no training partnership yet, and
+          // blocking the form on one would stop a municipality recording a
+          // course it ran alone.
+          ...(v.partnershipId ? { delivered_by_partnership_id: v.partnershipId } : {}),
+          ...(v.plannedSeats === null ? {} : { planned_seats: v.plannedSeats }),
+          ...(v.applicationOpensOn ? { application_opens_on: v.applicationOpensOn } : {}),
+          ...(v.applicationClosesOn ? { application_closes_on: v.applicationClosesOn } : {}),
+        })
+        .select('id')
+        .single()
+      if (res.error) throw toAppError(res.error)
+      return res.data
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: sessionKeys.list() })
+      // Not published yet, so the public list cannot have changed -- but D0.2
+      // reads training_session, and an unpublished undelivered row must leave
+      // it alone. Invalidating proves that on screen rather than assuming it.
+      void qc.invalidateQueries({ queryKey: ['indicators'] })
+    },
+  })
+}
+
 /* ── what deleting would cost ─────────────────────────────────────────────── */
 
 export type DeleteImpact = {

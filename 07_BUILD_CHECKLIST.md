@@ -444,6 +444,23 @@ from the ledger, not a demonstrated fact. Say so that way in any handover.
 
 ### ☐ Retire the demo data and draw the audit boundary before go-live
 
+**D0.2 currently reads 2, and both rows are demo data.** `Food Processing I` and
+`Food Safety Basics` were created by `0024_seed_demo` on 24 August 2026. Both
+have `is_delivered = true` and a food-processing topic, which is the entire
+basis of the figure, and both have `venue`, `focal_point`, `duration_hours`,
+`description` and both application dates **null** — they were never real
+sessions.
+
+So one of the twenty indicators is, today, purely demo.
+
+**When the demo range is removed, confirm `D0.2` goes to 0.** If it does not,
+something real has been created with a food-processing topic and
+`is_delivered = true`, and that needs checking before the first return rather
+than after.
+
+The same check is worth running for every indicator: note the value before
+retiring the demo data and after, and account for each change.
+
 This is one step with three parts and **the order matters.** Do not draw the audit boundary before the demo data is gone, or the boundary row will sit above data that is still live.
 
 Everything in `audit_log` up to this point is seeding, demo data and build-phase verification. None of it is operational activity, and some of it is actively misleading — see `02_DATABASE_PLAN.md` §17 for the `indicator_snapshot` insert/delete pair that reads like an erased quarter close.

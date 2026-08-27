@@ -54,14 +54,28 @@ function useNavGroups(): Group[] {
         : [],
     },
     { labelKey: 'nav:group.partnerships', items: [...mod('tp', '01'), ...mod('pp', '02')] },
-    { labelKey: 'nav:group.training', items: mod('tc', '03') },
+    {
+      labelKey: 'nav:group.training',
+      items: [
+        // Sessions was reachable only by typing the URL until now. It is the
+        // screen that creates and publishes the thing the public flow depends
+        // on, so it belongs in the navigation.
+        ...(can(role, 'record.edit')
+          ? [{ to: '/sessions', labelKey: 'nav:sessions', num: '03' } as Dest]
+          : []),
+        ...mod('tc', '04'),
+      ],
+    },
     { labelKey: 'nav:group.production', items: mod('ln', '04') },
     { labelKey: 'nav:group.markets', items: [...mod('ex', '05'), ...mod('rg', '06')] },
     { labelKey: 'nav:group.followup', items: mod('fu', '07') },
     {
       labelKey: 'nav:group.noForm',
       items: can(role, 'manual.view')
-        ? [{ to: '/manual-entries', labelKey: 'nav:manualEntries', num: '08', count: 8 }]
+        // No count: the number of indicators without a form changed twice in
+        // one session, and a hardcoded badge is a claim that goes stale
+        // silently. See CLAUDE.md, checks that verify shape not substance.
+        ? [{ to: '/manual-entries', labelKey: 'nav:manualEntries', num: '08' }]
         : [],
     },
     { labelKey: null, items: [{ to: '/settings', labelKey: 'nav:settings', num: '09' }] },

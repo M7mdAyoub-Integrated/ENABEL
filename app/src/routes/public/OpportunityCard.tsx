@@ -34,6 +34,13 @@ export function AvailabilityLine({ o }: { o: PublicOpportunity }) {
   const locale = i18n.resolvedLanguage ?? 'en'
   const a = availabilityOf(o)
 
+  if (a.kind === 'notYetOpen') {
+    return (
+      <span className="font-narrow text-[12px] font-bold uppercase tracking-[0.1em] text-muted">
+        {t('avail.opensOn', { date: formatShortDate(a.opensOn!, locale) })}
+      </span>
+    )
+  }
   if (a.kind === 'closed') {
     return (
       <span className="font-narrow text-[12px] font-bold uppercase tracking-[0.1em] text-faint">

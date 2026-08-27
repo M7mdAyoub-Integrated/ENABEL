@@ -126,6 +126,7 @@ export function ApplyForm() {
   const [sex, setSex] = useState('')
   const [village, setVillage] = useState('')
   const [foundName, setFoundName] = useState<string | null>(null)
+  const [known, setKnown] = useState<{ sex: string | null; village: string | null; phone: string | null } | null>(null)
   const [outcome, setOutcome] = useState<ApplyOutcome | null>(null)
   const [touched, setTouched] = useState(false)
   const [producerTypeId, setProducerTypeId] = useState('')
@@ -203,6 +204,10 @@ export function ApplyForm() {
     if (res.found) {
       setFoundName(res.full_name)
       setVillage(res.village ?? '')
+      // Shown read-only on the confirm step. The point of prefill is that
+      // nobody answers a question the Municipality can already answer -- but
+      // that only holds if they can SEE it is already answered.
+      setKnown({ sex: res.sex, village: res.village, phone: res.phone })
       setStep('confirm')
     } else {
       setStep(withPhone ? 'notFound' : 'notFound')
@@ -351,7 +356,40 @@ export function ApplyForm() {
           <p dir="auto" className="mt-2 text-[24px] font-extrabold leading-[1.2] tracking-[-0.02em]">
             {foundName}
           </p>
-          <p className="mt-3 text-[14px] text-muted">{t('apply.isThisYouHint')}</p>
+          {known && (known.sex || known.village || known.phone) ? (
+            <dl className="mt-3 border-t border-border-default pt-3">
+              {known.sex ? (
+                <div className="flex gap-2 py-1">
+                  <dt className="font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-muted">
+                    {t('apply.sex')}
+                  </dt>
+                  <dd className="text-[14px] text-ink">{t(`apply.${known.sex}`)}</dd>
+                </div>
+              ) : null}
+              {known.village ? (
+                <div className="flex gap-2 py-1">
+                  <dt className="font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-muted">
+                    {t('apply.village')}
+                  </dt>
+                  <dd dir="auto" className="text-[14px] text-ink">
+                    {known.village}
+                  </dd>
+                </div>
+              ) : null}
+              {known.phone ? (
+                <div className="flex gap-2 py-1">
+                  <dt className="font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-muted">
+                    {t('apply.phone')}
+                  </dt>
+                  <dd dir="ltr" className="text-[14px] text-ink">
+                    {known.phone}
+                  </dd>
+                </div>
+              ) : null}
+            </dl>
+          ) : null}
+          <p className="mt-3 text-[14px] text-muted">{t('apply.alreadyKnown')}</p>
+          <p className="mt-1 text-[14px] text-muted">{t('apply.isThisYouHint')}</p>
 
           {apply.isError ? (
             <p role="alert" className="mt-3 text-[14px] font-semibold text-error">

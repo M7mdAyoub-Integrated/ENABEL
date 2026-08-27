@@ -83,7 +83,14 @@ export function usePublicOpportunity(id: string | undefined) {
 /* ── what the card and the detail page actually say ──────────────────────── */
 
 export type AvailabilityKind =
-  /** Closed to applications: too early, too late, or the event is over. */
+  /**
+   * Applications have not opened YET. Distinct from `closed` on purpose:
+   * "applications closed" tells someone to give up, and if the window opens in
+   * five days that is simply false. They are both `applications_open = false`
+   * in SQL, so the difference has to be drawn here from the dates.
+   */
+  | 'notYetOpen'
+  /** Closed to applications: too late, or the event is over. */
   | 'closed'
   /** Every place is taken. */
   | 'full'
@@ -107,8 +114,18 @@ export function availabilityOf(o: PublicOpportunity): {
   kind: AvailabilityKind
   places?: number
   closesOn?: string
+  opensOn?: string
 } {
-  if (!o.applications_open) return { kind: 'closed' }
+  if (!o.applications_open) {
+    // Not open yet is a different message from closed. Check it first: an
+    // opening date in the future is unambiguous, whereas "not open" alone is
+    // not.
+    const today = new Date().toISOString().slice(0, 10)
+    if (o.application_opens_on && o.application_opens_on > today) {
+      return { kind: 'notYetOpen', opensOn: o.application_opens_on }
+    }
+    return { kind: 'closed' }
+  }
   if (o.is_full) return { kind: 'full' }
   if (o.places_remaining != null) {
     return {

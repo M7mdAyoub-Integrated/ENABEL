@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { availabilityOf, usePublicOpportunity } from '../../data/publicOpportunities'
 import { PublicShell } from './PublicShell'
 import { AvailabilityLine } from './OpportunityCard'
-import { formatDateRange } from '../../lib/format'
+import { formatDateRange, formatShortDate } from '../../lib/format'
 import { ARROW_START } from '../../ui/glyphs'
 
 /**
@@ -140,7 +140,13 @@ export function OpportunityDetail() {
             </>
           ) : (
             <p className="m-0 text-[15px] text-body">
-              {a.kind === 'full' ? t('detail.applyFull') : t('detail.applyClosed')}
+              {a.kind === 'full'
+                ? t('detail.applyFull')
+                : a.kind === 'notYetOpen'
+                  ? t('detail.applyNotYetOpen', {
+                      date: formatShortDate(a.opensOn!, locale),
+                    })
+                  : t('detail.applyClosed')}
             </p>
           )}
         </div>

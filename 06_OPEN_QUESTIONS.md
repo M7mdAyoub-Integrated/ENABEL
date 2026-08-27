@@ -531,6 +531,20 @@ This surfaced while working out whether *restoring a person* should warn about c
 
 ---
 
+## 🟠 OQ-27 · Nobody tells applicants when an event is cancelled
+
+**What happens now.** `v_public_opportunity` filters on `not is_cancelled`, so a cancelled training or market simply disappears from the public site. That is right for the listing — nobody needs to browse a cancelled market.
+
+**What is missing.** If twenty-five producers had already applied, the system has their applications and says nothing to them. The event vanishes from their view with no explanation, and no screen tells staff who needs contacting.
+
+**Where it belongs.** Not on a public page — on the participant list for the cancelled event, as a contact list: who applied, their phone numbers, and their application status at the moment of cancellation. The data is all there; nothing surfaces it.
+
+**Not built.** Recorded so it is not discovered by a farmer arriving at a market that is not happening.
+
+**Decides.** Municipal Coordinator — is contacting applicants a phone-call job from a printed list, or should the system record that they were told?
+
+---
+
 **Take OQ-12 to the Coordinator first.** It is the one that undermines the purpose of the programme, and it is a form change, not a database change.
 
 Note: OQ-12 and OQ-13 were briefly marked resolved on 2026-08-24 when the form fields were built, then set back to open when that work was reverted the same day at the project owner's instruction. Each carries a **History** line recording what was built and what survived. Nothing about the underlying questions has changed.

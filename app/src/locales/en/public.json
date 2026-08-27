@@ -27,7 +27,8 @@
     "places": "{count, plural, one {# place left} other {# places left}}",
     "open": "Open to apply",
     "closesOn": "Apply by {date}",
-    "noClosingDate": "No closing date given"
+    "noClosingDate": "No closing date given",
+    "opensOn": "Opens {date}"
   },
   "detail": {
     "back": "All opportunities",
@@ -45,7 +46,8 @@
     "applyFull": "This is full",
     "notFound": "This is no longer listed",
     "notFoundBody": "It may have closed, filled up, or finished. Go back to see what is open now.",
-    "applySoon": "Applications open shortly. Ask at the Municipality office in the meantime."
+    "applySoon": "Applications open shortly. Ask at the Municipality office in the meantime.",
+    "applyNotYetOpen": "Applications for this open on {date}. Come back then — nothing is needed from you before that."
   },
   "apply": {
     "backToDetail": "Back",
@@ -126,6 +128,7 @@
     "producerTypeHint": "Choose the closest match.",
     "choose": "Choose…",
     "products": "What do you make or sell?",
-    "productsHint": "Tap all that apply. You can leave this blank if you are not sure yet."
+    "productsHint": "Tap all that apply. You can leave this blank if you are not sure yet.",
+    "alreadyKnown": "We already have these details, so you will not be asked for them again."
   }
 }
