@@ -81,7 +81,7 @@ export function PortalRegister() {
           onClick={() => navigate('/portal')}
           className="min-h-11 cursor-pointer font-narrow text-[12px] font-bold uppercase tracking-[0.14em] text-bg opacity-80 hover:opacity-100"
         >
-          <span aria-hidden="true">{ARROW_START}</span> {t('portal:backToPortal')}
+          <span aria-hidden="true" className="inline-block mirror-rtl">{ARROW_START}</span> {t('portal:backToPortal')}
         </button>
 
         <h1

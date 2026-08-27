@@ -71,6 +71,7 @@ export type Database = {
           person_id: string
           registered_on: string
           session_id: string
+          submitted_by_participant: boolean
           updated_at: string
         }
         Insert: {
@@ -88,6 +89,7 @@ export type Database = {
           person_id: string
           registered_on?: string
           session_id: string
+          submitted_by_participant?: boolean
           updated_at?: string
         }
         Update: {
@@ -105,6 +107,7 @@ export type Database = {
           person_id?: string
           registered_on?: string
           session_id?: string
+          submitted_by_participant?: boolean
           updated_at?: string
         }
         Relationships: [
@@ -113,6 +116,13 @@ export type Database = {
             columns: ["person_id"]
             isOneToOne: false
             referencedRelation: "person"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "advisory_enrolment_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "v_person_missing_verification"
             referencedColumns: ["id"]
           },
           {
@@ -248,6 +258,45 @@ export type Database = {
           phone?: string | null
           role?: Database["public"]["Enums"]["app_role_t"]
           updated_at?: string
+        }
+        Relationships: []
+      }
+      applicant_lookup_secret: {
+        Row: {
+          created_at: string
+          id: boolean
+          salt: string
+        }
+        Insert: {
+          created_at?: string
+          id?: boolean
+          salt: string
+        }
+        Update: {
+          created_at?: string
+          id?: boolean
+          salt?: string
+        }
+        Relationships: []
+      }
+      applicant_lookup_throttle: {
+        Row: {
+          attempts: number
+          key_hash: string
+          minute_bucket: string
+          scope: string
+        }
+        Insert: {
+          attempts?: number
+          key_hash: string
+          minute_bucket: string
+          scope: string
+        }
+        Update: {
+          attempts?: number
+          key_hash?: string
+          minute_bucket?: string
+          scope?: string
         }
         Relationships: []
       }
@@ -394,6 +443,13 @@ export type Database = {
             columns: ["person_id"]
             isOneToOne: false
             referencedRelation: "person"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_study_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "v_person_missing_verification"
             referencedColumns: ["id"]
           },
           {
@@ -622,6 +678,13 @@ export type Database = {
             columns: ["person_id"]
             isOneToOne: false
             referencedRelation: "person"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "v_person_missing_verification"
             referencedColumns: ["id"]
           },
           {
@@ -957,6 +1020,13 @@ export type Database = {
             foreignKeyName: "followup_survey_person_id_fkey"
             columns: ["person_id"]
             isOneToOne: false
+            referencedRelation: "v_person_missing_verification"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "followup_survey_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
             referencedRelation: "v_person_public"
             referencedColumns: ["id"]
           },
@@ -1012,6 +1082,13 @@ export type Database = {
             columns: ["person_id"]
             isOneToOne: false
             referencedRelation: "person"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guidance_record_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "v_person_missing_verification"
             referencedColumns: ["id"]
           },
           {
@@ -1285,6 +1362,13 @@ export type Database = {
             foreignKeyName: "linkage_request_person_id_fkey"
             columns: ["person_id"]
             isOneToOne: false
+            referencedRelation: "v_person_missing_verification"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "linkage_request_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
             referencedRelation: "v_person_public"
             referencedColumns: ["id"]
           },
@@ -1518,6 +1602,13 @@ export type Database = {
             columns: ["person_id"]
             isOneToOne: false
             referencedRelation: "person"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "office_service_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "v_person_missing_verification"
             referencedColumns: ["id"]
           },
           {
@@ -1839,6 +1930,13 @@ export type Database = {
             foreignKeyName: "person_activity_type_person_id_fkey"
             columns: ["person_id"]
             isOneToOne: false
+            referencedRelation: "v_person_missing_verification"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "person_activity_type_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
             referencedRelation: "v_person_public"
             referencedColumns: ["id"]
           },
@@ -1906,6 +2004,13 @@ export type Database = {
             columns: ["person_id"]
             isOneToOne: false
             referencedRelation: "person"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "production_initiative_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "v_person_missing_verification"
             referencedColumns: ["id"]
           },
           {
@@ -2769,6 +2874,7 @@ export type Database = {
           person_id: string
           registered_on: string
           session_id: string
+          submitted_by_participant: boolean
           updated_at: string
         }
         Insert: {
@@ -2786,6 +2892,7 @@ export type Database = {
           person_id: string
           registered_on?: string
           session_id: string
+          submitted_by_participant?: boolean
           updated_at?: string
         }
         Update: {
@@ -2803,6 +2910,7 @@ export type Database = {
           person_id?: string
           registered_on?: string
           session_id?: string
+          submitted_by_participant?: boolean
           updated_at?: string
         }
         Relationships: [
@@ -2811,6 +2919,13 @@ export type Database = {
             columns: ["person_id"]
             isOneToOne: false
             referencedRelation: "person"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_enrolment_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "v_person_missing_verification"
             referencedColumns: ["id"]
           },
           {
@@ -3150,6 +3265,36 @@ export type Database = {
         }
         Relationships: []
       }
+      v_person_missing_verification: {
+        Row: {
+          date_of_birth: string | null
+          full_name: string | null
+          id: string | null
+          national_id: string | null
+          phone: string | null
+          verification_state: string | null
+          village: string | null
+        }
+        Insert: {
+          date_of_birth?: string | null
+          full_name?: string | null
+          id?: string | null
+          national_id?: string | null
+          phone?: string | null
+          verification_state?: never
+          village?: string | null
+        }
+        Update: {
+          date_of_birth?: string | null
+          full_name?: string | null
+          id?: string | null
+          national_id?: string | null
+          phone?: string | null
+          verification_state?: never
+          village?: string | null
+        }
+        Relationships: []
+      }
       v_person_public: {
         Row: {
           age_band: string | null
@@ -3238,7 +3383,39 @@ export type Database = {
         Args: { p: Database["public"]["Tables"]["person"]["Row"] }
         Returns: string
       }
+      applicant_prefill: {
+        Args: {
+          p_date_of_birth?: string
+          p_national_id: string
+          p_phone?: string
+        }
+        Returns: Json
+      }
+      apply_for_opportunity: {
+        Args: {
+          p_client_uuid?: string
+          p_date_of_birth?: string
+          p_full_name?: string
+          p_national_id: string
+          p_opportunity_id: string
+          p_opportunity_type: string
+          p_phone?: string
+          p_producer_type_id?: string
+          p_sex?: string
+          p_village?: string
+        }
+        Returns: Json
+      }
       attach_updated_at: { Args: { p_table: string }; Returns: undefined }
+      bump_lookup_throttle: {
+        Args: {
+          p_limit: number
+          p_scope: string
+          p_value: string
+          p_window: string
+        }
+        Returns: boolean
+      }
       current_role: {
         Args: never
         Returns: Database["public"]["Enums"]["app_role_t"]

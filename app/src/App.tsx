@@ -19,6 +19,7 @@ import NotFound from './routes/NotFound'
 import PortalDashboard from './routes/portal/PortalDashboard'
 import PortalRegister from './routes/portal/PortalRegister'
 import PublicHome from './routes/public/PublicHome'
+import ApplyForm from './routes/public/ApplyForm'
 import OpportunityDetail from './routes/public/OpportunityDetail'
 import SignIn from './routes/auth/SignIn'
 import ForgotPassword from './routes/auth/ForgotPassword'
@@ -92,6 +93,7 @@ const router = createBrowserRouter([
   // which anon is granted, and a farmer has no account to wait for.
   { path: '/', element: <PublicHome /> },
   { path: '/opportunity/:id', element: <OpportunityDetail /> },
+  { path: '/apply/:id', element: <ApplyForm /> },
 
   // Where staff used to land. Kept so an existing bookmark still works.
   { path: '/home', element: <Landing /> },

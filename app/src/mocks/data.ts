@@ -576,6 +576,7 @@ export const TRAINING_ENROLMENTS: TrainingEnrolment[] = [
     // Added by migration 0044. These are staff-entered completions, so they
     // take the same backfill the real rows did: approved, never applied.
     application_status: 'approved',
+    submitted_by_participant: false,
     applied_on: null,
 
   },
@@ -592,6 +593,7 @@ export const TRAINING_ENROLMENTS: TrainingEnrolment[] = [
     // Added by migration 0044. These are staff-entered completions, so they
     // take the same backfill the real rows did: approved, never applied.
     application_status: 'approved',
+    submitted_by_participant: false,
     applied_on: null,
 
   },
@@ -608,6 +610,7 @@ export const TRAINING_ENROLMENTS: TrainingEnrolment[] = [
     // Added by migration 0044. These are staff-entered completions, so they
     // take the same backfill the real rows did: approved, never applied.
     application_status: 'approved',
+    submitted_by_participant: false,
     applied_on: null,
 
   },
@@ -624,6 +627,7 @@ export const TRAINING_ENROLMENTS: TrainingEnrolment[] = [
     // Added by migration 0044. These are staff-entered completions, so they
     // take the same backfill the real rows did: approved, never applied.
     application_status: 'approved',
+    submitted_by_participant: false,
     applied_on: null,
 
   },
@@ -640,6 +644,7 @@ export const TRAINING_ENROLMENTS: TrainingEnrolment[] = [
     // Added by migration 0044. These are staff-entered completions, so they
     // take the same backfill the real rows did: approved, never applied.
     application_status: 'approved',
+    submitted_by_participant: false,
     applied_on: null,
 
   },
@@ -656,6 +661,7 @@ export const TRAINING_ENROLMENTS: TrainingEnrolment[] = [
     // Added by migration 0044. These are staff-entered completions, so they
     // take the same backfill the real rows did: approved, never applied.
     application_status: 'approved',
+    submitted_by_participant: false,
     applied_on: null,
 
   },

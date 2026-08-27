@@ -115,7 +115,7 @@ export function BackLink({ children, onClick }: { children: ReactNode; onClick: 
       onClick={onClick}
       className="cursor-pointer pt-[26px] font-narrow text-[12px] font-bold uppercase tracking-[0.14em] text-muted hover:text-ink"
     >
-      <span aria-hidden="true">{ARROW_START}</span> {children}
+      <span aria-hidden="true" className="inline-block mirror-rtl">{ARROW_START}</span> {children}
     </button>
   )
 }

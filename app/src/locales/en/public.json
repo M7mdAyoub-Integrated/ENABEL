@@ -46,5 +46,77 @@
     "notFound": "This is no longer listed",
     "notFoundBody": "It may have closed, filled up, or finished. Go back to see what is open now.",
     "applySoon": "Applications open shortly. Ask at the Municipality office in the meantime."
+  },
+  "apply": {
+    "backToDetail": "Back",
+    "heading": "Apply",
+    "identifyIntro": "First, tell us who you are. We use your national ID to check whether you are already on file, so you are not entered twice.",
+    "nationalId": "National ID number",
+    "nationalIdHint": "Nine digits, exactly as printed on your card.",
+    "nationalIdAgain": "Type it again",
+    "nationalIdAgainHint": "Typing it a second time catches a slip. Pasting is turned off here on purpose.",
+    "errNineDigits": "A national ID is exactly nine digits.",
+    "errNoMatch": "The two numbers are different. Check both against your card.",
+    "checkAgainstCard": "Check this against your card:",
+    "dateOfBirth": "Date of birth",
+    "dateOfBirthHint": "We use this to confirm it is really you.",
+    "continue": "Continue",
+    "checking": "Checking…",
+    "sending": "Sending…",
+    "submit": "Send application",
+    "errNetwork": "We could not reach the Municipality system. Check your connection and try again.",
+    "isThisYou": "Is this you?",
+    "isThisYouHint": "If this is not your name, the number was mistyped. Go back and check it against your card.",
+    "yesApply": "Yes, apply",
+    "notMe": "That is not me",
+    "noRecordTitle": "We have no record of this number",
+    "noRecordBody": "Nothing on file matches",
+    "takenPartBefore": "Have you taken part in a Municipality training or market before?",
+    "yesCheckNumber": "Yes — let me check the number",
+    "yesTryPhone": "Yes — try my phone number instead",
+    "noFirstTime": "No, this is my first time",
+    "phoneIntro": "If you have taken part before but we have no date of birth for you, your phone number can confirm it instead.",
+    "phone": "Phone number",
+    "phoneOptional": "Phone number (optional)",
+    "phoneHint": "For example 0791234567.",
+    "registerIntro": "We will add you to the register. Please check your details before sending.",
+    "registeringAs": "Registering national ID",
+    "fullName": "Full name",
+    "fullNameHint": "As written on your national ID card.",
+    "sex": "Sex",
+    "female": "Female",
+    "male": "Male",
+    "preferNotToSay": "Prefer not to say",
+    "village": "Village",
+    "backToList": "See what else is open",
+    "tryAgain": "Try again",
+    "exhibitionSoon": "Market applications are not open online yet. Please apply at the Municipality office.",
+    "privacyNote": "The Municipality uses these details to run the programme and to report totals to the donor. Reports never name anyone.",
+    "outcome": {
+      "applied": {
+        "title": "Application sent",
+        "body": "The Municipality will review it and contact you. Nothing is confirmed until they do."
+      },
+      "already_applied": {
+        "title": "You have already applied",
+        "body": "We already have your application for this. There is no need to send another one."
+      },
+      "cannot_verify": {
+        "title": "We could not confirm your details",
+        "body": "Check your national ID and date of birth against your card. If they are right and this keeps happening, please visit the Municipality office — we can sort it out there."
+      },
+      "not_open": {
+        "title": "This is no longer open",
+        "body": "It may have closed, filled, or been cancelled since you opened the page."
+      },
+      "full": {
+        "title": "Every place is taken",
+        "body": "This one is full. Other trainings and markets may still be open."
+      },
+      "ineligible": {
+        "title": "A completed training comes first",
+        "body": "Market advice is for people who have finished a Municipality training. Apply for a training first — once you have completed one, this opens up."
+      }
+    }
   }
 }

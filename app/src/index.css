@@ -184,3 +184,21 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* ── Direction-mirrored glyphs ──────────────────────────────────────────────
+   `←` means "back" only while reading runs left to right. Under RTL, back is
+   rightward, so the glyph is mirrored rather than swapped for a different
+   character: one glyph, one meaning, direction handled here.
+
+   Written as an explicit rule rather than Tailwind's `rtl:` variant because
+   that variant produced no utility in this build -- verified by walking
+   document.styleSheets and finding zero `scale-x` rules, not by assuming.
+
+   Inside @layer utilities so it can still be overridden by a later utility,
+   and so it does not outrank Tailwind the way unlayered CSS after
+   `@import 'tailwindcss'` would. */
+@layer utilities {
+  [dir='rtl'] .mirror-rtl {
+    transform: scaleX(-1);
+  }
+}

@@ -94,7 +94,7 @@ export function OpportunityDetail() {
         to="/"
         className="mt-5 inline-flex min-h-11 items-center font-narrow text-[12px] font-bold uppercase tracking-[0.14em] text-muted no-underline hover:text-ink"
       >
-        <span aria-hidden="true">{ARROW_START}</span>
+        <span aria-hidden="true" className="inline-block mirror-rtl">{ARROW_START}</span>
         <span className="ms-2">{t('detail.back')}</span>
       </Link>
 
