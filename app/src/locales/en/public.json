@@ -115,6 +115,10 @@
       "ineligible": {
         "title": "A completed training comes first",
         "body": "Market advice is for people who have finished a Municipality training. Apply for a training first — once you have completed one, this opens up."
+      },
+      "withdrawn": {
+        "title": "Your earlier application was withdrawn",
+        "body": "We received this application before, and it has since been withdrawn. Please contact the Municipality office — they can tell you why and what to do next."
       }
     },
     "stallIntro": "One more step. This helps the market team plan the stalls.",

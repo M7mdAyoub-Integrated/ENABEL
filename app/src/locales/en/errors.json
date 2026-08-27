@@ -31,7 +31,9 @@
     "boothCapacityPositive": "Capacity must be at least one booth.",
     "exhibitionDateOrder": "The end date cannot be before the start date.",
     "ageOrDobRequired": "A date of birth or an age is needed. Without one the person cannot be counted in any age breakdown.",
-    "decisionNeedsDate": "The completion decision needs a decision date. Both are saved together."
+    "decisionNeedsDate": "The completion decision needs a decision date. Both are saved together.",
+    "advisoryEnrolmentDuplicate": "This person is already on that advisory session. One person cannot be enrolled twice in the same session.",
+    "followupDuplicate": "This person already has a follow-up survey for that round."
   },
   "state": {
     "failedTitle": "Could not load",

@@ -131,6 +131,13 @@ export type ApplyOutcome =
   | 'full'
   /** A prerequisite is missing -- advisory needs a completed training. */
   | 'ineligible'
+  /**
+   * This exact submission was received before, and the application it created
+   * has since been withdrawn by the Municipality. Distinct from
+   * `already_applied` on purpose: telling someone they have already applied
+   * when staff removed their application sends them away satisfied and wrong.
+   */
+  | 'withdrawn'
 
 export type ApplyInput = {
   opportunityId: string

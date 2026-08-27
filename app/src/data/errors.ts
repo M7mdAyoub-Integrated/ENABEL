@@ -49,18 +49,36 @@ export type AppError = {
  * Keyed on the constraint name rather than the message text, because the text
  * is a Postgres implementation detail and the name is ours.
  */
+/**
+ * Constraint and index names, mapped to something a person can read.
+ *
+ * ── EVERY KEY HERE HAS BEEN CHECKED AGAINST THE DATABASE ──
+ *
+ * A name that matches nothing is worse than no entry at all: it looks handled,
+ * it silently falls through to the generic message, and nobody finds out until
+ * a user reports a useless error. Three have been caught this way so far —
+ * `person_national_id_format`, `training_enrolment_unique` and
+ * `exhibition_registration_unique`. All three were plausible. None existed.
+ *
+ * Before adding a key, read it from `pg_constraint.conname` or `pg_class.relname`,
+ * not from memory and not from what the migration looks like it should have
+ * called it.
+ *
+ * The `*_live` names are partial unique indexes added in 0059 — they replaced
+ * constraints that did not exclude soft-deleted rows (OQ-24).
+ */
 const CONSTRAINT_MESSAGES: Record<string, string> = {
   partner_name_unique: 'errors:db.partnerDuplicate',
-  partnership_partner_id_partnership_type_key: 'errors:db.partnershipDuplicate',
+  partnership_partner_type_live: 'errors:db.partnershipDuplicate',
   person_national_id_key: 'errors:db.personDuplicate',
-  // The real constraint names, read from the migrations. The two guesses that
-  // were here before ("person_national_id_format", "training_enrolment_unique")
-  // matched nothing, so both fell through to the generic message.
   national_id_format: 'errors:db.nationalIdFormat',
   age_or_dob: 'errors:db.ageOrDobRequired',
-  training_enrolment_person_id_session_id_key: 'errors:db.enrolmentDuplicate',
+  training_enrolment_person_session_live: 'errors:db.enrolmentDuplicate',
+  advisory_enrolment_person_session_live: 'errors:db.advisoryEnrolmentDuplicate',
   decision_needs_date: 'errors:db.decisionNeedsDate',
-  exhibition_registration_unique: 'errors:db.registrationDuplicate',
+  advisory_decision_needs_date: 'errors:db.decisionNeedsDate',
+  exhibition_registration_exhibition_person_live: 'errors:db.registrationDuplicate',
+  followup_survey_person_round_live: 'errors:db.followupDuplicate',
   exhibition_booth_capacity_check: 'errors:db.boothCapacityPositive',
   exhibition_dates: 'errors:db.exhibitionDateOrder',
 }

@@ -298,7 +298,7 @@ No crosswalk exists in any source document.
 | 🟡 Wording and policy | 4 | OQ-15, OQ-16, OQ-17, OQ-18 |
 | 🟡 Recorded during Phase 6 | 2 | OQ-19, OQ-20 |
 | 🟠 Public apply flow (Phase 6 step 4) | 2 | OQ-21 *(approved)*, OQ-22 *(resolved)* |
-| 🟠 Eligibility (Phase 6 step 5) | 2 | OQ-23, OQ-24 |
+| 🟢 Eligibility (Phase 6 step 5) | 2 | OQ-23 *(resolved)*, OQ-24 *(fixed)* |
 
 ## 🟡 OQ-19 · Cancellation reasons are required for training and advisory, not for exhibitions
 
@@ -417,7 +417,7 @@ Refused by the database, not by the form — the check is inside the security-de
 
 ---
 
-## 🟠 OQ-23 · Soft-deleting a training session silently removes a cohort's eligibility
+## 🟢 OQ-23 · Soft-deleting a training session silently removes a cohort's eligibility — RESOLVED
 
 **What the code does.** `check_advisory_eligibility` (migration `0057`) copies the four conditions from `v_ind_a1_3`, one of which is `training_session.deleted_at is null`. So eligibility for market advisory depends on the SESSION still being live, not only the person's enrolment.
 
@@ -427,19 +427,28 @@ Refused by the database, not by the form — the check is inside the security-de
 
 **What is NOT affected.** Advisory places already granted. The trigger fires at insert only and is never re-evaluated, so a later soft delete does not revoke anyone's existing enrolment. Verified.
 
-**Options.**
+**Resolved 27 August 2026: option A — warn, do not prevent.**
 
-| | Option | Cost |
-|---|---|---|
-| **A** | Warn in the staff UI before soft-deleting a session that has completions | Needs a count and a confirm step on the delete path |
-| **B** | Refuse to soft-delete a session that has any `met_criteria = true` enrolment | Safest, but blocks legitimate correction of a duplicate |
-| **C** | Leave it; rely on the session-delete path being rare | Free, and silent when it does happen |
+Preventing the deletion (option B) leaves a coordinator with a genuine mess and no path out. Duplicated sessions with enrolments on both is a real situation and this system has no merge. So the consequence is stated, the decision stays with the human, and the audit trigger records who made it. Same pattern as the existing linkage warning.
 
-**Decides.** Municipal Coordinator. This is about what staff should be stopped from doing by accident.
+**`training_session_delete_impact(session_id)`** (migration `0061`) returns what the deletion would cost:
+
+| field | meaning |
+|---|---|
+| `live_enrolments` | how many people are on the session at all |
+| `completions` | how many completed it |
+| **`eligibility_lost`** | **people who would be left with NO completed training anywhere** |
+| `keep_existing_advisory` | of those, how many already hold an advisory place they would keep |
+
+`eligibility_lost` is the number to put in front of a coordinator, and it is deliberately *not* `completions`. Someone with another completed training keeps their eligibility and loses nothing. On the current data, "Crop Practices" has 2 completions but only **1** person would actually lose eligibility — showing "2" would overstate the harm and train people to ignore the warning.
+
+`security invoker`, so RLS applies and it cannot become a way to count participants without permission to read them.
+
+**Remaining work:** wiring the confirmation step into the session delete path, which lands with the municipality screens in step 6.
 
 ---
 
-## 🟠 OQ-24 · Unique constraints do not exclude soft-deleted rows
+## 🟢 OQ-24 · Unique constraints do not exclude soft-deleted rows — FIXED
 
 **What was found.** `advisory_enrolment` has `unique (person_id, session_id)`, and `training_enrolment` has the equivalent. Neither excludes soft-deleted rows.
 
@@ -455,9 +464,25 @@ create unique index <table>_person_session_live
   where deleted_at is null;
 ```
 
-**Not applied.** It is a constraint change on tables holding live rows, it affects the staff-entry path as much as the public one, and "withdraw then re-add" may or may not be something the Municipality actually wants to allow. That is a policy question, not a technical one.
+**Fixed 27 August 2026 in migration `0059`.** The project owner settled the policy underneath it: **withdrawal is not a ban.** A withdrawn participant may re-apply; if a ban is ever needed that is a separate mechanism, not a side effect of soft delete.
 
-**Decides.** Municipal Coordinator — should a withdrawn participant be able to re-enrol in the same session?
+**It was live, five times.** Five soft-deleted `training_enrolment` rows were already in the database, each permanently blocking its `(person, session)` pair. All five were test residue — two from Phase 4 module-3 testing on 26 August, three from step-4 testing on 27 August — but two of them blocked *real* demo pairs, including Demo Person One from "Livestock management". Verified fixed: that exact pair now re-enrols.
+
+**The sweep found 35 unique indexes on soft-deletable tables. Only 5 were this bug.** Changing them all would have broken three separate things:
+
+| | what | why |
+|---|---|---|
+| **Fixed (5)** | `training_enrolment`, `advisory_enrolment`, `exhibition_registration`, `followup_survey`, `partnership` | things a person takes part in, which can be withdrawn |
+| **Left global** | `client_uuid` on six tables | it is the offline idempotency key — made partial, a re-syncing phone would **resurrect a withdrawn application** |
+| **Left global** | `person.national_id`, `person.auth_user_id` | a deleted person must not free their ID: rule 6, one person one row. A deleted person is **restored**, not recreated |
+| **Left global** | every `ref_*.code`, `milestone.code` | retired via `is_active`, never deleted — and the seeds' `on conflict (code)` needs a non-partial index to infer |
+| **Flagged, not changed** | `partner (name, unit)` | same shape, different question: partnerships and contributions hang off a partner, so re-creating one under the same name **splits its history**. That is the person argument, not the enrolment argument — a judgement for the Coordinator |
+
+**A1.3 confirmed unaffected.** Re-enrolling the previously-blocked pair *and* marking it complete left A1.3 at **3**, because it counts distinct people, not rows. A second *live* row for the same pair is still refused.
+
+**The error mapping was fixed too** (`0060`). "Already applied" is now established by looking for a live application, not inferred from a constraint name. A `client_uuid` replay whose row was withdrawn returns a new `withdrawn` outcome instead — telling someone they have already applied when staff removed their application sends them away satisfied and wrong.
+
+**Still open, and small.** `partner (name, unit)` — should re-creating a soft-deleted partner continue its history or start a new one?
 
 ---
 
