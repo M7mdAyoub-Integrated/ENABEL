@@ -482,7 +482,13 @@ create unique index <table>_person_session_live
 
 **The error mapping was fixed too** (`0060`). "Already applied" is now established by looking for a live application, not inferred from a constraint name. A `client_uuid` replay whose row was withdrawn returns a new `withdrawn` outcome instead — telling someone they have already applied when staff removed their application sends them away satisfied and wrong.
 
-**Still open, and small.** `partner (name, unit)` — should re-creating a soft-deleted partner continue its history or start a new one?
+**`partner (name, unit)` settled 27 August 2026: keep it global, same as `person`.**
+
+The project owner supplied the decisive reason. **G0.4 counts distinct partners with a contribution in the period.** Soft-delete a partner and recreate them under the same name, and the old contributions stop counting while the new ones attach to a different row — so a *historical quarter's G0.4 changes retroactively*. A reported figure moving after it was reported is worse than a constraint error.
+
+The general rule, now in `CLAUDE.md` under rule 2: **an entity with history hanging off it is restored, never recreated; an event someone took part in can be re-entered.** `person` and `partner` are the first kind; enrolments, registrations and surveys are the second.
+
+**Corollary, still to build:** when someone tries to create a person or partner whose key matches a soft-deleted row, the UI must offer **restore** rather than failing with a constraint error. Without that path the rule is correct and looks like a bug.
 
 ---
 

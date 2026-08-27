@@ -67,6 +67,20 @@ The reason the second one is allowed: this rule exists to keep **programme data*
 
 Anything else that wants to hard-delete is a defect until it is argued for here.
 
+### Restored, never recreated
+
+Soft delete raises a second question that is easy to get wrong: when a new row arrives whose unique key matches a soft-deleted one, is that a duplicate to refuse or a record to bring back?
+
+> **An entity with history hanging off it is RESTORED, never recreated. An event someone took part in can be re-entered.**
+
+`person` and `partner` are the first kind. Enrolments, registrations and surveys are the second.
+
+The reason is not tidiness, it is that recreating an entity **moves a figure that has already been reported.** G0.4 counts distinct partners with a contribution in the period. Soft-delete a partner and recreate them under the same name, and the old contributions stop counting while the new ones attach to a different row — so a historical quarter's G0.4 changes retroactively. A reported number moving after it was reported is worse than a constraint error.
+
+So their unique indexes stay **global**, deliberately, and `0059` left them that way while making the event-shaped ones partial.
+
+**The corollary is a UI obligation:** when someone tries to create a person or partner whose key matches a soft-deleted row, offer **restore** rather than failing with a constraint error. The rule is correct; without the restore path the UI makes it look like a bug.
+
 **3. Row-level security on every table, no exceptions.**
 Including reference tables. A table without RLS in a project holding national ID numbers is a defect, not a shortcut.
 
