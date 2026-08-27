@@ -34,5 +34,6 @@
   },
   "signedIn": "Signed in",
   "municipality": "Municipality",
-  "participant": "Participant"
+  "participant": "Participant",
+  "sessions": "Sessions"
 }

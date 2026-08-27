@@ -3,7 +3,7 @@
   "openMenu": "فتح القائمة",
   "more": "المزيد",
   "dashboard": "لوحة المؤشرات",
-  "manualEntries": "الإدخالات اليدوية",
+  "manualEntries": "إدخال يدوي",
   "settings": "الإعدادات",
   "skipToContent": "تخطي إلى المحتوى",
   "module": {
@@ -34,5 +34,6 @@
   },
   "signedIn": "مسجّل الدخول",
   "municipality": "البلدية",
-  "participant": "المشارك"
+  "participant": "المشارك",
+  "sessions": "الدورات"
 }

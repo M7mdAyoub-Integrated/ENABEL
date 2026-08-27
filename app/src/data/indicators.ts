@@ -88,8 +88,40 @@ const BY_SOURCE: Record<string, string[]> = {
   exhibition_registration: ['rg'],
 }
 
-export function sourceModules(code: string, dataSource: string): string[] {
-  return BY_CODE[code] ?? BY_SOURCE[dataSource] ?? []
+/**
+ * Entry paths that are not one of the seven form modules.
+ *
+ * D0.2 counts training_session rows with is_delivered and a food-processing
+ * topic. The sessions screen sets exactly that flag, so this indicator HAS an
+ * entry path -- it just is not a /forms/ module. Without this it would carry a
+ * "no entry path yet" tag that stopped being true the moment /sessions landed.
+ *
+ * The five on the manual-entries screen point there for the same reason.
+ */
+const BY_CODE_PATH: Record<string, { to: string; labelKey: string }[]> = {
+  'D0.2': [{ to: '/sessions', labelKey: 'nav:sessions' }],
+  'B1.1': [{ to: '/manual-entries', labelKey: 'nav:manualEntries' }],
+  'G0.1': [{ to: '/manual-entries', labelKey: 'nav:manualEntries' }],
+  'F0.1': [{ to: '/manual-entries', labelKey: 'nav:manualEntries' }],
+  'G0.2': [{ to: '/manual-entries', labelKey: 'nav:manualEntries' }],
+  'G0.3': [{ to: '/manual-entries', labelKey: 'nav:manualEntries' }],
+}
+
+export type SourceLink = { to: string; labelKey: string }
+
+/**
+ * Where the source chip on an indicator row points.
+ *
+ * Returns [] only when the indicator genuinely has NOWHERE to be entered --
+ * which after the manual-entries screen is B1.2, D0.1 and C1.3, all three of
+ * which count distinct people and need a per-person log that does not exist
+ * yet for D0.1.
+ */
+export function sourceLinks(code: string, dataSource: string): SourceLink[] {
+  const byPath = BY_CODE_PATH[code]
+  if (byPath) return byPath
+  const mods = BY_CODE[code] ?? BY_SOURCE[dataSource] ?? []
+  return mods.map((m) => ({ to: `/forms/${m}`, labelKey: `nav:module.${m}` }))
 }
 
 /* ── periods ──────────────────────────────────────────────────────────────── */

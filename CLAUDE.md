@@ -117,6 +117,42 @@ This is a real municipality with a real donor. If a definition is ambiguous, sto
 
 ---
 
+## Checks that verify shape, not substance
+
+This has now happened four times, in four unrelated parts of the project. It is
+one failure mode, and it is worth naming because every instance looked fine.
+
+| | what existed | what was missing |
+|---|---|---|
+| Migration files `0034`–`0049` | the file, correctly named, in the right order | any SQL in it |
+| `CONSTRAINT_MESSAGES` keys | a key mapped to a readable message | a constraint of that name in the database |
+| Comments in `format.ts`, `glyphs.ts` | a comment describing the behaviour | the behaviour, anywhere |
+| `locales/ar/indicators.json` | all 20 `name.*` keys present | Arabic — every value is the English string |
+
+In each case the thing that would normally be checked *was there*. The file
+existed. The key existed. The comment existed. The translation key existed. Any
+check counting files, counting keys, or grepping for a name would pass.
+
+Nothing ever asked whether the **content** was real.
+
+> **The test for any check: could this pass while the thing it checks is wrong?**
+> If yes, it is not a check.
+
+What that means in practice:
+
+- Do not verify a migration by confirming the file is present. Verify its SQL is
+  byte-identical to what was applied — `check_migration_files.sh`.
+- Do not verify an error mapping by reading it. Verify each name exists in
+  `pg_constraint` / `pg_class` — `check-constraint-names.mjs`.
+- Do not verify behaviour with a comment. Run it, or write a test.
+- Do not verify a translation by counting keys. A key whose value equals the
+  English string is untranslated, and counting will never say so.
+
+The two automated checks above both exist because of this pattern. When you add
+another, write down which substance it verifies — not which shape.
+
+---
+
 ## Conventions
 
 ### Every table gets this block

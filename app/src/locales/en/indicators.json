@@ -105,7 +105,6 @@
   "loadFailedBody": "Nothing is shown rather than something approximate. Check your connection and reload — these numbers go into the donor return, so a stale figure is worse than none.",
   "firstQuarterNoTargets": "No targets are set for {code}. This is the plan's first quarter, which the framework leaves without targets — it is not missing data. Actuals below are still counted from your records.",
   "periodNoTargets": "No targets are set for {code} in the framework workbook. Actuals below are still counted from your records.",
-  "manualNotice": "{count, plural, one {# indicator has no data-collection form behind it. Its figure is counted from records that must be entered another way, and the manual entry screen is not connected yet — so it will not move from this screen.} other {# indicators have no data-collection form behind them. Their figures are counted from records that must be entered another way, and the manual entry screen is not connected yet — so they will not move from this screen.}}",
   "noEntryPath": "No entry path yet",
   "noTargetLabel": "{code}: no target set for this period",
   "objective": {
@@ -115,5 +114,52 @@
     "SO3": "SO3 · Promotion and marketing",
     "SO4": "SO4 · Coordination and governance"
   },
-  "withoutForm": "{count, plural, one {# without a form} other {# without a form}}"
+  "withoutForm": "{count, plural, one {# without a form} other {# without a form}}",
+  "manual": {
+    "title": "Manual entries",
+    "intro": "Some indicators have no data-collection form behind them. They are recorded here — as records, not as typed totals, because each indicator counts rows and the donor return needs to know what was counted.",
+    "loadFailed": "Could not load these records. Check your connection and try again.",
+    "milestonesHeading": "Milestones",
+    "achievedOn": "Achieved on {date}.",
+    "achievedOnLabel": "Date achieved",
+    "markAchieved": "Mark achieved",
+    "notAchievedYet": "Not achieved after all",
+    "logsHeading": "Records",
+    "countThisFar": "{count, plural, =0 {none recorded} one {# recorded} other {# recorded}}",
+    "noneYet": "Nothing recorded yet.",
+    "withdraw": "Withdraw",
+    "add": "Add",
+    "choose": "Choose…",
+    "fieldTitle": "Title",
+    "fieldChannel": "Channel",
+    "fieldDate": "Date",
+    "fieldSubject": "Subject",
+    "fieldSummary": "Summary",
+    "fieldChange": "Change evidenced",
+    "log": {
+      "F0.1": {
+        "title": "Promotional actions",
+        "hint": "One record per action. The indicator counts these, so a campaign run twice is two records."
+      },
+      "G0.2": {
+        "title": "Coordination meetings",
+        "hint": "One record per meeting held."
+      },
+      "G0.3": {
+        "title": "Case studies",
+        "hint": "One record per documented case study. The summary and the change evidenced both go into the donor return."
+      }
+    },
+    "elsewhereHeading": "Entered somewhere else",
+    "elsewhereIntro": "These are not on this screen on purpose. Three of them count distinct people, so a typed total could double-count the same person and could never be corrected afterwards — the identities would not have been captured.",
+    "elsewhere": {
+      "B1.2": "Farmers reaching office services — counts distinct people, so each visit is logged against a national ID in the coordination office module.",
+      "D0.1": "Producers guided on food safety and licensing — counts distinct people, so each session is logged against a national ID in the guidance log.",
+      "C1.3": "Advisory mentorship sessions — each session belongs to a producer's initiative, so it is recorded against that initiative rather than counted here.",
+      "D0.2": "Training sessions on food processing — counted from sessions marked as delivered, so it moves when you record delivery."
+    },
+    "goThere": "Go there",
+    "notBuiltYet": "Not built yet"
+  },
+  "noPathNotice": "{count, plural, one {# indicator still has nowhere to be entered. It counts distinct people, so it needs a per-person log rather than a typed total — until that exists it will stay at zero.} other {# indicators still have nowhere to be entered. They count distinct people, so they need a per-person log rather than a typed total — until those exist they will stay at zero.}}"
 }

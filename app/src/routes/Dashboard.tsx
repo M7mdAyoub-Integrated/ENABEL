@@ -6,7 +6,7 @@ import {
   useIndicatorSources,
   currentPeriodCode,
   groupByObjective,
-  sourceModules,
+  sourceLinks,
   targetText,
   actualText,
   barWidth,
@@ -109,7 +109,7 @@ function Row({
   dataSource: string | undefined
 }) {
   const { t } = useTranslation(['indicators', 'nav'])
-  const mods = dataSource ? sourceModules(row.code, dataSource) : []
+  const links = dataSource ? sourceLinks(row.code, dataSource) : []
   const width = barWidth(row)
 
   return (
@@ -133,22 +133,21 @@ function Row({
       </span>
 
       <span className="flex flex-wrap gap-x-2 gap-y-[5px]">
-        {mods.length === 0 ? (
-          // No form feeds this indicator, and the Manual entries screen that is
-          // meant to is still reading mock data. Saying "no entry path yet" is
-          // the honest label -- linking to a screen that cannot save would be
-          // worse than saying nothing.
+        {links.length === 0 ? (
+          // Genuinely nowhere to enter this yet. After the manual-entries
+          // screen that is B1.2, D0.1 and C1.3 -- all three count distinct
+          // people, so they need a per-person log rather than a typed total.
           <span className="border-b-[1.5px] border-dashed border-attention-border font-narrow text-[11.5px] font-bold uppercase tracking-[0.08em] text-amber">
             {t('indicators:noEntryPath')}
           </span>
         ) : (
-          mods.map((m) => (
+          links.map((l) => (
             <Link
-              key={m}
-              to={`/forms/${m}`}
+              key={l.to}
+              to={l.to}
               className="border-b-[1.5px] border-solid border-border-strong font-narrow text-[11.5px] font-bold uppercase tracking-[0.08em] text-ink"
             >
-              {t(`nav:module.${m}`)}
+              {t(l.labelKey)}
             </Link>
           ))
         )}
@@ -211,7 +210,9 @@ export function Dashboard() {
   // Every target absent for this quarter is a fact about the plan, not a fault.
   const noTargetsAtAll = rows.length > 0 && !rows.some(hasTarget)
   const firstPeriod = periods.length > 0 && periods[0]?.code === periodCode
-  const manualCount = rows.filter((r) => r.is_manual).length
+  const noPathCount = rows.filter(
+    (r) => sourceLinks(r.code, sourceOf.get(r.code) ?? '').length === 0,
+  ).length
 
   return (
     <div className="pb-16">
@@ -259,9 +260,9 @@ export function Dashboard() {
             </p>
           ) : null}
 
-          {manualCount > 0 ? (
+          {noPathCount > 0 ? (
             <p className="mt-2 border-s-[3px] border-amber bg-sunken p-3 text-[14px] leading-[1.5] text-body">
-              {t('indicators:manualNotice', { count: manualCount })}
+              {t('indicators:noPathNotice', { count: noPathCount })}
             </p>
           ) : null}
 
