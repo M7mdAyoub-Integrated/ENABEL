@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useManagedSessions, missingForPublish } from '../data/sessions'
+import { useManagedSessions, missingForPublish, type SessionKind } from '../data/sessions'
 import { formatDateRange } from '../lib/format'
 import { SEP } from '../ui/glyphs'
 
@@ -12,24 +12,25 @@ import { SEP } from '../ui/glyphs'
  * donor return, and a coordinator scanning this list should never have to work
  * out which is which. See the longer note in SessionDetail.
  */
-export function SessionList() {
+export function SessionList({ kind = 'training' }: { kind?: SessionKind }) {
   const { t, i18n } = useTranslation('forms')
   const locale = i18n.resolvedLanguage ?? 'en'
-  const q = useManagedSessions()
+  const base = kind === 'advisory' ? '/advisory' : '/sessions'
+  const q = useManagedSessions(kind)
   const rows = q.data ?? []
 
   return (
     <div className="pb-16">
       <h1 className="mt-4 text-[24px] font-black uppercase leading-[1.08] tracking-[-0.03em] sm:text-[30px]">
-        {t('session.listHeading')}
+        {t(kind === 'advisory' ? 'session.listHeadingAdvisory' : 'session.listHeading')}
       </h1>
-      <p className="mt-1 max-w-[60ch] text-[14px] text-muted">{t('session.listIntro')}</p>
+      <p className="mt-1 max-w-[60ch] text-[14px] text-muted">{t(kind === 'advisory' ? 'session.listIntroAdvisory' : 'session.listIntro')}</p>
 
       <Link
-        to="/sessions/new"
+        to={`${base}/new`}
         className="mt-4 inline-flex min-h-11 items-center bg-ink px-5 font-narrow text-[12.5px] font-bold uppercase tracking-[0.12em] text-bg no-underline hover:text-bg"
       >
-        {t('session.newSession')}
+        {t(kind === 'advisory' ? 'session.newAdvisory' : 'session.newSession')}
       </Link>
 
       {q.isLoading ? (
@@ -44,14 +45,14 @@ export function SessionList() {
         </p>
       ) : rows.length === 0 ? (
         <p className="mt-5 border-[1.5px] border-dashed border-border-muted p-6 text-center text-[15px] text-muted">
-          {t('session.noSessions')}
+          {t(kind === 'advisory' ? 'session.noAdvisory' : 'session.noSessions')}
         </p>
       ) : (
         <ul className="mt-5 flex list-none flex-col gap-2 p-0">
           {rows.map((s) => (
             <li key={s.id}>
               <Link
-                to={`/sessions/${s.id}`}
+                to={`${base}/${s.id}`}
                 className="block border-[1.5px] border-border-strong bg-bg p-4 text-ink no-underline hover:bg-sunken"
               >
                 <div className="flex flex-wrap items-center gap-2">

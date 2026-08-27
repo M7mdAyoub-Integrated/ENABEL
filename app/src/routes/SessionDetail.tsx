@@ -12,6 +12,8 @@ import {
   useSessionDeleteImpact,
   useSoftDeleteSession,
   missingForPublish,
+  useQualifications,
+  type SessionKind,
   type Participant,
 } from '../data/sessions'
 import { formatShortDate, formatDateRange } from '../lib/format'
@@ -64,10 +66,12 @@ function StatusPill({ status }: { status: Participant['application_status'] }) {
 function CompletionCell({
   p,
   sessionId,
+  kind,
   disabled,
 }: {
   p: Participant
   sessionId: string
+  kind: SessionKind
   disabled: boolean
 }) {
   const { t } = useTranslation('forms')
@@ -83,7 +87,7 @@ function CompletionCell({
         <button
           type="button"
           disabled={busy || disabled}
-          onClick={() => decide.mutate({ id: p.id, sessionId, met: null })}
+          onClick={() => decide.mutate({ id: p.id, sessionId, kind, met: null })}
           className="mt-1 block text-[12px] text-muted underline hover:text-ink disabled:no-underline"
         >
           {t('session.undoDecision')}
@@ -100,7 +104,7 @@ function CompletionCell({
         <button
           type="button"
           disabled={busy || disabled}
-          onClick={() => decide.mutate({ id: p.id, sessionId, met: null })}
+          onClick={() => decide.mutate({ id: p.id, sessionId, kind, met: null })}
           className="mt-1 block text-[12px] text-muted underline hover:text-ink disabled:no-underline"
         >
           {t('session.undoDecision')}
@@ -116,7 +120,7 @@ function CompletionCell({
       <button
         type="button"
         disabled={busy || disabled}
-        onClick={() => decide.mutate({ id: p.id, sessionId, met: true })}
+        onClick={() => decide.mutate({ id: p.id, sessionId, kind, met: true })}
         className="min-h-9 whitespace-nowrap bg-ink px-2.5 font-narrow text-[11px] font-bold uppercase tracking-[0.1em] text-bg disabled:bg-track disabled:text-faint"
       >
         {t('session.markCompleted')}
@@ -124,7 +128,7 @@ function CompletionCell({
       <button
         type="button"
         disabled={busy || disabled}
-        onClick={() => decide.mutate({ id: p.id, sessionId, met: false })}
+        onClick={() => decide.mutate({ id: p.id, sessionId, kind, met: false })}
         className="min-h-9 whitespace-nowrap border-[1.5px] border-border-strong px-2.5 font-narrow text-[11px] font-bold uppercase tracking-[0.1em] text-ink disabled:text-faint"
       >
         {t('session.markNotCompleted')}
@@ -133,13 +137,13 @@ function CompletionCell({
   )
 }
 
-export function SessionDetail() {
+export function SessionDetail({ kind = 'training' }: { kind?: SessionKind }) {
   const { id } = useParams()
   const { t, i18n } = useTranslation('forms')
   const locale = i18n.resolvedLanguage ?? 'en'
 
-  const sq = useManagedSession(id)
-  const pq = useSessionParticipants(id)
+  const sq = useManagedSession(kind, id)
+  const pq = useSessionParticipants(kind, id)
   const publish = usePublishSession()
   const setDelivered = useSetDelivered()
   const decideApp = useDecideApplication()
@@ -147,10 +151,16 @@ export function SessionDetail() {
   const softDelete = useSoftDeleteSession()
 
   const [confirmingDelete, setConfirmingDelete] = useState(false)
-  const impact = useSessionDeleteImpact(id, confirmingDelete)
+  // Training only: the impact function counts advisory eligibility lost, which
+  // has no meaning for an advisory session itself.
+  const impact = useSessionDeleteImpact(kind === 'training' ? id : undefined, confirmingDelete)
 
   const s = sq.data
   const rows = pq.data ?? []
+  // Advisory only: which training let each person in. A generic "has completed
+  // a training" is not an audit trail -- a coordinator asking "why is this
+  // person here" needs a course and a date they can check.
+  const quals = useQualifications(kind === 'advisory' ? rows.map((r) => r.person_id) : [])
 
   if (sq.isLoading) {
     return (
@@ -174,13 +184,13 @@ export function SessionDetail() {
   return (
     <div className="pb-16">
       <Link
-        to="/sessions"
+        to={kind === "advisory" ? "/advisory" : "/sessions"}
         className="mt-4 inline-flex min-h-11 items-center font-narrow text-[12px] font-bold uppercase tracking-[0.14em] text-muted no-underline hover:text-ink"
       >
         <span aria-hidden="true" className="inline-block mirror-rtl">
           {ARROW_START}
         </span>
-        <span className="ms-2">{t('session.backToSessions')}</span>
+        <span className="ms-2">{t(kind === 'advisory' ? 'session.backToAdvisory' : 'session.backToSessions')}</span>
       </Link>
 
       <h1
@@ -190,7 +200,7 @@ export function SessionDetail() {
         {s.title}
       </h1>
       <Link
-        to={`/sessions/${s.id}/edit`}
+        to={`${kind === "advisory" ? "/advisory" : "/sessions"}/${s.id}/edit`}
         className="mt-1 inline-block font-narrow text-[12px] font-bold uppercase tracking-[0.12em] text-muted underline hover:text-ink"
       >
         {t('session.editDetails')}
@@ -225,7 +235,7 @@ export function SessionDetail() {
             ))}
           </ul>
           <Link
-            to={`/sessions/${s.id}/edit`}
+            to={`${kind === "advisory" ? "/advisory" : "/sessions"}/${s.id}/edit`}
             className="mt-3 inline-flex min-h-11 items-center bg-ink px-4 font-narrow text-[12px] font-bold uppercase tracking-[0.12em] text-bg no-underline hover:text-bg"
           >
             {t('session.fillInDetails')}
@@ -240,10 +250,10 @@ export function SessionDetail() {
         </h2>
         <p className="mt-1 max-w-[60ch] text-[14px] leading-[1.5] text-body">
           {ended
-            ? t('session.endedNoPublish')
+            ? t(kind === 'advisory' ? 'session.endedNoPublishAdvisory' : 'session.endedNoPublish')
             : s.is_published
-              ? t('session.publishedBody')
-              : t('session.notPublishedBody')}
+              ? t(kind === 'advisory' ? 'session.publishedBodyAdvisory' : 'session.publishedBody')
+              : t(kind === 'advisory' ? 'session.notPublishedBodyAdvisory' : 'session.notPublishedBody')}
         </p>
 
         {/* What actually becomes public, named. focal_point especially: it is
@@ -279,7 +289,7 @@ export function SessionDetail() {
             ended ||
             (!s.is_published && missingForPublish(s).length > 0)
           }
-          onClick={() => publish.mutate({ id: s.id, on: !s.is_published })}
+          onClick={() => publish.mutate({ id: s.id, on: !s.is_published, kind })}
           className={`mt-4 inline-flex min-h-11 items-center justify-center px-5 font-narrow text-[12.5px] font-bold uppercase tracking-[0.12em] disabled:bg-track disabled:text-faint ${
             s.is_published
               ? 'border-[1.5px] border-border-strong text-ink'
@@ -295,13 +305,13 @@ export function SessionDetail() {
              it names the indicator it moves. ─────────────────────────────── */}
       <section className="mt-4 border-[1.5px] border-dashed border-border-strong p-4">
         <h2 className="m-0 font-narrow text-[12px] font-bold uppercase tracking-[0.14em] text-muted">
-          {t('session.deliveryHeading')}
+          {t(kind === 'advisory' ? 'session.deliveryHeadingAdvisory' : 'session.deliveryHeading')}
         </h2>
         <p className="mt-1 max-w-[60ch] text-[14px] leading-[1.5] text-body">
-          {t('session.deliveryBody')}
+          {t(kind === 'advisory' ? 'session.deliveryBodyAdvisory' : 'session.deliveryBody')}
         </p>
         {!ended ? (
-          <p className="mt-2 text-[13px] text-muted">{t('session.deliveryNotEnded')}</p>
+          <p className="mt-2 text-[13px] text-muted">{t(kind === 'advisory' ? 'session.deliveryNotEndedAdvisory' : 'session.deliveryNotEnded')}</p>
         ) : null}
         <label className="mt-3 flex items-start gap-2.5">
           <input
@@ -309,9 +319,9 @@ export function SessionDetail() {
             className="mt-1 h-5 w-5 accent-ink"
             checked={s.is_delivered}
             disabled={setDelivered.isPending || !ended}
-            onChange={(e) => setDelivered.mutate({ id: s.id, on: e.target.checked })}
+            onChange={(e) => setDelivered.mutate({ id: s.id, on: e.target.checked, kind })}
           />
-          <span className="text-[14px] text-ink">{t('session.deliveredLabel')}</span>
+          <span className="text-[14px] text-ink">{t(kind === 'advisory' ? 'session.deliveredLabelAdvisory' : 'session.deliveredLabel')}</span>
         </label>
         {setDelivered.isError ? (
           <p role="alert" className="mt-2 text-[13px] font-semibold text-error">
@@ -332,7 +342,7 @@ export function SessionDetail() {
         </div>
 
         <p className="mt-2 max-w-[70ch] text-[13px] leading-[1.5] text-muted">
-          {t('session.threeFactsNote')}
+          {t(kind === 'advisory' ? 'session.threeFactsNoteAdvisory' : 'session.threeFactsNote')}
         </p>
 
         {pq.isLoading ? (
@@ -352,11 +362,16 @@ export function SessionDetail() {
                   <th className="py-2 pe-3 text-start font-narrow text-[11px] font-bold uppercase tracking-[0.1em] text-muted">
                     {t('session.colApplication')}
                   </th>
+                  {kind === 'advisory' ? (
+                    <th className="py-2 pe-3 text-start font-narrow text-[11px] font-bold uppercase tracking-[0.1em] text-muted">
+                      {t('session.colQualified')}
+                    </th>
+                  ) : null}
                   <th className="py-2 pe-3 text-start font-narrow text-[11px] font-bold uppercase tracking-[0.1em] text-muted">
                     {t('session.colAttended')}
                   </th>
                   <th className="py-2 text-start font-narrow text-[11px] font-bold uppercase tracking-[0.1em] text-ink">
-                    {t('session.colCompleted')}
+                    {t(kind === 'advisory' ? 'session.colCompletedAdvisory' : 'session.colCompleted')}
                   </th>
                 </tr>
               </thead>
@@ -390,7 +405,7 @@ export function SessionDetail() {
                               type="button"
                               disabled={decideApp.isPending}
                               onClick={() =>
-                                decideApp.mutate({ id: p.id, sessionId: s.id, status: 'approved' })
+                                decideApp.mutate({ id: p.id, sessionId: s.id, kind, status: 'approved' })
                               }
                               className="min-h-9 bg-ink px-2.5 font-narrow text-[11px] font-bold uppercase tracking-[0.1em] text-bg disabled:bg-track"
                             >
@@ -400,7 +415,7 @@ export function SessionDetail() {
                               type="button"
                               disabled={decideApp.isPending}
                               onClick={() =>
-                                decideApp.mutate({ id: p.id, sessionId: s.id, status: 'rejected' })
+                                decideApp.mutate({ id: p.id, sessionId: s.id, kind, status: 'rejected' })
                               }
                               className="min-h-9 border-[1.5px] border-border-strong px-2.5 font-narrow text-[11px] font-bold uppercase tracking-[0.1em] text-ink"
                             >
@@ -410,6 +425,35 @@ export function SessionDetail() {
                         ) : null}
                       </td>
 
+                      {kind === 'advisory' ? (
+                        <td className="py-3 pe-3">
+                          {(() => {
+                            const q = quals.data?.get(p.person_id)
+                            if (!q) {
+                              return (
+                                <span className="text-[13px] text-muted">
+                                  {quals.isLoading ? t('session.checking') : t('session.qualUnknown')}
+                                </span>
+                              )
+                            }
+                            return (
+                              <>
+                                <div dir="auto" className="text-[13.5px] text-ink">
+                                  {q.title}
+                                </div>
+                                <div className="text-[12px] text-muted">
+                                  {formatShortDate(q.completedOn, locale)}
+                                </div>
+                                {q.total > 1 ? (
+                                  <div className="mt-0.5 text-[12px] text-muted">
+                                    {t('session.qualPlusMore', { count: q.total - 1 })}
+                                  </div>
+                                ) : null}
+                              </>
+                            )
+                          })()}
+                        </td>
+                      ) : null}
                       <td className="py-3 pe-3">
                         <label className="flex items-center gap-2">
                           <input
@@ -421,6 +465,7 @@ export function SessionDetail() {
                               setAttended.mutate({
                                 id: p.id,
                                 sessionId: s.id,
+                                kind,
                                 attended: e.target.checked,
                               })
                             }
@@ -432,7 +477,7 @@ export function SessionDetail() {
                       </td>
 
                       <td className="py-3">
-                        <CompletionCell p={p} sessionId={s.id} disabled={!accepted} />
+                        <CompletionCell p={p} sessionId={s.id} kind={kind} disabled={!accepted} />
                         {p.decided_on ? (
                           <div className="mt-1 text-[12px] text-muted">
                             {formatShortDate(p.decided_on, locale)}
@@ -499,7 +544,7 @@ export function SessionDetail() {
               <button
                 type="button"
                 disabled={softDelete.isPending || impact.isLoading}
-                onClick={() => softDelete.mutate({ id: s.id })}
+                onClick={() => softDelete.mutate({ id: s.id, kind })}
                 className="min-h-11 border-[1.5px] border-error px-4 font-narrow text-[12px] font-bold uppercase tracking-[0.12em] text-error disabled:border-border-strong disabled:text-faint"
               >
                 {t('session.deleteConfirm')}

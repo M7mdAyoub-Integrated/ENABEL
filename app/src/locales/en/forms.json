@@ -376,7 +376,25 @@
       "durationHours": "Duration in hours",
       "description": "Description"
     },
-    "endedNoPublish": "This session has already ended, so it cannot be published. The public site only lists what is still to come — publishing it would change nothing anyone could see."
+    "endedNoPublish": "This session has already ended, so it cannot be published. The public site only lists what is still to come — publishing it would change nothing anyone could see.",
+    "listHeadingAdvisory": "Market advisory sessions",
+    "listIntroAdvisory": "Advisory is for people who have completed a training. Publish a session to open it for applications.",
+    "newAdvisory": "New advisory session",
+    "noAdvisory": "No advisory sessions yet.",
+    "colQualified": "Qualified by",
+    "checking": "Checking…",
+    "qualUnknown": "No completed training found",
+    "qualPlusMore": "{count, plural, one {and # other completed training} other {and # other completed trainings}}",
+    "deliveryHeadingAdvisory": "The record",
+    "deliveryBodyAdvisory": "Recording delivery says the session actually took place. Unlike a training, this does not feed any indicator — advisory has none of its own, and C1.3 is an open question that is deliberately not wired to it. It is recorded so the programme has an honest account of what was delivered.",
+    "deliveredLabelAdvisory": "This session took place",
+    "deliveryNotEndedAdvisory": "This session has not ended yet, so it cannot be recorded as delivered.",
+    "threeFactsNoteAdvisory": "Accepted, attended and completed are three separate facts. Only completed unlocks a market linkage request — and unlike a training, completing an advisory does not move any indicator.",
+    "colCompletedAdvisory": "Completed the advisory",
+    "backToAdvisory": "All advisory sessions",
+    "publishedBodyAdvisory": "This session is on the public site now. People who have completed a training can see it and apply.",
+    "notPublishedBodyAdvisory": "This session is not on the public site. Nobody outside the Municipality can see it.",
+    "endedNoPublishAdvisory": "This session has already ended, so it cannot be published. The public site only lists what is still to come — publishing it would change nothing anyone could see."
   },
   "newSession": {
     "heading": "New training session",

@@ -66,7 +66,15 @@ function useNavGroups(): Group[] {
         ...mod('tc', '04'),
       ],
     },
-    { labelKey: 'nav:group.production', items: mod('ln', '04') },
+    {
+      labelKey: 'nav:group.production',
+      items: [
+        ...(can(role, 'record.edit')
+          ? [{ to: '/advisory', labelKey: 'nav:advisory', num: '05' } as Dest]
+          : []),
+        ...mod('ln', '06'),
+      ],
+    },
     { labelKey: 'nav:group.markets', items: [...mod('ex', '05'), ...mod('rg', '06')] },
     { labelKey: 'nav:group.followup', items: mod('fu', '07') },
     {

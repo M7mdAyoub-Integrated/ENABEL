@@ -151,6 +151,32 @@ const router = createBrowserRouter([
           <RequireCapability capability="record.edit">{n}</RequireCapability>
         )),
       },
+      // Advisory reuses the session screens with kind="advisory": one publish
+      // gate, one completion decision, one set of rules. See data/sessions.ts.
+      {
+        path: '/advisory',
+        element: guard(<SessionList kind="advisory" />, (n) => (
+          <RequireCapability capability="record.edit">{n}</RequireCapability>
+        )),
+      },
+      {
+        path: '/advisory/new',
+        element: guard(<SessionNew kind="advisory" />, (n) => (
+          <RequireCapability capability="record.create">{n}</RequireCapability>
+        )),
+      },
+      {
+        path: '/advisory/:id/edit',
+        element: guard(<SessionNew mode="edit" kind="advisory" />, (n) => (
+          <RequireCapability capability="record.edit">{n}</RequireCapability>
+        )),
+      },
+      {
+        path: '/advisory/:id',
+        element: guard(<SessionDetail kind="advisory" />, (n) => (
+          <RequireCapability capability="record.edit">{n}</RequireCapability>
+        )),
+      },
       {
         path: '/sessions/new',
         element: guard(<SessionNew />, (n) => (

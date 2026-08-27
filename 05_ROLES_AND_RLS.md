@@ -465,3 +465,34 @@ where s.nspname = 'public' and t.typname = 'trigger'
 
 And confirm the triggers still fire afterwards, rather than assuming they do — inserting a `training_session` with `is_delivered = true` and a future `end_date` must still be refused. It was, with zero grants in place.
 
+---
+
+## 12. `current_role()` is null without a JWT, and guards default to refusing
+
+`public."current_role"()` reads `auth.uid()`. With **no JWT there is no uid**, so it returns null, and every guard that coalesces a null role treats the caller as the least-privileged one.
+
+`guard_registration_status` does exactly that:
+
+```sql
+if new.status is distinct from old.status
+   and coalesce(public."current_role"(), 'participant') <> 'coordinator' then
+  raise exception 'only a coordinator may change registration status';
+end if;
+```
+
+### What this means in practice
+
+**A direct database connection is not privileged here.** Reverting two test approvals through the Supabase MCP — a connection with full table rights — was refused with *"only a coordinator may change registration status"*. The row could not be updated until coordinator claims were set:
+
+```sql
+perform set_config('request.jwt.claims',
+  json_build_object('sub', (select id::text from app_user where role = 'coordinator' limit 1),
+                    'role', 'authenticated')::text, true);
+```
+
+This is the guard working. It is not a bug, and it is worth writing down because **it will not look like a guard when it happens.** A migration, a backfill, a scheduled job or a support script that touches `exhibition_registration.status` will fail with a message about coordinators, from a connection that owns the table — which reads like a broken trigger rather than a policy decision.
+
+> **Any script or job that changes a status must carry coordinator claims.** Set them explicitly, in the same transaction, and say in a comment why.
+
+The same applies to anything else guarded on `current_role()`. Grep for `coalesce(public."current_role"()` before writing a script that updates rows in bulk.
+

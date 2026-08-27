@@ -6,6 +6,7 @@ import {
   useUpdateSession,
   useManagedSession,
   type ManagedSession,
+  type SessionKind,
 } from '../data/sessions'
 import { usePartnerships } from '../data/partnerships'
 import { useRef as useRefTable } from '../data/refTables'
@@ -93,10 +94,16 @@ function Warning({ children }: { children: React.ReactNode }) {
  * rules -- duration asked not derived, the three warnings, what goes public --
  * cannot drift between creating and fixing.
  */
-export function SessionNew({ mode = 'new' }: { mode?: 'new' | 'edit' }) {
+export function SessionNew({
+  mode = 'new',
+  kind = 'training',
+}: {
+  mode?: 'new' | 'edit'
+  kind?: SessionKind
+}) {
   const { t } = useTranslation('forms')
   const { id } = useParams()
-  const existing = useManagedSession(mode === 'edit' ? id : undefined)
+  const existing = useManagedSession(kind, mode === 'edit' ? id : undefined)
 
   if (mode === 'edit') {
     if (existing.isLoading) {
@@ -124,6 +131,7 @@ export function SessionNew({ mode = 'new' }: { mode?: 'new' | 'edit' }) {
     <SessionForm
       key={existing.data?.id ?? 'new'}
       mode={mode}
+      kind={kind}
       {...(id ? { id } : {})}
       {...(existing.data ? { initial: existing.data } : {})}
     />
@@ -132,10 +140,12 @@ export function SessionNew({ mode = 'new' }: { mode?: 'new' | 'edit' }) {
 
 function SessionForm({
   mode,
+  kind,
   id,
   initial,
 }: {
   mode: 'new' | 'edit'
+  kind: SessionKind
   id?: string
   initial?: ManagedSession
 }) {
@@ -165,6 +175,7 @@ function SessionForm({
   const [opensOn, setOpensOn] = useState(initial?.application_opens_on ?? '')
   const [closesOn, setClosesOn] = useState(initial?.application_closes_on ?? '')
 
+  const base = kind === 'advisory' ? '/advisory' : '/sessions'
   const today = new Date().toISOString().slice(0, 10)
 
   const durationOk = hours !== '' && Number(hours) > 0
@@ -197,20 +208,20 @@ function SessionForm({
       applicationClosesOn: closesOn || null,
     }
     if (mode === 'edit' && id) {
-      await update.mutateAsync({ ...values, id })
-      nav(`/sessions/${id}`)
+      await update.mutateAsync({ ...values, id, kind })
+      nav(`${base}/${id}`)
       return
     }
-    const row = await create.mutateAsync(values)
+    const row = await create.mutateAsync({ ...values, kind })
     // Straight to the session, which is where publishing happens. The form
     // deliberately does not offer to publish.
-    nav(`/sessions/${row.id}`)
+    nav(`${base}/${row.id}`)
   }
 
   return (
     <div className="pb-16">
       <Link
-        to={mode === 'edit' && id ? `/sessions/${id}` : '/sessions'}
+        to={mode === 'edit' && id ? `${base}/${id}` : base}
         className="mt-4 inline-flex min-h-11 items-center font-narrow text-[12px] font-bold uppercase tracking-[0.14em] text-muted no-underline hover:text-ink"
       >
         <span aria-hidden="true" className="inline-block mirror-rtl">
@@ -408,7 +419,7 @@ function SessionForm({
                 : t('forms:newSession.save')}
           </button>
           <Link
-            to={mode === 'edit' && id ? `/sessions/${id}` : '/sessions'}
+            to={mode === 'edit' && id ? `${base}/${id}` : base}
             className="inline-flex min-h-12 items-center justify-center border-[1.5px] border-border-strong px-6 font-narrow text-[13px] font-bold uppercase tracking-[0.12em] text-ink no-underline hover:text-ink"
           >
             {t('forms:newSession.cancel')}

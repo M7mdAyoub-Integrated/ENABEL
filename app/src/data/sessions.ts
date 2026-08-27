@@ -5,7 +5,30 @@ import type { Database } from '../types/database'
 
 /** The generated Update shapes, so a patch cannot name a column that is gone. */
 type EnrolmentPatch = Database['public']['Tables']['training_enrolment']['Update']
-type SessionPatch = Database['public']['Tables']['training_session']['Update']
+/**
+ * Only the columns BOTH session tables share.
+ *
+ * Written out rather than taken from one table's Update type: that would
+ * compile against training and silently permit a column advisory does not
+ * have, or vice versa. The shared set is the contract these screens work in.
+ */
+type SessionPatch = {
+  title?: string
+  topic_id?: string
+  start_date?: string
+  end_date?: string
+  venue?: string | null
+  focal_point?: string | null
+  description?: string | null
+  duration_hours?: number | null
+  delivered_by_partnership_id?: string | null
+  planned_seats?: number | null
+  application_opens_on?: string | null
+  application_closes_on?: string | null
+  is_published?: boolean
+  is_delivered?: boolean
+  deleted_at?: string | null
+}
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -41,12 +64,33 @@ type SessionPatch = Database['public']['Tables']['training_session']['Update']
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
+/**
+ * Training and advisory are the SAME SHAPE, deliberately.
+ *
+ * advisory_session mirrors training_session column for column (0045), because
+ * the public site renders one opportunity template and the Municipality one
+ * participant template. Duplicating these screens would mean two publish gates,
+ * two ended-event rules and two completion decisions, all free to drift -- and
+ * the completion decision is the one that moves A1.3 on one side and unlocks
+ * linkage on the other.
+ *
+ * So the kind is a parameter, not a copy. Advisory adds `adviser` and the
+ * qualification trail; nothing else differs.
+ */
+export type SessionKind = 'training' | 'advisory'
+
+const TABLES = {
+  training: { session: 'training_session', enrolment: 'training_enrolment' },
+  advisory: { session: 'advisory_session', enrolment: 'advisory_enrolment' },
+} as const
+
 export const sessionKeys = {
-  all: ['sessions'] as const,
-  list: () => [...sessionKeys.all, 'list'] as const,
-  one: (id: string) => [...sessionKeys.all, 'one', id] as const,
-  participants: (id: string) => [...sessionKeys.all, 'participants', id] as const,
-  deleteImpact: (id: string) => [...sessionKeys.all, 'delete-impact', id] as const,
+  all: (kind: SessionKind) => ['sessions', kind] as const,
+  list: (kind: SessionKind) => [...sessionKeys.all(kind), 'list'] as const,
+  one: (kind: SessionKind, id: string) => [...sessionKeys.all(kind), 'one', id] as const,
+  participants: (kind: SessionKind, id: string) =>
+    [...sessionKeys.all(kind), 'participants', id] as const,
+  deleteImpact: (id: string) => ['sessions', 'training', 'delete-impact', id] as const,
 }
 
 export type ManagedSession = {
@@ -69,13 +113,20 @@ export type ManagedSession = {
   description: string | null
   duration_hours: number | null
   delivered_by_partnership_id: string | null
+  /** Advisory only. Null on a training row, which has no such column. */
+  adviser?: string | null
 }
 
-const SESSION_COLS =
-  'id, title, origin, topic_id, start_date, end_date, venue, planned_seats, is_published, ' +
+const COMMON_COLS =
+  'id, title, topic_id, start_date, end_date, venue, planned_seats, is_published, ' +
   'is_delivered, is_cancelled, cancellation_reason, application_opens_on, ' +
   'application_closes_on, focal_point, description, duration_hours, ' +
   'delivered_by_partnership_id'
+
+// `origin` is training-only (0063): advisory has no resolveSession equivalent
+// creating rows as a by-product, so there is no provenance to record.
+const colsFor = (kind: SessionKind) =>
+  kind === 'training' ? `${COMMON_COLS}, origin` : `${COMMON_COLS}, adviser`
 
 /**
  * Can this be published, and if not, what is missing?
@@ -98,13 +149,13 @@ export function missingForPublish(s: ManagedSession): string[] {
   return gaps
 }
 
-export function useManagedSessions() {
+export function useManagedSessions(kind: SessionKind) {
   return useQuery({
-    queryKey: sessionKeys.list(),
+    queryKey: sessionKeys.list(kind),
     queryFn: async (): Promise<ManagedSession[]> => {
       const res = await supabase
-        .from('training_session')
-        .select(SESSION_COLS)
+        .from(TABLES[kind].session)
+        .select(colsFor(kind))
         .is('deleted_at', null)
         .order('start_date', { ascending: false })
       return unwrapList(res as unknown as { data: ManagedSession[] | null; error: unknown })
@@ -112,14 +163,14 @@ export function useManagedSessions() {
   })
 }
 
-export function useManagedSession(id: string | undefined) {
+export function useManagedSession(kind: SessionKind, id: string | undefined) {
   return useQuery({
-    queryKey: sessionKeys.one(id ?? ''),
+    queryKey: sessionKeys.one(kind, id ?? ''),
     enabled: !!id,
     queryFn: async (): Promise<ManagedSession> => {
       const res = await supabase
-        .from('training_session')
-        .select(SESSION_COLS)
+        .from(TABLES[kind].session)
+        .select(colsFor(kind))
         .eq('id', id!)
         .is('deleted_at', null)
         .single()
@@ -149,13 +200,13 @@ export type Participant = {
   } | null
 }
 
-export function useSessionParticipants(sessionId: string | undefined) {
+export function useSessionParticipants(kind: SessionKind, sessionId: string | undefined) {
   return useQuery({
-    queryKey: sessionKeys.participants(sessionId ?? ''),
+    queryKey: sessionKeys.participants(kind, sessionId ?? ''),
     enabled: !!sessionId,
     queryFn: async (): Promise<Participant[]> => {
       const res = await supabase
-        .from('training_enrolment')
+        .from(TABLES[kind].enrolment)
         .select(
           'id, person_id, application_status, applied_on, registered_on, attended, ' +
             'met_criteria, decided_on, submitted_by_participant, ' +
@@ -171,7 +222,7 @@ export function useSessionParticipants(sessionId: string | undefined) {
 
 /* ── the three decisions, deliberately three mutations ────────────────────── */
 
-function useParticipantMutation<TVars extends { id: string; sessionId: string }>(
+function useParticipantMutation<TVars extends { id: string; sessionId: string; kind: SessionKind }>(
   key: string,
   patch: (vars: TVars, userId: string | null) => EnrolmentPatch,
 ) {
@@ -181,7 +232,7 @@ function useParticipantMutation<TVars extends { id: string; sessionId: string }>
     mutationFn: async (vars: TVars) => {
       const { data: auth } = await supabase.auth.getUser()
       const res = await supabase
-        .from('training_enrolment')
+        .from(TABLES[vars.kind].enrolment)
         .update(patch(vars, auth.user?.id ?? null))
         .eq('id', vars.id)
         .is('deleted_at', null)
@@ -191,7 +242,7 @@ function useParticipantMutation<TVars extends { id: string; sessionId: string }>
       return res.data
     },
     onSuccess: (_d, vars) => {
-      void qc.invalidateQueries({ queryKey: sessionKeys.participants(vars.sessionId) })
+      void qc.invalidateQueries({ queryKey: sessionKeys.participants(vars.kind, vars.sessionId) })
       // A completion moves A1.3, so anything showing indicator figures is stale.
       void qc.invalidateQueries({ queryKey: ['indicators'] })
       void qc.invalidateQueries({ queryKey: ['overview'] })
@@ -204,13 +255,19 @@ export function useDecideApplication() {
   return useParticipantMutation<{
     id: string
     sessionId: string
+    kind: SessionKind
     status: 'approved' | 'rejected'
   }>('decide-application', (v) => ({ application_status: v.status }))
 }
 
 /** Did they turn up. Says nothing about whether they completed. */
 export function useSetAttended() {
-  return useParticipantMutation<{ id: string; sessionId: string; attended: boolean }>(
+  return useParticipantMutation<{
+    id: string
+    sessionId: string
+    kind: SessionKind
+    attended: boolean
+  }>(
     'set-attended',
     (v) => ({ attended: v.attended }),
   )
@@ -231,6 +288,7 @@ export function useDecideCompletion() {
   return useParticipantMutation<{
     id: string
     sessionId: string
+    kind: SessionKind
     met: boolean | null
   }>('decide-completion', (v, userId) =>
     v.met === null
@@ -250,9 +308,9 @@ function useSessionFlag(key: string, patch: (on: boolean) => SessionPatch) {
   const qc = useQueryClient()
   return useMutation({
     mutationKey: ['sessions', key],
-    mutationFn: async (vars: { id: string; on: boolean }) => {
+    mutationFn: async (vars: { id: string; on: boolean; kind: SessionKind }) => {
       const res = await supabase
-        .from('training_session')
+        .from(TABLES[vars.kind].session)
         .update(patch(vars.on))
         .eq('id', vars.id)
         .is('deleted_at', null)
@@ -262,8 +320,8 @@ function useSessionFlag(key: string, patch: (on: boolean) => SessionPatch) {
       return res.data
     },
     onSuccess: (_d, vars) => {
-      void qc.invalidateQueries({ queryKey: sessionKeys.one(vars.id) })
-      void qc.invalidateQueries({ queryKey: sessionKeys.list() })
+      void qc.invalidateQueries({ queryKey: sessionKeys.one(vars.kind, vars.id) })
+      void qc.invalidateQueries({ queryKey: sessionKeys.list(vars.kind) })
       void qc.invalidateQueries({ queryKey: ['public', 'opportunities'] })
       void qc.invalidateQueries({ queryKey: ['indicators'] })
     },
@@ -320,9 +378,9 @@ export function useUpdateSession() {
   const qc = useQueryClient()
   return useMutation({
     mutationKey: ['sessions', 'update'],
-    mutationFn: async (v: NewSession & { id: string }) => {
+    mutationFn: async (v: NewSession & { id: string; kind: SessionKind }) => {
       const res = await supabase
-        .from('training_session')
+        .from(TABLES[v.kind].session)
         .update({
           title: v.title.trim(),
           topic_id: v.topicId,
@@ -347,8 +405,8 @@ export function useUpdateSession() {
       return res.data
     },
     onSuccess: (_d, v) => {
-      void qc.invalidateQueries({ queryKey: sessionKeys.one(v.id) })
-      void qc.invalidateQueries({ queryKey: sessionKeys.list() })
+      void qc.invalidateQueries({ queryKey: sessionKeys.one(v.kind, v.id) })
+      void qc.invalidateQueries({ queryKey: sessionKeys.list(v.kind) })
       void qc.invalidateQueries({ queryKey: ['public', 'opportunities'] })
     },
   })
@@ -358,9 +416,9 @@ export function useCreateSession() {
   const qc = useQueryClient()
   return useMutation({
     mutationKey: ['sessions', 'create'],
-    mutationFn: async (v: NewSession) => {
+    mutationFn: async (v: NewSession & { kind: SessionKind }) => {
       const res = await supabase
-        .from('training_session')
+        .from(TABLES[v.kind].session)
         .insert({
           title: v.title.trim(),
           topic_id: v.topicId,
@@ -383,8 +441,8 @@ export function useCreateSession() {
       if (res.error) throw toAppError(res.error)
       return res.data
     },
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: sessionKeys.list() })
+    onSuccess: (_d, v) => {
+      void qc.invalidateQueries({ queryKey: sessionKeys.list(v.kind) })
       // Not published yet, so the public list cannot have changed -- but D0.2
       // reads training_session, and an unpublished undelivered row must leave
       // it alone. Invalidating proves that on screen rather than assuming it.
@@ -435,9 +493,9 @@ export function useSoftDeleteSession() {
   const qc = useQueryClient()
   return useMutation({
     mutationKey: ['sessions', 'soft-delete'],
-    mutationFn: async (vars: { id: string }) => {
+    mutationFn: async (vars: { id: string; kind: SessionKind }) => {
       const res = await supabase
-        .from('training_session')
+        .from(TABLES[vars.kind].session)
         .update({ deleted_at: new Date().toISOString() })
         .eq('id', vars.id)
         .is('deleted_at', null)
@@ -446,10 +504,89 @@ export function useSoftDeleteSession() {
       if (res.error) throw toAppError(res.error)
       return res.data
     },
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: sessionKeys.all })
+    onSuccess: (_d, vars) => {
+      void qc.invalidateQueries({ queryKey: sessionKeys.all(vars.kind) })
       void qc.invalidateQueries({ queryKey: ['public', 'opportunities'] })
       void qc.invalidateQueries({ queryKey: ['indicators'] })
+    },
+  })
+}
+
+/* ── how each advisory participant qualified ─────────────────────────────── */
+
+/**
+ * The trainings that made these people eligible for advisory.
+ *
+ * ── WHY THIS IS NOT "HAS COMPLETED A TRAINING" ──
+ *
+ * That sentence is not an audit trail. A coordinator looking at an advisory
+ * list needs to answer "why is this person here", and the answer is a specific
+ * course on a specific date -- something they can check.
+ *
+ * ── AND WHY IT RETURNS A LIST, NOT ONE ROW ──
+ *
+ * Demo Person One qualifies through three completed trainings. Naming only one
+ * would imply their eligibility rests on it, and it does not: soft-delete that
+ * one and they are still eligible through the other two. So the earliest is
+ * shown as the one that first opened the door, and the count says how many
+ * others back it up.
+ *
+ * The four conditions match v_ind_a1_3 and check_advisory_eligibility exactly.
+ * A person shown here as qualified is one the gate would let through -- if this
+ * ever disagreed with the trigger, the list would be explaining a decision the
+ * database did not make.
+ */
+export type Qualification = {
+  personId: string
+  /** Earliest completed training -- the one that first granted eligibility. */
+  title: string
+  completedOn: string
+  /** How many completed trainings this person has in total. */
+  total: number
+}
+
+export function useQualifications(personIds: string[]) {
+  const key = [...personIds].sort().join(',')
+  return useQuery({
+    queryKey: ['sessions', 'qualifications', key],
+    enabled: personIds.length > 0,
+    queryFn: async (): Promise<Map<string, Qualification>> => {
+      const res = await supabase
+        .from('training_enrolment')
+        .select(
+          'person_id, decided_on, registered_on, training_session!inner (title, end_date, deleted_at)',
+        )
+        .in('person_id', personIds)
+        .eq('met_criteria', true)
+        .is('deleted_at', null)
+        .is('training_session.deleted_at', null)
+      type Raw = {
+        person_id: string
+        decided_on: string | null
+        registered_on: string
+        training_session: { title: string; end_date: string } | null
+      }
+      const rows = unwrapList(res as unknown as { data: Raw[] | null; error: unknown })
+      const byPerson = new Map<string, Qualification>()
+      for (const r of rows) {
+        const on = r.decided_on ?? r.registered_on
+        const cur = byPerson.get(r.person_id)
+        if (!cur) {
+          byPerson.set(r.person_id, {
+            personId: r.person_id,
+            title: r.training_session?.title ?? '',
+            completedOn: on,
+            total: 1,
+          })
+        } else {
+          cur.total += 1
+          if (on < cur.completedOn) {
+            cur.title = r.training_session?.title ?? cur.title
+            cur.completedOn = on
+          }
+        }
+      }
+      return byPerson
     },
   })
 }
