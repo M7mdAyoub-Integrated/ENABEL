@@ -20,6 +20,8 @@ import PortalDashboard from './routes/portal/PortalDashboard'
 import PortalRegister from './routes/portal/PortalRegister'
 import PublicHome from './routes/public/PublicHome'
 import ApplyForm from './routes/public/ApplyForm'
+import SessionList from './routes/SessionList'
+import SessionDetail from './routes/SessionDetail'
 import OpportunityDetail from './routes/public/OpportunityDetail'
 import SignIn from './routes/auth/SignIn'
 import ForgotPassword from './routes/auth/ForgotPassword'
@@ -138,6 +140,21 @@ const router = createBrowserRouter([
           <RequireModule>
             <RequireCapability capability="record.edit">{n}</RequireCapability>
           </RequireModule>
+        )),
+      },
+      // Municipality side of the public flow: publish an opportunity, then
+      // decide who took part. Kept out of /forms/:module because a participant
+      // list is a different shape from the seven record forms.
+      {
+        path: '/sessions',
+        element: guard(<SessionList />, (n) => (
+          <RequireCapability capability="record.edit">{n}</RequireCapability>
+        )),
+      },
+      {
+        path: '/sessions/:id',
+        element: guard(<SessionDetail />, (n) => (
+          <RequireCapability capability="record.edit">{n}</RequireCapability>
         )),
       },
       {

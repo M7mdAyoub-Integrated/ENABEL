@@ -3532,6 +3532,15 @@ export type Database = {
         }[]
       }
       snapshot_period: { Args: { p_period_code: string }; Returns: number }
+      training_session_delete_impact: {
+        Args: { p_session_id: string }
+        Returns: {
+          completions: number
+          eligibility_lost: number
+          keep_existing_advisory: number
+          live_enrolments: number
+        }[]
+      }
     }
     Enums: {
       app_role_t:
