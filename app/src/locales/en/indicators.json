@@ -96,5 +96,24 @@
     "milestone": "Attach the signed decision or minutes",
     "count": "Attach the register or attendance sheet"
   },
-  "zeroPlaceholder": "0"
+  "zeroPlaceholder": "0",
+  "dashboardTitle": "Indicators",
+  "showingPeriod": "Reporting period {code}",
+  "noValue": "—",
+  "targetNotSet": "not set",
+  "loadFailedTitle": "The indicator figures could not be loaded.",
+  "loadFailedBody": "Nothing is shown rather than something approximate. Check your connection and reload — these numbers go into the donor return, so a stale figure is worse than none.",
+  "firstQuarterNoTargets": "No targets are set for {code}. This is the plan's first quarter, which the framework leaves without targets — it is not missing data. Actuals below are still counted from your records.",
+  "periodNoTargets": "No targets are set for {code} in the framework workbook. Actuals below are still counted from your records.",
+  "manualNotice": "{count, plural, one {# indicator has no data-collection form behind it. Its figure is counted from records that must be entered another way, and the manual entry screen is not connected yet — so it will not move from this screen.} other {# indicators have no data-collection form behind them. Their figures are counted from records that must be entered another way, and the manual entry screen is not connected yet — so they will not move from this screen.}}",
+  "noEntryPath": "No entry path yet",
+  "noTargetLabel": "{code}: no target set for this period",
+  "objective": {
+    "IMPACT": "Impact",
+    "SO1": "SO1 · Skills and participation",
+    "SO2": "SO2 · Production and markets",
+    "SO3": "SO3 · Promotion and marketing",
+    "SO4": "SO4 · Coordination and governance"
+  },
+  "withoutForm": "{count, plural, one {# without a form} other {# without a form}}"
 }

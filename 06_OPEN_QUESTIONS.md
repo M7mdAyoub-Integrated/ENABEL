@@ -299,6 +299,7 @@ No crosswalk exists in any source document.
 | 🟡 Recorded during Phase 6 | 2 | OQ-19, OQ-20 |
 | 🟠 Public apply flow (Phase 6 step 4) | 2 | OQ-21 *(approved)*, OQ-22 *(resolved)* |
 | 🟢 Eligibility (Phase 6 step 5) | 2 | OQ-23 *(resolved)*, OQ-24 *(fixed)* |
+| 🔴 Reporting integrity | 2 | OQ-25, OQ-26 |
 
 ## 🟡 OQ-19 · Cancellation reasons are required for training and advisory, not for exhibitions
 
@@ -489,6 +490,44 @@ The project owner supplied the decisive reason. **G0.4 counts distinct partners 
 The general rule, now in `CLAUDE.md` under rule 2: **an entity with history hanging off it is restored, never recreated; an event someone took part in can be re-entered.** `person` and `partner` are the first kind; enrolments, registrations and surveys are the second.
 
 **Corollary, still to build:** when someone tries to create a person or partner whose key matches a soft-deleted row, the UI must offer **restore** rather than failing with a constraint error. Without that path the rule is correct and looks like a bug.
+
+---
+
+## 🔴 OQ-25 · Nothing protects a reported figure, because no period has ever been snapshotted
+
+**The state today.** `indicator_snapshot` holds **0 rows**. All 13 reporting periods have `is_locked = false`. `snapshot_period()` exists, is coordinator-gated, refuses locked periods and honours `is_final` — and has never been called.
+
+**What that means.** There is currently no such thing as a reported figure in this system. Every number on the dashboard is recomputed live from mutable data. Editing a completion, soft-deleting a session, soft-deleting or restoring a person — all silently rewrite history, including quarters that have already been sent to the donor.
+
+This surfaced while working out whether *restoring a person* should warn about changing past figures. It should, but restore is one instance of a general property, not the problem itself.
+
+**The fix is NOT to block writes to a closed quarter.** Corrections to closed periods are normal in M&E — a completion recorded late, a duplicate found in January that belongs to November. Blocking them prevents legitimate work and pushes people to edit around the system.
+
+**The fix is:**
+
+1. For a **locked** period, the dashboard shows the **snapshot**, not the live value.
+2. Live recomputation continues underneath, as now.
+3. **Surface the divergence deliberately** — *"reported 47, current data says 49"*. That reconciliation is exactly what a donor asks about, and a system that can answer it is more trustworthy than one that cannot drift at all.
+
+**So the open question is a process one, not a schema one:** at what point does the coordinator snapshot and lock a quarter, and who decides? Two weeks after quarter end? On submission of the donor return? Can a locked quarter be reopened, and by whom?
+
+**Decides.** M&E lead, with the Municipal Coordinator.
+
+**Needed before.** The first donor return. Until a period is snapshotted and locked, any figure quoted from this system is a live recomputation and should be described that way in any handover.
+
+---
+
+## 🟠 OQ-26 · The Arabic indicator names are English text
+
+**What was found.** `locales/ar/indicators.json` carries all 20 `name.*` keys, and **every value is the English string** — `"A1.3": "Unique participants completing a training"`. `indicator.name_ar` in the database is **NULL for all 20**.
+
+**Why this is worse than a missing translation.** A missing key falls back visibly and shows up in the missing-key console warning the i18n setup already emits. A key present with English text passes every check — completeness tooling, the missing-key handler, a reviewer counting keys — while being untranslated. It is the same failure shape as the dead constraint names and the comments that claimed behaviour living elsewhere: it looks handled.
+
+**Why it has not been fixed here.** D-3 in `08_FRONTEND_BUILD_PLAN.md` is explicit: a native speaker must review the Arabic, *especially* M&E terms — indicator, disaggregation, baseline, milestone. Machine-translating "Unique participants completing a training" would produce something that reads wrong to a Jordanian civil servant and, worse, would look finished. **Inventing M&E terminology is exactly what CLAUDE.md rule 7 forbids.**
+
+**Where the translation should live.** `indicator.name_ar` already exists on the table and is the better home than a locale file: these are the framework's own wording, they must match the workbook, and they change only when the framework does. The locale file would then be redundant for names.
+
+**Decides.** M&E lead, with a native Arabic speaker who knows the framework vocabulary. This is a translation task with a defined scope: 20 names, 20 definitions.
 
 ---
 
