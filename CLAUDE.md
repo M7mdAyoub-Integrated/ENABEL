@@ -84,10 +84,14 @@ So, for every migration:
 
 1. Write the SQL into `supabase/migrations/<timestamp>_<nnnn>_<name>.sql` **first**.
 2. Apply that exact text — do not retype it, do not improve it on the way through.
-3. The filename timestamp must equal the `version` recorded in `supabase_migrations.schema_migrations`. Two of the recovered files had drifted, which silently breaks replay ordering.
+3. The filename timestamp must equal the `version` recorded in `supabase_migrations.schema_migrations`. **A file whose name disagrees with the ledger is not the same migration, even when the bytes match.** `supabase db reset` orders by filename and the CLI identifies migrations by version, so a mismatch replays a migration the ledger has never heard of, in a position it never occupied. Two of the recovered files had drifted this way; the ordering happened to survive, which is luck, not a margin.
 4. Verify with `bash supabase/check_migration_files.sh` (see that file's header for the one query it needs).
 
 The recovered files are byte-identical to what was applied, taken from the migration ledger — not reconstructed from the schema. `0030` and `0031` are deliberate exceptions and are listed in the check script: the applied text of `0030` contains a password literal, so repairing it from the ledger would put a credential back into git.
+
+**A secret written into a migration survives a git history rewrite.** `supabase_migrations.schema_migrations` stores the applied SQL verbatim, so anything that has ever been in a migration exists in *two* places. Scrubbing the repository — even with `git-filter-repo`, even verified against the remote — does not touch the ledger copy. That is exactly what happened here: the test-account password was removed from git history, and its original text sat in the ledger unnoticed until the recovery work went looking.
+
+So: **never put a credential in a migration.** If one gets in, rotating it is the fix that actually works, because the ledger copy cannot be assumed gone. Scrubbing git is necessary but not sufficient, and treating it as sufficient is how a live secret gets left behind.
 
 **6. One person, one row.**
 `person.national_id` is unique and constrained to exactly nine digits. Nothing else stores a name or phone for a participant — everything references `person_id`.

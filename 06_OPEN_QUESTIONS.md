@@ -297,7 +297,7 @@ No crosswalk exists in any source document.
 | 🟠 Affects schema or forms | 8 | OQ-6, OQ-7, OQ-8, OQ-9, OQ-10, OQ-11, OQ-13, OQ-14 |
 | 🟡 Wording and policy | 4 | OQ-15, OQ-16, OQ-17, OQ-18 |
 | 🟡 Recorded during Phase 6 | 2 | OQ-19, OQ-20 |
-| 🟠 Public apply flow (Phase 6 step 4) | 2 | OQ-21 *(approved)*, OQ-22 *(resolved)* |
+| 🟠 Public apply flow (Phase 6 step 4) | 2 | OQ-21 *(approved)*, OQ-22 *(half open)* |
 
 ## 🟡 OQ-19 · Cancellation reasons are required for training and advisory, not for exhibitions
 
@@ -357,7 +357,7 @@ No crosswalk exists in any source document.
 
 ---
 
-## 🟢 OQ-22 · A person with no date of birth cannot be found by the public lookup — RESOLVED
+## 🟠 OQ-22 · A person with no date of birth cannot be found by the public lookup — RESOLVED, ONE HALF STILL OPEN
 
 **The problem.** `applicant_prefill` (migration `0052`) verifies an applicant on **national ID + date of birth**. `person.date_of_birth` is **nullable**. A person whose DOB was never recorded cannot satisfy the check, receives the standard `{"found": false}`, and — unless the form stops them — registers again as a new person.
 
@@ -399,6 +399,14 @@ Three changes instead, in migration `0053`:
 **Noted while implementing.** `person` carries `check (date_of_birth is not null or age_recorded is not null)`, so a person with no DOB always has a recorded age. Age is *not* usable as a verification factor — it changes every year and has roughly sixty possible values — so it does not help here, but it does mean the "no DOB" population is never entirely undated.
 
 **Current state of the data.** All 4 live people have a date of birth; `v_person_missing_verification` returns zero rows.
+
+### ⚠ Still open: public self-registration does not yet require a date of birth
+
+Point 1 above is **not implemented**. It cannot be, until the registration RPC exists — that arrives with the application form in Phase 6 step 4.
+
+**Until then this loop is not closed.** Migration `0053` stops an existing no-DOB person from being pushed into re-registering, but nothing yet stops a *new* person being created through the public path with no date of birth, which would grow the very gap `0053` exists to contain.
+
+**Do not treat OQ-22 as done until the registration RPC requires `date_of_birth` as a NOT NULL argument on the public path**, and a test confirms a registration attempt without one is refused by the database rather than only by the form.
 
 ---
 

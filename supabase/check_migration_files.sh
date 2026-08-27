@@ -63,8 +63,38 @@ declare -A EXPECTED_DIVERGENT=(
   [20260825085639_0031_fix_test_user_auth_fixtures]="auth fixture repair, deliberately no longer applied from a migration"
 )
 
-exact=0; divergent=0; missing=0; unexpected=0
+exact=0; divergent=0; missing=0; unexpected=0; misnamed=0
 declare -A seen=()
+
+# ── Filename timestamp must equal the ledger version ─────────────────────────
+#
+# Checked separately and FIRST, because content comparison alone does not catch
+# it: 0048 and 0049 had filename timestamps that disagreed with their ledger
+# versions (101500/102000 vs 100046/100452) while their bytes were fine.
+#
+# A file whose name disagrees with the ledger is NOT the same migration even
+# when the content matches. `supabase db reset` orders by filename and the CLI
+# identifies migrations by version, so a mismatch means the replay runs a
+# migration the ledger has never heard of, in a position the ledger never used.
+# Ordering survived by luck last time; it will not always.
+declare -A ledger_version_of=()
+while read -r stem _; do
+  [[ -z "${stem:-}" ]] && continue
+  ledger_version_of["${stem#*_}"]="${stem%%_*}"
+done < "$manifest"
+
+for f in "$migdir"/*.sql; do
+  stem="$(basename "$f" .sql)"
+  suffix="${stem#*_}"; ts="${stem%%_*}"
+  want_ts="${ledger_version_of[$suffix]:-}"
+  if [[ -n "$want_ts" && "$want_ts" != "$ts" ]]; then
+    echo "MISNAMED  $stem.sql"
+    echo "            ledger version $want_ts"
+    echo "            filename says  $ts"
+    echo "            rename to ${want_ts}_${suffix}.sql"
+    misnamed=$((misnamed+1))
+  fi
+done
 
 while read -r stem want; do
   [[ -z "${stem:-}" ]] && continue
@@ -102,9 +132,9 @@ for f in "$migdir"/*.sql; do
 done
 
 echo
-echo "exact=$exact  expected-divergent=$divergent  DIFFERS=$unexpected  MISSING=$missing"
+echo "exact=$exact  expected-divergent=$divergent  DIFFERS=$unexpected  MISSING=$missing  MISNAMED=$misnamed"
 
-if (( unexpected > 0 || missing > 0 )); then
+if (( unexpected > 0 || missing > 0 || misnamed > 0 )); then
   echo "FAIL — the repository cannot rebuild this database."
   exit 1
 fi

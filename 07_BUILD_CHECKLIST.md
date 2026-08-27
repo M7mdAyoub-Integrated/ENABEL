@@ -397,6 +397,43 @@ Tests 5 and 5b are the two ways it leaks a national ID.
 
 ---
 
+### ☐ Rebuild from the migration files alone, before real data
+
+**Required. Not optional, and not satisfied by the md5 check.**
+
+`supabase/check_migration_files.sh` proves the files equal the SQL that was
+applied. It does not prove that replaying those files on an empty database
+produces this schema. Those are different claims, and only the second one is
+what "we can rebuild from source" means.
+
+This was deferred during Phase 6 because the machine had no Docker and a
+preview branch is billed. Go-live is the right moment: the cost is trivial next
+to migrating real municipal data onto a schema nobody has ever rebuilt.
+
+1. Rebuild — whichever is available:
+   - `supabase db reset` locally (needs Docker), or
+   - a Supabase preview branch, which replays the migration files.
+2. Diff the rebuilt schema against production. **Everything**: tables, columns,
+   types, defaults, constraints, indexes, views, functions, triggers, policies,
+   grants.
+3. Report every difference, including ones that look cosmetic. A grant that did
+   not replay is a data leak; a missing `deleted_at` filter in a rebuilt view is
+   migration 0025's bug returning.
+
+**Known things the diff should surface, so they are not mistaken for new
+problems:**
+
+- `0030` and `0031` are deliberately neutered in the repo — the applied text of
+  `0030` contains a password literal. A rebuild produces **no test accounts**.
+  That is correct, and it means role testing needs accounts created another way.
+- `0038` recreates the corrupted `as已held` column on purpose; `0039` renames it.
+  A rebuild passing through that state is the history working, not a fault.
+
+Until this passes, "the repository can rebuild the database" is an inference
+from the ledger, not a demonstrated fact. Say so that way in any handover.
+
+---
+
 ### ☐ Retire the demo data and draw the audit boundary before go-live
 
 This is one step with three parts and **the order matters.** Do not draw the audit boundary before the demo data is gone, or the boundary row will sit above data that is still live.
