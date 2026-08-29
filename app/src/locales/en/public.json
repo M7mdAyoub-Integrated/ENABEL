@@ -210,5 +210,10 @@
       "matched": "Matched",
       "closed": "Closed"
     }
+  },
+  "preview": {
+    "title": "Previewing the public site",
+    "note": "Only you can see this bar. Visitors do not.",
+    "back": "Back to the Municipality"
   }
 }

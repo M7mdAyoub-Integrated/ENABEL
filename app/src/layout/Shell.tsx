@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { type ModuleId } from '../modules'
 import { useNavCounts } from '../data/moduleCounts'
@@ -8,6 +8,7 @@ import { OfflineBar } from '../components/OfflineBar'
 import { useAuth } from '../auth/AuthProvider'
 import { can, modulesFor } from '../auth/permissions'
 import { DEMO_MODE } from '../demo/demoMode'
+import { EXTERNAL } from '../ui/glyphs'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -221,54 +222,50 @@ function Brand() {
 }
 
 /**
- * Municipality / Participant.
+ * View public site.
  *
- * In demo mode this is the prototype's toggle: two segments, one button, same
- * placement in the header. It switches VIEW, not identity -- there is one
- * session underneath and it never changes. Participant simply routes to the
- * producer portal, which is a different screen, not a different account.
+ * ── WHAT THIS REPLACED, AND WHY IT HAD TO CHANGE ──
  *
- * With DEMO_MODE off it goes back to being a static label showing which side of
- * the app you are on, because then the side is decided by your real role and
- * offering to switch it would undo Phase 3. See src/demo/demoMode.ts.
+ * This was a Municipality / Participant segmented control. It routed to
+ * `/portal`, and the participant portal was retired when `/` became the public
+ * home page -- so the second segment led to "Page not found", in the header of
+ * every municipal screen. A dead control in permanent chrome is worse than no
+ * control: it is on screen constantly, and the only way to find out it is
+ * broken is to press it.
+ *
+ * ── AND WHY IT IS NOT A SWITCHER AT ALL ANY MORE ──
+ *
+ * It used to imply two sides of one app that a person could move between. There
+ * are no longer two sides: there is the Municipality's app, and there is a
+ * public website that anyone can read without an account. Going to the second
+ * is not switching who you are -- it is a coordinator looking at what a farmer
+ * sees.
+ *
+ * That is a PREVIEW, and the honest treatment is the one a CMS uses: a way out
+ * to the public view, and a bar on the far side saying you are previewing and
+ * how to come back. Not an account switcher, which promises a change of
+ * identity that never happens. The return half lives in PublicShell.
+ *
+ * ── NO LONGER TIED TO DEMO_MODE ──
+ *
+ * The old control was demo-only, and collapsed to a dead "Municipality" label
+ * with the flag off, because switching between roles is a thing Phase 3 had to
+ * stop. Previewing a public page is not a role change and has nothing to do
+ * with identity, so it works the same either way. The public pages read
+ * `v_public_opportunity`, which `anon` is granted, so a coordinator sees
+ * exactly what a visitor sees.
  */
-function ViewToggle() {
+function ViewPublicSite() {
   const { t } = useTranslation('nav')
-  const navigate = useNavigate()
-  const { pathname } = useLocation()
-  const onPortal = pathname.startsWith('/portal')
-
-  if (!DEMO_MODE) {
-    return (
-      <div className="flex border-[1.5px] border-ink">
-        <span className="flex min-h-11 items-center bg-ink px-[11px] py-[5px] font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-bg sm:min-h-0">
-          {t('municipality')}
-        </span>
-      </div>
-    )
-  }
-
-  const segments = [
-    { key: 'municipality' as const, to: '/dashboard', active: !onPortal },
-    { key: 'participant' as const, to: '/portal', active: onPortal },
-  ]
 
   return (
-    <div className="flex flex-none border-[1.5px] border-ink">
-      {segments.map((seg, i) => (
-        <button
-          key={seg.key}
-          type="button"
-          aria-pressed={seg.active}
-          onClick={() => navigate(seg.to)}
-          className={`min-h-11 cursor-pointer whitespace-nowrap px-[11px] py-[5px] font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] sm:min-h-0 ${
-            i > 0 ? 'border-s-[1.5px] border-ink' : ''
-          } ${seg.active ? 'bg-ink text-bg' : 'bg-bg text-muted hover:text-ink'}`}
-        >
-          {t(seg.key)}
-        </button>
-      ))}
-    </div>
+    <NavLink
+      to="/"
+      className="flex min-h-11 flex-none items-center gap-2 whitespace-nowrap border-[1.5px] border-ink bg-bg px-[11px] py-[5px] font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-ink no-underline hover:bg-ink hover:text-bg sm:min-h-0"
+    >
+      <span aria-hidden="true" className="inline-block mirror-rtl">{EXTERNAL}</span>
+      {t('viewPublicSite')}
+    </NavLink>
   )
 }
 
@@ -319,7 +316,7 @@ export function Shell({ children }: { children: ReactNode }) {
           </div>
           <div className="flex flex-none items-stretch gap-[10px]">
             <div className="hidden sm:flex">
-              <ViewToggle />
+              <ViewPublicSite />
             </div>
             <LocaleSwitcher />
           </div>
@@ -402,6 +399,23 @@ export function Shell({ children }: { children: ReactNode }) {
             style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)' }}
           >
             <NavGroups groups={groups} onNavigate={() => setMoreOpen(false)} />
+            {/* The header copy of this sits in a `hidden sm:flex` wrapper, so on
+                a phone it does not exist. That was tolerable for the role
+                toggle it replaced; it is not for this one, because checking how
+                the public site looks on a phone is the single most likely
+                reason to press it. */}
+            <div className="border-t border-border-default px-[18px] py-3 md:hidden">
+              <NavLink
+                to="/"
+                onClick={() => setMoreOpen(false)}
+                className="flex min-h-11 items-center gap-2 border-[1.5px] border-ink px-3 font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-ink no-underline"
+              >
+                <span aria-hidden="true" className="inline-block mirror-rtl">
+                  {EXTERNAL}
+                </span>
+                {t('nav:viewPublicSite')}
+              </NavLink>
+            </div>
             <SignedInAs compact />
           </nav>
         </div>

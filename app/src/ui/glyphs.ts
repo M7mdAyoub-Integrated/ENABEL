@@ -9,9 +9,17 @@
 export const SEP = '·' // ·
 export const EMDASH = '—' // —
 export const ARROW_END = '→' // →
-/** Back/previous. Named for the reading direction, and mirrored under RTL by
-    the `scale-x-[-1]` on the span that renders it. */
+/** Back/previous. Named for the reading direction.
+    Call sites that want it mirrored under RTL add the `mirror-rtl` class --
+    NOT `scale-x-[-1]`, which is what this comment used to claim and which no
+    call site ever did. `mirror-rtl` is defined explicitly in the stylesheet
+    because Tailwind's `rtl:` variant generated no utility here. This comment
+    describes the convention; it does not vouch for any particular call site
+    following it. */
 export const ARROW_START = '←' // ←
+/** Leaving the municipal app for the public site. Mirrored under RTL by the
+    same `mirror-rtl` convention, so it points away from the reading start. */
+export const EXTERNAL = '↗' // ↗
 /** The "pulled from another form" hook on a provenance tag. */
 export const HOOK = '↳' // ↳
 export const EMPTY = '—' // — shown where a value is absent

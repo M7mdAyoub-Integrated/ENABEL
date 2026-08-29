@@ -36,9 +36,10 @@
     "office": "Coordination office"
   },
   "signedIn": "Signed in",
-  "municipality": "Municipality",
-  "participant": "Participant",
   "sessions": "Sessions",
   "advisory": "Market advisory",
-  "linkageRequests": "Linkage requests"
+  "linkageRequests": "Linkage requests",
+  "viewPublicSite": "View public site",
+  "municipality": "Municipality",
+  "participant": "Participant"
 }

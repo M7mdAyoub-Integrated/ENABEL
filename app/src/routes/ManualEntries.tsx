@@ -378,10 +378,23 @@ function CaseStudyForm() {
 
 /* ── the three that belong elsewhere ─────────────────────────────────────── */
 
+/**
+ * `to: null` renders "Not built yet". That label is a claim about the rest of
+ * the app, made on a screen that cannot verify it, so it goes stale silently --
+ * B1.2 sat here saying "not built yet" for the whole of the session in which
+ * the coordination office was built, while its own description already said
+ * "in the coordination office module".
+ *
+ * G0.4 was not listed at all, which is worse than a stale label: partner
+ * contributions have no screen anywhere, and this screen is where a coordinator
+ * would come looking. An indicator that is neither here nor pointed at from
+ * here is simply invisible.
+ */
 const ELSEWHERE: { code: string; to: string | null }[] = [
-  { code: 'B1.2', to: null },
+  { code: 'B1.2', to: '/forms/os' },
   { code: 'D0.1', to: null },
   { code: 'C1.3', to: null },
+  { code: 'G0.4', to: null },
   { code: 'D0.2', to: '/sessions' },
 ]
 

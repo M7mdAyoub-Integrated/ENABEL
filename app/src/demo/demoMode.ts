@@ -16,7 +16,13 @@
  *    • the account chip and sign-out in the sidebar          (Shell.tsx)
  *    • the sign-out button in the producer portal            (PortalShell.tsx)
  *    • capability gating on create / edit / delete / approve (permissions.ts)
- *    • the Municipality/Participant toggle disappears again  (Shell.tsx)
+ *
+ *  The Municipality/Participant toggle used to be listed here as a thing this
+ *  mode adds. It is gone: it routed to `/portal`, the participant portal was
+ *  retired when `/` became the public home page, and the second segment led to
+ *  "Page not found". It is replaced by "View public site", which is NOT
+ *  conditional on this flag — previewing a public page is not a role change,
+ *  so it behaves the same either way. See Shell.tsx and PublicShell.tsx.
  *
  *  Grep for DEMO_MODE to find all of them. Every site carries a comment
  *  pointing back here.
