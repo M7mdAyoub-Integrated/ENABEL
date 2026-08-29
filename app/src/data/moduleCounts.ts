@@ -38,6 +38,22 @@ function useLiveCount(module: 'tp' | 'pp', enabled: boolean) {
   })
 }
 
+/** Visits recorded by the coordination office. See the note in useNavCounts. */
+function useOfficeCount() {
+  return useQuery({
+    queryKey: ['office-services', 'count'],
+    queryFn: async (): Promise<number> => {
+      const res = await supabase
+        .from('office_service')
+        .select('id, person!inner(deleted_at)', { count: 'exact', head: true })
+        .is('deleted_at', null)
+        .is('person.deleted_at', null)
+      if (res.error) throw toAppError(res.error)
+      return res.count ?? 0
+    },
+  })
+}
+
 /**
  * Counts for the rail.
  *
@@ -50,10 +66,14 @@ export function useNavCounts(): Record<ModuleId, number> {
   const mock = useMockCounts()
   const tp = useLiveCount('tp', true)
   const pp = useLiveCount('pp', true)
+  const os = useOfficeCount()
 
   return {
     ...mock,
     tp: tp.data ?? mock.tp,
     pp: pp.data ?? mock.pp,
+    // Counts VISITS, not people. B1.2 counts people, and the two differ the
+    // moment anyone comes twice -- so this number must never be read as B1.2.
+    os: os.data ?? mock.os,
   }
 }

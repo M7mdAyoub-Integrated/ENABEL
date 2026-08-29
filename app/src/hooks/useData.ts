@@ -354,6 +354,10 @@ export function useModuleCounts(): Record<ModuleId, number> {
       ex: alive('ex', db.EXHIBITIONS.map((e) => e.id)),
       rg: alive('rg', [...db.REGISTRATIONS, ...s.extraRegistrations].map((r) => r.id)),
       fu: alive('fu', db.SURVEYS.map((f) => f.id)),
+      // The coordination office was built after the mock era and has no mock
+      // rows. Its real count comes from useNavCounts; a zero here would only
+      // ever show for the instant before that query lands.
+      os: 0,
     }
   }, [s])
 }

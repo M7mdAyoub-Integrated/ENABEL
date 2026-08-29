@@ -13,7 +13,8 @@
     "ln": "Market linkages",
     "ex": "Exhibitions",
     "rg": "Registrations",
-    "fu": "Post-intervention"
+    "fu": "Post-intervention",
+    "os": "Coordination office"
   },
   "objective": {
     "tp": "Objective 1",
@@ -22,7 +23,8 @@
     "ln": "Objective 2",
     "ex": "Objective 3",
     "rg": "Objective 3",
-    "fu": "Cross-cutting"
+    "fu": "Cross-cutting",
+    "os": "Objective 1"
   },
   "group": {
     "partnerships": "Partnerships",
@@ -30,7 +32,8 @@
     "production": "Production",
     "markets": "Markets",
     "followup": "Follow-up",
-    "noForm": "No form yet"
+    "noForm": "No form yet",
+    "office": "Coordination office"
   },
   "signedIn": "Signed in",
   "municipality": "Municipality",

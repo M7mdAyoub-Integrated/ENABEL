@@ -6,6 +6,7 @@ import { usePartnership, type PartnershipType } from './partnerships'
 import { refLabel, useRef } from './refTables'
 import { formatDate, formatDateRange } from '../lib/format'
 import { useExhibition, durationDays } from './exhibitions'
+import { useOfficeService } from './officeServices'
 import { useCompletion } from './completions'
 import { formatShortDate } from '../lib/format'
 
@@ -190,6 +191,59 @@ function useCompletionDetail(
   }
 }
 
+/**
+ * Coordination office — module 8.
+ *
+ * No status chip. A visit has no decision attached to it and nothing to
+ * approve; giving it a chip would invent a state the table does not have.
+ */
+function useOfficeDetail(
+  id: string,
+  enabled: boolean,
+  t: Translate,
+  locale: string,
+): ModuleDetail {
+  const q = useOfficeService(enabled ? id : undefined, enabled)
+  const types = useRef('office_service_type')
+
+  const record = useMemo(() => {
+    const o = q.data
+    if (!o) return null
+    return {
+      id: o.id,
+      title: o.fullName,
+      subtitle: o.nationalId,
+      // No chip. A visit carries no decision and nothing to approve, and
+      // inventing a status would show a state office_service does not have.
+      status: null,
+      fields: [
+        { labelKey: 'columns.os.0', value: o.nationalId, ltr: true },
+        { labelKey: 'columns.os.1', value: o.fullName },
+        {
+          labelKey: 'columns.os.2',
+          value: refLabel(types.find((r) => r.id === o.serviceTypeId), locale),
+        },
+        { labelKey: 'columns.os.3', value: formatShortDate(o.serviceDate, locale) },
+        { labelKey: 'columns.os.4', value: o.adviser ?? '' },
+        { labelKey: 'office.village', value: o.village ?? '' },
+        { labelKey: 'office.phone', value: o.phone ?? '', ltr: true },
+        { labelKey: 'office.notes', value: o.notes ?? '' },
+      ],
+      by: t('forms:detail.coordinator'),
+      at: o.createdAt,
+    }
+  }, [q.data, types, t, locale])
+
+  return {
+    record,
+    isLoading: q.isLoading,
+    isError: q.isError,
+    error: q.error,
+    refetch: () => void q.refetch(),
+    isLive: true,
+  }
+}
+
 export function useModuleDetail(
   module: ModuleId,
   id: string,
@@ -201,7 +255,9 @@ export function useModuleDetail(
   const pp = usePartnershipDetail('pp', id, module === 'pp', t, locale)
   const ex = useExhibitionDetail(id, module === 'ex', t, locale)
   const tc = useCompletionDetail(id, module === 'tc', t, locale)
+  const os = useOfficeDetail(id, module === 'os', t, locale)
 
+  if (module === 'os') return os
   if (module === 'tp') return tp
   if (module === 'pp') return pp
   if (module === 'ex') return ex

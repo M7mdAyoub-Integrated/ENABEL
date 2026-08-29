@@ -29,7 +29,8 @@
     "ln": "ملف ربط جديد",
     "ex": "معرض جديد",
     "rg": "تسجيل جديد",
-    "fu": "بدء متابعة"
+    "fu": "بدء متابعة",
+    "os": "سجّل زيارة"
   },
   "description": {
     "tp": "Institutions and organisations contributing to the delivery of the training programme.",
@@ -38,7 +39,8 @@
     "ln": "Each profile joins one farmer from the completion records to one production-support partner.",
     "ex": "Municipal markets and exhibitions organised under the Action Plan. Only events already held count towards E0.1.",
     "rg": "Producer registrations per event. Registrations from the producer portal wait for municipality approval.",
-    "fu": "Follow-up interviews at six and twelve months. Forty-three questions across six sections."
+    "fu": "Follow-up interviews at six and twelve months. Forty-three questions across six sections.",
+    "os": "سجل واحد لكل زيارة إلى مكتب التنسيق. المؤشر B1.2 يعدّ الأشخاص المتمايزين لا الزيارات — فالمزارع نفسه إذا حضر ست مرات هو شخص واحد وستة سجلات."
   },
   "searchPlaceholder": {
     "tp": "Search partner or contact person",
@@ -56,7 +58,8 @@
     "ln": "كل الشركاء",
     "ex": "كل الحالات",
     "rg": "كل الحالات",
-    "fu": "كل الجولات"
+    "fu": "كل الجولات",
+    "os": "كل الخدمات"
   },
   "columns": {
     "tp": [
@@ -111,6 +114,13 @@
       "تاريخ التواصل",
       "الوسيلة",
       "الحالة"
+    ],
+    "os": [
+      "الرقم الوطني",
+      "الشخص",
+      "الخدمة",
+      "التاريخ",
+      "المرشد"
     ]
   },
   "empty": {
@@ -564,5 +574,23 @@
     "toastProposed": "يبدأ الربط بحالة «مقترح»، لذا لم يتحرّك المؤشر C1.2.",
     "toastLinkStatus": "حالة الربط الآن: {status}",
     "toastClosed": "أُغلق الطلب"
+  },
+  "office": {
+    "who": "من الذي حضر",
+    "whoNote": "لا يوجد سجل لهذا الرقم الوطني. تعبئة هذه الحقول سيُنشئ سجلًا جديدًا للشخص.",
+    "returning": "هذا الشخص مسجّل لدينا. تظهر بياناته كما هي مسجّلة ولا تُعدّل هنا — والمؤشر B1.2 يعدّه مرة واحدة مهما تكرّرت زياراته.",
+    "countsToward": "يُحتسب في {code}",
+    "nidHelp": "اطلب البطاقة. المؤشر B1.2 يعدّ الأشخاص المتمايزين، والرقم الوطني هو ما يمنع احتساب الزائر المتكرّر كشخص جديد.",
+    "name": "الاسم الكامل",
+    "sex": "الجنس",
+    "age": "العمر",
+    "phone": "الهاتف",
+    "visit": "الزيارة",
+    "serviceType": "ما الذي احتاجه",
+    "date": "تاريخ الزيارة",
+    "adviser": "المرشد",
+    "adviserHelp": "من في المكتب تولّى الأمر.",
+    "notes": "ملاحظات",
+    "village": "القرية"
   }
 }

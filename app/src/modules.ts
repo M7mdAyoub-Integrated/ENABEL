@@ -1,10 +1,16 @@
 /**
- * The seven form modules, and everything that is the same shape across them.
+ * The form modules, and everything that is the same shape across them.
+ *
+ * Seven of them are the seven forms of the Action Plan. `os` -- the
+ * coordination office -- is the eighth, and is deliberately not counted among
+ * them: CLAUDE.md describes seven forms because the workbook does. The office
+ * is a municipal record of walk-in advice, and it exists here because B1.2
+ * cannot be computed without it.
  *
  * Labels are NOT here -- they live in locale files, keyed by module id, so this
  * file stays free of user-visible strings.
  */
-export const MODULE_IDS = ['tp', 'pp', 'tc', 'ln', 'ex', 'rg', 'fu'] as const
+export const MODULE_IDS = ['tp', 'pp', 'tc', 'ln', 'ex', 'rg', 'fu', 'os'] as const
 export type ModuleId = (typeof MODULE_IDS)[number]
 
 export function isModuleId(value: string | undefined): value is ModuleId {
@@ -32,6 +38,9 @@ export const MODULES: Record<ModuleId, ModuleMeta> = {
   ex: { id: 'ex', accent: 'amber', indicators: ['E0.1'], columnCount: 6, filterColumn: 5 },
   rg: { id: 'rg', accent: 'amber', indicators: ['E0.2'], columnCount: 6, filterColumn: 5 },
   fu: { id: 'fu', accent: 'ink', indicators: ['A1', 'B1', 'C1', 'IMP-0'], columnCount: 6, filterColumn: 2 },
+  // B1.2 counts distinct PEOPLE, not visits -- which is why this module is
+  // national-ID-first. See data/officeServices.ts.
+  os: { id: 'os', accent: 'teal', indicators: ['B1.2'], columnCount: 5, filterColumn: 2 },
 }
 
 /** Tailwind classes per accent. Kept here so no component hardcodes a colour. */

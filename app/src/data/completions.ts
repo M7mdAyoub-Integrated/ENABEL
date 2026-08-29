@@ -297,14 +297,34 @@ export function useSessionsForTopic(topicId: string, date: string) {
 }
 
 /**
+ * The person fields any form needs in order to find or create someone.
+ *
+ * Narrower than CompletionInput on purpose, so a second module can reuse
+ * `resolvePerson` without dragging a training topic along with it.
+ */
+export type PersonDraft = {
+  nationalId: string
+  fullName: string
+  sex: string | null
+  age: number | null
+  phone: string | null
+}
+
+/**
  * Find the person, or create them.
  *
  * Returns the id and whether a row was written, so the caller can report it.
  * The national ID is never updated on an existing row: it is the identity, and
  * the unique key plus the format check make it the one field that must not
  * drift.
+ *
+ * EXPORTED, and there must stay exactly one of these. CLAUDE.md rule 6 is one
+ * person one row, and A1.3, B1.2, D0.1 and E0.2 all count distinct person_id --
+ * so a second creation path with its own slightly different trimming or
+ * fallbacks is how the same farmer becomes two people and four donor figures
+ * inflate at once. The coordination office form uses this one.
  */
-async function resolvePerson(input: CompletionInput): Promise<{ id: string; created: boolean }> {
+export async function resolvePerson(input: PersonDraft): Promise<{ id: string; created: boolean }> {
   const found = await supabase
     .from('person')
     .select('id')

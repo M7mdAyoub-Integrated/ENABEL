@@ -7,6 +7,7 @@ import { usePartnerships, type PartnershipType } from './partnerships'
 import { refLabel, useRef } from './refTables'
 import { useExhibitions, durationDays } from './exhibitions'
 import { useCompletions } from './completions'
+import { useOfficeServices } from './officeServices'
 import { formatShortDate } from '../lib/format'
 import { formatDateRange } from '../lib/format'
 
@@ -28,6 +29,7 @@ import { formatDateRange } from '../lib/format'
  *      rg       Registrations      mock     module 4
  *      ln       Market linkages    mock     module 5
  *      fu       Follow-up          mock     module 7
+ *      os       Coordination office LIVE    module 8
  *
  *  Keep this table honest. It is the only quick answer to "is this screen
  *  showing real rows?", and a wrong answer here is how a demo turns into a
@@ -192,6 +194,54 @@ function useCompletionRows(t: Translate, locale: string, enabled: boolean): Modu
 }
 
 /**
+ * Coordination office (os) — module 8.
+ *
+ * The list shows VISITS, one row each. It is not a list of people, and the
+ * count beside it is not B1.2 -- the same farmer coming six times is six rows
+ * here and one person there. Anyone reading this list as the indicator will be
+ * wrong the moment somebody returns.
+ */
+function useOfficeRows(locale: string, enabled: boolean): ModuleRows {
+  const q = useOfficeServices(enabled)
+  const types = useRef('office_service_type')
+
+  const rows = useMemo(
+    () =>
+      (q.data ?? []).map((o): ListRow => {
+        const typeLabel = refLabel(types.find((r) => r.id === o.serviceTypeId), locale)
+        const cells: Cell[] = [
+          { kind: 'ltr', text: o.nationalId },
+          { kind: 'text', text: o.fullName, ...(o.village ? { sub: o.village } : {}) },
+          { kind: 'text', text: typeLabel },
+          { kind: 'text', text: formatShortDate(o.serviceDate, locale) },
+          { kind: 'text', text: o.adviser ?? '' },
+        ]
+        return {
+          id: o.id,
+          cells,
+          // MODULES.os.filterColumn is 2 -- the service type.
+          filterValue: typeLabel,
+          // The national ID is searchable because that is how the office will
+          // look someone up: a returning farmer hands over the same card.
+          search: [o.nationalId, o.fullName, o.village ?? '', typeLabel, o.adviser ?? '']
+            .join(' ')
+            .toLowerCase(),
+        }
+      }),
+    [q.data, types, locale],
+  )
+
+  return {
+    rows,
+    isLoading: q.isLoading,
+    isError: q.isError,
+    error: q.error,
+    refetch: () => void q.refetch(),
+    isLive: true,
+  }
+}
+
+/**
  * Rows for a module's list screen.
  *
  * EVERY branch's hooks run on EVERY render, and the inactive ones are disabled
@@ -206,7 +256,9 @@ export function useModuleRows(module: ModuleId, t: Translate, locale: string): M
   const production = usePartnershipRows('production_support', locale, module === 'pp')
   const exhibitions = useExhibitionRows(t, locale, module === 'ex')
   const completions = useCompletionRows(t, locale, module === 'tc')
+  const office = useOfficeRows(locale, module === 'os')
 
+  if (module === 'os') return office
   if (module === 'tp') return training
   if (module === 'pp') return production
   if (module === 'ex') return exhibitions

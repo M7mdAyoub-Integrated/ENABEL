@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSessionsForTopic, NEW_SESSION } from '../data/completions'
+import { useSessionsForTopic, usePersonByNationalId, NEW_SESSION } from '../data/completions'
 import type { FieldSpec } from '../ui/Field'
 import type { ModuleId } from '../modules'
 import { makeTranslate, type Translate } from '../i18n/tx'
@@ -66,15 +66,22 @@ export function useFormSchema(
   const activityType = useRef('activity_type')
   const product = useRef('product')
   const producerType = useRef('producer_type')
+  const officeServiceType = useRef('office_service_type')
+  // The coordination office looks people up by national ID before anything
+  // else, because B1.2 counts distinct people and a second row for someone
+  // already on file would inflate it permanently. This is the REAL lookup,
+  // not the mock `personByNationalId` the older branches still use.
+  const osNid = typeof values['nid'] === 'string' ? (values['nid'] as string) : ''
+  const osPerson = usePersonByNationalId(module === 'os' ? osNid : '')
   const refs = useMemo(
     () => ({
       partnerTypeTraining, partnerTypeProduction, partnerRoleTraining,
       partnerRoleProduction, trainingTopic, agriInvolvement, activityType,
-      product, producerType,
+      product, producerType, officeServiceType,
     }),
     [partnerTypeTraining, partnerTypeProduction, partnerRoleTraining,
      partnerRoleProduction, trainingTopic, agriInvolvement, activityType,
-     product, producerType],
+     product, producerType, officeServiceType],
   )
 
   return useMemo(() => {
@@ -133,6 +140,66 @@ export function useFormSchema(
               options: opts(training ? refs.partnerRoleTraining : refs.partnerRoleProduction),
               help: training ? t('forms:partner.roleHelpTraining') : t('forms:partner.roleHelpProduction'),
             },
+          ],
+        },
+      ]
+    }
+
+    if (module === 'os') {
+      const nidErr = touched ? nationalIdError(str('nid'), true, tx) : ''
+      const mismatch =
+        touched && str('nid2') && str('nid') !== str('nid2') ? t('forms:validation.nidMismatch') : ''
+      const found = osPerson.data
+
+      // Prefilled and LOCKED when the person is already on file. Two reasons,
+      // and the second is the one that matters: it shows the office that this
+      // is a returning visitor, so nobody re-types a name slightly differently
+      // and wonders later why B1.2 counted them twice. (It would not -- the
+      // national ID is the key -- but the form should not look as though it
+      // might.)
+      const personFields: FieldSpec[] = found
+        ? [
+            { key: 'foundName', label: t('forms:office.name'), type: 'readonly', text: found.fullName, half: true },
+            {
+              key: 'foundSex',
+              label: t('forms:office.sex'),
+              type: 'readonly',
+              text: found.sex ? t(`common:enums.sex.${found.sex}`) : '—',
+              half: true,
+            },
+            { key: 'foundPhone', label: t('forms:office.phone'), type: 'readonly', text: found.phone ?? '—', half: true, ltr: true },
+          ]
+        : [
+            { key: 'name', label: t('forms:office.name'), type: 'text', required: true, half: true },
+            { key: 'sex', label: t('forms:office.sex'), type: 'select', half: true, options: [
+              { value: 'male', label: t('common:enums.sex.male') },
+              { value: 'female', label: t('common:enums.sex.female') },
+            ] },
+            { key: 'age', label: t('forms:office.age'), type: 'number', half: true, placeholder: t('forms:completion.agePh') },
+            { key: 'phone', label: t('forms:office.phone'), type: 'tel', half: true, ltr: true },
+          ]
+
+      return [
+        {
+          id: 'who',
+          title: t('forms:office.who'),
+          pill: t('forms:office.countsToward', { code: 'B1.2' }),
+          pillAccent: 'teal',
+          note: found ? t('forms:office.returning') : t('forms:office.whoNote'),
+          fields: [
+            { key: 'nid', label: t('forms:completion.nid'), type: 'text', required: true, half: true, ltr: true, placeholder: t('forms:completion.nidPh'), help: t('forms:office.nidHelp'), ...(nidErr ? { error: nidErr } : {}) },
+            { key: 'nid2', label: t('forms:completion.nidConfirm'), type: 'text', required: true, half: true, ltr: true, placeholder: t('forms:completion.nidConfirmPh'), ...(mismatch ? { error: mismatch } : {}) },
+            ...personFields,
+          ],
+        },
+        {
+          id: 'visit',
+          title: t('forms:office.visit'),
+          fields: [
+            { key: 'svcType', label: t('forms:office.serviceType'), type: 'select', required: true, half: true, options: opts(refs.officeServiceType) },
+            { key: 'date', label: t('forms:office.date'), type: 'date', required: true, half: true },
+            { key: 'adviser', label: t('forms:office.adviser'), type: 'text', half: true, help: t('forms:office.adviserHelp') },
+            { key: 'notes', label: t('forms:office.notes'), type: 'area' },
           ],
         },
       ]
@@ -398,6 +465,10 @@ export function useFormSchema(
     // rebuild when it resolves -- otherwise the field renders with only
     // "create a new session" and a coordinator creates one that already exists.
     matchingSessions.data,
+    // Same reason: the office form swaps editable name/sex/phone inputs for a
+    // locked panel once the person is found. Without this the lookup resolves
+    // and the form keeps asking for details the Municipality already holds.
+    osPerson.data,
   ])
 }
 
@@ -683,7 +754,7 @@ export function useWizardSteps(values: FormValues, step: number): FormSection[] 
       id: 'closing',
       title: t('survey:s6.title'),
       pill: t('survey:s6.questions'),
-      pillAccent: 'slate',
+      pillAccent: 'teal',
       ...(isTwelveMonth ? {} : { note: t('survey:s5.skipped') }),
       fields: [
         { key: 'q41', label: t('survey:q41'), type: 'checks', twoCol: true, accent: 'slate', options: [

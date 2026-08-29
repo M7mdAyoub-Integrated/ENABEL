@@ -119,7 +119,10 @@ export function can(role: Role | null, capability: Capability): boolean {
  * reads the aggregate views. See the divergence note in the Phase 3 report.
  */
 const MODULE_ACCESS: Record<Role, readonly ModuleId[]> = {
-  coordinator: ['tp', 'pp', 'tc', 'ln', 'ex', 'rg', 'fu'],
+  // `os` is coordinator-only for now, as specified. The office-staff role does
+  // not exist yet; when it does, adding it is a line here plus a policy, because
+  // office_service already uses the same is_staff() shape as everything else.
+  coordinator: ['tp', 'pp', 'tc', 'ln', 'ex', 'rg', 'fu', 'os'],
   data_entry: ['tp', 'pp', 'tc', 'ln', 'ex', 'rg', 'fu'],
   enumerator: ['fu'],
   partner_viewer: [],

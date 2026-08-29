@@ -81,6 +81,10 @@ function useNavGroups(): Group[] {
       ],
     },
     { labelKey: 'nav:group.markets', items: [...mod('ex', '05'), ...mod('rg', '06')] },
+    // The coordination office. Its own group rather than folded into another:
+    // it is the only module that is a record of walk-in advice, and B1.2 is the
+    // only indicator it feeds.
+    { labelKey: 'nav:group.office', items: mod('os', '07') },
     { labelKey: 'nav:group.followup', items: mod('fu', '07') },
     {
       labelKey: 'nav:group.noForm',

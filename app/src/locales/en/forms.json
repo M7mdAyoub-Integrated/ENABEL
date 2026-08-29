@@ -29,7 +29,8 @@
     "ln": "New linkage profile",
     "ex": "New exhibition",
     "rg": "New registration",
-    "fu": "Start a follow-up"
+    "fu": "Start a follow-up",
+    "os": "Record a visit"
   },
   "description": {
     "tp": "Institutions and organisations contributing to the delivery of the training programme.",
@@ -38,7 +39,8 @@
     "ln": "Each profile joins one farmer from the completion records to one production-support partner.",
     "ex": "Municipal markets and exhibitions organised under the Action Plan. Only events already held count towards E0.1.",
     "rg": "Producer registrations per event. Registrations from the producer portal wait for municipality approval.",
-    "fu": "Follow-up interviews at six and twelve months. Forty-three questions across six sections."
+    "fu": "Follow-up interviews at six and twelve months. Forty-three questions across six sections.",
+    "os": "One record per visit to the coordination office. B1.2 counts distinct people, not visits — the same farmer coming six times is one person and six records."
   },
   "searchPlaceholder": {
     "tp": "Search partner or contact person",
@@ -56,7 +58,8 @@
     "ln": "All partners",
     "ex": "All statuses",
     "rg": "All statuses",
-    "fu": "All rounds"
+    "fu": "All rounds",
+    "os": "All services"
   },
   "columns": {
     "tp": [
@@ -111,6 +114,13 @@
       "Date of contact",
       "Mode",
       "Status"
+    ],
+    "os": [
+      "National ID",
+      "Person",
+      "Service",
+      "Date",
+      "Adviser"
     ]
   },
   "empty": {
@@ -564,5 +574,23 @@
     "toastProposed": "The linkage starts as proposed, so C1.2 has not moved.",
     "toastLinkStatus": "Linkage is now {status}",
     "toastClosed": "Request closed"
+  },
+  "office": {
+    "who": "Who came in",
+    "whoNote": "We have no record of this national ID. Filling this in will create a new person record.",
+    "returning": "This person is already on file. Their details are shown as recorded and are not edited here — B1.2 counts them once however many times they come.",
+    "countsToward": "Counts toward {code}",
+    "nidHelp": "Ask for the card. B1.2 counts distinct people, so the national ID is what keeps a returning visitor from being counted as a new one.",
+    "name": "Full name",
+    "sex": "Sex",
+    "age": "Age",
+    "phone": "Phone",
+    "visit": "The visit",
+    "serviceType": "What they needed",
+    "date": "Date of visit",
+    "adviser": "Adviser",
+    "adviserHelp": "Who in the office dealt with it.",
+    "notes": "Notes",
+    "village": "Village"
   }
 }

@@ -22,6 +22,12 @@ import {
   type CompletionInput,
   NEW_SESSION,
 } from './completions'
+import {
+  useOfficeService,
+  useCreateOfficeService,
+  useUpdateOfficeService,
+  type OfficeServiceInput,
+} from './officeServices'
 
 /**
  * The form half of the migration seam.
@@ -276,6 +282,83 @@ function useCompletionWrite(
   }
 }
 
+/**
+ * Coordination office — module 8.
+ *
+ * The person fields are only sent on CREATE. On edit `useUpdateOfficeService`
+ * ignores them and never rewrites person_id: moving a visit to a different
+ * person would move B1.2 for two people at once, and could drop one of them
+ * out of a quarter entirely if it was their first visit.
+ *
+ * So the national ID is shown on the edit form and is not a way to reassign
+ * the record. Correcting the wrong person is delete-and-re-enter, deliberately.
+ */
+function useOfficeWrite(id: string | undefined, enabled: boolean): ModuleWrite {
+  const existing = useOfficeService(enabled && id ? id : undefined, enabled)
+  const create = useCreateOfficeService()
+  const update = useUpdateOfficeService()
+
+  const initialValues = useMemo((): FormValues | null => {
+    const o = existing.data
+    if (!o) return null
+    return {
+      nid: o.nationalId,
+      nid2: o.nationalId,
+      name: o.fullName,
+      sex: o.sex ?? '',
+      phone: o.phone ?? '',
+      svcType: o.serviceTypeId,
+      date: o.serviceDate,
+      adviser: o.adviser ?? '',
+      notes: o.notes ?? '',
+    }
+  }, [existing.data])
+
+  const toInput = (v: FormValues): OfficeServiceInput => {
+    const ageText = str(v, 'age')
+    return {
+      nationalId: str(v, 'nid'),
+      fullName: str(v, 'name'),
+      sex: str(v, 'sex') || null,
+      age: ageText ? Number(ageText) : null,
+      phone: str(v, 'phone') || null,
+      serviceTypeId: str(v, 'svcType'),
+      serviceDate: str(v, 'date'),
+      adviser: str(v, 'adviser') || null,
+      notes: str(v, 'notes') || null,
+    }
+  }
+
+  const save = async (v: FormValues) => {
+    const input = toInput(v)
+    if (id && existing.data) {
+      return update.mutateAsync({
+        id,
+        input: {
+          serviceTypeId: input.serviceTypeId,
+          serviceDate: input.serviceDate,
+          adviser: input.adviser,
+          notes: input.notes,
+        },
+      })
+    }
+    return create.mutateAsync(input)
+  }
+
+  return {
+    initialValues,
+    isLoadingInitial: existing.isLoading,
+    save,
+    isSaving: create.isPending || update.isPending,
+    error: create.error ?? update.error,
+    reset: () => {
+      create.reset()
+      update.reset()
+    },
+    isLive: true,
+  }
+}
+
 export function useModuleWrite(
   module: ModuleId,
   id: string | undefined,
@@ -286,7 +369,9 @@ export function useModuleWrite(
   const pp = usePartnershipWrite('pp', id, module === 'pp')
   const ex = useExhibitionWrite(id, module === 'ex')
   const tc = useCompletionWrite(id, module === 'tc', locale)
+  const os = useOfficeWrite(id, module === 'os')
 
+  if (module === 'os') return os
   if (module === 'tp') return tp
   if (module === 'pp') return pp
   if (module === 'ex') return ex
