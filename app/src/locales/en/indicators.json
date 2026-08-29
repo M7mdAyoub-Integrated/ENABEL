@@ -155,7 +155,7 @@
     "elsewhere": {
       "B1.2": "Farmers reaching office services — counts distinct people, so each visit is logged against a national ID in the coordination office module.",
       "D0.1": "Producers guided on food safety and licensing — counts distinct people, so each session is logged against a national ID in the guidance log.",
-      "C1.3": "Advisory mentorship sessions — each session belongs to a producer's initiative, so it is recorded against that initiative rather than counted here.",
+      "C1.3": "Advisory mentorship sessions — counts sessions, and each one belongs to a producer's initiative, so it is recorded against that initiative rather than typed as a total here.",
       "D0.2": "Training sessions on food processing — counted from sessions marked as delivered, so it moves when you record delivery.",
       "G0.4": "Partners contributing to the plan — counts distinct partners with a recorded contribution, so it needs a contribution log against a partnership. There is no screen for it anywhere yet."
     },

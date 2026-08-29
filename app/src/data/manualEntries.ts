@@ -22,14 +22,27 @@ import { toAppError, unwrapList } from './errors'
  *
  *  B1.2  office_service     counts DISTINCT PEOPLE
  *  D0.1  guidance_record    counts DISTINCT PEOPLE
- *  C1.3  mentorship_session initiative_id is NOT NULL -> production_initiative
- *                           -> person. Per-initiative, so per-person.
+ *  C1.3  mentorship_session counts ROWS, but each row needs a parent
+ *  G0.4  partner_contribution  counts DISTINCT PARTNERS, and each row needs a
+ *                              parent partnership
  *
- *  A number field for any of these is a way to get the figure wrong and never
+ *  For B1.2 and D0.1 a number field is a way to get the figure wrong and never
  *  find out: enter 20 twice and the indicator reads 40 for what may be the same
  *  20 people. Distinct-person counting is the single most common way these
  *  numbers go wrong (CLAUDE.md rule 4), and a typed total cannot be
  *  de-duplicated afterwards because the identities were never captured.
+ *
+ *  C1.3 IS NOT ONE OF THOSE, and this comment used to say it was -- "per
+ *  initiative, so per-person". `v_ind_c1_3` is `count(ms.id)`: it counts
+ *  SESSIONS. The join through production_initiative to person exists to apply
+ *  the soft-delete cascade, not to de-duplicate. Two mentorship sessions with
+ *  the same producer are two, correctly.
+ *
+ *  The conclusion is unchanged -- it does not belong here -- but for a
+ *  different reason: initiative_id is NOT NULL, so there is a parent to pick
+ *  before any field on the form means anything, and the parent has a screen of
+ *  its own. Same for G0.4 and its partnership. A record that hangs off
+ *  something belongs on the thing it hangs off.
  *
  *  D0.2 is also absent, for a different reason: it counts delivered
  *  training_session rows with a food-processing topic, and the sessions screen

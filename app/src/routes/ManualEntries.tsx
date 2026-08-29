@@ -29,13 +29,18 @@ import { AccentRule, PageHead, SectionRule } from '../ui/primitives'
  *  actions" cannot be reported; five titled actions with dates and channels
  *  can. So each of these is a short record log.
  *
- *  ── THE THREE THAT ARE NOT ON THIS SCREEN ──
+ *  ── THE ONES THAT ARE NOT ON THIS SCREEN ──
  *
- *  B1.2, D0.1 and C1.3 count DISTINCT PEOPLE (C1.3 through an initiative, which
- *  belongs to a person). A number field for any of them is a way to be wrong
- *  and never find out: enter 20 twice and the indicator reads 40 for what may
- *  be the same 20 people, and it cannot be de-duplicated later because the
- *  identities were never captured.
+ *  B1.2 and D0.1 count DISTINCT PEOPLE. A number field for either is a way to
+ *  be wrong and never find out: enter 20 twice and the indicator reads 40 for
+ *  what may be the same 20 people, and it cannot be de-duplicated later because
+ *  the identities were never captured. Both need a national ID.
+ *
+ *  C1.3 and G0.4 are here for a different reason, and this comment used to give
+ *  the wrong one -- it said C1.3 counted distinct people too. `v_ind_c1_3` is
+ *  `count(ms.id)`: it counts SESSIONS. What keeps it off this screen is that
+ *  `initiative_id` is NOT NULL, so there is a parent to choose before any field
+ *  means anything. G0.4 is the same with a partnership.
  *
  *  They appear below as rows that say where they are entered instead, because
  *  omitting them silently would leave a coordinator hunting for them here.
