@@ -496,3 +496,79 @@ This is the guard working. It is not a bug, and it is worth writing down because
 
 The same applies to anything else guarded on `current_role()`. Grep for `coalesce(public."current_role"()` before writing a script that updates rows in bulk.
 
+
+---
+
+## 13. RLS applies the UPDATE policy to `SELECT ... FOR UPDATE`
+
+**Any function that locks a row before updating it will hit this.** It is not obvious from reading either the policy or the function, and the symptom is a message that is wrong rather than an error that is loud.
+
+Measured on `linkage_request`, as `data_entry`, on a row that exists:
+
+```sql
+select ... where id = $1;              -- 1 row
+select ... where id = $1 for update;   -- 0 rows
+```
+
+`linkage_request` has `op_read` = `is_staff()` and `op_update` = coordinator only. A plain read passes the SELECT policy. A **locking** read must also pass the UPDATE policy's `USING` clause, so for a non-coordinator it returns nothing — silently, with no error.
+
+`match_linkage_request` (0067) opened with exactly that pattern:
+
+```sql
+select * into v_req from linkage_request where id = p_request_id for update;
+if not found then
+  return jsonb_build_object('ok', false, 'result', 'not_found');
+end if;
+```
+
+So a `data_entry` user clicking **Match** was told *"That request no longer exists. It may have been withdrawn while this page was open."* The request was on their screen. They would reload, still see it, and conclude the software was broken.
+
+**The guard held — nothing was ever written.** The defect was the words. A refusal must never be dressed as a disappearance: it sends someone to look for a bug instead of for a coordinator.
+
+`0068` fixes it by looking rather than assuming:
+
+```sql
+if not found then
+  if exists (select 1 from linkage_request where id = p_request_id and deleted_at is null) then
+    return jsonb_build_object('ok', false, 'result', 'not_permitted');
+  end if;
+  return jsonb_build_object('ok', false, 'result', 'not_found');
+end if;
+```
+
+The plain read is safe to distinguish on because `op_read` is `is_staff()` — anyone who can reach the function at all can see the row. A caller who cannot passes neither read and still gets `not_found`, which for them is true.
+
+> **When a `security invoker` function locks before updating, an empty `FOR UPDATE` means either "no such row" or "not your row". Tell them apart before reporting absence.**
+
+This also means the lock is doing double duty as an authorisation check. That is fine — it is the same policy either way — but do not *rely* on it as the only one, because it is invisible at the call site.
+
+---
+
+## 14. What this document specified and the database did not have
+
+Twice now this file has been read as a description of the database. It was a specification. On 2026-08-29 every guard named here was checked against `pg_proc` and `pg_trigger`:
+
+| Specified in | Status before 0069 |
+|---|---|
+| `guard_soft_delete` — §4 | **missing entirely.** No function, no trigger |
+| `guard_person_immutable` — §6 | **missing entirely.** No function, no trigger |
+| `can_write()` — §2, §4 | never created; policies inline `current_role() = any(...)` instead |
+| `guard_registration_status` — §5 | present and attached |
+| `guard_person_national_id` | present, and *stricter* than §6 asks — coordinator only, not staff |
+| `v_person_public` — §6 | present |
+| evidence storage policies — §8 | read / insert / **update** present; no delete policy at all |
+
+**`guard_soft_delete` was the serious one.** Soft delete is an `update` that sets `deleted_at`, and the update policy on `person` admits `data_entry`. So a data_entry account could delete any person, partnership, session or partner — removing them from `A1.3`, `B1.2`, `D0.1`, `E0.2` and every disaggregation, retroactively, in quarters already reported to the donor. It is the most destructive operation in the schema and it was the one restriction never built. Nothing went wrong only because the data_entry account is a test fixture.
+
+Both guards were built in `0069` and verified as `data_entry` and as `participant` through RLS with `set local role authenticated` — not as the owner, which bypasses RLS and would have proved nothing.
+
+Two divergences are deliberately left alone:
+
+- **`can_write()`** is doc drift, not a hole. The policies do the same test inline. This file should be corrected to match the database, or the function added — but nothing is unprotected today.
+- **No `delete` policy on `storage.objects`** is *stricter* than §8, which grants delete to a coordinator. Absent policy means nobody deletes. Left as is.
+
+One thing found while checking, and **not** resolved: `evidence_staff_update` exists and is not in §8. An update on a storage object lets any staff member overwrite evidence in place — which destroys it as surely as a delete would, without needing the delete permission §8 withholds. Recorded as **OQ-30**.
+
+`attachment` carries `uploaded_by`/`uploaded_at` rather than the standard `created_by`. Functionally the same thing under a different name; noted so the next person does not go looking for `created_by`.
+
+> **Anything specified in this file is a claim until a query says otherwise.** `check-soft-delete-guards.mjs` now fails the build if a table carrying `deleted_at` has no guard, and `check-constraint-names.mjs` does the same for error mappings. Neither existed when this document was written, and both were added after the thing they check turned out to be missing.

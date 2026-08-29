@@ -301,6 +301,7 @@ No crosswalk exists in any source document.
 | 🟢 Eligibility (Phase 6 step 5) | 2 | OQ-23 *(resolved)*, OQ-24 *(fixed)* |
 | 🔴 Reporting integrity | 2 | OQ-25, OQ-26 |
 | 🟠 Linkage (Phase 6 step 6) | 2 | OQ-28, OQ-29 |
+| 🔴 Evidence integrity | 1 | OQ-30 |
 
 ## 🟡 OQ-19 · Cancellation reasons are required for training and advisory, not for exhibitions
 
@@ -573,6 +574,22 @@ This surfaced while working out whether *restoring a person* should warn about c
 **What was done instead.** `match_linkage_request` (0067) does not filter. The matching screen shows the partnership type beside every option, so a coordinator choosing a training partner can see that is what they are doing.
 
 **Decides.** Municipal Coordinator — should a market linkage be restricted to production-support partnerships, or is a training partner that also buys a legitimate case?
+
+---
+
+## 🔴 OQ-30 · Staff can overwrite evidence in place, which section 8 was written to prevent
+
+**What section 8 grants.** Read and insert to staff; delete to a coordinator only. The intent is clear: uploading evidence is routine, removing it is not.
+
+**What the database has.** `evidence_staff_read`, `evidence_staff_insert` and **`evidence_staff_update`** — and no delete policy at all.
+
+The missing delete policy is *stricter* than the spec and is fine. `evidence_staff_update` is not in the spec, and it defeats the same protection by another route: an `update` on a `storage.objects` row lets any staff member replace the bytes of an uploaded file while keeping its path, name and row id. The attachment record still points at it, the audit log shows nothing about the file contents, and the evidence is gone.
+
+**Why it matters.** Evidence is mandatory for `B1.1`, `G0.1`, `G0.2` and `G0.3` — the workbook names the required document for each. Those are the indicators whose defensibility rests entirely on a file existing and being what it says it is.
+
+**Why it is not fixed here.** Dropping the policy may break a legitimate flow — re-uploading after a failed upload, or a metadata update Supabase Storage performs internally as part of a normal upload. That needs checking against how the storage client actually writes, not guessing.
+
+**Decides.** Municipal Coordinator, with a technical check first — is `evidence_staff_update` needed for uploads to work at all, and if not, should overwriting be a coordinator action like deleting?
 
 ---
 
