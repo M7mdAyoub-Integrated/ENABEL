@@ -92,6 +92,17 @@ const TRIGGER_MESSAGES: { match: RegExp; key: string }[] = [
   { match: /only a coordinator/i, key: 'errors:db.coordinatorOnly' },
   { match: /already held/i, key: 'errors:db.exhibitionHeld' },
   { match: /full|no booths/i, key: 'errors:db.exhibitionFull' },
+  // BEFORE the national_id catch-all below, and that ordering is the whole
+  // point. guard_reserved_demo_national_id refuses an INSERT in the
+  // 300000000-300000099 range, and its message contains the words
+  // "national_id" -- so the catch-all claimed it and told a coordinator
+  // creating a record that "a national ID cannot be changed once the record is
+  // saved". They had not changed anything, and nothing on screen said what was
+  // actually wrong.
+  { match: /reserved demo range/i, key: 'errors:db.nationalIdReserved' },
+  // Deliberately last, and deliberately broad: any other national_id complaint
+  // is more usefully reported as immutability than as a raw Postgres string.
+  // Anything added after this line is unreachable.
   { match: /national_id/i, key: 'errors:db.nationalIdImmutable' },
 ]
 

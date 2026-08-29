@@ -48,6 +48,12 @@ supabase/migrations/           ← the SQL you write
 
 When a task touches indicators, open `03_INDICATORS.md`. When it touches a form field, open `04_DATA_DICTIONARY.md`. Do not work from memory on either — the definitions have known conflicts and the exact wording matters.
 
+This applies to the small things too, not only to formulas and targets. The
+coordination office module was given the objective label `SO2`, written from
+memory, on a screen a coordinator would read as authoritative. `03_INDICATORS.md`
+gives `B1.2` as **`SHM-SO1-B1.2`**. One grep would have answered it, and the
+document exists so that nobody has to remember.
+
 ---
 
 ## Hard rules
@@ -130,7 +136,7 @@ This is a real municipality with a real donor. If a definition is ambiguous, sto
 
 ## Checks that verify shape, not substance
 
-This has now happened four times, in four unrelated parts of the project. It is
+This has now happened five times, in five unrelated parts of the project. It is
 one failure mode, and it is worth naming because every instance looked fine.
 
 | | what existed | what was missing |
@@ -139,10 +145,17 @@ one failure mode, and it is worth naming because every instance looked fine.
 | `CONSTRAINT_MESSAGES` keys | a key mapped to a readable message | a constraint of that name in the database |
 | Comments in `format.ts`, `glyphs.ts` | a comment describing the behaviour | the behaviour, anywhere |
 | `locales/ar/indicators.json` | all 20 `name.*` keys present | Arabic — every value is the English string |
+| `objective.os`, `cta.os`, `description.os`, `filterAll.os` | a module wired end to end, compiling, typed, linted | the four keys themselves — the page rendered `description.os` as literal text |
 
 In each case the thing that would normally be checked *was there*. The file
 existed. The key existed. The comment existed. The translation key existed. Any
 check counting files, counting keys, or grepping for a name would pass.
+
+The fifth is the inverse of the fourth and the most awkward of the family. There
+the key existed and the content was wrong; here the content was never written
+and **nothing anywhere knew a key was expected.** `ModuleId` became exhaustive,
+`tsc` was clean, `eslint --max-warnings=0` was clean, and four headings on a
+live screen read `objective.os`, `cta.os`, `description.os` and `filterAll.os`.
 
 Nothing ever asked whether the **content** was real.
 
@@ -158,6 +171,11 @@ What that means in practice:
 - Do not verify behaviour with a comment. Run it, or write a test.
 - Do not verify a translation by counting keys. A key whose value equals the
   English string is untranslated, and counting will never say so.
+- **Do not assume a missing translation key will be caught.** It is not a type
+  error and it cannot be, because `t()` takes a string. Adding a module means
+  opening every one of its screens in both languages and reading them. There is
+  no automated answer to this one, and pretending otherwise is how four raw keys
+  reached a screen that had passed every check in the build.
 
 The two automated checks above both exist because of this pattern. When you add
 another, write down which substance it verifies — not which shape.
