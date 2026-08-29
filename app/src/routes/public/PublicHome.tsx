@@ -110,6 +110,22 @@ export function PublicHome() {
           {t('home.linkageCtaAction')}
         </Link>
       </section>
+
+      {/* Last, and quieter than the rest. Someone arriving to apply should not
+          have to step past a "check your existing application" panel to reach
+          the thing they came for. */}
+      <section className="mt-4 border-[1.5px] border-border-default p-5 sm:p-6">
+        <h2 className="m-0 text-[17px] font-extrabold tracking-[-0.02em]">{t('home.mineCta')}</h2>
+        <p className="mt-2 max-w-[46ch] text-[15px] leading-[1.55] text-body">
+          {t('home.mineCtaBody')}
+        </p>
+        <Link
+          to="/my-applications"
+          className="mt-4 inline-flex min-h-12 items-center border-[1.5px] border-border-strong px-5 font-narrow text-[12.5px] font-bold uppercase tracking-[0.12em] text-ink no-underline hover:bg-sunken"
+        >
+          {t('home.mineCtaAction')}
+        </Link>
+      </section>
     </PublicShell>
   )
 }

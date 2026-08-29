@@ -19,6 +19,7 @@ import NotFound from './routes/NotFound'
 import PublicHome from './routes/public/PublicHome'
 import ApplyForm from './routes/public/ApplyForm'
 import LinkageRequest from './routes/public/LinkageRequest'
+import MyApplications from './routes/public/MyApplications'
 import LinkageQueue from './routes/LinkageQueue'
 import LinkageMatch from './routes/LinkageMatch'
 import SessionList from './routes/SessionList'
@@ -103,6 +104,10 @@ const router = createBrowserRouter([
   // Municipality publishes and people apply to, it is a standing offer to
   // anyone who has finished an advisory. So it is a page, not a /apply/:id.
   { path: '/linkage', element: <LinkageRequest /> },
+  // No session, by design: someone who applied through the public site has no
+  // account to sign in to. Identity is the same national ID plus date of birth
+  // check as everywhere else, in its own RPC. See 0070.
+  { path: '/my-applications', element: <MyApplications /> },
 
   // Where staff used to land. Kept so an existing bookmark still works.
   { path: '/home', element: <Landing /> },

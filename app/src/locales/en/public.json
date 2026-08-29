@@ -12,7 +12,10 @@
     "loadFailed": "The list could not be loaded. Check your connection and try again.",
     "linkageCta": "Finished a market advisory session?",
     "linkageCtaBody": "Ask the Municipality to connect you with a buyer, a processor or a market.",
-    "linkageCtaAction": "Ask to be connected"
+    "linkageCtaAction": "Ask to be connected",
+    "mineCta": "Already applied for something?",
+    "mineCtaBody": "Check what has happened with it.",
+    "mineCtaAction": "My applications"
   },
   "type": {
     "training": "Training course",
@@ -177,6 +180,35 @@
         "title": "Something went wrong",
         "body": "Your request was not sent. This is a problem on our side, not with your details. Please try again."
       }
+    }
+  },
+  "mine": {
+    "heading": "My applications",
+    "intro": "Enter your national ID and date of birth to see everything you have applied for and what has happened with it.",
+    "show": "Show my applications",
+    "usePhone": "I do not know my date of birth",
+    "yours": "What you have applied for",
+    "count": "{count, plural, one {# application} other {# applications}}",
+    "checkAnother": "Check another number",
+    "cannotVerifyBody": "The details you gave do not match a record we hold. Check the national ID number and the date of birth, or contact the Municipality. We give the same answer whenever we cannot confirm who you are, so this page can never be used to find out whether a number is registered.",
+    "emptyTitle": "Nothing yet",
+    "emptyBody": "We know who you are, and you have not applied for anything so far. Have a look at what is open.",
+    "kind": {
+      "training": "Training",
+      "advisory": "Market advisory",
+      "exhibition": "Market",
+      "linkage": "Linkage request"
+    },
+    "status": {
+      "draft": "Draft",
+      "submitted": "Awaiting review",
+      "approved": "Accepted",
+      "rejected": "Not accepted",
+      "completed": "Completed",
+      "not_completed": "Not completed",
+      "under_review": "Under review",
+      "matched": "Matched",
+      "closed": "Closed"
     }
   }
 }
