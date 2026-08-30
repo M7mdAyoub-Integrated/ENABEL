@@ -319,6 +319,17 @@ No crosswalk exists in any source document.
 
 ## 🟡 OQ-20 · `ref_office_service_type` was invented, not taken from the workbook
 
+> **RESOLVED, 2026-08-30.** The Post_intervention sheet's Q15 service list was
+> supplied from the workbook: *Technical advice / Input or equipment guidance /
+> Licensing and paperwork help / Market or buyer information / Referral to
+> another entity / Other*. That is `ref_office_service_type` exactly, option for
+> option and in the same order. The invented list turned out to match the
+> source. `guard_followup_option` now maps Q15 onto it (0076) rather than
+> creating a second copy.
+>
+> Worth keeping the entry rather than deleting it: it was right to record the
+> uncertainty, and being right by luck is not the same as having checked.
+
 **What the source says.** Nothing. The six categories seeded in `0016` were written by the project owner as a placeholder, not drawn from the Action Plan or the framework workbook:
 
 | code | label |

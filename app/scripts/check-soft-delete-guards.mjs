@@ -113,6 +113,24 @@ for (const file of readdirSync(migrationsDir)
     if (/\bdeleted_at\b/.test(sql.slice(m.index, end))) declared.add(m[1])
   }
 
+  // Tables created through a `format(%I)` loop over a name array.
+  //
+  // This was the hole. The scan could only see literal `create table <name>`,
+  // so 18 ref_* tables were invisible and the message said so -- and then 0075
+  // added EIGHT more the same way and this check passed anyway, because a
+  // stale snapshot cannot notice a table it has never heard of. It would have
+  // passed just as happily if the triggers had been forgotten.
+  //
+  // The names are not really hidden: they sit in the `array[...]` literal that
+  // drives the loop. Read them, and require the loop body to declare
+  // deleted_at, which is what makes them soft-deletable in the first place.
+  const loopRe = /array\s*\[([^\]]+)\]([\s\S]{0,2000}?)end\s+(?:loop|\$)/gi
+  let lm
+  while ((lm = loopRe.exec(sql)) !== null) {
+    if (!/\bdeleted_at\b/.test(lm[2])) continue
+    for (const q of lm[1].matchAll(/'([a-z0-9_]+)'/g)) declared.add(q[1])
+  }
+
   // A table that was later dropped is not a gap. Files are read in filename
   // order -- which is migration order, enforced by check_migration_files.sh --
   // so a drop always follows the create it undoes.
@@ -177,9 +195,9 @@ const templated = readdirSync(migrationsDir).some((f) =>
 console.log(
   `check-soft-delete-guards: ${snapshot.length} soft-deletable tables, all guarded; ` +
     `${declared.size} name-checked against migrations.` +
-    (templated
-      ? ` The remaining ${snapshot.length - declared.size} are ref_* tables built by` +
-        ` format(%I), whose names do not appear in the SQL — the snapshot is the` +
-        ` only check on those.`
+    (templated && snapshot.length > declared.size
+      ? ` The remaining ${snapshot.length - declared.size} are built by format(%I)` +
+        ` from a name array this scan could not read — the snapshot is the only` +
+        ` check on those.`
       : ''),
 )
