@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useSurveyDetail, useSaveSectionA } from '../data/followups'
-import { refLabel, useRef, type RefRow } from '../data/refTables'
+import { useRef } from '../data/refTables'
 import { BackLink, EmptyState, PageHead } from '../ui/primitives'
+import { CARD, NOTE, STEM, Choice, MultiChoice } from '../ui/surveyControls'
 import { useToast } from '../ui/Toast'
 
 /**
@@ -43,75 +44,6 @@ import { useToast } from '../ui/Toast'
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-const CARD = 'mt-4 border-[1.5px] border-ink p-4 sm:p-5'
-const STEM = 'm-0 text-[17px] font-extrabold leading-[1.3] tracking-[-0.02em]'
-const NOTE = 'mt-1 text-[13.5px] leading-[1.5] text-muted'
-
-function Choice<T extends string>({
-  value,
-  options,
-  onChange,
-}: {
-  value: T | undefined
-  options: { value: T; label: string }[]
-  onChange: (v: T) => void
-}) {
-  return (
-    <div className="mt-3 flex flex-col gap-2">
-      {options.map((o) => (
-        <button
-          key={o.value}
-          type="button"
-          aria-pressed={value === o.value}
-          onClick={() => onChange(o.value)}
-          className={`min-h-12 border-[1.5px] px-4 text-start text-[15px] ${
-            value === o.value
-              ? 'border-ink bg-ink font-semibold text-bg'
-              : 'border-border-strong bg-bg text-ink hover:bg-sunken'
-          }`}
-        >
-          {o.label}
-        </button>
-      ))}
-    </div>
-  )
-}
-
-function MultiChoice({
-  selected,
-  options,
-  onToggle,
-}: {
-  selected: string[]
-  options: { id: string; label: string }[]
-  onToggle: (id: string) => void
-}) {
-  return (
-    <div className="mt-3 flex flex-col gap-2">
-      {options.map((o) => {
-        const on = selected.includes(o.id)
-        return (
-          <button
-            key={o.id}
-            type="button"
-            aria-pressed={on}
-            onClick={() => onToggle(o.id)}
-            className={`flex min-h-12 items-center gap-3 border-[1.5px] px-4 text-start text-[15px] ${
-              on ? 'border-ink bg-sunken font-semibold text-ink' : 'border-border-strong bg-bg text-ink'
-            }`}
-          >
-            <span
-              aria-hidden="true"
-              className={`h-4 w-4 flex-none border-[1.5px] ${on ? 'border-ink bg-ink' : 'border-border-strong'}`}
-            />
-            {o.label}
-          </button>
-        )
-      })}
-    </div>
-  )
-}
-
 export function FollowupSectionA() {
   const { id } = useParams()
   const { t, i18n } = useTranslation(['survey', 'common'])
@@ -130,13 +62,16 @@ export function FollowupSectionA() {
   const [q7, setQ7] = useState<string>()
   const [q8, setQ8] = useState<string>()
   const [q9, setQ9] = useState<string[]>([])
+  const [q9Other, setQ9Other] = useState('')
   const [q10, setQ10] = useState<string>()
   const [q11, setQ11] = useState<string[]>([])
+  const [q11Other, setQ11Other] = useState('')
   const [q12, setQ12] = useState<string>()
   const [q13, setQ13] = useState<string>()
   const [q14, setQ14] = useState<string>()
   const [q15Count, setQ15Count] = useState('')
   const [q15, setQ15] = useState<string[]>([])
+  const [q15Other, setQ15Other] = useState('')
   const [q16, setQ16] = useState<string>()
   const [refusal, setRefusal] = useState<string | null>(null)
 
@@ -147,13 +82,16 @@ export function FollowupSectionA() {
     setQ7(d.answers['Q7']?.text ?? undefined)
     setQ8(d.q08 ?? undefined)
     setQ9(d.options['Q9'] ?? [])
+    setQ9Other(d.optionOther['Q9'] ?? '')
     setQ10(d.answers['Q10']?.text ?? undefined)
     setQ11(d.options['Q11'] ?? [])
+    setQ11Other(d.optionOther['Q11'] ?? '')
     setQ12(d.answers['Q12']?.text ?? undefined)
     setQ13(d.answers['Q13']?.text ?? undefined)
     setQ14(d.q14 ?? undefined)
     setQ15Count(d.answers['Q15']?.number == null ? '' : String(d.answers['Q15']?.number))
     setQ15(d.options['Q15'] ?? [])
+    setQ15Other(d.optionOther['Q15'] ?? '')
     setQ16(d.q16 ?? undefined)
   }
 
@@ -174,24 +112,34 @@ export function FollowupSectionA() {
   const showQ9 = q8 === 'no'
   const showQ11 = !!q10 && q10 !== 'no'
   const showOffice = q14 === 'yes'
-  const opt = (rows: RefRow[]) =>
-    rows.map((r) => ({ id: r.id, label: refLabel(r, locale) }))
+  // An "Other" ticked with nothing typed is refused by the database (0082),
+  // so it is caught here rather than sent and bounced.
+  const otherMissing =
+    (showQ9 && q9.some((x) => reasons.find((r) => r.id === x)?.allows_free_text) &&
+      q9Other.trim() === '') ||
+    (showQ11 && q11.some((x) => changes.find((r) => r.id === x)?.allows_free_text) &&
+      q11Other.trim() === '') ||
+    (showOffice && q15.some((x) => services.find((r) => r.id === x)?.allows_free_text) &&
+      q15Other.trim() === '')
 
   async function submit() {
-    if (!id) return
+    if (!id || otherMissing) return
     setRefusal(null)
     const res = await save.mutateAsync({
       surveyId: id,
       ...(q7 ? { q7 } : {}),
       ...(q8 ? { q8 } : {}),
       ...(showQ9 && q9.length ? { q9Options: q9 } : {}),
+      ...(showQ9 && q9Other.trim() ? { q9Other: q9Other.trim() } : {}),
       ...(q10 ? { q10 } : {}),
       ...(showQ11 && q11.length ? { q11Options: q11 } : {}),
+      ...(showQ11 && q11Other.trim() ? { q11Other: q11Other.trim() } : {}),
       ...(q12 ? { q12 } : {}),
       ...(q13 ? { q13 } : {}),
       ...(q14 ? { q14 } : {}),
       ...(showOffice && q15Count !== '' ? { q15Count: Number(q15Count) } : {}),
       ...(showOffice && q15.length ? { q15Options: q15 } : {}),
+      ...(showOffice && q15Other.trim() ? { q15Other: q15Other.trim() } : {}),
       ...(showOffice && q16 ? { q16 } : {}),
     })
     if (res.result === 'saved') {
@@ -260,9 +208,12 @@ export function FollowupSectionA() {
             <p className={STEM}>{t('survey:q.9')}</p>
             <p className={NOTE}>{t('survey:selectAll')}</p>
             <MultiChoice
+              rows={reasons}
               selected={q9}
-              options={opt(reasons)}
+              other={q9Other}
               onToggle={(x) => setQ9((c) => (c.includes(x) ? c.filter((y) => y !== x) : [...c, x]))}
+              onOther={setQ9Other}
+              locale={locale}
             />
           </div>
         ) : null}
@@ -284,9 +235,12 @@ export function FollowupSectionA() {
             <p className={STEM}>{t('survey:q.11')}</p>
             <p className={NOTE}>{t('survey:selectAll')}</p>
             <MultiChoice
+              rows={changes}
               selected={q11}
-              options={opt(changes)}
+              other={q11Other}
               onToggle={(x) => setQ11((c) => (c.includes(x) ? c.filter((y) => y !== x) : [...c, x]))}
+              onOther={setQ11Other}
+              locale={locale}
             />
           </div>
         ) : null}
@@ -355,11 +309,14 @@ export function FollowupSectionA() {
               </label>
               <p className={`${NOTE} mt-4`}>{t('survey:sectionA.q15Services')}</p>
               <MultiChoice
+                rows={services}
                 selected={q15}
-                options={opt(services)}
+                other={q15Other}
                 onToggle={(x) =>
                   setQ15((c) => (c.includes(x) ? c.filter((y) => y !== x) : [...c, x]))
                 }
+                onOther={setQ15Other}
+                locale={locale}
               />
             </div>
 
@@ -401,7 +358,7 @@ export function FollowupSectionA() {
           </p>
           <button
             type="submit"
-            disabled={save.isPending}
+            disabled={save.isPending || otherMissing}
             className="inline-flex min-h-12 w-full items-center justify-center bg-ink px-6 font-narrow text-[13px] font-bold uppercase tracking-[0.12em] text-bg disabled:cursor-not-allowed disabled:bg-track disabled:text-faint sm:w-auto"
           >
             {save.isPending ? t('survey:sectionA.saving') : t('survey:sectionA.save')}

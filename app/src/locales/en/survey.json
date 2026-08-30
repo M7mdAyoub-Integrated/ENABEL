@@ -162,7 +162,9 @@
     "equipment": "Equipment or inputs",
     "finance": "Financing or a small grant",
     "findBuyers": "Help finding buyers",
-    "moreExhibitions": "More exhibitions"
+    "moreExhibitions": "More exhibitions",
+    "beforeStrengthened": "Existed before, strengthened after support",
+    "beforeNoChange": "Existed before, no change"
   },
   "qRange": {
     "0": "Questions 1—6",
@@ -231,7 +233,13 @@
     "13": "Have you shown or taught any of these practices to another producer or family member?",
     "14": "Have you used the municipal agricultural advisory and technical office?",
     "15": "How many times, and for what service?",
-    "16": "Was the advice useful in practice?"
+    "16": "Was the advice useful in practice?",
+    "19": "When did it stop, and why?",
+    "21": "What are your main products?",
+    "23": "Food safety and licensing",
+    "24": "For the items not yet done, what is the main obstacle?",
+    "25": "Do you know which authority to approach?",
+    "26": "How many people work in this activity?"
   },
   "q5": {
     "training": "Training programme",
@@ -352,6 +360,43 @@
     "refused": {
       "not_found": "This survey no longer exists. It may have been withdrawn while this page was open.",
       "not_permitted": "You may not edit this survey. An enumerator can edit a survey only while it is in progress; after that it is a coordinator's to change."
+    }
+  },
+  "otherPlease": "Please specify",
+  "otherRequired": "This is needed before the section will save.",
+  "b": {
+    "title": "Section B — Production and market readiness",
+    "intro": "Questions 17 to 26. Saving this section keeps it whether or not the rest is finished.",
+    "feedsC1": "This answer is indicator C1.",
+    "q19When": "When did it stop? A month and year is enough.",
+    "q19Why": "Why? Select all that apply.",
+    "q21Note": "The same product list the municipal markets use.",
+    "q23Intro": "Nine items, read one at a time. Leave an item blank if it was not asked — blank is not the same answer as “not started”.",
+    "q23Progress": "{done} of {total} answered",
+    "q23Jump": "Next unanswered",
+    "q23Complete": "All answered",
+    "tri": {
+      "done": "Done",
+      "in_progress": "In progress",
+      "not_started": "Not started"
+    },
+    "q24Note": "Asked because at least one item above is not done. It is dropped if the checklist is later completed.",
+    "q25PendingTitle": "Question 25 is not built yet",
+    "q25PendingBody": "Its answer options have never been supplied, and guessing them would mean storing values that will not match the real list when it arrives. Ask the respondent if you like, and put it in the notes at the end.",
+    "q26Note": "Include the respondent. Women and under-30 are counted within the total, not added to it.",
+    "savesNote": "Saving stores this section now. The survey stays in progress and counts towards nothing until the whole thing is submitted.",
+    "save": "Save this section",
+    "saving": "Saving…",
+    "saved": "Section B saved",
+    "savedSub": "The survey is still in progress and is in no indicator yet.",
+    "notSaved": "Not saved",
+    "saveFailed": "The section could not be saved. Nothing was written.",
+    "refused": {
+      "not_found": "This survey no longer exists. It may have been withdrawn while this page was open.",
+      "not_permitted": "You may not edit this survey. An enumerator can edit a survey only while it is in progress; after that it is a coordinator's to change.",
+      "workers_women_lte_total": "There cannot be more women than people. Check question 26.",
+      "workers_under30_lte_total": "There cannot be more people under 30 than people. Check question 26.",
+      "invalid": "One of the numbers in question 26 does not add up."
     }
   }
 }

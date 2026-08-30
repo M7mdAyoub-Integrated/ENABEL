@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import { toAppError, unwrapList } from './errors'
 import { normaliseNationalId } from './apply'
+import type { TriStatus } from '../ui/surveyControls'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -224,18 +225,33 @@ export type SurveyDetail = {
   q08: string | null
   q14: string | null
   q16: string | null
+  q17: string | null
+  q18: string | null
+  q22: string | null
+  q26Total: number | null
+  q26Women: number | null
+  q26Under30: number | null
   /** followup_answer, keyed by question code. */
   answers: Record<string, { text: string | null; number: number | null; bool: boolean | null }>
   /** followup_answer_option, option ids per question code. */
   options: Record<string, string[]>
+  /**
+   * The "Other" specification per question code, taken from whichever option
+   * row carries it. Each list has at most one, so one string per question is
+   * the whole of it -- see 0082.
+   */
+  optionOther: Record<string, string>
+  /** Q23, tri-state per ref_safety_item id. An absent key is unanswered. */
+  safety: Record<string, TriStatus>
 }
 
 /**
- * Everything section A needs to reopen with what was already answered.
+ * Everything a section needs to reopen with what was already answered.
  *
- * Three reads rather than one: the survey, its answers and its options are
- * three tables and PostgREST embeds would not make them one round trip anyway.
- * They are separate queries so a slow one cannot block the section rendering.
+ * Four reads rather than one: the survey, its answers, its options and its
+ * safety items are four tables and PostgREST embeds would not make them one
+ * round trip anyway. They are separate queries so a slow one cannot block the
+ * section rendering.
  */
 export function useSurveyDetail(id: string | undefined) {
   return useQuery({
@@ -246,7 +262,9 @@ export function useSurveyDetail(id: string | undefined) {
         .from('followup_survey')
         .select(
           'id, round, contact_date, status, q08_applied_knowledge, q14_used_office,' +
-            ' q16_advice_useful, person!inner ( full_name, national_id )',
+            ' q16_advice_useful, q17_activity_status, q18_started_after_support,' +
+            ' q22_volume_change, q26_workers_total, q26_workers_women, q26_workers_under30,' +
+            ' person!inner ( full_name, national_id )',
         )
         .eq('id', id!)
         .is('deleted_at', null)
@@ -260,6 +278,12 @@ export function useSurveyDetail(id: string | undefined) {
         q08_applied_knowledge: string | null
         q14_used_office: string | null
         q16_advice_useful: string | null
+        q17_activity_status: string | null
+        q18_started_after_support: string | null
+        q22_volume_change: string | null
+        q26_workers_total: number | null
+        q26_workers_women: number | null
+        q26_workers_under30: number | null
         person: { full_name: string; national_id: string }
       }
 
@@ -271,9 +295,15 @@ export function useSurveyDetail(id: string | undefined) {
 
       const o = await supabase
         .from('followup_answer_option')
-        .select('question_code, option_id')
+        .select('question_code, option_id, option_other')
         .eq('survey_id', id!)
       if (o.error) throw toAppError(o.error)
+
+      const si = await supabase
+        .from('followup_safety_item')
+        .select('item_id, status')
+        .eq('survey_id', id!)
+      if (si.error) throw toAppError(si.error)
 
       const answers: SurveyDetail['answers'] = {}
       for (const r of (a.data ?? []) as {
@@ -290,8 +320,19 @@ export function useSurveyDetail(id: string | undefined) {
       }
 
       const options: SurveyDetail['options'] = {}
-      for (const r of (o.data ?? []) as { question_code: string; option_id: string }[]) {
+      const optionOther: SurveyDetail['optionOther'] = {}
+      for (const r of (o.data ?? []) as {
+        question_code: string
+        option_id: string
+        option_other: string | null
+      }[]) {
         ;(options[r.question_code] ??= []).push(r.option_id)
+        if (r.option_other) optionOther[r.question_code] = r.option_other
+      }
+
+      const safety: SurveyDetail['safety'] = {}
+      for (const r of (si.data ?? []) as { item_id: string; status: TriStatus }[]) {
+        safety[r.item_id] = r.status
       }
 
       return {
@@ -304,8 +345,16 @@ export function useSurveyDetail(id: string | undefined) {
         q08: row.q08_applied_knowledge,
         q14: row.q14_used_office,
         q16: row.q16_advice_useful,
+        q17: row.q17_activity_status,
+        q18: row.q18_started_after_support,
+        q22: row.q22_volume_change,
+        q26Total: row.q26_workers_total,
+        q26Women: row.q26_workers_women,
+        q26Under30: row.q26_workers_under30,
         answers,
         options,
+        optionOther,
+        safety,
       }
     },
   })
@@ -318,13 +367,16 @@ export type SectionAInput = {
   q7?: string
   q8?: string
   q9Options?: string[]
+  q9Other?: string
   q10?: string
   q11Options?: string[]
+  q11Other?: string
   q12?: string
   q13?: string
   q14?: string
   q15Count?: number | null
   q15Options?: string[]
+  q15Other?: string
   q16?: string
 }
 
@@ -353,13 +405,16 @@ export function useSaveSectionA() {
         ...(input.q7 ? { p_q7: input.q7 } : {}),
         ...(input.q8 ? { p_q8: input.q8 } : {}),
         ...(input.q9Options?.length ? { p_q9_options: input.q9Options } : {}),
+        ...(input.q9Other ? { p_q9_other: input.q9Other } : {}),
         ...(input.q10 ? { p_q10: input.q10 } : {}),
         ...(input.q11Options?.length ? { p_q11_options: input.q11Options } : {}),
+        ...(input.q11Other ? { p_q11_other: input.q11Other } : {}),
         ...(input.q12 ? { p_q12: input.q12 } : {}),
         ...(input.q13 ? { p_q13: input.q13 } : {}),
         ...(input.q14 ? { p_q14: input.q14 } : {}),
         ...(input.q15Count != null ? { p_q15_count: input.q15Count } : {}),
         ...(input.q15Options?.length ? { p_q15_options: input.q15Options } : {}),
+        ...(input.q15Other ? { p_q15_other: input.q15Other } : {}),
         ...(input.q16 ? { p_q16: input.q16 } : {}),
       })
       if (error) throw toAppError(error)
@@ -372,6 +427,86 @@ export function useSaveSectionA() {
         // The survey is still a draft, so no indicator has moved -- but the
         // dashboard is cheap to refresh and a stale figure here would be read
         // as this section having done something.
+        void qc.invalidateQueries({ queryKey: ['indicators'] })
+      }
+    },
+  })
+}
+
+/* ── section B ────────────────────────────────────────────────────────────── */
+
+export type SectionBInput = {
+  surveyId: string
+  q17?: string
+  q18?: string
+  q19When?: string
+  q19Options?: string[]
+  q19Other?: string
+  q20Options?: string[]
+  q20Other?: string
+  q21Options?: string[]
+  q22?: string
+  /** One entry per ANSWERED item. An unanswered item is absent, not defaulted. */
+  q23?: { item_id: string; status: TriStatus }[]
+  q24Options?: string[]
+  q24Other?: string
+  q26Total?: number | null
+  q26Women?: number | null
+  q26Under30?: number | null
+}
+
+export type SectionBResult = {
+  ok: boolean
+  result: 'saved' | 'not_found' | 'not_permitted' | 'invalid'
+  survey_id?: string
+  /** On 'invalid', the constraint that refused -- see 0084. */
+  constraint?: string
+}
+
+/**
+ * One RPC, one transaction, across four tables.
+ *
+ * Q17 is C1's numerator and denominator both, so this is the section that moves
+ * a donor figure. It moves nothing while the survey is a draft: 0072 made the
+ * four survey-fed views require submitted or approved.
+ *
+ * The conditional branches (Q19 when the activity is not stopped, Q24 when the
+ * checklist has nothing undone) are cleared server-side in the same
+ * transaction, and the clear is read back -- a delete RLS refuses reports
+ * success, which is what 0080 was written for.
+ */
+export function useSaveSectionB() {
+  const qc = useQueryClient()
+  return useMutation({
+    retry: false,
+    mutationFn: async (input: SectionBInput): Promise<SectionBResult> => {
+      const { data, error } = await supabase.rpc('save_followup_section_b', {
+        p_survey_id: input.surveyId,
+        ...(input.q17 ? { p_q17: input.q17 } : {}),
+        ...(input.q18 ? { p_q18: input.q18 } : {}),
+        ...(input.q19When ? { p_q19_when: input.q19When } : {}),
+        ...(input.q19Options?.length ? { p_q19_options: input.q19Options } : {}),
+        ...(input.q19Other ? { p_q19_other: input.q19Other } : {}),
+        ...(input.q20Options?.length ? { p_q20_options: input.q20Options } : {}),
+        ...(input.q20Other ? { p_q20_other: input.q20Other } : {}),
+        ...(input.q21Options?.length ? { p_q21_options: input.q21Options } : {}),
+        ...(input.q22 ? { p_q22: input.q22 } : {}),
+        ...(input.q23?.length ? { p_q23: input.q23 } : {}),
+        ...(input.q24Options?.length ? { p_q24_options: input.q24Options } : {}),
+        ...(input.q24Other ? { p_q24_other: input.q24Other } : {}),
+        ...(input.q26Total != null ? { p_q26_total: input.q26Total } : {}),
+        ...(input.q26Women != null ? { p_q26_women: input.q26Women } : {}),
+        ...(input.q26Under30 != null ? { p_q26_under30: input.q26Under30 } : {}),
+      })
+      if (error) throw toAppError(error)
+      return data as SectionBResult
+    },
+    onSuccess: (res, input) => {
+      if (res.result === 'saved') {
+        void qc.invalidateQueries({ queryKey: followupKeys.one(input.surveyId) })
+        void qc.invalidateQueries({ queryKey: followupKeys.list() })
+        // Still a draft, so C1 has not moved -- but a stale figure on the
+        // dashboard would be read as this section having done something.
         void qc.invalidateQueries({ queryKey: ['indicators'] })
       }
     },

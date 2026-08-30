@@ -136,7 +136,7 @@ This is a real municipality with a real donor. If a definition is ambiguous, sto
 
 ## Checks that verify shape, not substance
 
-This has now happened seven times, in seven unrelated parts of the project. It is
+This has now happened eight times, in eight unrelated parts of the project. It is
 one failure mode, and it is worth naming because every instance looked fine.
 
 | | what existed | what was missing |
@@ -148,6 +148,7 @@ one failure mode, and it is worth naming because every instance looked fine.
 | `objective.os`, `cta.os`, `description.os`, `filterAll.os` | a module wired end to end, compiling, typed, linted | the four keys themselves — the page rendered `description.os` as literal text |
 | The four survey views | `status` present in all four definitions, and an `ilike '%status%'` returning true | any `WHERE` on it — the word was in the subquery's *column list*, so a draft survey counted |
 | Eight multi-select junctions | a `delete`, a success response, a green toast, and a comment explaining the design | a DELETE **policy** — RLS filtered every row, so unticking a box did nothing, silently, forever |
+| `save_followup_section_a` after `0082` | the file, the function, the right signature, a passing migration check and a passing test of the new behaviour | the read-back guard `0080` had added — `create or replace` was written from `0079`'s text and reverted it |
 
 In each case the thing that would normally be checked *was there*. The file
 existed. The key existed. The comment existed. The translation key existed. Any
@@ -204,6 +205,27 @@ why nobody swept for the same shape elsewhere and found the other seven.
 > in PostgREST, `GET DIAGNOSTICS`/read-back in plpgsql. A delete that returns
 > zero rows is either "nothing matched" or "you are not allowed", and the
 > difference is invisible unless you ask.
+
+**The eighth happened while fixing the seventh, twenty minutes later.**
+
+`0082` needed to change `save_followup_section_a`'s signature. It rewrote the
+function starting from `0079`'s text — which is the version from *before* `0080`
+added the read-back guard above. The guard vanished.
+
+Everything was green. The file was there, the function was there, the signature
+was right, `check_migration_files.sh` passed, and `0082`'s own test of the new
+free-text behaviour passed. Nothing in the project could have caught it, because
+every check was pointed at what `0082` *added*.
+
+> **`create or replace function` takes the whole body, so it silently reverts
+> every later change to that function.** It is the only kind of migration here
+> that can undo an earlier one. Before replacing a function, list what has
+> touched it:
+>
+>     grep -l "function public.<name>" supabase/migrations/*.sql
+>
+> `0079` wrote it, `0080` guarded it, `0082` re-signed it. Three files, and the
+> middle one was the one that mattered.
 
 What that means in practice:
 

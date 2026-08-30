@@ -3983,15 +3983,39 @@ export type Database = {
         Args: {
           p_q10?: string
           p_q11_options?: string[]
+          p_q11_other?: string
           p_q12?: string
           p_q13?: string
           p_q14?: string
           p_q15_count?: number
           p_q15_options?: string[]
+          p_q15_other?: string
           p_q16?: string
           p_q7?: string
           p_q8?: string
           p_q9_options?: string[]
+          p_q9_other?: string
+          p_survey_id: string
+        }
+        Returns: Json
+      }
+      save_followup_section_b: {
+        Args: {
+          p_q17?: string
+          p_q18?: string
+          p_q19_options?: string[]
+          p_q19_other?: string
+          p_q19_when?: string
+          p_q20_options?: string[]
+          p_q20_other?: string
+          p_q21_options?: string[]
+          p_q22?: string
+          p_q23?: Json
+          p_q24_options?: string[]
+          p_q24_other?: string
+          p_q26_total?: number
+          p_q26_under30?: number
+          p_q26_women?: number
           p_survey_id: string
         }
         Returns: Json

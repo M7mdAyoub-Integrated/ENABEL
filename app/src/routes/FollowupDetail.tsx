@@ -9,8 +9,8 @@ import { formatShortDate } from '../lib/format'
  *
  * ── WHAT THIS IS RIGHT NOW ──
  *
- * Section 0 exists; sections A to E do not. This screen shows the draft that
- * section 0 created and says plainly which sections are still to come.
+ * Sections 0, A and B exist; C to E do not. This screen shows the draft and
+ * says plainly which sections are still to come.
  *
  * It deliberately does NOT offer a submit. A survey submitted with five of six
  * sections empty would be counted by A1, B1 and C1 -- 0072 makes them count
@@ -45,7 +45,7 @@ export function FollowupDetail() {
   const SECTIONS: { key: string; done: boolean; twelveOnly?: boolean; to?: string }[] = [
     { key: '0', done: true },
     { key: 'A', done: false, to: `/followups/${survey.id}/a` },
-    { key: 'B', done: false },
+    { key: 'B', done: false, to: `/followups/${survey.id}/b` },
     { key: 'C', done: false },
     { key: 'D', done: false, twelveOnly: true },
     { key: 'E', done: false },

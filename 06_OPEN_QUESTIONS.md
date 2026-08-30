@@ -604,6 +604,46 @@ The missing delete policy is *stricter* than the spec and is fine. `evidence_sta
 
 ---
 
+## 🟡 OQ-31 · Q25 has no answer options anywhere, so the question is not built
+
+**What the sheet asks.** Q25, "Do you know which authority to approach?" — in the section on food safety and licensing.
+
+**What exists.** Nothing. Every other Section B question resolved to a list: Q19 and Q39 share `ref_stop_reason`, Q20 got `ref_survey_activity`, Q24 got `ref_compliance_obstacle`, all verbatim from the Post_intervention sheet. Q25's options have never been supplied. `0078` left `followup_answer` deliberately unconstrained for it and said so.
+
+**What was done.** `save_followup_section_b` (0084) has **no Q25 parameter**, and the screen shows the question as a visible gap rather than omitting it. Two options were rejected:
+
+- Guessing yes/no. The neighbouring questions are three- and four-point scales, so yes/no is a guess about the *shape* as well as the wording. Answers stored under a guessed list will not match the real one when it arrives, and nothing will flag them — they will simply be wrong in a way that reads as data.
+- Collecting free text. Same problem, one step later: it would have to be recoded by hand, and by then the interviews are done.
+
+An enumerator who wants the answer can put it in Q43, the notes field.
+
+**Decides.** Whoever holds the Post_intervention sheet — the Q25 option list, verbatim, in sheet order, the way Q19, Q20 and Q24 were supplied.
+
+---
+
+## 🔴 OQ-32 · 138 of 204 reference labels have no Arabic, and this is a survey read aloud in Arabic
+
+**What was found.** Measured, not estimated:
+
+| | rows | without `label_ar` |
+|---|---|---|
+| The 18 original `ref_` tables | 138 | **138 — all of them** |
+| The 8 tables added by `0075` | 66 | 0 |
+
+`0016` says why, and it was a defensible decision at the time: *"The source workbook is English-only. Rather than seed fake Arabic, label_ar is nullable."* Inventing Arabic for a donor-facing option list would have been worse.
+
+**Why it now blocks fieldwork.** Section B renders Q23's nine food-safety items from `ref_safety_item` and Q21's products from `ref_product`. Verified on the built screen at 320px with the interface in Arabic: heading, buttons, tri-state labels and the progress line are all Arabic — and **0 of 9 checklist items are.** An enumerator reads nine food-safety items aloud, in English, to an Arabic-speaking farmer, and writes down what they think the answer was.
+
+`refLabel()` falls back to English and warns in the console, which is the right behaviour for a missing label and no substitute for having one.
+
+**The same shape in the locale files.** 226 values in `src/locales/ar/*.json` are the English string — 113 in `survey.json` alone. `check-untranslated.mjs` now holds that as a baseline that may fall and must never rise. It cannot see the `ref_` tables: those are rows, not files, and no build check will reach them.
+
+**What is needed.** Arabic for 138 option labels. The two that block the survey are `ref_safety_item` (9) and `ref_product` (11); `ref_sales_channel` (11) and `ref_buyer_type` (9) block Section C.
+
+**Decides.** Municipal Coordinator — who supplies the Arabic, and whether the survey can be run in the field before it exists.
+
+---
+
 **Take OQ-12 to the Coordinator first.** It is the one that undermines the purpose of the programme, and it is a form change, not a database change.
 
 Note: OQ-12 and OQ-13 were briefly marked resolved on 2026-08-24 when the form fields were built, then set back to open when that work was reverted the same day at the project owner's instruction. Each carries a **History** line recording what was built and what survived. Nothing about the underlying questions has changed.
