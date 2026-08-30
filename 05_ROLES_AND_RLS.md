@@ -599,17 +599,36 @@ Both directions, as everywhere else in this document: confirm the roles that sho
 
 ### Where else this can bite
 
-Any invoker calling a definer. Today that is the three section saves calling `count_markets_attended`. To find the others:
+Any invoker calling a definer. Today there is exactly one such call in the whole schema — `save_followup_section_c` calling `count_markets_attended` — and this is the sweep that says so:
 
 ```sql
-select p.proname, p.prosecdef
-  from pg_proc p join pg_namespace n on n.oid = p.pronamespace
- where n.nspname = 'public'
-   and not p.prosecdef                                   -- an invoker
-   and p.prosrc ~ '<name of any definer function>';
+with stripped as (
+  select p.oid, p.proname, p.prosecdef,
+         regexp_replace(p.prosrc, '--[^' || chr(10) || ']*', '', 'g') as src
+    from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+   where n.nspname = 'public'
+     and p.prolang = (select oid from pg_language where lanname = 'plpgsql')
+     and p.prorettype <> 'trigger'::regtype
+),
+definers as (
+  select oid, proname,
+         has_function_privilege('authenticated', oid, 'EXECUTE') as authed_can_call
+    from stripped where prosecdef
+)
+select s.proname as invoker, d.proname as calls_definer, d.authed_can_call
+  from stripped s join definers d on s.src ~ ('\m' || d.proname || '\M')
+ where not s.prosecdef and d.proname <> s.proname
+ order by d.authed_can_call, s.proname;
 ```
 
-A new definer with a narrow grant is the moment to ask which invokers call it.
+**Both exclusions in that query are there because the obvious version was wrong,** and it is worth saying how — it is CLAUDE.md's sixth failure, committed while writing the check for the ninth.
+
+The first draft matched `prosrc` directly and returned six rows that looked like the same defect: three trigger functions, `authed_can_call = false`, called from the section saves. All six were false.
+
+- **`prosrc` includes comments.** Every one of those matches was a *comment* saying an option id "has to reach `guard_followup_option` and be refused". Searching a function body for a name tells you the name appears in it, not that anything calls it — the same thing that made an `ilike '%status%'` on a view definition return true for four views that filtered nothing.
+- **Trigger functions are not called by the function that fires them.** The trigger mechanism runs them as the trigger's owner, so no `EXECUTE` check happens against the caller at all. `authed_can_call = false` is correct and deliberate for every one of them — see §11.
+
+A check that cries wolf six times is worse than no check, because the seventh time nobody looks. A new definer with a narrow grant is still the moment to run this.
 
 ---
 

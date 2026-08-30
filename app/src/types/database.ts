@@ -4049,6 +4049,18 @@ export type Database = {
         }
         Returns: Json
       }
+      save_followup_section_d: {
+        Args: {
+          p_q37?: string
+          p_q38?: string
+          p_q39_options?: string[]
+          p_q39_other?: string
+          p_q39_when?: string
+          p_q40?: string
+          p_survey_id: string
+        }
+        Returns: Json
+      }
       snapshot_period: { Args: { p_period_code: string }; Returns: number }
       start_followup: {
         Args: {

@@ -714,6 +714,56 @@ Either a line in `04_DATA_DICTIONARY.md` giving the seven labels the way it alre
 
 ---
 
+## 🟡 OQ-34 · Q37 and Q38 can contradict each other, and nothing stops them
+
+**A deliberate non-decision, recorded so it is not mistaken for an oversight.**
+
+Section D asks two questions about the same thing from different angles:
+
+| Q | Column | Answers |
+|---|---|---|
+| 37 | `q37_still_engaged` | `main`, `secondary`, `no` |
+| 38 | `q38_capacity` | `own_land`, `rented_land`, `own_business`, `employed`, `family_activity`, **`not_engaged`** |
+
+`not_engaged` is one of Q38's own six options, so the sheet plainly expects Q38 answered whether or not the person is still working. That is why `save_followup_section_d` (0092) does **not** clear Q38 when Q37 says `no`, and why the screen does not hide options.
+
+The consequence is that these pairs are storable:
+
+- `q37 = 'main'` with `q38 = 'not_engaged'` — still engaged, in no capacity
+- `q37 = 'no'` with `q38 = 'own_land'` — not engaged, on their own land
+
+### Why it was left possible
+
+**No indicator reads Q38.** IMP-0 takes `q37_still_engaged` and nothing else, so a contradictory pair produces a confusing row for a coordinator, never a wrong figure in a donor return. That is the whole reason this is amber rather than red.
+
+Refusing the pair would mean writing a cross-field rule the source sheet does not state. This project has been bitten harder by invented rules than by permissive ones — `ref_office_service_type` was invented and spent weeks as OQ-20 before turning out to be right by luck. A rule that says "these two answers may not co-occur" is exactly the kind of thing that looks obvious and turns out to have a case nobody thought of: someone who owns land they have stopped working is `no` + `own_land` under one reading and `no` + `not_engaged` under another.
+
+### The alternative, if it is wanted
+
+A check constraint is the natural home, because it compares two columns of one row and needs no other table:
+
+```sql
+alter table public.followup_survey
+  add constraint q38_agrees_with_q37 check (
+    q37_still_engaged is null or q38_capacity is null
+    or (q37_still_engaged = 'no') = (q38_capacity = 'not_engaged')
+  );
+```
+
+That is written here rather than applied — but it was run before being written down, in a transaction that rolled back: `no`+`not_engaged` accepted, `main`+`not_engaged` refused, `main`+`own_land` accepted, both-null accepted. It is a constraint that works, not a sketch of one.
+
+It would also need a decision about existing rows — there are none today, so it is cheap now and gets more expensive with every twelve-month interview.
+
+### What would settle it
+
+A line in `04_DATA_DICTIONARY.md` saying whether Q38 is asked of everyone or only of the still-engaged. If it is only asked of the still-engaged, then `not_engaged` is the answer for everybody else and the constraint above is right. If it is asked of everyone, the current behaviour is right and this resolves as-written.
+
+**Decides.** M&E Officer.
+
+**Raised.** 2026-08-30, building Section D.
+
+---
+
 **Take OQ-12 to the Coordinator first.** It is the one that undermines the purpose of the programme, and it is a form change, not a database change.
 
 Note: OQ-12 and OQ-13 were briefly marked resolved on 2026-08-24 when the form fields were built, then set back to open when that work was reverted the same day at the project owner's instruction. Each carries a **History** line recording what was built and what survived. Nothing about the underlying questions has changed.

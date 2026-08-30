@@ -499,5 +499,52 @@
       "buyer_invalid": "One of the buyers in question 35 was refused by the database. The rest of the section may already have been saved — reopen it and check question 35 before continuing.",
       "invalid": "One of the answers in this section was refused. Nothing was written."
     }
+  },
+  "d": {
+    "title": "Section D — Continued engagement",
+    "intro": "Questions 37 to 40, asked only at twelve months. Saving this section keeps it whether or not the rest is finished.",
+    "wrongRoundTitle": "Section D is not asked in this round",
+    "wrongRoundBody": "This is a {round} follow-up. Question 37 measures where a participant stands twelve months after support, so the database refuses these answers on any other round. Nothing is missing from this survey — there is simply no section D to fill in.",
+    "feedsImp0": "This answer is indicator IMP-0.",
+    "q37": "Are you currently engaged in an income-generating activity?",
+    "q37Note": "IMP-0 counts both “main” and “secondary” as still engaged — someone who kept the activity alongside other work has not dropped out. The line that matters for the figure is between “secondary” and “no”.",
+    "q37opt": {
+      "main": "Yes, as my main activity",
+      "secondary": "Yes, alongside other work",
+      "no": "No, not at the moment"
+    },
+    "q38": "In what capacity?",
+    "q38Note": "Asked either way — “not engaged in any activity” is one of the answers.",
+    "q38opt": {
+      "own_land": "On my own land",
+      "rented_land": "On rented land",
+      "own_business": "Through my own business",
+      "employed": "Employed by someone else",
+      "family_activity": "In a family activity",
+      "not_engaged": "Not engaged in any activity"
+    },
+    "q39": "When did it stop, and why?",
+    "q39When": "When did it stop? A month and year is enough.",
+    "q39Why": "Why? Select all that apply.",
+    "q40": "Compared with twelve months ago, is your income from this activity…",
+    "q40opt": {
+      "higher": "Higher",
+      "about_same": "About the same",
+      "lower": "Lower",
+      "no_income": "No income from this activity"
+    },
+    "savesNote": "Saving stores this section now. The survey stays in progress and counts towards nothing until the whole thing is submitted.",
+    "save": "Save this section",
+    "saving": "Saving…",
+    "saved": "Section D saved",
+    "savedSub": "The survey is still in progress and is in no indicator yet.",
+    "notSaved": "Not saved",
+    "saveFailed": "The section could not be saved. Nothing was written.",
+    "refused": {
+      "not_found": "This survey no longer exists. It may have been withdrawn while this page was open.",
+      "not_permitted": "You may not edit this survey. An enumerator can edit a survey only while it is in progress; after that it is a coordinator's to change.",
+      "not_twelve_month": "This survey is not a twelve-month round, so it has no section D. The round is set when the survey is started and cannot be changed from here.",
+      "invalid": "One of the answers in this section was refused. Nothing was written — the whole section is saved together or not at all."
+    }
   }
 }

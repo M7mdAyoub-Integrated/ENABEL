@@ -244,6 +244,16 @@ export type SurveyDetail = {
   q30Overridden: boolean
   q31: string | null
   q34: string | null
+  /**
+   * Section D, twelve-month round only.
+   *
+   * `section_d_only_at_12m` keeps these null on any other round, so a six-month
+   * survey reads them as null and the screen refuses to open rather than
+   * offering questions the database will not store.
+   */
+  q37: string | null
+  q38: string | null
+  q40: string | null
   /** followup_answer, keyed by question code. */
   answers: Record<string, { text: string | null; number: number | null; bool: boolean | null }>
   /** followup_answer_option, option ids per question code. */
@@ -299,6 +309,7 @@ export function useSurveyDetail(id: string | undefined) {
             ' q22_volume_change, q26_workers_total, q26_workers_women, q26_workers_under30,' +
             ' q29_selling_change, q30_events_attended, q30_is_overridden,' +
             ' q31_last_event_sales_band, q34_connection_made,' +
+            ' q37_still_engaged, q38_capacity, q40_income_change,' +
             ' person!inner ( full_name, national_id )',
         )
         .eq('id', id!)
@@ -324,6 +335,9 @@ export function useSurveyDetail(id: string | undefined) {
         q30_is_overridden: boolean | null
         q31_last_event_sales_band: string | null
         q34_connection_made: string | null
+        q37_still_engaged: string | null
+        q38_capacity: string | null
+        q40_income_change: string | null
         person: { full_name: string; national_id: string }
       }
 
@@ -436,6 +450,9 @@ export function useSurveyDetail(id: string | undefined) {
         q30Overridden: row.q30_is_overridden ?? false,
         q31: row.q31_last_event_sales_band,
         q34: row.q34_connection_made,
+        q37: row.q37_still_engaged,
+        q38: row.q38_capacity,
+        q40: row.q40_income_change,
         answers,
         options,
         optionOther,
@@ -739,6 +756,90 @@ export function useSaveSectionC() {
         void qc.invalidateQueries({ queryKey: followupKeys.list() })
         // Still a draft, so nothing has moved -- but a stale dashboard figure
         // would be read as this section having done something.
+        void qc.invalidateQueries({ queryKey: ['indicators'] })
+      }
+    },
+  })
+}
+
+/* ── section D ────────────────────────────────────────────────────────────── */
+
+export type SectionDInput = {
+  surveyId: string
+  q37?: string
+  q38?: string
+  q39When?: string
+  q39Options?: string[]
+  q39Other?: string
+  q40?: string
+}
+
+export type SectionDResult = {
+  ok: boolean
+  result:
+    | 'saved'
+    | 'not_found'
+    | 'not_permitted'
+    | 'invalid'
+    /**
+     * The survey is not a twelve-month round, so it has no section D.
+     *
+     * Answered by name rather than as a constraint violation, because the
+     * enumerator cannot fix it from here -- the round is fixed at section 0.
+     * The screen should make this unreachable; a direct link or a tab left open
+     * from a different survey can still get here.
+     */
+    | 'not_twelve_month'
+  survey_id?: string
+  constraint?: string
+  /** On 'not_twelve_month', the round the survey actually has. */
+  round?: FollowupRound
+}
+
+/**
+ * One RPC, one transaction, across three tables.
+ *
+ * ── THIS IS THE SECTION THAT MOVES IMP-0 ──
+ *
+ * Q37 is the whole of it: `v_ind_imp_0` takes twelve-month surveys with a
+ * non-null `q37_still_engaged` as the denominator and `main` or `secondary` as
+ * the numerator. It is the impact indicator the Action Plan is judged on, it is
+ * a percentage, and this file must never compute it -- the answer is written
+ * and the view reads it.
+ *
+ * It moves nothing while the survey is a draft. 0072 made the four survey-fed
+ * views require `submitted` or `approved`, and that was confirmed here by
+ * saving a twelve-month answer and watching IMP-0 stay at a null actual with a
+ * denominator of zero, then flipping the status and watching it appear.
+ *
+ * Q39 is cleared server-side when Q37 is not 'no', so an enumerator who ticks
+ * reasons and then corrects Q37 cannot leave "why did you stop" attached to
+ * someone who did not stop.
+ */
+export function useSaveSectionD() {
+  const qc = useQueryClient()
+  return useMutation({
+    retry: false,
+    mutationFn: async (input: SectionDInput): Promise<SectionDResult> => {
+      const { data, error } = await supabase.rpc('save_followup_section_d', {
+        p_survey_id: input.surveyId,
+        ...(input.q37 ? { p_q37: input.q37 } : {}),
+        ...(input.q38 ? { p_q38: input.q38 } : {}),
+        ...(input.q39When ? { p_q39_when: input.q39When } : {}),
+        ...(input.q39Options?.length ? { p_q39_options: input.q39Options } : {}),
+        ...(input.q39Other ? { p_q39_other: input.q39Other } : {}),
+        ...(input.q40 ? { p_q40: input.q40 } : {}),
+      })
+      if (error) throw toAppError(error)
+      return data as SectionDResult
+    },
+    onSuccess: (res, input) => {
+      if (res.result === 'saved') {
+        void qc.invalidateQueries({ queryKey: followupKeys.one(input.surveyId) })
+        void qc.invalidateQueries({ queryKey: followupKeys.list() })
+        // Still a draft, so IMP-0 has not moved -- but a stale dashboard figure
+        // would be read as this section having done something, and IMP-0 is the
+        // one figure nobody should have to wonder about.
         void qc.invalidateQueries({ queryKey: ['indicators'] })
       }
     },

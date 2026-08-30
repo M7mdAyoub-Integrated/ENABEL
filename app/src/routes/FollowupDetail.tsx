@@ -9,8 +9,12 @@ import { formatShortDate } from '../lib/format'
  *
  * ── WHAT THIS IS RIGHT NOW ──
  *
- * Sections 0, A, B and C exist; D and E do not. This screen shows the draft and
+ * Sections 0, A, B, C and D exist; E does not. This screen shows the draft and
  * says plainly which sections are still to come.
+ *
+ * D is offered only on a twelve-month survey. `twelveOnly` already renders it
+ * as locked-with-a-reason on the others, and giving it a `to` does not change
+ * that -- the button appears only when it is not locked.
  *
  * It deliberately does NOT offer a submit. A survey submitted with five of six
  * sections empty would be counted by A1, B1 and C1 -- 0072 makes them count
@@ -47,7 +51,7 @@ export function FollowupDetail() {
     { key: 'A', done: false, to: `/followups/${survey.id}/a` },
     { key: 'B', done: false, to: `/followups/${survey.id}/b` },
     { key: 'C', done: false, to: `/followups/${survey.id}/c` },
-    { key: 'D', done: false, twelveOnly: true },
+    { key: 'D', done: false, twelveOnly: true, to: `/followups/${survey.id}/d` },
     { key: 'E', done: false },
   ]
 
