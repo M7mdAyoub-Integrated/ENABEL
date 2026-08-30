@@ -592,5 +592,8 @@
     "adviserHelp": "Who in the office dealt with it.",
     "notes": "Notes",
     "village": "Village"
-  }
+  },
+  "notConnectedTag": "Not connected",
+  "notConnectedBody": "This screen is not wired to the database yet. Anything entered here is not saved and does not reach {list}. The records listed are sample data, not real participants.",
+  "notConnectedFoot": "Saving is disabled until this screen is connected."
 }

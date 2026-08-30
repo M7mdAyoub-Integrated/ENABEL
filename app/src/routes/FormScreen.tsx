@@ -158,6 +158,12 @@ export function FormScreen({ mode }: { mode: 'new' | 'edit' }) {
       return { ...cur, [k]: arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v] }
     })
 
+  // A module whose write branch is still the mock IDLE one. rg, ln and fu are
+  // in this state: the list and detail read mocks/data.ts and there is no save
+  // path at all. Named here rather than tested inline, because the submit
+  // button and the warning band must agree.
+  const notConnected = !write.isLive
+
   const backToList = () => navigate(`/forms/${module}`)
 
   const submit = () => {
@@ -170,6 +176,12 @@ export function FormScreen({ mode }: { mode: 'new' | 'edit' }) {
         setStep(step + 1)
         return
       }
+      // Paging through the wizard is allowed -- it is how anyone reviews the
+      // form -- but the terminal action is not, because there is nothing behind
+      // it. Before this, it fired "Submitted - 43 questions" and navigated away
+      // having written no survey at all, while the dashboard showed A1, B1, C1
+      // and IMP-0 as empty.
+      if (notConnected) return
       toast.fire({
         tag: t('common:toast.saved'),
         title: t('survey:submitted'),
@@ -178,6 +190,8 @@ export function FormScreen({ mode }: { mode: 'new' | 'edit' }) {
       backToList()
       return
     }
+
+    if (notConnected) return
 
     if (module === 'tc' || module === 'rg') {
       const a = typeof values['nid'] === 'string' ? values['nid'] : ''
@@ -202,14 +216,17 @@ export function FormScreen({ mode }: { mode: 'new' | 'edit' }) {
       backToList()
     }
 
+    // Only leave the screen once the database has accepted it -- navigating
+    // away on optimism would tell the coordinator a partnership was registered
+    // when RLS had refused it.
+    //
+    // There is deliberately NO else branch. It used to be a bare announce(),
+    // which is what made a module with no save path claim it had saved. A
+    // module without `save` is stopped above, and if one ever reaches here
+    // without it, doing nothing is the right failure.
     if (write.save) {
-      // Live module. Only leave the screen once the database has accepted it --
-      // navigating away on optimism would tell the coordinator a partnership
-      // was registered when RLS had refused it.
       void write.save(values).then(announce, () => undefined)
-      return
     }
-    announce()
   }
 
   const cancel = () => {
@@ -300,6 +317,34 @@ export function FormScreen({ mode }: { mode: 'new' | 'edit' }) {
 
       {write.error ? <WriteError error={write.error} onDismiss={write.reset} /> : null}
 
+      {/*
+        A module whose write is not connected yet.
+
+        `announce()` at the bottom of submit() used to run unconditionally, so a
+        module with `save: null` fired a "Saved" toast naming the indicators it
+        fed, and navigated away, having written nothing. Submit is now disabled
+        for those modules and this band says so before anyone fills the form in.
+
+        Not a tinted notice: the same solid red as a refused save, because the
+        outcome is the same -- nothing is recorded.
+      */}
+      {notConnected ? (
+        <div
+          role="alert"
+          className="mt-[18px] bg-error px-[18px] py-[14px] text-bg"
+        >
+          <div className="font-narrow text-[11.5px] font-bold uppercase tracking-[0.14em]">
+            {t('forms:notConnectedTag')}
+          </div>
+          <p className="m-0 mt-1 max-w-[62ch] text-[15px] font-medium leading-[1.5]">
+            {t('forms:notConnectedBody', {
+              name: t(`nav:module.${module}`),
+              list: indicators,
+            })}
+          </p>
+        </div>
+      ) : null}
+
       {/* A save that did not happen. Solid red band, not a tinted box. */}
       {formError ? (
         <div
@@ -331,15 +376,25 @@ export function FormScreen({ mode }: { mode: 'new' | 'edit' }) {
         <span className="font-narrow text-[12px] font-semibold uppercase tracking-[0.09em] text-muted">
           {isWizard
             ? lastStep
-              ? t('survey:footNoteSubmit')
+              ? notConnected
+                ? t('forms:notConnectedFoot')
+                : t('survey:footNoteSubmit')
               : t('survey:footNoteKeep')
-            : t('forms:footNoteSave', { list: indicators })}
+            : notConnected
+              ? t('forms:notConnectedFoot')
+              : t('forms:footNoteSave', { list: indicators })}
         </span>
         <div className="flex gap-2.5">
           <SecondaryButton onClick={cancel}>
             {isWizard && step > 0 ? `← ${t('survey:back')}` : t('common:actions.cancel')}
           </SecondaryButton>
-          <PrimaryButton onClick={submit} disabled={write.isSaving}>
+          {/* Disabled on the terminal action of a module with no save path, so
+              the refusal is visible before the form is filled in rather than
+              silent after. Stepping through the wizard stays enabled. */}
+          <PrimaryButton
+            onClick={submit}
+            disabled={write.isSaving || (notConnected && (!isWizard || lastStep))}
+          >
             {isWizard
               ? lastStep
                 ? t('survey:submit')
