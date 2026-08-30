@@ -179,5 +179,103 @@
   "footNoteSubmit": "Submitting records all 43 answers against this respondent",
   "footNoteKeep": "Answers are kept as you move between steps",
   "title": "Post-intervention Follow-up",
-  "desc": "Six sections, 43 questions. Answers feed A1, B1, C1 and IMP-0."
+  "desc": "Six sections, 43 questions. Answers feed A1, B1, C1 and IMP-0.",
+  "eyebrow": "Post-intervention",
+  "listTitle": "Follow-up surveys",
+  "listIntro": "Interviews at six and twelve months. Forty-three questions across six sections.",
+  "listNote": "A1, B1, C1 and IMP-0 come from these surveys and count submitted ones only. A draft is an interview in progress and is in no figure.",
+  "startOne": "Start a follow-up",
+  "surveys": "Surveys",
+  "draftCount": "{count, plural, =0 {none in progress} one {# in progress} other {# in progress}}",
+  "emptyTitle": "No follow-ups yet",
+  "emptyBody": "Nothing has been recorded. A1, B1, C1 and IMP-0 stay empty until the first survey is submitted.",
+  "loadFailedTitle": "Could not load the surveys",
+  "loadFailed": "Check your connection and try again.",
+  "notFoundTitle": "Survey not found",
+  "notFoundBody": "This survey does not exist, or it has been withdrawn.",
+  "backToList": "All follow-ups",
+  "round": {
+    "six_month": "Six-month",
+    "twelve_month": "Twelve-month",
+    "annual": "Annual"
+  },
+  "status": {
+    "draft": "In progress",
+    "submitted": "Submitted",
+    "approved": "Approved",
+    "rejected": "Rejected"
+  },
+  "mode": {
+    "telephone": "By telephone",
+    "site_visit": "Visit to their site",
+    "municipal_office": "At the municipal office"
+  },
+  "respondent": {
+    "participant": "Yes — the registered participant",
+    "household_member": "No — a household member answered",
+    "not_reached": "Could not be reached"
+  },
+  "q": {
+    "1": "Who are we speaking to?",
+    "2": "Is the respondent the registered participant?",
+    "3": "Which follow-up round is this?",
+    "4": "Contact details for this interview",
+    "5": "Which municipal support has this person received?",
+    "6": "Which training did they attend?"
+  },
+  "q5": {
+    "training": "Training programme",
+    "guidance": "Guidance on food safety, licensing or packaging",
+    "production": "Production support for a small-scale or family activity",
+    "exhibition": "Participation in a rural market or exhibition",
+    "office": "Advisory service from the technical coordination office",
+    "referral": "Referral or connection to a partner or programme"
+  },
+  "sectionName": {
+    "0": "Identification",
+    "A": "Technical capacity",
+    "B": "Production, food safety and market readiness",
+    "C": "Market access",
+    "D": "Continued engagement",
+    "E": "Closing"
+  },
+  "section0": {
+    "title": "Section 0 — Identification",
+    "intro": "Questions 1 to 6. Finishing this section saves the survey, so nothing after it is lost if you lose signal.",
+    "nationalId": "National ID",
+    "notFound": "No one on file with that national ID. A follow-up can only be recorded against someone the Municipality already knows.",
+    "roundNote": "This decides whether Section D is asked. It is only put to people at the twelve-month round.",
+    "contactDate": "Date of this contact",
+    "contactMode": "How was contact made?",
+    "enumerator": "Enumerator name",
+    "q5Note": "Not asked. Taken from this person's own records — read it back to them and correct it out loud if it is wrong.",
+    "q6Note": "Not asked. Inherited from the training registration.",
+    "notRecorded": "Not recorded anywhere — we cannot tell from the records",
+    "completed": "completed",
+    "notCompleted": "did not complete",
+    "noTrainings": "No training on record for this person.",
+    "savesNote": "This saves the survey and opens the remaining sections. It does not count towards any indicator until the whole survey is submitted.",
+    "begin": "Save and begin",
+    "starting": "Saving…",
+    "cannotStart": "Cannot start",
+    "startFailed": "The survey could not be started. Nothing was saved.",
+    "refused": {
+      "already_exists": "A {round} follow-up already exists for this person, recorded on {date}. There can only be one per round. If it needs changing, open it from the list instead of starting again.",
+      "person_not_found": "No one on file with that national ID.",
+      "bad_national_id": "A national ID is exactly nine digits.",
+      "enumerator_required": "Enter the enumerator's name before starting.",
+      "withdrawn": "This survey was recorded before and the Municipality has withdrawn it. Speak to a coordinator before recording another."
+    }
+  },
+  "detail": {
+    "draftSaved": "Section 0 is saved. Everything from here on updates this survey, so a lost connection costs the section you are on and nothing before it.",
+    "notCounted": "It counts towards nothing yet. A1, B1, C1 and IMP-0 include submitted surveys only.",
+    "sections": "Sections",
+    "sectionLabel": "Section {key}",
+    "done": "Saved",
+    "toCome": "To come",
+    "locked": "Not asked",
+    "lockedWhy": "Section D is put only to people at the twelve-month round. The database refuses those answers on any other round.",
+    "noSubmitYet": "There is no submit button yet, and that is deliberate: submitting with five sections empty would put a survey into four percentages that nothing could tell apart from a real one."
+  }
 }

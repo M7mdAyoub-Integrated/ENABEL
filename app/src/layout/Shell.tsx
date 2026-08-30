@@ -86,7 +86,15 @@ function useNavGroups(): Group[] {
     // it is the only module that is a record of walk-in advice, and B1.2 is the
     // only indicator it feeds.
     { labelKey: 'nav:group.office', items: mod('os', '07') },
-    { labelKey: 'nav:group.followup', items: mod('fu', '07') },
+    {
+      labelKey: 'nav:group.followup',
+      // Its own route, not a /forms module: the survey is used on a phone in a
+      // field and needed screens built for that. Enumerators reach it too, so
+      // it is gated on record.edit rather than on a module list.
+      items: can(role, 'record.edit')
+        ? [{ to: '/followups', labelKey: 'nav:followups', num: '07' } as Dest]
+        : [],
+    },
     {
       labelKey: 'nav:group.noForm',
       items: can(role, 'manual.view')

@@ -22,6 +22,9 @@ import LinkageRequest from './routes/public/LinkageRequest'
 import MyApplications from './routes/public/MyApplications'
 import LinkageQueue from './routes/LinkageQueue'
 import LinkageDirect from './routes/LinkageDirect'
+import FollowupList from './routes/FollowupList'
+import FollowupStart from './routes/FollowupStart'
+import FollowupDetail from './routes/FollowupDetail'
 import LinkageMatch from './routes/LinkageMatch'
 import SessionList from './routes/SessionList'
 import SessionNew from './routes/SessionNew'
@@ -136,8 +139,8 @@ const router = createBrowserRouter([
       // splat scores LOWER than a route ending in a static segment, so
       // `/forms/:module/new` beat `/forms/rg/*` and the retired form kept
       // rendering. Verified by following the URL, not by reading the config.
-      ...(['rg', 'ln'] as const).flatMap((m) => {
-        const to = m === 'rg' ? '/forms/ex' : '/linkage-requests'
+      ...(['rg', 'ln', 'fu'] as const).flatMap((m) => {
+        const to = m === 'rg' ? '/forms/ex' : m === 'ln' ? '/linkage-requests' : '/followups'
         return [`/forms/${m}`, `/forms/${m}/new`, `/forms/${m}/:id`, `/forms/${m}/:id/edit`].map(
           (path) => ({ path, element: <Navigate to={to} replace /> }),
         )
@@ -248,6 +251,27 @@ const router = createBrowserRouter([
       {
         path: '/sessions/:id',
         element: guard(<SessionDetail />, (n) => (
+          <RequireCapability capability="record.edit">{n}</RequireCapability>
+        )),
+      },
+      // The follow-up survey. Its own screens rather than the generic form
+      // wizard: an enumerator uses this standing in a field on a phone, and the
+      // module shell is built for someone at a desk.
+      {
+        path: '/followups',
+        element: guard(<FollowupList />, (n) => (
+          <RequireCapability capability="record.edit">{n}</RequireCapability>
+        )),
+      },
+      {
+        path: '/followups/new',
+        element: guard(<FollowupStart />, (n) => (
+          <RequireCapability capability="record.create">{n}</RequireCapability>
+        )),
+      },
+      {
+        path: '/followups/:id',
+        element: guard(<FollowupDetail />, (n) => (
           <RequireCapability capability="record.edit">{n}</RequireCapability>
         )),
       },

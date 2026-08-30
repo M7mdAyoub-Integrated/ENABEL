@@ -3547,6 +3547,10 @@ export type Database = {
         Returns: Database["public"]["Enums"]["app_role_t"]
       }
       followup_prefill: { Args: { p_national_id: string }; Returns: Json }
+      followup_prefill_for_staff: {
+        Args: { p_national_id: string }
+        Returns: Json
+      }
       indicator_figures: {
         Args: {
           p_age_bands?: string[]
@@ -3640,6 +3644,18 @@ export type Database = {
         Returns: Json
       }
       snapshot_period: { Args: { p_period_code: string }; Returns: number }
+      start_followup: {
+        Args: {
+          p_client_uuid?: string
+          p_contact_date: string
+          p_contact_mode: Database["public"]["Enums"]["contact_mode_t"]
+          p_enumerator_name: string
+          p_national_id: string
+          p_respondent: Database["public"]["Enums"]["respondent_t"]
+          p_round: Database["public"]["Enums"]["followup_round_t"]
+        }
+        Returns: Json
+      }
       training_session_delete_impact: {
         Args: { p_session_id: string }
         Returns: {
