@@ -10,6 +10,7 @@ import { useModuleDetail } from '../data/moduleDetail'
 import { useDeletePartnership } from '../data/partnerships'
 import { useDeleteExhibition } from '../data/exhibitions'
 import { useDeleteCompletion } from '../data/completions'
+import { useDeleteOfficeService } from '../data/officeServices'
 import { DetailSkeleton, ErrorState, WriteError } from '../ui/states'
 import { BidiIsolate } from '../components/BidiIsolate'
 import {
@@ -60,6 +61,7 @@ export function DetailScreen() {
   const delProduction = useDeletePartnership('production_support')
   const delExhibition = useDeleteExhibition()
   const delCompletion = useDeleteCompletion()
+  const delOffice = useDeleteOfficeService()
   const liveDelete =
     module === 'tp'
       ? delTraining
@@ -69,7 +71,13 @@ export function DetailScreen() {
           ? delExhibition
           : module === 'tc'
             ? delCompletion
-            : null
+            // `os` was missing here when the module was built, so deleting an
+            // office visit fell through to the session-local mock remove and
+            // fired a "Deleted" toast while B1.2 did not move. That is the
+            // exact failure the comment above this map already warned about.
+            : module === 'os'
+              ? delOffice
+              : null
 
   if (!valid) return <NotFound />
   if (detail.isLoading) {

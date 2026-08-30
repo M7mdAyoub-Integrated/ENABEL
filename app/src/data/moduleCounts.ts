@@ -38,6 +38,31 @@ function useLiveCount(module: 'tp' | 'pp', enabled: boolean) {
   })
 }
 
+/**
+ * Exhibitions and training completions.
+ *
+ * Both modules went live without their badge following, so the rail read
+ * "Exhibitions 4" beside a list showing "2 OF 2" and "Training completion 6"
+ * beside "5 OF 5" -- the exact inconsistency the note on useNavCounts warns
+ * about, sitting in the navigation for weeks.
+ */
+function useSimpleCount(
+  key: string,
+  table: 'exhibition' | 'training_enrolment',
+) {
+  return useQuery({
+    queryKey: [key, 'count'],
+    queryFn: async (): Promise<number> => {
+      const res = await supabase
+        .from(table)
+        .select('id', { count: 'exact', head: true })
+        .is('deleted_at', null)
+      if (res.error) throw toAppError(res.error)
+      return res.count ?? 0
+    },
+  })
+}
+
 /** Visits recorded by the coordination office. See the note in useNavCounts. */
 function useOfficeCount() {
   return useQuery({
@@ -67,11 +92,15 @@ export function useNavCounts(): Record<ModuleId, number> {
   const tp = useLiveCount('tp', true)
   const pp = useLiveCount('pp', true)
   const os = useOfficeCount()
+  const ex = useSimpleCount('exhibitions', 'exhibition')
+  const tc = useSimpleCount('completions', 'training_enrolment')
 
   return {
     ...mock,
     tp: tp.data ?? mock.tp,
     pp: pp.data ?? mock.pp,
+    ex: ex.data ?? mock.ex,
+    tc: tc.data ?? mock.tc,
     // Counts VISITS, not people. B1.2 counts people, and the two differ the
     // moment anyone comes twice -- so this number must never be read as B1.2.
     os: os.data ?? mock.os,

@@ -21,6 +21,7 @@ import ApplyForm from './routes/public/ApplyForm'
 import LinkageRequest from './routes/public/LinkageRequest'
 import MyApplications from './routes/public/MyApplications'
 import LinkageQueue from './routes/LinkageQueue'
+import LinkageDirect from './routes/LinkageDirect'
 import LinkageMatch from './routes/LinkageMatch'
 import SessionList from './routes/SessionList'
 import SessionNew from './routes/SessionNew'
@@ -127,6 +128,20 @@ const router = createBrowserRouter([
           <RequireCapability capability="dashboard.view">{n}</RequireCapability>
         )),
       },
+      // rg and ln are retired. A link removed from the sidebar is still a live
+      // URL in someone's bookmarks, and these two fake-saved -- so they
+      // redirect to the screen that actually does the work rather than 404.
+      //
+      // Each concrete shape is spelled out rather than using `/forms/rg/*`. A
+      // splat scores LOWER than a route ending in a static segment, so
+      // `/forms/:module/new` beat `/forms/rg/*` and the retired form kept
+      // rendering. Verified by following the URL, not by reading the config.
+      ...(['rg', 'ln'] as const).flatMap((m) => {
+        const to = m === 'rg' ? '/forms/ex' : '/linkage-requests'
+        return [`/forms/${m}`, `/forms/${m}/new`, `/forms/${m}/:id`, `/forms/${m}/:id/edit`].map(
+          (path) => ({ path, element: <Navigate to={to} replace /> }),
+        )
+      }),
       {
         path: '/forms/:module',
         element: guard(<ListScreen />, (n) => <RequireModule>{n}</RequireModule>),
@@ -196,6 +211,14 @@ const router = createBrowserRouter([
         path: '/linkage-requests',
         element: guard(<LinkageQueue />, (n) => (
           <RequireCapability capability="record.edit">{n}</RequireCapability>
+        )),
+      },
+      // A linkage brokered in person, with no public request behind it. Before
+      // 0073 the website was the only way into C1.2.
+      {
+        path: '/linkage-requests/new',
+        element: guard(<LinkageDirect />, (n) => (
+          <RequireCapability capability="record.create">{n}</RequireCapability>
         )),
       },
       {

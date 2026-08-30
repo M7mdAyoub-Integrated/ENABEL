@@ -74,6 +74,16 @@ export function LinkageQueue() {
         eyebrow={t('forms:linkageAdmin.eyebrow')}
         title={t('forms:linkageAdmin.queueTitle')}
         description={t('forms:linkageAdmin.queueIntro')}
+        action={
+          // Most linkages are not requested through the website. Without this
+          // the only path into C1.2 was a public form.
+          <Link
+            to="/linkage-requests/new"
+            className="inline-flex min-h-12 items-center bg-ink px-5 font-narrow text-[12.5px] font-bold uppercase tracking-[0.12em] text-bg no-underline hover:text-bg"
+          >
+            {t('forms:linkageDirect.record')}
+          </Link>
+        }
       />
 
       <div className="mt-8">

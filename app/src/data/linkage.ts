@@ -9,10 +9,16 @@ import { normaliseNationalId, normalisePhone } from './apply'
  *
  *  ── NOTHING HERE DECIDES ANYTHING ──
  *
- *  Both writes go through an RPC, and both RPCs hold the rules:
+ *  Every write goes through an RPC, and the RPCs hold the rules:
  *
- *    request_linkage        0066  who may ask, and how a failure is worded
- *    match_linkage_request  0067  what a match creates, in one transaction
+ *    request_linkage           0066  who may ask, and how a failure is worded
+ *    match_linkage_request     0067  what a match creates, in one transaction
+ *    create_direct_linkage     0073  the same, for a linkage brokered in person
+ *
+ *  0073 pulled the shared part of the last two into attach_or_create_linkage,
+ *  so the duplicate-initiative refusal is ONE rule rather than two copies. A
+ *  linkage made at a meeting is not a lesser record than one that came through
+ *  the website, and until 0073 the website was the only way in.
  *
  *  This file must not acquire a rule of its own. In particular it does NOT
  *  decide whether someone has completed an advisory, and it does NOT decide
@@ -550,6 +556,82 @@ export function useSetLinkageStatus() {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: linkageKeys.all })
       void qc.invalidateQueries({ queryKey: ['indicators'] })
+    },
+  })
+}
+
+/* ── a linkage brokered in person ─────────────────────────────────────────── */
+
+/**
+ * Every outcome `create_direct_linkage` can return. No default branch.
+ *
+ * `needs_initiative_choice` and `initiative_not_theirs` are the SAME refusals
+ * matching returns, from the same function -- 0073 extracted
+ * `attach_or_create_linkage` so the rule that protects C1.2 exists once rather
+ * than in two copies free to drift.
+ */
+export type DirectOutcome =
+  | 'linked'
+  | 'bad_national_id'
+  | 'person_not_found'
+  | 'scope_required'
+  | 'partnership_not_found'
+  | 'initiative_not_theirs'
+  | 'initiative_details_required'
+  | 'needs_initiative_choice'
+
+export type DirectResult = {
+  ok: boolean
+  result: DirectOutcome
+  initiative_id?: string
+  linkage_id?: string
+  initiative_created?: boolean
+  linkage_status?: LinkStatus
+  existing_initiatives?: number
+}
+
+export type DirectInput = {
+  nationalId: string
+  partnershipId: string
+  scope: string
+  /** Attach to this initiative. Omitted means "create a new one". */
+  initiativeId?: string
+  /** Only ever set by a click, never to get past a refusal. */
+  createNewInitiative?: boolean
+  initiativeTitle?: string
+  activityTypeId?: string
+  mainProduct?: string
+  linkedOn?: string
+  note?: string
+}
+
+export function useCreateDirectLinkage() {
+  const qc = useQueryClient()
+  return useMutation({
+    retry: false,
+    mutationFn: async (input: DirectInput): Promise<DirectResult> => {
+      const { data, error } = await supabase.rpc('create_direct_linkage', {
+        p_national_id: input.nationalId.replace(/\D/g, '').slice(0, 9),
+        p_partnership_id: input.partnershipId,
+        p_scope: input.scope.trim(),
+        ...(input.initiativeId ? { p_initiative_id: input.initiativeId } : {}),
+        ...(input.createNewInitiative ? { p_create_new_initiative: true } : {}),
+        ...(input.initiativeTitle?.trim()
+          ? { p_initiative_title: input.initiativeTitle.trim() }
+          : {}),
+        ...(input.activityTypeId ? { p_activity_type_id: input.activityTypeId } : {}),
+        ...(input.mainProduct?.trim() ? { p_main_product: input.mainProduct.trim() } : {}),
+        ...(input.linkedOn ? { p_linked_on: input.linkedOn } : {}),
+        ...(input.note?.trim() ? { p_note: input.note.trim() } : {}),
+      })
+      if (error) throw toAppError(error)
+      return data as DirectResult
+    },
+    onSuccess: (res) => {
+      if (res.result === 'linked') {
+        void qc.invalidateQueries({ queryKey: linkageKeys.all })
+        void qc.invalidateQueries({ queryKey: ['indicators'] })
+      }
     },
   })
 }

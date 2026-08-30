@@ -122,8 +122,14 @@ const MODULE_ACCESS: Record<Role, readonly ModuleId[]> = {
   // `os` is coordinator-only for now, as specified. The office-staff role does
   // not exist yet; when it does, adding it is a line here plus a policy, because
   // office_service already uses the same is_staff() shape as everything else.
-  coordinator: ['tp', 'pp', 'tc', 'ln', 'ex', 'rg', 'fu', 'os'],
-  data_entry: ['tp', 'pp', 'tc', 'ln', 'ex', 'rg', 'fu'],
+  //
+  // `rg` and `ln` are DELIBERATELY ABSENT. Both were Phase 4 mock screens that
+  // duplicated newer live ones -- registrations are decided on /exhibitions/:id
+  // and linkages on /linkage-requests -- and both fired a "Saved" toast naming
+  // the indicator they fed while writing nothing. They stay in MODULE_IDS so
+  // the redirects in App.tsx keep working and nothing else has to be unpicked.
+  coordinator: ['tp', 'pp', 'tc', 'ex', 'fu', 'os'],
+  data_entry: ['tp', 'pp', 'tc', 'ex', 'fu'],
   enumerator: ['fu'],
   partner_viewer: [],
   participant: [],

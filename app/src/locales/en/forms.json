@@ -310,7 +310,8 @@
     "ex": "E0.1 drops by one if the event had already been held. This cannot be undone.",
     "tc": "A1.3 and D0.1 are recalculated in the next quarterly return. This cannot be undone.",
     "rg": "E0.2 is recalculated in the next quarterly return. This cannot be undone.",
-    "fu": "A1, B1, C1 and IMP-0 are recalculated in the next quarterly return. This cannot be undone."
+    "fu": "A1, B1, C1 and IMP-0 are recalculated in the next quarterly return. This cannot be undone.",
+    "os": "B1.2 counts distinct people reaching office services. Removing this visit only changes the figure if it was that person’s only one."
   },
   "saveChanges": "Save changes",
   "session": {
@@ -595,5 +596,26 @@
   },
   "notConnectedTag": "Not connected",
   "notConnectedBody": "This screen is not wired to the database yet. Anything entered here is not saved and does not reach {list}. The records listed are sample data, not real participants.",
-  "notConnectedFoot": "Saving is disabled until this screen is connected."
+  "notConnectedFoot": "Saving is disabled until this screen is connected.",
+  "linkageDirect": {
+    "title": "Record a linkage",
+    "intro": "For a linkage the Municipality made in person — a buyer mentioned at a meeting, an introduction at a market. It creates the same records a matched request does.",
+    "noGateNote": "A public linkage request requires a completed advisory, because that gate is about who may ask. This screen has no such condition: it records something that already happened, and refusing to write it down would lose real programme activity.",
+    "nationalId": "Producer's national ID",
+    "nationalIdHint": "Nine digits. The producer must already be on file.",
+    "notFound": "No producer on file with that national ID. Check the number, or record their first activity before linking them.",
+    "initiativeTitle": "What they produce",
+    "activityType": "Type of activity",
+    "mainProduct": "Main product",
+    "theLinkage": "The linkage",
+    "note": "Note",
+    "noteHint": "How the connection came about. Optional.",
+    "record": "Record a linkage",
+    "linkageCount": "{count, plural, one {# linkage} other {# linkages}}",
+    "refused": {
+      "person_not_found": "No producer on file with that national ID.",
+      "bad_national_id": "A national ID is exactly nine digits.",
+      "initiative_details_required": "A new initiative needs a title and an activity type."
+    }
+  }
 }

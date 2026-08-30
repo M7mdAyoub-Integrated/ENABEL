@@ -152,8 +152,8 @@ export const REF_PRODUCER_TYPE: RefRow[] = [
 export const PEOPLE: Person[] = [
   {
     ...base('p1', '2026-03-11T15:40:00Z'),
-    national_id: '991200447',
-    full_name: 'Aisha Al-Zoubi',
+    national_id: '300000011',
+    full_name: 'Demo Person Eleven',
     sex: 'female',
     date_of_birth: null,
     age_recorded: 34,
@@ -169,8 +169,8 @@ export const PEOPLE: Person[] = [
   },
   {
     ...base('p2', '2026-03-18T12:05:00Z'),
-    national_id: '988145520',
-    full_name: 'Khaled Obeidat',
+    national_id: '300000012',
+    full_name: 'Demo Person Twelve',
     sex: 'male',
     date_of_birth: null,
     age_recorded: 41,
@@ -186,8 +186,8 @@ export const PEOPLE: Person[] = [
   },
   {
     ...base('p3', '2026-04-02T09:20:00Z'),
-    national_id: '200311498',
-    full_name: 'Noor Al-Rousan',
+    national_id: '300000013',
+    full_name: 'Demo Person Thirteen',
     sex: 'female',
     date_of_birth: null,
     age_recorded: 27,
@@ -203,8 +203,8 @@ export const PEOPLE: Person[] = [
   },
   {
     ...base('p4', '2026-04-09T14:55:00Z'),
-    national_id: '977230146',
-    full_name: 'Yousef Al-Momani',
+    national_id: '300000014',
+    full_name: 'Demo Person Fourteen',
     sex: 'male',
     date_of_birth: null,
     age_recorded: 52,
@@ -220,8 +220,8 @@ export const PEOPLE: Person[] = [
   },
   {
     ...base('p5', '2026-04-23T11:10:00Z'),
-    national_id: '200455712',
-    full_name: 'Maryam Haddad',
+    national_id: '300000015',
+    full_name: 'Demo Person Fifteen',
     sex: 'female',
     date_of_birth: null,
     age_recorded: 23,
@@ -237,8 +237,8 @@ export const PEOPLE: Person[] = [
   },
   {
     ...base('p6', '2026-05-07T16:30:00Z'),
-    national_id: '984117603',
-    full_name: 'Omar Al-Sharif',
+    national_id: '300000016',
+    full_name: 'Demo Person Sixteen',
     sex: 'male',
     date_of_birth: null,
     age_recorded: 38,
@@ -294,7 +294,7 @@ export const PARTNERS: Partner[] = [
     ...base('pt4', '2026-03-21T15:25:00Z'),
     name: 'Zikra Initiative',
     unit: null,
-    contact_person: 'Lina Haddad',
+    contact_person: 'Demo Contact One',
     phone: '079 118 7742',
     email: 'lina@zikra.jo',
   },
@@ -310,7 +310,7 @@ export const PARTNERS: Partner[] = [
     ...base('pt6', '2026-04-20T14:20:00Z'),
     name: 'Sahel Horan Dairy Processing Facility',
     unit: null,
-    contact_person: 'Mahmoud Al-Sharif',
+    contact_person: 'Demo Contact Two',
     phone: '078 445 9012',
     email: 'info@shdairy.jo',
   },
@@ -318,7 +318,7 @@ export const PARTNERS: Partner[] = [
     ...base('pt7', '2026-05-11T10:45:00Z'),
     name: 'Cities and Villages Development Bank',
     unit: null,
-    contact_person: 'Reem Qudah',
+    contact_person: 'Demo Contact Three',
     phone: '079 550 2288',
     email: 'r.qudah@cvdb.jo',
   },
@@ -918,8 +918,8 @@ export const REGISTRATIONS: ExhibitionRegistration[] = [
 
 /** Producers who registered but never went through Training Completion. */
 export const EXTERNAL_PRODUCERS: Record<string, { national_id: string; full_name: string; phone: string }> = {
-  p7_external: { national_id: '200188034', full_name: 'Fatima Al-Khalidi', phone: '078 774 2210' },
-  p8_external: { national_id: '979442015', full_name: 'Ahmad Al-Bataineh', phone: '079 663 5518' },
+  p7_external: { national_id: '300000017', full_name: 'Demo Person Seventeen', phone: '078 774 2210' },
+  p8_external: { national_id: '300000018', full_name: 'Demo Person Eighteen', phone: '079 663 5518' },
 }
 
 /** Products per registration (exhibition_registration_product junction). */

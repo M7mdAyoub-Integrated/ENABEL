@@ -136,7 +136,7 @@ This is a real municipality with a real donor. If a definition is ambiguous, sto
 
 ## Checks that verify shape, not substance
 
-This has now happened five times, in five unrelated parts of the project. It is
+This has now happened six times, in six unrelated parts of the project. It is
 one failure mode, and it is worth naming because every instance looked fine.
 
 | | what existed | what was missing |
@@ -146,6 +146,7 @@ one failure mode, and it is worth naming because every instance looked fine.
 | Comments in `format.ts`, `glyphs.ts` | a comment describing the behaviour | the behaviour, anywhere |
 | `locales/ar/indicators.json` | all 20 `name.*` keys present | Arabic — every value is the English string |
 | `objective.os`, `cta.os`, `description.os`, `filterAll.os` | a module wired end to end, compiling, typed, linted | the four keys themselves — the page rendered `description.os` as literal text |
+| The four survey views | `status` present in all four definitions, and an `ilike '%status%'` returning true | any `WHERE` on it — the word was in the subquery's *column list*, so a draft survey counted |
 
 In each case the thing that would normally be checked *was there*. The file
 existed. The key existed. The comment existed. The translation key existed. Any
@@ -161,6 +162,19 @@ Nothing ever asked whether the **content** was real.
 
 > **The test for any check: could this pass while the thing it checks is wrong?**
 > If yes, it is not a check.
+
+The sixth is the one to remember, because the check was a deliberate act rather
+than an oversight. Someone asked "do the survey views filter `status`?", ran
+`ilike '%status%'` against `pg_get_viewdef`, got `true` on all four, and moved
+on. The word was there. The filter was not — `select s.*` puts every column
+name into the definition text, so the pattern matched the subquery's column
+list. A grep for a column name can never distinguish a filter from a mention.
+
+> **Searching a view definition for a column name tells you the column exists,
+> not that anything is done with it.** Read the `WHERE`, or test the behaviour:
+> insert a row in the state that should be excluded and confirm the figure does
+> not move — and then flip it to the state that should be included and confirm
+> it does. One direction alone passes against a view that counts nothing.
 
 What that means in practice:
 

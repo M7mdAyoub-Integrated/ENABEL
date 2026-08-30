@@ -3502,6 +3502,21 @@ export type Database = {
         }
         Returns: Json
       }
+      attach_or_create_linkage: {
+        Args: {
+          p_activity_type_id: string
+          p_create_new_initiative: boolean
+          p_initiative_id: string
+          p_initiative_title: string
+          p_linked_on: string
+          p_main_product: string
+          p_partnership_id: string
+          p_person_id: string
+          p_request: string
+          p_scope: string
+        }
+        Returns: Json
+      }
       attach_updated_at: { Args: { p_table: string }; Returns: undefined }
       bump_lookup_throttle: {
         Args: {
@@ -3511,6 +3526,21 @@ export type Database = {
           p_window: string
         }
         Returns: boolean
+      }
+      create_direct_linkage: {
+        Args: {
+          p_activity_type_id?: string
+          p_create_new_initiative?: boolean
+          p_initiative_id?: string
+          p_initiative_title?: string
+          p_linked_on?: string
+          p_main_product?: string
+          p_national_id: string
+          p_note?: string
+          p_partnership_id: string
+          p_scope: string
+        }
+        Returns: Json
       }
       current_role: {
         Args: never
