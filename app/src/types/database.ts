@@ -934,10 +934,10 @@ export type Database = {
           id: string
           person_id: string
           q08_applied_knowledge: string | null
-          q14_used_office: boolean | null
+          q14_used_office: string | null
           q16_advice_useful: string | null
           q17_activity_status: string | null
-          q18_started_after_support: boolean | null
+          q18_started_after_support: string | null
           q22_volume_change: string | null
           q26_workers_total: number | null
           q26_workers_under30: number | null
@@ -967,10 +967,10 @@ export type Database = {
           id?: string
           person_id: string
           q08_applied_knowledge?: string | null
-          q14_used_office?: boolean | null
+          q14_used_office?: string | null
           q16_advice_useful?: string | null
           q17_activity_status?: string | null
-          q18_started_after_support?: boolean | null
+          q18_started_after_support?: string | null
           q22_volume_change?: string | null
           q26_workers_total?: number | null
           q26_workers_under30?: number | null
@@ -1000,10 +1000,10 @@ export type Database = {
           id?: string
           person_id?: string
           q08_applied_knowledge?: string | null
-          q14_used_office?: boolean | null
+          q14_used_office?: string | null
           q16_advice_useful?: string | null
           q17_activity_status?: string | null
-          q18_started_after_support?: boolean | null
+          q18_started_after_support?: string | null
           q22_volume_change?: string | null
           q26_workers_total?: number | null
           q26_workers_under30?: number | null
@@ -2233,6 +2233,48 @@ export type Database = {
         }
         Relationships: []
       }
+      ref_compliance_obstacle: {
+        Row: {
+          allows_free_text: boolean
+          code: string
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          is_active: boolean
+          label_ar: string
+          label_en: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          allows_free_text?: boolean
+          code: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          label_ar: string
+          label_en: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          allows_free_text?: boolean
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          label_ar?: string
+          label_en?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ref_disability_type: {
         Row: {
           allows_free_text: boolean
@@ -2317,6 +2359,48 @@ export type Database = {
         }
         Relationships: []
       }
+      ref_market_improvement: {
+        Row: {
+          allows_free_text: boolean
+          code: string
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          is_active: boolean
+          label_ar: string
+          label_en: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          allows_free_text?: boolean
+          code: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          label_ar: string
+          label_en: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          allows_free_text?: boolean
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          label_ar?: string
+          label_en?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ref_nationality: {
         Row: {
           allows_free_text: boolean
@@ -2353,6 +2437,48 @@ export type Database = {
           id?: string
           is_active?: boolean
           label_ar?: string | null
+          label_en?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ref_nonapply_reason: {
+        Row: {
+          allows_free_text: boolean
+          code: string
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          is_active: boolean
+          label_ar: string
+          label_en: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          allows_free_text?: boolean
+          code: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          label_ar: string
+          label_en: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          allows_free_text?: boolean
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          label_ar?: string
           label_en?: string
           sort_order?: number
           updated_at?: string
@@ -2569,6 +2695,48 @@ export type Database = {
         }
         Relationships: []
       }
+      ref_practice_change: {
+        Row: {
+          allows_free_text: boolean
+          code: string
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          is_active: boolean
+          label_ar: string
+          label_en: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          allows_free_text?: boolean
+          code: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          label_ar: string
+          label_en: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          allows_free_text?: boolean
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          label_ar?: string
+          label_en?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ref_producer_type: {
         Row: {
           allows_free_text: boolean
@@ -2779,6 +2947,48 @@ export type Database = {
         }
         Relationships: []
       }
+      ref_selling_barrier: {
+        Row: {
+          allows_free_text: boolean
+          code: string
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          is_active: boolean
+          label_ar: string
+          label_en: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          allows_free_text?: boolean
+          code: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          label_ar: string
+          label_en: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          allows_free_text?: boolean
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          label_ar?: string
+          label_en?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ref_stakeholder_type: {
         Row: {
           allows_free_text: boolean
@@ -2815,6 +3025,132 @@ export type Database = {
           id?: string
           is_active?: boolean
           label_ar?: string | null
+          label_en?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ref_stop_reason: {
+        Row: {
+          allows_free_text: boolean
+          code: string
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          is_active: boolean
+          label_ar: string
+          label_en: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          allows_free_text?: boolean
+          code: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          label_ar: string
+          label_en: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          allows_free_text?: boolean
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          label_ar?: string
+          label_en?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ref_support_need: {
+        Row: {
+          allows_free_text: boolean
+          code: string
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          is_active: boolean
+          label_ar: string
+          label_en: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          allows_free_text?: boolean
+          code: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          label_ar: string
+          label_en: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          allows_free_text?: boolean
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          label_ar?: string
+          label_en?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ref_survey_activity: {
+        Row: {
+          allows_free_text: boolean
+          code: string
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          is_active: boolean
+          label_ar: string
+          label_en: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          allows_free_text?: boolean
+          code: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          label_ar: string
+          label_en: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          allows_free_text?: boolean
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          label_ar?: string
           label_en?: string
           sort_order?: number
           updated_at?: string
@@ -3640,6 +3976,23 @@ export type Database = {
           p_national_id: string
           p_phone?: string
           p_request: string
+        }
+        Returns: Json
+      }
+      save_followup_section_a: {
+        Args: {
+          p_q10?: string
+          p_q11_options?: string[]
+          p_q12?: string
+          p_q13?: string
+          p_q14?: string
+          p_q15_count?: number
+          p_q15_options?: string[]
+          p_q16?: string
+          p_q7?: string
+          p_q8?: string
+          p_q9_options?: string[]
+          p_survey_id: string
         }
         Returns: Json
       }

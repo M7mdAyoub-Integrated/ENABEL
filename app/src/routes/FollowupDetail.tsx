@@ -42,9 +42,9 @@ export function FollowupDetail() {
     )
   }
 
-  const SECTIONS = [
+  const SECTIONS: { key: string; done: boolean; twelveOnly?: boolean; to?: string }[] = [
     { key: '0', done: true },
-    { key: 'A', done: false },
+    { key: 'A', done: false, to: `/followups/${survey.id}/a` },
     { key: 'B', done: false },
     { key: 'C', done: false },
     { key: 'D', done: false, twelveOnly: true },
@@ -89,17 +89,27 @@ export function FollowupDetail() {
                 <span className="min-w-0 flex-1 text-[15px] text-ink">
                   {t(`survey:sectionName.${s.key}`)}
                 </span>
-                <span
-                  className={`whitespace-nowrap font-narrow text-[11px] font-bold uppercase tracking-[0.1em] ${
-                    s.done ? 'text-success' : locked ? 'text-muted' : 'text-warning'
-                  }`}
-                >
-                  {s.done
-                    ? t('survey:detail.done')
-                    : locked
-                      ? t('survey:detail.locked')
-                      : t('survey:detail.toCome')}
-                </span>
+                {s.to && !locked ? (
+                  <button
+                    type="button"
+                    onClick={() => navigate(s.to as string)}
+                    className="whitespace-nowrap border-[1.5px] border-ink px-3 py-1 font-narrow text-[11px] font-bold uppercase tracking-[0.1em] text-ink hover:bg-sunken"
+                  >
+                    {t('survey:detail.open')}
+                  </button>
+                ) : (
+                  <span
+                    className={`whitespace-nowrap font-narrow text-[11px] font-bold uppercase tracking-[0.1em] ${
+                      s.done ? 'text-success' : locked ? 'text-muted' : 'text-warning'
+                    }`}
+                  >
+                    {s.done
+                      ? t('survey:detail.done')
+                      : locked
+                        ? t('survey:detail.locked')
+                        : t('survey:detail.toCome')}
+                  </span>
+                )}
                 {locked ? (
                   <span className="w-full text-[13px] leading-[1.45] text-muted">
                     {t('survey:detail.lockedWhy')}

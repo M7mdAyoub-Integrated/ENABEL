@@ -25,6 +25,7 @@ import LinkageDirect from './routes/LinkageDirect'
 import FollowupList from './routes/FollowupList'
 import FollowupStart from './routes/FollowupStart'
 import FollowupDetail from './routes/FollowupDetail'
+import FollowupSectionA from './routes/FollowupSectionA'
 import LinkageMatch from './routes/LinkageMatch'
 import SessionList from './routes/SessionList'
 import SessionNew from './routes/SessionNew'
@@ -267,6 +268,12 @@ const router = createBrowserRouter([
         path: '/followups/new',
         element: guard(<FollowupStart />, (n) => (
           <RequireCapability capability="record.create">{n}</RequireCapability>
+        )),
+      },
+      {
+        path: '/followups/:id/a',
+        element: guard(<FollowupSectionA />, (n) => (
+          <RequireCapability capability="record.edit">{n}</RequireCapability>
         )),
       },
       {

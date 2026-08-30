@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import { toAppError, unwrapList } from './errors'
 import { normaliseNationalId } from './apply'
@@ -207,6 +207,173 @@ export function useFollowups() {
         status: r.status,
         enumeratorName: r.enumerator_name,
       }))
+    },
+  })
+}
+
+/* ── one survey, with the answers already given ───────────────────────────── */
+
+export type SurveyDetail = {
+  id: string
+  personName: string
+  nationalId: string
+  round: FollowupRound
+  contactDate: string
+  status: string
+  /** followup_survey's own answer columns. */
+  q08: string | null
+  q14: string | null
+  q16: string | null
+  /** followup_answer, keyed by question code. */
+  answers: Record<string, { text: string | null; number: number | null; bool: boolean | null }>
+  /** followup_answer_option, option ids per question code. */
+  options: Record<string, string[]>
+}
+
+/**
+ * Everything section A needs to reopen with what was already answered.
+ *
+ * Three reads rather than one: the survey, its answers and its options are
+ * three tables and PostgREST embeds would not make them one round trip anyway.
+ * They are separate queries so a slow one cannot block the section rendering.
+ */
+export function useSurveyDetail(id: string | undefined) {
+  return useQuery({
+    queryKey: followupKeys.one(id ?? ''),
+    enabled: !!id,
+    queryFn: async (): Promise<SurveyDetail> => {
+      const s = await supabase
+        .from('followup_survey')
+        .select(
+          'id, round, contact_date, status, q08_applied_knowledge, q14_used_office,' +
+            ' q16_advice_useful, person!inner ( full_name, national_id )',
+        )
+        .eq('id', id!)
+        .is('deleted_at', null)
+        .single()
+      if (s.error) throw toAppError(s.error)
+      const row = s.data as unknown as {
+        id: string
+        round: FollowupRound
+        contact_date: string
+        status: string
+        q08_applied_knowledge: string | null
+        q14_used_office: string | null
+        q16_advice_useful: string | null
+        person: { full_name: string; national_id: string }
+      }
+
+      const a = await supabase
+        .from('followup_answer')
+        .select('question_code, value_text, value_number, value_boolean')
+        .eq('survey_id', id!)
+      if (a.error) throw toAppError(a.error)
+
+      const o = await supabase
+        .from('followup_answer_option')
+        .select('question_code, option_id')
+        .eq('survey_id', id!)
+      if (o.error) throw toAppError(o.error)
+
+      const answers: SurveyDetail['answers'] = {}
+      for (const r of (a.data ?? []) as {
+        question_code: string
+        value_text: string | null
+        value_number: number | null
+        value_boolean: boolean | null
+      }[]) {
+        answers[r.question_code] = {
+          text: r.value_text,
+          number: r.value_number,
+          bool: r.value_boolean,
+        }
+      }
+
+      const options: SurveyDetail['options'] = {}
+      for (const r of (o.data ?? []) as { question_code: string; option_id: string }[]) {
+        ;(options[r.question_code] ??= []).push(r.option_id)
+      }
+
+      return {
+        id: row.id,
+        personName: row.person.full_name,
+        nationalId: row.person.national_id,
+        round: row.round,
+        contactDate: row.contact_date,
+        status: row.status,
+        q08: row.q08_applied_knowledge,
+        q14: row.q14_used_office,
+        q16: row.q16_advice_useful,
+        answers,
+        options,
+      }
+    },
+  })
+}
+
+/* ── section A ────────────────────────────────────────────────────────────── */
+
+export type SectionAInput = {
+  surveyId: string
+  q7?: string
+  q8?: string
+  q9Options?: string[]
+  q10?: string
+  q11Options?: string[]
+  q12?: string
+  q13?: string
+  q14?: string
+  q15Count?: number | null
+  q15Options?: string[]
+  q16?: string
+}
+
+export type SectionAResult = {
+  ok: boolean
+  result: 'saved' | 'not_found' | 'not_permitted'
+  survey_id?: string
+}
+
+/**
+ * One RPC, one transaction. Section A touches three tables, and a connection
+ * dropping part-way through eight browser round trips would leave the section
+ * half-written -- which is what the draft design exists to prevent. See 0079.
+ *
+ * The conditional branches are cleared server-side, not here: an enumerator who
+ * ticks reasons under Q9 and then corrects Q8 must not leave those reasons
+ * attached to a survey that says the knowledge was applied.
+ */
+export function useSaveSectionA() {
+  const qc = useQueryClient()
+  return useMutation({
+    retry: false,
+    mutationFn: async (input: SectionAInput): Promise<SectionAResult> => {
+      const { data, error } = await supabase.rpc('save_followup_section_a', {
+        p_survey_id: input.surveyId,
+        ...(input.q7 ? { p_q7: input.q7 } : {}),
+        ...(input.q8 ? { p_q8: input.q8 } : {}),
+        ...(input.q9Options?.length ? { p_q9_options: input.q9Options } : {}),
+        ...(input.q10 ? { p_q10: input.q10 } : {}),
+        ...(input.q11Options?.length ? { p_q11_options: input.q11Options } : {}),
+        ...(input.q12 ? { p_q12: input.q12 } : {}),
+        ...(input.q13 ? { p_q13: input.q13 } : {}),
+        ...(input.q14 ? { p_q14: input.q14 } : {}),
+        ...(input.q15Count != null ? { p_q15_count: input.q15Count } : {}),
+        ...(input.q15Options?.length ? { p_q15_options: input.q15Options } : {}),
+        ...(input.q16 ? { p_q16: input.q16 } : {}),
+      })
+      if (error) throw toAppError(error)
+      return data as SectionAResult
+    },
+    onSuccess: (res, input) => {
+      if (res.result === 'saved') {
+        void qc.invalidateQueries({ queryKey: followupKeys.one(input.surveyId) })
+        void qc.invalidateQueries({ queryKey: followupKeys.list() })
+        // The survey is still a draft, so no indicator has moved -- but the
+        // dashboard is cheap to refresh and a stale figure here would be read
+        // as this section having done something.
+        void qc.invalidateQueries({ queryKey: ['indicators'] })
+      }
     },
   })
 }

@@ -44,6 +44,17 @@ export type RefTableName =
   | 'ref_sales_channel'
   | 'ref_stakeholder_type'
   | 'ref_training_topic'
+  // The follow-up survey's own option lists, added by 0075. They are ordinary
+  // ref_ tables in every respect; they exist separately because the questions
+  // that use them had no list anywhere in the schema.
+  | 'ref_nonapply_reason'
+  | 'ref_practice_change'
+  | 'ref_stop_reason'
+  | 'ref_survey_activity'
+  | 'ref_compliance_obstacle'
+  | 'ref_market_improvement'
+  | 'ref_selling_barrier'
+  | 'ref_support_need'
 
 export function useRefTable(table: RefTableName) {
   return useQuery({
@@ -125,6 +136,14 @@ export const REF_ALIAS = {
   sales_channel: 'ref_sales_channel',
   stakeholder_type: 'ref_stakeholder_type',
   training_topic: 'ref_training_topic',
+  nonapply_reason: 'ref_nonapply_reason',
+  practice_change: 'ref_practice_change',
+  stop_reason: 'ref_stop_reason',
+  survey_activity: 'ref_survey_activity',
+  compliance_obstacle: 'ref_compliance_obstacle',
+  market_improvement: 'ref_market_improvement',
+  selling_barrier: 'ref_selling_barrier',
+  support_need: 'ref_support_need',
 } as const satisfies Record<string, RefTableName>
 
 export type RefAlias = keyof typeof REF_ALIAS

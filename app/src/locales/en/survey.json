@@ -221,7 +221,17 @@
     "3": "Which follow-up round is this?",
     "4": "Contact details for this interview",
     "5": "Which municipal support has this person received?",
-    "6": "Which training did they attend?"
+    "6": "Which training did they attend?",
+    "7": "How relevant was the training to your agricultural work?",
+    "8": "Have you applied any of the knowledge or skills from the training?",
+    "9": "What are the main reasons you have not applied them?",
+    "10": "As a result of the training, have you changed the way you carry out any agricultural activities?",
+    "11": "What changes have you made?",
+    "12": "How would you rate your ability to carry out this work on your own, compared with before the training?",
+    "13": "Have you shown or taught any of these practices to another producer or family member?",
+    "14": "Have you used the municipal agricultural advisory and technical office?",
+    "15": "How many times, and for what service?",
+    "16": "Was the advice useful in practice?"
   },
   "q5": {
     "training": "Training programme",
@@ -276,6 +286,72 @@
     "toCome": "To come",
     "locked": "Not asked",
     "lockedWhy": "Section D is put only to people at the twelve-month round. The database refuses those answers on any other round.",
-    "noSubmitYet": "There is no submit button yet, and that is deliberate: submitting with five sections empty would put a survey into four percentages that nothing could tell apart from a real one."
+    "noSubmitYet": "There is no submit button yet, and that is deliberate: submitting with five sections empty would put a survey into four percentages that nothing could tell apart from a real one.",
+    "open": "Open"
+  },
+  "backToSurvey": "Back to this survey",
+  "selectAll": "Select all that apply.",
+  "a": {
+    "q7": {
+      "very_relevant": "Very relevant",
+      "somewhat_relevant": "Somewhat relevant",
+      "not_very_relevant": "Not very relevant",
+      "not_at_all_relevant": "Not at all relevant"
+    },
+    "q8": {
+      "regularly": "Yes, regularly",
+      "occasionally": "Yes, occasionally",
+      "no": "No"
+    },
+    "q10": {
+      "yes_significantly": "Yes, significantly",
+      "yes_some_extent": "Yes, to some extent",
+      "no": "No"
+    },
+    "q12": {
+      "much_better": "Much better than before",
+      "somewhat_better": "Somewhat better",
+      "no_change": "No change",
+      "worse": "Worse"
+    },
+    "q13": {
+      "more_than_three": "Yes, more than three people",
+      "one_to_three": "Yes, one to three people",
+      "no": "No"
+    },
+    "q14": {
+      "yes": "Yes",
+      "no": "No",
+      "not_aware": "I was not aware it exists"
+    },
+    "q16": {
+      "very": "Very useful",
+      "somewhat": "Somewhat useful",
+      "not_very": "Not very useful",
+      "not_at_all": "Not useful at all"
+    }
+  },
+  "sectionA": {
+    "title": "Section A — Technical capacity",
+    "intro": "Questions 7 to 16. Saving this section keeps it whether or not the rest is finished.",
+    "q7Note": "The source sheet asks “how useful” and offers relevance answers. The question is worded to match the answers.",
+    "q13Note": "This asks how many people, not whether anyone. Both “yes” answers are different findings.",
+    "feedsA1": "This answer is indicator A1.",
+    "feedsB1": "This answer is indicator B1's denominator — who is counted at all.",
+    "feedsB1Num": "This answer is indicator B1's numerator.",
+    "notAwareNote": "Worth recording carefully. “Not aware it exists” is a different finding from “chose not to use it”, and only one of them is the Municipality's to fix.",
+    "q15Count": "Roughly how many times",
+    "q15Services": "Which services did they use? Select all that apply.",
+    "savesNote": "Saving stores this section now. The survey stays in progress and counts towards nothing until the whole thing is submitted.",
+    "save": "Save this section",
+    "saving": "Saving…",
+    "saved": "Section A saved",
+    "savedSub": "The survey is still in progress and is in no indicator yet.",
+    "notSaved": "Not saved",
+    "saveFailed": "The section could not be saved. Nothing was written.",
+    "refused": {
+      "not_found": "This survey no longer exists. It may have been withdrawn while this page was open.",
+      "not_permitted": "You may not edit this survey. An enumerator can edit a survey only while it is in progress; after that it is a coordinator's to change."
+    }
   }
 }
