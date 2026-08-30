@@ -136,7 +136,7 @@ This is a real municipality with a real donor. If a definition is ambiguous, sto
 
 ## Checks that verify shape, not substance
 
-This has now happened six times, in six unrelated parts of the project. It is
+This has now happened seven times, in seven unrelated parts of the project. It is
 one failure mode, and it is worth naming because every instance looked fine.
 
 | | what existed | what was missing |
@@ -147,6 +147,7 @@ one failure mode, and it is worth naming because every instance looked fine.
 | `locales/ar/indicators.json` | all 20 `name.*` keys present | Arabic — every value is the English string |
 | `objective.os`, `cta.os`, `description.os`, `filterAll.os` | a module wired end to end, compiling, typed, linted | the four keys themselves — the page rendered `description.os` as literal text |
 | The four survey views | `status` present in all four definitions, and an `ilike '%status%'` returning true | any `WHERE` on it — the word was in the subquery's *column list*, so a draft survey counted |
+| Eight multi-select junctions | a `delete`, a success response, a green toast, and a comment explaining the design | a DELETE **policy** — RLS filtered every row, so unticking a box did nothing, silently, forever |
 
 In each case the thing that would normally be checked *was there*. The file
 existed. The key existed. The comment existed. The translation key existed. Any
@@ -175,6 +176,34 @@ list. A grep for a column name can never distinguish a filter from a mention.
 > insert a row in the state that should be excluded and confirm the figure does
 > not move — and then flip it to the state that should be included and confirm
 > it does. One direction alone passes against a view that counts nothing.
+
+**The seventh is the worst of the family, and it is worth understanding why.**
+
+Eight junction tables — every multi-select in the platform — had RLS enabled,
+SELECT/INSERT/UPDATE policies, and no DELETE policy. Every one of them replaces
+its rows by delete-then-insert, because that is the only way to express "these
+and only these".
+
+**RLS does not raise on a delete it will not permit. It filters the rows.** The
+statement affects zero rows and reports success. So: the code runs, PostgREST
+returns 200, the UI shows a confirmation, `audit_log` records nothing because
+nothing happened, and the box the user just unticked is still ticked in the
+database. There is no error anywhere in the system.
+
+The only symptom is a wrong number in a donor report a quarter later, and by
+then nothing connects it to the click that caused it.
+
+`partnership_role` had this documented in a code comment for months. The comment
+was accurate, thorough, and made the defect feel handled — which is precisely
+why nobody swept for the same shape elsewhere and found the other seven.
+
+> **A comment describing a defect is not a fix, and it stops the search.**
+> If something cannot be fixed now, the note must say what to grep for.
+>
+> **After any delete you rely on, count what came back.** `.delete().select()`
+> in PostgREST, `GET DIAGNOSTICS`/read-back in plpgsql. A delete that returns
+> zero rows is either "nothing matched" or "you are not allowed", and the
+> difference is invisible unless you ask.
 
 What that means in practice:
 

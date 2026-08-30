@@ -297,12 +297,15 @@ export function useCreatePartnership(type: PartnershipType) {
  * silently (PostgREST reports success, zero rows), then the INSERT collides
  * with the rows that are still there and returns 23505 "already exists".
  *
- * So this diffs instead. Additions are inserted; removals are detected and
- * reported truthfully rather than being attempted and mistranslated. Everything
- * else about the record still saves.
+ * FIXED IN 0081. `partnership_role` now has a DELETE policy mirroring its
+ * update policy, so removals actually happen and this diffs both ways.
  *
- * Reported to the project owner for a decision. It needs either a DELETE policy
- * scoped to junction tables, or `deleted_at` plus a wider primary key here.
+ * The delete asks for the removed rows BACK and compares the count. RLS filters
+ * a delete it will not permit and PostgREST reports success, so a count is the
+ * only way to tell "removed nothing" from "removed nothing because it was not
+ * allowed". A comment describing the problem is what this file had instead, for
+ * months, and it is why the same defect was still live in three other
+ * junctions when someone finally swept for its shape.
  */
 export function useUpdatePartnership(type: PartnershipType) {
   const qc = useQueryClient()
@@ -354,14 +357,26 @@ export function useUpdatePartnership(type: PartnershipType) {
         if (ins.error) throw toAppError(ins.error)
       }
 
-      // Everything that could be saved has been. Say plainly what could not.
       if (removed.length > 0) {
-        throw {
-          kind: 'invalid' as const,
-          messageKey: 'errors:db.roleRemovalUnsupported',
-          values: { count: String(removed.length) },
-          code: 'NO_DELETE_POLICY',
-          detail: 'partnership_role has no DELETE policy; roles are add-only',
+        // `.select()` so the deleted rows come BACK. Without it PostgREST
+        // reports success on a delete RLS filtered to nothing, which is exactly
+        // how this table stayed append-only for months while a comment
+        // described the problem instead of a check catching it.
+        const del = await supabase
+          .from('partnership_role')
+          .delete()
+          .eq('partnership_id', id)
+          .in('role_id', removed)
+          .select('role_id')
+        if (del.error) throw toAppError(del.error)
+
+        if ((del.data?.length ?? 0) !== removed.length) {
+          throw toAppError({
+            code: '42501',
+            message:
+              `expected to remove ${removed.length} partnership_role rows, removed ` +
+              `${del.data?.length ?? 0} -- a delete RLS refuses reports success`,
+          })
         }
       }
 
