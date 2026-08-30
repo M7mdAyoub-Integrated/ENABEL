@@ -674,6 +674,46 @@ It cannot see the `ref_` tables. Those are rows, not files, and no build check w
 
 ---
 
+## 🟡 OQ-33 · Q35's arrangement and "still active" answers have codes but no wording
+
+**Low stakes, easy to settle, and written down because an enumerator reads these aloud.**
+
+`02_DATABASE_PLAN.md` gives `followup_buyer_connection` three fixed-list columns and specifies each as a set of codes in a trailing comment. Two of them have no display wording anywhere — not in the plan, not in `04_DATA_DICTIONARY.md`, not in a `ref_` table:
+
+| Column | Codes, from the plan | Where the wording comes from |
+|---|---|---|
+| `how_connected` | `exhibition`, `referral`, `partner`, `own_effort`, `other` | **Specified.** `04_DATA_DICTIONARY.md` gives all five verbatim, and they matter — four attribute the connection to municipal support and one does not. |
+| `arrangement` | `one_off`, `repeat_no_agreement`, `verbal`, `written` | **Not specified.** Written for the Section C screen. |
+| `still_active` | `yes`, `no`, `seasonal` | **Not specified.** Written for the Section C screen. |
+
+### What was written, and on what basis
+
+The codes are close to self-describing, so this is a reading rather than an invention — but it is still wording that goes on a screen and gets read to a producer, so it is recorded rather than left in a commit message.
+
+| Code | English | Arabic |
+|---|---|---|
+| `one_off` | A one-off sale | بيعة واحدة |
+| `repeat_no_agreement` | Repeat sales, no agreement | مبيعات متكررة دون اتفاق |
+| `verbal` | A verbal agreement | اتفاق شفهي |
+| `written` | A written agreement | اتفاق مكتوب |
+| `yes` / `no` / `seasonal` | Yes / No / Seasonal | نعم / لا / موسمية |
+
+### Why it is amber rather than red
+
+Nothing counts these. No indicator reads `followup_buyer_connection` — Section C feeds no view (see `03_INDICATORS.md`; A1 reads Q08, C1 reads Q17, IMP-0 reads Q37). The rows are read by a coordinator looking at one producer's market connections, so wrong wording produces a misfiled answer rather than a wrong figure in a donor report.
+
+It is still worth confirming, because `verbal` versus `written` is the distinction that says whether a linkage is contractual, and "agreement" is a word a producer may hear as more binding than intended.
+
+### What would settle it
+
+Either a line in `04_DATA_DICTIONARY.md` giving the seven labels the way it already gives Q35's five "how it came about" options, or a shrug — in which case the wording above stands and this becomes resolved-as-written.
+
+**Decides.** M&E Officer. The labels are live in Section C in both languages, so a change is a one-line edit to `locales/{en,ar}/survey.json` and nothing else.
+
+**Raised.** 2026-08-30, building Section C.
+
+---
+
 **Take OQ-12 to the Coordinator first.** It is the one that undermines the purpose of the programme, and it is a form change, not a database change.
 
 Note: OQ-12 and OQ-13 were briefly marked resolved on 2026-08-24 when the form fields were built, then set back to open when that work was reverted the same day at the project owner's instruction. Each carries a **History** line recording what was built and what survived. Nothing about the underlying questions has changed.

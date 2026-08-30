@@ -359,7 +359,8 @@
     "saveFailed": "The section could not be saved. Nothing was written.",
     "refused": {
       "not_found": "This survey no longer exists. It may have been withdrawn while this page was open.",
-      "not_permitted": "You may not edit this survey. An enumerator can edit a survey only while it is in progress; after that it is a coordinator's to change."
+      "not_permitted": "You may not edit this survey. An enumerator can edit a survey only while it is in progress; after that it is a coordinator's to change.",
+      "invalid": "One of the answers in this section was refused. Nothing was written — the whole section is saved together or not at all."
     }
   },
   "otherPlease": "Please specify",

@@ -468,8 +468,17 @@ export type SectionAInput = {
 
 export type SectionAResult = {
   ok: boolean
-  result: 'saved' | 'not_found' | 'not_permitted'
+  result: 'saved' | 'not_found' | 'not_permitted' | 'invalid'
   survey_id?: string
+  /**
+   * On 'invalid', the constraint that refused.
+   *
+   * Section A gained this in 0090. Before it, a value guard_followup_answer
+   * refused came back as a raw Postgres error with no result at all -- the
+   * screen showed "something went wrong" and the enumerator had nothing to act
+   * on. All three sections now answer the same way.
+   */
+  constraint?: string
 }
 
 /**

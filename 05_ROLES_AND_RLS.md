@@ -544,7 +544,76 @@ This also means the lock is doing double duty as an authorisation check. That is
 
 ---
 
-## 14. What this document specified and the database did not have
+## 14. A `security invoker` function needs its own grant on every function it calls
+
+The sibling of §10. There the outer object was a definer and the inner one was not, so the inner view's permissions were still checked against the visitor. Here it is the other way round — the outer function is an **invoker** — and the same thing happens for the same reason: the caller's privileges are what get checked, however deep the call goes.
+
+### The rule
+
+> **A `security invoker` function runs every nested call with the CALLER's privileges. If it calls a `security definer` function, the caller needs `EXECUTE` on that function — being allowed to call the outer one is not enough.**
+
+### The failure mode
+
+`save_followup_section_c` is an invoker on purpose. All three section saves rely on RLS applying the UPDATE policy to their locking read (§13), and that read *is* the permission check. A definer would bypass RLS and let any authenticated user write any survey.
+
+`count_markets_attended` is a definer on purpose. It reads every exhibition registration for a person, so `0086` revoked `EXECUTE` from `public`, `anon` and `authenticated` — otherwise any logged-in account could ask how many markets any named person had attended.
+
+Both decisions are right. Together they did not work:
+
+```
+authenticated (an enumerator)
+  └─ save_followup_section_c        security INVOKER  ← runs as the enumerator
+       └─ count_markets_attended    security DEFINER  ← EXECUTE still checked
+                                                        against the ENUMERATOR
+
+ERROR: 42501: permission denied for function count_markets_attended
+```
+
+`authenticated` is the only role the application ever connects as, so **Section C could not be saved by anybody**. `0089` is the fix: `EXECUTE` granted to `authenticated`, and the coordinator-or-enumerator gate moved *inside* the definer so the grant does not reopen what `0086` closed.
+
+### Why nothing caught it
+
+Every check in the project passed. The file existed, the function existed, the signature was right, `check_migration_files.sh` passed, `tsc` and `eslint` passed, the option lists were seeded, and the Q30 prefill worked correctly on screen — because `followup_prefill_for_staff` is a **definer**, so its nested call is checked against its owner rather than the caller.
+
+Half the feature worked and the visible half was the working one.
+
+> **A privilege check does not fire for the owner, and the owner is who runs it when a query is pasted into the SQL editor.** Testing a `security invoker` function as `postgres` proves nothing about whether anyone else can run it. It fires for `authenticated`, once, in a field, at the end of an interview.
+
+This is the same shape as §13: a permission behaves differently for the role that will actually use it, and testing as yourself cannot see the difference.
+
+### Testing it
+
+Reading `proacl` is not a test. Reading the function body is not a test. **Execute as the role, with the claims set:**
+
+```sql
+begin;
+  set local role authenticated;
+  set local request.jwt.claims = '{"sub":"<an enumerator''s auth.users id>"}';
+  select public.save_followup_section_c(p_survey_id => '<a draft>', p_q29 => 'about_same');
+rollback;
+```
+
+`set local role` and `set local request.jwt.claims` inside a transaction that rolls back is the whole technique, and it costs nothing — DDL and grants are transactional in PostgreSQL, so a fix can be simulated in the same transaction and thrown away.
+
+Both directions, as everywhere else in this document: confirm the roles that should reach it do, **and** that the roles that should not are refused. `0089` was verified with four calls — enumerator and coordinator return a number, participant and partner_viewer raise `insufficient_privilege`.
+
+### Where else this can bite
+
+Any invoker calling a definer. Today that is the three section saves calling `count_markets_attended`. To find the others:
+
+```sql
+select p.proname, p.prosecdef
+  from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+ where n.nspname = 'public'
+   and not p.prosecdef                                   -- an invoker
+   and p.prosrc ~ '<name of any definer function>';
+```
+
+A new definer with a narrow grant is the moment to ask which invokers call it.
+
+---
+
+## 15. What this document specified and the database did not have
 
 Twice now this file has been read as a description of the database. It was a specification. On 2026-08-29 every guard named here was checked against `pg_proc` and `pg_trigger`:
 

@@ -152,7 +152,9 @@ export function FollowupSectionA() {
       navigate(`/followups/${id}`)
       return
     }
-    setRefusal(res.result)
+    // 'invalid' names the constraint that refused, so the message can point at
+    // the answer rather than saying something went wrong. See 0090.
+    setRefusal(res.result === 'invalid' ? (res.constraint ?? 'invalid') : res.result)
   }
 
   return (
@@ -341,7 +343,9 @@ export function FollowupSectionA() {
               {t('survey:sectionA.notSaved')}
             </div>
             <p className="m-0 mt-1 max-w-[62ch] text-[15px] font-medium leading-[1.5]">
-              {t(`survey:sectionA.refused.${refusal}`, { defaultValue: refusal })}
+              {t(`survey:sectionA.refused.${refusal}`, {
+                defaultValue: t('survey:sectionA.refused.invalid'),
+              })}
             </p>
           </div>
         ) : null}

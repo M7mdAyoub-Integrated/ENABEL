@@ -136,7 +136,7 @@ This is a real municipality with a real donor. If a definition is ambiguous, sto
 
 ## Checks that verify shape, not substance
 
-This has now happened eight times, in eight unrelated parts of the project. It is
+This has now happened nine times, in nine unrelated parts of the project. It is
 one failure mode, and it is worth naming because every instance looked fine.
 
 | | what existed | what was missing |
@@ -149,6 +149,7 @@ one failure mode, and it is worth naming because every instance looked fine.
 | The four survey views | `status` present in all four definitions, and an `ilike '%status%'` returning true | any `WHERE` on it — the word was in the subquery's *column list*, so a draft survey counted |
 | Eight multi-select junctions | a `delete`, a success response, a green toast, and a comment explaining the design | a DELETE **policy** — RLS filtered every row, so unticking a box did nothing, silently, forever |
 | `save_followup_section_a` after `0082` | the file, the function, the right signature, a passing migration check and a passing test of the new behaviour | the read-back guard `0080` had added — `create or replace` was written from `0079`'s text and reverted it |
+| `save_followup_section_c` after `0088` | the function, the right signature, the RLS policies, four seeded option lists, a green build, and a Q30 prefill that worked on screen | `EXECUTE` on the definer it calls — every test ran as the owner, and a privilege check does not fire for the owner. `authenticated` could not save Section C at all |
 
 In each case the thing that would normally be checked *was there*. The file
 existed. The key existed. The comment existed. The translation key existed. Any
@@ -164,6 +165,20 @@ Nothing ever asked whether the **content** was real.
 
 > **The test for any check: could this pass while the thing it checks is wrong?**
 > If yes, it is not a check.
+
+The ninth is the one that testing could not have caught by being more careful,
+only by being run as somebody else. `save_followup_section_c` is a
+`security invoker`, so its nested call to a `security definer` had `EXECUTE`
+checked against the caller — and `authenticated`, the only role the application
+uses, had been revoked from it. Pasted into the SQL editor it worked perfectly,
+because the editor connects as the owner and a privilege check does not fire for
+the owner. `05_ROLES_AND_RLS.md` §14 has the full shape and the two-line
+technique for testing it.
+
+> **Running something as yourself proves nothing about whether anyone else can
+> run it.** `set local role` plus `set local request.jwt.claims`, inside a
+> transaction you roll back. Both directions: the roles that should reach it,
+> and the roles that should not.
 
 The sixth is the one to remember, because the check was a deliberate act rather
 than an oversight. Someone asked "do the survey views filter `status`?", ran
@@ -205,6 +220,38 @@ why nobody swept for the same shape elsewhere and found the other seven.
 > in PostgREST, `GET DIAGNOSTICS`/read-back in plpgsql. A delete that returns
 > zero rows is either "nothing matched" or "you are not allowed", and the
 > difference is invisible unless you ask.
+
+**And the delete has to be inside the exception block, not above it.**
+
+Every one of these save functions replaces its children by delete-then-insert,
+and every one of them catches the refusal and returns a structured result rather
+than raising. A plpgsql `exception` block only rolls back the statements inside
+its own block. So a handler that begins *after* the delete catches the failure,
+reports "not saved", and leaves the deleted rows deleted.
+
+`save_followup_section_c` did exactly that: `buyer_invalid` came back with the
+previously recorded buyers already destroyed, and the screen said *"Not saved.
+Nothing was written."* Both halves of that sentence were false.
+
+> **Any save function that deletes then inserts must have its exception block
+> cover the delete, not just the insert.** One handler on the outermost block.
+> Otherwise a refusal reports failure and destroys the old rows in the same
+> breath — and the message it shows will be a lie in the most reassuring
+> possible direction.
+
+Three things follow, and `0090` is all three:
+
+- Wrap **every** such function the same way, including the ones that look safe.
+  Sections A and B were safe only because their handlers happened to sit before
+  any delete. Safe by accident is a defect waiting for someone to move a line.
+- Do **not** fix it by raising instead of returning. That rolls back correctly
+  and throws away the specific result — `buyer_invalid` is the only thing that
+  tells the enumerator which block was wrong.
+- Do **not** fix it by validating before writing. It reads cleanest and it means
+  a second copy of a rule that a trigger already enforces, and two copies drift.
+- Keep `insufficient_privilege` **out** of the handler. That is the read-back
+  guard above reporting that RLS filtered a delete, and turning it into a tidy
+  message is the exact failure the guard exists to catch.
 
 **The eighth happened while fixing the seventh, twenty minutes later.**
 
