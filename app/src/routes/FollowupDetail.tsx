@@ -9,7 +9,7 @@ import { formatShortDate } from '../lib/format'
  *
  * ── WHAT THIS IS RIGHT NOW ──
  *
- * Sections 0, A and B exist; C to E do not. This screen shows the draft and
+ * Sections 0, A, B and C exist; D and E do not. This screen shows the draft and
  * says plainly which sections are still to come.
  *
  * It deliberately does NOT offer a submit. A survey submitted with five of six
@@ -46,7 +46,7 @@ export function FollowupDetail() {
     { key: '0', done: true },
     { key: 'A', done: false, to: `/followups/${survey.id}/a` },
     { key: 'B', done: false, to: `/followups/${survey.id}/b` },
-    { key: 'C', done: false },
+    { key: 'C', done: false, to: `/followups/${survey.id}/c` },
     { key: 'D', done: false, twelveOnly: true },
     { key: 'E', done: false },
   ]

@@ -831,8 +831,10 @@ export type Database = {
           arrangement: string
           buyer_name: string
           buyer_type_id: string
+          buyer_type_other: string | null
           created_at: string
           how_connected: string
+          how_connected_other: string | null
           id: string
           seq: number
           still_active: string
@@ -843,8 +845,10 @@ export type Database = {
           arrangement: string
           buyer_name: string
           buyer_type_id: string
+          buyer_type_other?: string | null
           created_at?: string
           how_connected: string
+          how_connected_other?: string | null
           id?: string
           seq: number
           still_active: string
@@ -855,8 +859,10 @@ export type Database = {
           arrangement?: string
           buyer_name?: string
           buyer_type_id?: string
+          buyer_type_other?: string | null
           created_at?: string
           how_connected?: string
+          how_connected_other?: string | null
           id?: string
           seq?: number
           still_active?: string
@@ -3863,6 +3869,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      count_markets_attended: { Args: { p_person_id: string }; Returns: number }
       create_direct_linkage: {
         Args: {
           p_activity_type_id?: string
@@ -4018,6 +4025,26 @@ export type Database = {
           p_q26_total?: number
           p_q26_under30?: number
           p_q26_women?: number
+          p_survey_id: string
+        }
+        Returns: Json
+      }
+      save_followup_section_c: {
+        Args: {
+          p_q27_options?: string[]
+          p_q27_other?: string
+          p_q28_options?: string[]
+          p_q28_other?: string
+          p_q29?: string
+          p_q30?: number
+          p_q31?: string
+          p_q32?: string
+          p_q33_options?: string[]
+          p_q33_other?: string
+          p_q34?: string
+          p_q35?: Json
+          p_q36_options?: string[]
+          p_q36_other?: string
           p_survey_id: string
         }
         Returns: Json

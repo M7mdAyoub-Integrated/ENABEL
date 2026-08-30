@@ -53,7 +53,7 @@ const BASELINE = {
   'nav.json': 0,
   'portal.json': 0,
   'public.json': 0,
-  'survey.json': 113,
+  'survey.json': 112,
 }
 
 /**

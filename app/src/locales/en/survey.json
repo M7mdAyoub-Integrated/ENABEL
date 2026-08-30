@@ -404,5 +404,99 @@
       "no": "No"
     },
     "q25Note": "This covers both a food safety approval and a licence — questions 23a and 23b are separate items, and this one spans them."
+  },
+  "c": {
+    "title": "Section C — Market access",
+    "intro": "Questions 27 to 36. Saving this section keeps it whether or not the rest is finished.",
+    "q27": "Where do you currently sell your products?",
+    "q28": "Which of those channels are new since the municipal support?",
+    "q28Note": "Only the channels you selected above. A channel cannot be new without being one you currently sell through.",
+    "q28Empty": "Answer question 27 first. This question asks which of those channels are new, so it opens once there is something to choose from.",
+    "q29": "Are you selling more or less than before the support?",
+    "q30": "How many municipal markets or exhibitions have you taken part in?",
+    "q30Note": "Filled in from the Municipality's own registrations. Correct it if the respondent says otherwise — both figures are kept.",
+    "q30Records": "Municipal records",
+    "q30Box": "Recorded in this interview",
+    "q30Counting": "Counting…",
+    "q30Unknown": "Not available",
+    "q30Invalid": "This must be a whole number, zero or more.",
+    "q30Gap": "The records count {records}. This interview records {entered}.",
+    "q30GapNote": "The difference is kept, not corrected. It may be a registration that was never approved, a market attended without registering, or a different reading of the question — each is worth a coordinator's attention.",
+    "q31": "Roughly what were your total sales at the most recent market you attended?",
+    "band": {
+      "under_50": "Under 50 JOD",
+      "50_150": "50 to 150 JOD",
+      "151_300": "151 to 300 JOD",
+      "301_500": "301 to 500 JOD",
+      "over_500": "Over 500 JOD",
+      "prefer_not_to_say": "Prefer not to say"
+    },
+    "q32": "How many new customers or buyers did you meet through these markets?",
+    "q32opt": {
+      "none": "None",
+      "one_to_two": "One or two",
+      "three_to_five": "Three to five",
+      "more_than_five": "More than five"
+    },
+    "q33": "What would make the municipal markets more useful to you?",
+    "q34": "Have you established a market connection with a buyer?",
+    "q34Note": "A connection that has not yet produced a sale is still a connection, and it has its own answer.",
+    "q34opt": {
+      "yes": "Yes, and it has led to sales",
+      "connection_no_sale": "Yes, but no sale yet",
+      "no": "No"
+    },
+    "q35": "Tell us about the buyers you connected with.",
+    "q35Note": "Up to three. Each buyer needs all five answers before this section can be saved — a buyer with only a name would be counted as a connection while saying nothing about how it came about.",
+    "q35Incomplete": "{count, plural, one {# buyer is not finished. Complete it or remove it before saving.} other {# buyers are not finished. Complete them or remove them before saving.}}",
+    "q35WillClear": "{count, plural, one {Saving with “No” will remove the buyer already recorded here.} other {Saving with “No” will remove the # buyers already recorded here.}}",
+    "q36": "What is the main thing stopping you selling more?",
+    "buyer": {
+      "n": "Buyer {n}",
+      "blank": "Not started",
+      "needs": "{count, plural, one {# answer missing} other {# answers missing}}",
+      "complete": "Complete",
+      "remove": "Remove",
+      "name": "Buyer name",
+      "type": "What kind of buyer?",
+      "how": "How did this connection come about?",
+      "arrangement": "What is the arrangement?",
+      "stillActive": "Still active today?",
+      "add": "Add another buyer",
+      "addFirst": "Add a buyer",
+      "max": "Three buyers is the most this question records."
+    },
+    "how": {
+      "exhibition": "Through a municipal exhibition or market",
+      "referral": "Through a municipal referral or the coordination office",
+      "partner": "Through a partner introduced by the Municipality",
+      "own_effort": "Through my own effort, unrelated to municipal support",
+      "other": "Other"
+    },
+    "arrangement": {
+      "one_off": "A one-off sale",
+      "repeat_no_agreement": "Repeat sales, no agreement",
+      "verbal": "A verbal agreement",
+      "written": "A written agreement"
+    },
+    "active": {
+      "yes": "Yes",
+      "no": "No",
+      "seasonal": "Seasonal"
+    },
+    "savesNote": "Saving stores this section now. The survey stays in progress and counts towards nothing until the whole thing is submitted.",
+    "save": "Save this section",
+    "saving": "Saving…",
+    "saved": "Section C saved",
+    "savedSub": "The survey is still in progress and is in no indicator yet.",
+    "notSaved": "Not saved",
+    "saveFailed": "The section could not be saved. Nothing was written.",
+    "refused": {
+      "not_found": "This survey no longer exists. It may have been withdrawn while this page was open.",
+      "not_permitted": "You may not edit this survey. An enumerator can edit a survey only while it is in progress; after that it is a coordinator's to change.",
+      "q28_not_in_q27": "Question 28 names a channel that question 27 does not. Reload this page — it was probably left open while the answers changed.",
+      "buyer_invalid": "One of the buyers in question 35 was refused by the database. The rest of the section may already have been saved — reopen it and check question 35 before continuing.",
+      "invalid": "One of the answers in this section was refused. Nothing was written."
+    }
   }
 }

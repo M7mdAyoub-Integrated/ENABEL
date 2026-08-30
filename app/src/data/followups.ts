@@ -231,6 +231,19 @@ export type SurveyDetail = {
   q26Total: number | null
   q26Women: number | null
   q26Under30: number | null
+  q29: string | null
+  /** Q30 as stored. Prefilled from count_markets_attended, overridable. */
+  q30: number | null
+  /**
+   * Whether the stored Q30 differs from what the records counted.
+   *
+   * Decided by `save_followup_section_c`, never by this client -- 0086 and 0088
+   * exist so that one rule counts and one place compares. The screen reads this
+   * to show both figures; it must not recompute it.
+   */
+  q30Overridden: boolean
+  q31: string | null
+  q34: string | null
   /** followup_answer, keyed by question code. */
   answers: Record<string, { text: string | null; number: number | null; bool: boolean | null }>
   /** followup_answer_option, option ids per question code. */
@@ -243,15 +256,35 @@ export type SurveyDetail = {
   optionOther: Record<string, string>
   /** Q23, tri-state per ref_safety_item id. An absent key is unanswered. */
   safety: Record<string, TriStatus>
+  /** Q35, up to three, already ordered by seq. */
+  buyers: BuyerConnection[]
+}
+
+/**
+ * One buyer from Q35.
+ *
+ * Every field is required in the database, so there is no partial buyer here
+ * either: a row with a name and nothing else would still be counted as a
+ * connection, which is why 0088 writes a buyer whole or not at all.
+ */
+export type BuyerConnection = {
+  seq: number
+  buyerName: string
+  buyerTypeId: string
+  buyerTypeOther: string | null
+  howConnected: string
+  howConnectedOther: string | null
+  arrangement: string
+  stillActive: string
 }
 
 /**
  * Everything a section needs to reopen with what was already answered.
  *
- * Four reads rather than one: the survey, its answers, its options and its
- * safety items are four tables and PostgREST embeds would not make them one
- * round trip anyway. They are separate queries so a slow one cannot block the
- * section rendering.
+ * Five reads rather than one: the survey, its answers, its options, its safety
+ * items and its buyer connections are five tables and PostgREST embeds would
+ * not make them one round trip anyway. They are separate queries so a slow one
+ * cannot block the section rendering.
  */
 export function useSurveyDetail(id: string | undefined) {
   return useQuery({
@@ -264,6 +297,8 @@ export function useSurveyDetail(id: string | undefined) {
           'id, round, contact_date, status, q08_applied_knowledge, q14_used_office,' +
             ' q16_advice_useful, q17_activity_status, q18_started_after_support,' +
             ' q22_volume_change, q26_workers_total, q26_workers_women, q26_workers_under30,' +
+            ' q29_selling_change, q30_events_attended, q30_is_overridden,' +
+            ' q31_last_event_sales_band, q34_connection_made,' +
             ' person!inner ( full_name, national_id )',
         )
         .eq('id', id!)
@@ -284,6 +319,11 @@ export function useSurveyDetail(id: string | undefined) {
         q26_workers_total: number | null
         q26_workers_women: number | null
         q26_workers_under30: number | null
+        q29_selling_change: string | null
+        q30_events_attended: number | null
+        q30_is_overridden: boolean | null
+        q31_last_event_sales_band: string | null
+        q34_connection_made: string | null
         person: { full_name: string; national_id: string }
       }
 
@@ -304,6 +344,22 @@ export function useSurveyDetail(id: string | undefined) {
         .select('item_id, status')
         .eq('survey_id', id!)
       if (si.error) throw toAppError(si.error)
+
+      // Ordered by seq because the screen shows them as buyer 1, 2, 3 and the
+      // numbering has to survive a reload. 0088 reassigns seq from the order it
+      // is given, so the order here is the order the enumerator last saw.
+      const bc = await supabase
+        .from('followup_buyer_connection')
+        // One string literal, deliberately: `'a' + 'b'` widens to `string` and
+        // PostgREST then cannot check the column names against the generated
+        // schema, so a typo would come back as null at runtime instead of
+        // failing to compile.
+        .select(
+          'seq, buyer_name, buyer_type_id, buyer_type_other, how_connected, how_connected_other, arrangement, still_active',
+        )
+        .eq('survey_id', id!)
+        .order('seq')
+      if (bc.error) throw toAppError(bc.error)
 
       const answers: SurveyDetail['answers'] = {}
       for (const r of (a.data ?? []) as {
@@ -335,6 +391,28 @@ export function useSurveyDetail(id: string | undefined) {
         safety[r.item_id] = r.status
       }
 
+      const buyers: BuyerConnection[] = (
+        (bc.data ?? []) as {
+          seq: number
+          buyer_name: string
+          buyer_type_id: string
+          buyer_type_other: string | null
+          how_connected: string
+          how_connected_other: string | null
+          arrangement: string
+          still_active: string
+        }[]
+      ).map((r) => ({
+        seq: r.seq,
+        buyerName: r.buyer_name,
+        buyerTypeId: r.buyer_type_id,
+        buyerTypeOther: r.buyer_type_other,
+        howConnected: r.how_connected,
+        howConnectedOther: r.how_connected_other,
+        arrangement: r.arrangement,
+        stillActive: r.still_active,
+      }))
+
       return {
         id: row.id,
         personName: row.person.full_name,
@@ -351,10 +429,18 @@ export function useSurveyDetail(id: string | undefined) {
         q26Total: row.q26_workers_total,
         q26Women: row.q26_workers_women,
         q26Under30: row.q26_workers_under30,
+        q29: row.q29_selling_change,
+        q30: row.q30_events_attended,
+        // The column is nullable and false is the honest reading of "never
+        // saved": nothing has been compared yet, so nothing disagrees.
+        q30Overridden: row.q30_is_overridden ?? false,
+        q31: row.q31_last_event_sales_band,
+        q34: row.q34_connection_made,
         answers,
         options,
         optionOther,
         safety,
+        buyers,
       }
     },
   })
@@ -511,6 +597,139 @@ export function useSaveSectionB() {
         void qc.invalidateQueries({ queryKey: followupKeys.list() })
         // Still a draft, so C1 has not moved -- but a stale figure on the
         // dashboard would be read as this section having done something.
+        void qc.invalidateQueries({ queryKey: ['indicators'] })
+      }
+    },
+  })
+}
+
+/* ── section C ────────────────────────────────────────────────────────────── */
+
+/**
+ * One buyer as it goes to the server.
+ *
+ * Snake-cased because 0088 reads these keys straight out of the jsonb with
+ * `e ->> 'buyer_name'`. Renaming here would not be caught by the compiler --
+ * a missing key arrives as NULL and the row is refused by a not-null violation
+ * at the far end, which is a save that fails for a reason nothing on screen
+ * explains.
+ */
+export type BuyerInput = {
+  buyer_name: string
+  buyer_type_id: string
+  buyer_type_other?: string
+  how_connected: string
+  how_connected_other?: string
+  arrangement: string
+  still_active: string
+}
+
+export type SectionCInput = {
+  surveyId: string
+  q27Options?: string[]
+  q27Other?: string
+  q28Options?: string[]
+  q28Other?: string
+  q29?: string
+  /**
+   * What the enumerator has in the box.
+   *
+   * Sent even when it equals the prefill. `q30_is_overridden` is decided by
+   * comparing it against a freshly counted figure inside the transaction, so
+   * "the same number" is a real answer the server needs, not a no-op -- see
+   * 0088. Omitting it would store the count as if it had never been reviewed.
+   */
+  q30?: number | null
+  q31?: string
+  q32?: string
+  q33Options?: string[]
+  q33Other?: string
+  q34?: string
+  /** Up to three, whole. An incomplete buyer is not sent at all. */
+  q35?: BuyerInput[]
+  q36Options?: string[]
+  q36Other?: string
+}
+
+export type SectionCResult = {
+  ok: boolean
+  result:
+    | 'saved'
+    | 'not_found'
+    | 'not_permitted'
+    | 'invalid'
+    /** A Q28 channel that is not also in Q27. The screen should make this unreachable. */
+    | 'q28_not_in_q27'
+    /** A buyer row the database refused. */
+    | 'buyer_invalid'
+  survey_id?: string
+  /** On 'invalid' or 'buyer_invalid', the constraint that refused. */
+  constraint?: string
+  /** On 'q28_not_in_q27', how many channels were not in Q27. */
+  count?: number
+  /**
+   * What the records counted for Q30 at save time.
+   *
+   * Returned so the screen can show the derived figure beside the enumerator's
+   * number without asking a second question of the database, and so the number
+   * displayed after a save is the one the flag was actually decided against.
+   */
+  markets_counted?: number
+}
+
+/**
+ * One RPC, one transaction, across four tables.
+ *
+ * ── NOTHING IN SECTION C IS AN INDICATOR ──
+ *
+ * A1, C1 and IMP-0 read Q08, Q17 and Q37. Section C feeds none of them. Q30 is
+ * adjacent to E0.2 without being it: E0.2 counts distinct *people* with an
+ * approved registration, and Q30 counts distinct *markets* for one person. They
+ * share the rule for what counts as participating -- approved, live market,
+ * live registration -- which is the whole reason 0086 put that rule in one
+ * function. The unit of count is different and this file must not blur them.
+ *
+ * ── THE TWO REFUSALS THE SCREEN SHOULD NEVER PROVOKE ──
+ *
+ * `q28_not_in_q27` and `buyer_invalid` are reachable from a stale tab, not from
+ * ordinary use: the screen offers Q28 only the channels Q27 has, and sends a
+ * buyer only when it is complete. They are still handled, because the client is
+ * not the guard -- it is the thing that keeps the guard from firing mid-interview.
+ */
+export function useSaveSectionC() {
+  const qc = useQueryClient()
+  return useMutation({
+    retry: false,
+    mutationFn: async (input: SectionCInput): Promise<SectionCResult> => {
+      const { data, error } = await supabase.rpc('save_followup_section_c', {
+        p_survey_id: input.surveyId,
+        ...(input.q27Options?.length ? { p_q27_options: input.q27Options } : {}),
+        ...(input.q27Other ? { p_q27_other: input.q27Other } : {}),
+        ...(input.q28Options?.length ? { p_q28_options: input.q28Options } : {}),
+        ...(input.q28Other ? { p_q28_other: input.q28Other } : {}),
+        ...(input.q29 ? { p_q29: input.q29 } : {}),
+        ...(input.q30 != null ? { p_q30: input.q30 } : {}),
+        ...(input.q31 ? { p_q31: input.q31 } : {}),
+        ...(input.q32 ? { p_q32: input.q32 } : {}),
+        ...(input.q33Options?.length ? { p_q33_options: input.q33Options } : {}),
+        ...(input.q33Other ? { p_q33_other: input.q33Other } : {}),
+        ...(input.q34 ? { p_q34: input.q34 } : {}),
+        // Sent whenever Q34 says a connection was made, including as an empty
+        // array: that is how "the connection exists but no buyer was named yet"
+        // reaches the server, and it is not the same as omitting the argument.
+        ...(input.q35 ? { p_q35: input.q35 } : {}),
+        ...(input.q36Options?.length ? { p_q36_options: input.q36Options } : {}),
+        ...(input.q36Other ? { p_q36_other: input.q36Other } : {}),
+      })
+      if (error) throw toAppError(error)
+      return data as SectionCResult
+    },
+    onSuccess: (res, input) => {
+      if (res.result === 'saved') {
+        void qc.invalidateQueries({ queryKey: followupKeys.one(input.surveyId) })
+        void qc.invalidateQueries({ queryKey: followupKeys.list() })
+        // Still a draft, so nothing has moved -- but a stale dashboard figure
+        // would be read as this section having done something.
         void qc.invalidateQueries({ queryKey: ['indicators'] })
       }
     },
