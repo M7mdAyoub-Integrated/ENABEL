@@ -42,12 +42,14 @@ import { useToast } from '../ui/Toast'
  *  just wrote before deciding whether Q24 survives. A stale tab cannot attach
  *  obstacles to a checklist that is now complete.
  *
- *  ── Q25 IS DELIBERATELY ABSENT ──
+ *  ── Q25 WOULD HAVE BEEN GUESSED WRONG ──
  *
- *  Its answer options have never been supplied. A guess would be stored, look
- *  like data, and not match the real list when it arrives -- so the question is
- *  shown as a visible gap rather than quietly skipped, and 0084 has no
- *  parameter that could carry a guess. See OQ-31.
+ *  Its options were missing until 0085 and the question shipped as a visible
+ *  gap rather than a guess. The supplied answers are "Yes, clearly / Somewhat /
+ *  No" -- a three-point scale, so yes/no would have been wrong about the shape
+ *  as well as the wording. "Somewhat" is the answer that separates a producer
+ *  who has heard of the process from one who could actually start it, which is
+ *  the distinction the office exists to close.
  *
  *  ── PHONE FIRST ──
  *
@@ -71,6 +73,8 @@ const Q18 = [
   ['before_strengthened', 'beforeStrengthened'],
   ['before_no_change', 'beforeNoChange'],
 ] as const
+
+const Q25 = ['yes_clearly', 'somewhat', 'no'] as const
 
 const Q22 = [
   ['much_more', 'muchMore'],
@@ -105,10 +109,12 @@ export function FollowupSectionB() {
   const [q20, setQ20] = useState<string[]>([])
   const [q20Other, setQ20Other] = useState('')
   const [q21, setQ21] = useState<string[]>([])
+  const [q21Free, setQ21Free] = useState('')
   const [q22, setQ22] = useState<string>()
   const [q23, setQ23] = useState<Record<string, TriStatus>>({})
   const [q24, setQ24] = useState<string[]>([])
   const [q24Other, setQ24Other] = useState('')
+  const [q25, setQ25] = useState<string>()
   const [q26Total, setQ26Total] = useState('')
   const [q26Women, setQ26Women] = useState('')
   const [q26Under30, setQ26Under30] = useState('')
@@ -126,10 +132,12 @@ export function FollowupSectionB() {
     setQ20(d.options['Q20'] ?? [])
     setQ20Other(d.optionOther['Q20'] ?? '')
     setQ21(d.options['Q21'] ?? [])
+    setQ21Free(d.answers['Q21']?.text ?? '')
     setQ22(d.q22 ?? undefined)
     setQ23(d.safety)
     setQ24(d.options['Q24'] ?? [])
     setQ24Other(d.optionOther['Q24'] ?? '')
+    setQ25(d.answers['Q25']?.text ?? undefined)
     setQ26Total(d.q26Total == null ? '' : String(d.q26Total))
     setQ26Women(d.q26Women == null ? '' : String(d.q26Women))
     setQ26Under30(d.q26Under30 == null ? '' : String(d.q26Under30))
@@ -191,6 +199,7 @@ export function FollowupSectionB() {
       ...(q20.length ? { q20Options: q20 } : {}),
       ...(q20Other.trim() ? { q20Other: q20Other.trim() } : {}),
       ...(q21.length ? { q21Options: q21 } : {}),
+      ...(q21Free.trim() ? { q21FreeText: q21Free.trim() } : {}),
       ...(q22 ? { q22 } : {}),
       // Only the items actually answered. An absent item is unanswered, which
       // is not the same finding as 'not_started'.
@@ -201,6 +210,7 @@ export function FollowupSectionB() {
         : {}),
       ...(anyUndone && q24.length ? { q24Options: q24 } : {}),
       ...(anyUndone && q24Other.trim() ? { q24Other: q24Other.trim() } : {}),
+      ...(q25 ? { q25 } : {}),
       ...(total != null ? { q26Total: total } : {}),
       ...(women != null ? { q26Women: women } : {}),
       ...(under30 != null ? { q26Under30: under30 } : {}),
@@ -311,6 +321,24 @@ export function FollowupSectionB() {
             onOther={() => undefined}
             locale={locale}
           />
+          {/* The sheet gives Q21 as open text OR the list. This is not an
+              "Other" option: ref_product is shared with the market
+              registration form, which has no column to hold a specification,
+              so a free-text row there would be unanswerable. See 0085. */}
+          <label className="mt-3 block">
+            <span className="font-narrow text-[12px] font-bold uppercase tracking-[0.12em] text-muted">
+              {t('survey:b.q21Free')}
+            </span>
+            <input
+              className="mt-1.5 block min-h-12 w-full border-[1.5px] border-border-strong bg-bg px-3 text-[16px] text-ink focus:border-ink focus:outline-none"
+              value={q21Free}
+              onChange={(e) => setQ21Free(e.target.value)}
+              maxLength={200}
+            />
+            <span className="mt-1 block text-[13px] leading-[1.45] text-muted">
+              {t('survey:b.q21FreeNote')}
+            </span>
+          </label>
         </div>
 
         <div className={CARD}>
@@ -348,18 +376,14 @@ export function FollowupSectionB() {
           </div>
         ) : null}
 
-        {/* Q25. Shown as a gap on purpose -- an enumerator who cannot see it
-            would assume the form covers the sheet, and it does not. */}
-        <div className="mt-4 border-[1.5px] border-dashed border-border-strong bg-sunken p-4 sm:p-5">
-          <p className="m-0 font-narrow text-[11.5px] font-bold uppercase tracking-[0.14em] text-muted">
-            {t('survey:b.q25PendingTitle')}
-          </p>
-          <p className="m-0 mt-2 text-[15px] font-semibold leading-[1.35] text-ink">
-            {t('survey:q.25')}
-          </p>
-          <p className="m-0 mt-2 max-w-[62ch] text-[13.5px] leading-[1.55] text-muted">
-            {t('survey:b.q25PendingBody')}
-          </p>
+        <div className={CARD}>
+          <p className={STEM}>{t('survey:q.25')}</p>
+          <p className={NOTE}>{t('survey:b.q25Note')}</p>
+          <Choice
+            value={q25}
+            onChange={setQ25}
+            options={Q25.map((v) => ({ value: v, label: t(`survey:b.q25.${v}`) }))}
+          />
         </div>
 
         <div className={CARD}>

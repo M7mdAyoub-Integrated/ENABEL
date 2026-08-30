@@ -238,7 +238,7 @@
     "21": "What are your main products?",
     "23": "Food safety and licensing",
     "24": "For the items not yet done, what is the main obstacle?",
-    "25": "Do you know which authority to approach?",
+    "25": "Do you know which authority to approach for a food safety approval or licence for your product?",
     "26": "How many people work in this activity?"
   },
   "q5": {
@@ -381,8 +381,6 @@
       "not_started": "Not started"
     },
     "q24Note": "Asked because at least one item above is not done. It is dropped if the checklist is later completed.",
-    "q25PendingTitle": "Question 25 is not built yet",
-    "q25PendingBody": "Its answer options have never been supplied, and guessing them would mean storing values that will not match the real list when it arrives. Ask the respondent if you like, and put it in the notes at the end.",
     "q26Note": "Include the respondent. Women and under-30 are counted within the total, not added to it.",
     "savesNote": "Saving stores this section now. The survey stays in progress and counts towards nothing until the whole thing is submitted.",
     "save": "Save this section",
@@ -397,6 +395,14 @@
       "workers_women_lte_total": "There cannot be more women than people. Check question 26.",
       "workers_under30_lte_total": "There cannot be more people under 30 than people. Check question 26.",
       "invalid": "One of the numbers in question 26 does not add up."
-    }
+    },
+    "q21Free": "A product the list does not carry",
+    "q21FreeNote": "The sheet allows open text as well as the list. Leave it blank if the list covers everything.",
+    "q25": {
+      "yes_clearly": "Yes, clearly",
+      "somewhat": "Somewhat",
+      "no": "No"
+    },
+    "q25Note": "This covers both a food safety approval and a licence — questions 23a and 23b are separate items, and this one spans them."
   }
 }

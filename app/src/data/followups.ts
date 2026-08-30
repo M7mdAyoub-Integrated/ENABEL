@@ -445,11 +445,13 @@ export type SectionBInput = {
   q20Options?: string[]
   q20Other?: string
   q21Options?: string[]
+  q21FreeText?: string
   q22?: string
   /** One entry per ANSWERED item. An unanswered item is absent, not defaulted. */
   q23?: { item_id: string; status: TriStatus }[]
   q24Options?: string[]
   q24Other?: string
+  q25?: string
   q26Total?: number | null
   q26Women?: number | null
   q26Under30?: number | null
@@ -490,10 +492,12 @@ export function useSaveSectionB() {
         ...(input.q20Options?.length ? { p_q20_options: input.q20Options } : {}),
         ...(input.q20Other ? { p_q20_other: input.q20Other } : {}),
         ...(input.q21Options?.length ? { p_q21_options: input.q21Options } : {}),
+        ...(input.q21FreeText ? { p_q21_free_text: input.q21FreeText } : {}),
         ...(input.q22 ? { p_q22: input.q22 } : {}),
         ...(input.q23?.length ? { p_q23: input.q23 } : {}),
         ...(input.q24Options?.length ? { p_q24_options: input.q24Options } : {}),
         ...(input.q24Other ? { p_q24_other: input.q24Other } : {}),
+        ...(input.q25 ? { p_q25: input.q25 } : {}),
         ...(input.q26Total != null ? { p_q26_total: input.q26Total } : {}),
         ...(input.q26Women != null ? { p_q26_women: input.q26Women } : {}),
         ...(input.q26Under30 != null ? { p_q26_under30: input.q26Under30 } : {}),

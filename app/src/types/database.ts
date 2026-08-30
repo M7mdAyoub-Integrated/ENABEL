@@ -4008,11 +4008,13 @@ export type Database = {
           p_q19_when?: string
           p_q20_options?: string[]
           p_q20_other?: string
+          p_q21_free_text?: string
           p_q21_options?: string[]
           p_q22?: string
           p_q23?: Json
           p_q24_options?: string[]
           p_q24_other?: string
+          p_q25?: string
           p_q26_total?: number
           p_q26_under30?: number
           p_q26_women?: number

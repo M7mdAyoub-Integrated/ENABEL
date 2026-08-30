@@ -604,43 +604,73 @@ The missing delete policy is *stricter* than the spec and is fine. `evidence_sta
 
 ---
 
-## 🟡 OQ-31 · Q25 has no answer options anywhere, so the question is not built
+## ✅ OQ-31 · Q25's options — RESOLVED 2026-08-30
 
-**What the sheet asks.** Q25, "Do you know which authority to approach?" — in the section on food safety and licensing.
+**Was.** Q25 had no answer list anywhere. `0078` left `followup_answer` unconstrained for it and named the gap; `0084` shipped with no Q25 parameter at all and the screen showed the question as a visible gap rather than a guess.
 
-**What exists.** Nothing. Every other Section B question resolved to a list: Q19 and Q39 share `ref_stop_reason`, Q20 got `ref_survey_activity`, Q24 got `ref_compliance_obstacle`, all verbatim from the Post_intervention sheet. Q25's options have never been supplied. `0078` left `followup_answer` deliberately unconstrained for it and said so.
+**Supplied, verbatim.**
 
-**What was done.** `save_followup_section_b` (0084) has **no Q25 parameter**, and the screen shows the question as a visible gap rather than omitting it. Two options were rejected:
+> Do you know which authority to approach for a food safety approval or licence for your product?
+> — Yes, clearly / Somewhat / No
 
-- Guessing yes/no. The neighbouring questions are three- and four-point scales, so yes/no is a guess about the *shape* as well as the wording. Answers stored under a guessed list will not match the real one when it arrives, and nothing will flag them — they will simply be wrong in a way that reads as data.
-- Collecting free text. Same problem, one step later: it would have to be recoded by hand, and by then the interviews are done.
+Note the stem: **"a food safety approval OR licence"**, not licensing alone. Q23 lists the health certificate and the home-business licence as separate items, and Q25 spans both.
 
-An enumerator who wants the answer can put it in Q43, the notes field.
+**Why the guess would have been wrong, which is the point worth keeping.** Yes/no was the obvious assumption and it is wrong about the *shape*, not just the wording. "Somewhat" is the answer that separates a producer who has heard of the process from one who could actually start it — and that is precisely the gap the technical coordination office exists to close, so it is the answer B1.1 and G0.1 are about.
 
-**Decides.** Whoever holds the Post_intervention sheet — the Q25 option list, verbatim, in sheet order, the way Q19, Q20 and Q24 were supplied.
+Verified after `0085`: `guard_followup_answer` refuses `'yes'` on Q25 with *"value_text yes is not one of the answers to Q25"*. The guess would have been caught.
 
----
+**Built in.** `0085` — constrained in `guard_followup_answer`, carried by `save_followup_section_b`, rendered as a three-option question in Section B.
 
-## 🔴 OQ-32 · 138 of 204 reference labels have no Arabic, and this is a survey read aloud in Arabic
+## 🔴 OQ-32 · A request for 138 Arabic labels — a translator's afternoon, blocking a field survey
 
-**What was found.** Measured, not estimated:
+**This is a request, not a question.** The wording is not ours to invent and the migration to load it is trivial; what is needed is the Arabic.
 
-| | rows | without `label_ar` |
-|---|---|---|
-| The 18 original `ref_` tables | 138 | **138 — all of them** |
-| The 8 tables added by `0075` | 66 | 0 |
+### The size of it
 
-`0016` says why, and it was a defensible decision at the time: *"The source workbook is English-only. Rather than seed fake Arabic, label_ar is nullable."* Inventing Arabic for a donor-facing option list would have been worse.
+204 option labels across 26 `ref_` tables. **66 already have Arabic** — the eight tables `0075` added for the follow-up survey were translated as they were written. So the request is **138 labels in 18 tables**, and it is smaller than "the platform has no Arabic" sounds.
 
-**Why it now blocks fieldwork.** Section B renders Q23's nine food-safety items from `ref_safety_item` and Q21's products from `ref_product`. Verified on the built screen at 320px with the interface in Arabic: heading, buttons, tri-state labels and the progress line are all Arabic — and **0 of 9 checklist items are.** An enumerator reads nine food-safety items aloud, in English, to an Arabic-speaking farmer, and writes down what they think the answer was.
+| Table | Labels | What it is for | Priority |
+|---|---|---|---|
+| `ref_safety_item` | 9 | Q23, the food-safety checklist | **First — blocks the survey** |
+| `ref_product` | 11 | Q21, and market registration | **First — blocks the survey** |
+| `ref_sales_channel` | 11 | Q27 and Q28 | **Second — blocks Section C** |
+| `ref_buyer_type` | 9 | Q35, buyer connections | **Second — blocks Section C** |
+| `ref_office_service_type` | 6 | Q15, and the office form | Third |
+| `ref_activity_type` | 5 | production initiatives, linkage | Third |
+| `ref_training_topic` | 6 | training sessions | Third |
+| `ref_guidance_type` | 6 | guidance records | Third |
+| `ref_producer_type` | 9 | market registration | Third |
+| `ref_agri_involvement` | 6 | the applicant form | Third |
+| `ref_nationality` | 4 | the applicant form | Third |
+| `ref_disability_type` | 6 | disaggregation | Third |
+| `ref_partner_role_training` | 12 | partnerships | Fourth — staff-facing |
+| `ref_partner_role_production` | 10 | partnerships | Fourth — staff-facing |
+| `ref_partner_type_production` | 9 | partnerships | Fourth — staff-facing |
+| `ref_partner_type_training` | 8 | partnerships | Fourth — staff-facing |
+| `ref_stakeholder_type` | 6 | coordination meetings | Fourth — staff-facing |
+| `ref_promotional_channel` | 5 | promotion records | Fourth — staff-facing |
 
-`refLabel()` falls back to English and warns in the console, which is the right behaviour for a missing label and no substitute for having one.
+The first four tables are 40 labels and unblock the whole follow-up survey. The last six are 50 labels read only by municipal staff, who can work in English if they must.
 
-**The same shape in the locale files.** 226 values in `src/locales/ar/*.json` are the English string — 113 in `survey.json` alone. `check-untranslated.mjs` now holds that as a baseline that may fall and must never rise. It cannot see the `ref_` tables: those are rows, not files, and no build check will reach them.
+### Why it is urgent for the survey specifically
 
-**What is needed.** Arabic for 138 option labels. The two that block the survey are `ref_safety_item` (9) and `ref_product` (11); `ref_sales_channel` (11) and `ref_buyer_type` (9) block Section C.
+Verified on the built Section B screen at 320px with the interface set to Arabic: the heading, the buttons, the tri-state labels, the progress line and the layout direction are all correct Arabic — and **0 of the 9 food-safety items are.** An enumerator reads nine items aloud, in English, to an Arabic-speaking producer.
 
-**Decides.** Municipal Coordinator — who supplies the Arabic, and whether the survey can be run in the field before it exists.
+### Why it was not drafted here
+
+Nine of those items name regulatory artefacts — a health certificate, a home-business licence, a production registration. Those have official Jordanian wordings. A form read aloud using an approximation is **worse** than one read in English, because the producer will act on what they are told and go to the wrong office with the wrong document.
+
+`0016` chose nullable `label_ar` over seeded fake Arabic and that was the right call. This is the bill for it, and it comes due the first time an enumerator opens the survey in Arabic.
+
+### The same shape, in files rather than rows
+
+226 values in `src/locales/ar/*.json` **are** the English string — 113 in `survey.json`, 71 in `forms.json`, 42 in `indicators.json`. Not missing keys: present keys whose value was never translated, which renders as finished English and passes every count-based check.
+
+`app/scripts/check-untranslated.mjs` now holds those as a per-file baseline that may fall and must never rise, wired into `npm run build`. It compares the **value**, so it cannot be satisfied by adding a key — only by translating one. It was confirmed to fail by sabotaging a key, not by reading it.
+
+It cannot see the `ref_` tables. Those are rows, not files, and no build check will reach them.
+
+**Decides.** Municipal Coordinator — who supplies the Arabic, in what order, and whether the follow-up survey may be run in the field before `ref_safety_item` and `ref_product` have it.
 
 ---
 
