@@ -4061,6 +4061,16 @@ export type Database = {
         }
         Returns: Json
       }
+      save_followup_section_e: {
+        Args: {
+          p_q41_options?: string[]
+          p_q41_other?: string
+          p_q42?: boolean
+          p_q43?: string
+          p_survey_id: string
+        }
+        Returns: Json
+      }
       snapshot_period: { Args: { p_period_code: string }; Returns: number }
       start_followup: {
         Args: {
@@ -4072,6 +4082,10 @@ export type Database = {
           p_respondent: Database["public"]["Enums"]["respondent_t"]
           p_round: Database["public"]["Enums"]["followup_round_t"]
         }
+        Returns: Json
+      }
+      submit_followup: {
+        Args: { p_confirm?: boolean; p_survey_id: string }
         Returns: Json
       }
       training_session_delete_impact: {

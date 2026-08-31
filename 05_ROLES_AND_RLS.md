@@ -90,11 +90,30 @@ Revoke `execute` from `anon` on all of them.
 | `exhibition_registration_product` | R C U D | R C U | R | R | R C own |
 | `promotional_action` | R C U D | R C U | R | R | — |
 | `coordination_meeting`, `_partner`, `case_study` | R C U D | R C U | R | R | — |
-| `followup_survey` and children | R C U D | R | R C U draft | R | — |
+| `followup_survey` and children | R C U D | — | R C U draft | — | — |
 | `attachment` | R C U D | R C | R C | R | — |
 | `audit_log` | R | — | — | — | — |
 
 Nobody, including `coordinator`, may update or delete `audit_log`.
+
+**The `followup_survey` row was corrected on 2026-08-31 to match the database,
+not the other way round.** It granted `R` to `data_entry` and to
+`partner_viewer`; `fu_read` admits `current_role() in ('coordinator',
+'enumerator')` and always has. Tested as all five roles against a submitted
+survey, through RLS: coordinator 1 row, enumerator 1 row, `data_entry` 0,
+`partner_viewer` 0, `participant` 0.
+
+The database is the stricter one and it is right. A follow-up survey is
+forty-three answers about one named person's household, income and food-safety
+compliance — the most intrusive record the platform holds. `data_entry` never
+has a reason to open one, and `partner_viewer` is the donor, who gets
+percentages: `v_indicator_actual` admits `partner_viewer` explicitly, so the
+figures reach them without the interviews behind them ever doing so.
+
+> **Two roles losing a permission on paper is not a regression here — it is the
+> document catching up.** When this file and `pg_policy` disagree, find out
+> which is right before changing either; §15 exists because the assumption ran
+> the other way and two guards turned out never to have been built.
 
 ---
 
@@ -217,6 +236,8 @@ end $$;
 
 ## 6. `person` — the sensitive table
 
+**What this section specified:**
+
 ```sql
 -- staff read
 create policy person_staff_read on public.person
@@ -233,6 +254,63 @@ create policy person_own_update on public.person
   using (auth_user_id = auth.uid())
   with check (auth_user_id = auth.uid());
 ```
+
+**What the database has** — two policies rather than four, and *neither filters
+`deleted_at`*:
+
+```sql
+person_read   select  using (is_staff() or auth_user_id = auth.uid())
+person_update update  using / with check
+                        (current_role() in ('coordinator','data_entry')
+                         or auth_user_id = auth.uid())
+```
+
+### The missing `deleted_at` filter is design, and it is what the restore path stands on
+
+Checked on 2026-08-31 rather than assumed, because "a policy that forgot its
+soft-delete filter" is exactly what an oversight looks like.
+
+CLAUDE.md requires that a `person` matching a soft-deleted row is **restored,
+never recreated** — their unique index is global on purpose, because recreating
+an entity moves a figure that has already been reported. Offering restore means
+being able to *find* the soft-deleted row and then *write* to it. A
+`deleted_at is null` on either policy would make that impossible: the row would
+be invisible to the very screen that has to offer the choice.
+
+So the pair is coherent, and it was run end to end as each role, through RLS, in
+a transaction that rolled back:
+
+| | |
+|---|---|
+| coordinator sets `deleted_at` | 1 row |
+| the row is still visible to a coordinator afterwards | visible — restore needs this |
+| the row is still visible to `data_entry` | visible |
+| `data_entry` clears `deleted_at` | **refused** — *only a coordinator may delete or restore a record* |
+| coordinator clears `deleted_at` | 1 row, live again |
+
+**`guard_soft_delete` is what makes it safe, not the policy.** The policy lets
+`data_entry` see and update a soft-deleted person; the trigger is the only thing
+stopping them undeleting one. That is the right division — §15 is the record of
+what happened when that trigger did not exist — but it means this permission
+cannot be reasoned about from `pg_policy` alone.
+
+### Nothing relies on it yet, and that is the part to watch
+
+**The restore path is not built.** No screen offers it, so today this is a
+capability sitting unused, and the only *live* consequence is that a staff read
+of `person` returns soft-deleted people unless the query excludes them itself.
+
+All three of the application's `person` reads do:
+`AuthProvider.tsx`, and two in `data/completions.ts`. They filter
+`.is('deleted_at', null)` in the query. So the platform behaves correctly and
+would keep behaving correctly if the filter were added to the policy — until
+someone came to build the restore path and found the row invisible.
+
+> **A fourth `person` read that forgets `.is('deleted_at', null)` will silently
+> include deleted people, and RLS will not stop it.** That is the cost of
+> keeping this open. Grep before adding one:
+>
+>     grep -n "from('person')" app/src -r
 
 **A participant must never change their own national ID, refugee status or disability status.** Those drive indicator disaggregation. Guard with a trigger:
 
@@ -375,20 +453,54 @@ where n.nspname = 'public' and c.relkind = 'r' and c.relrowsecurity
   and not exists (select 1 from pg_policy p where p.polrelid = c.oid);
 -- expect zero rows
 
--- 3. anon has no access anywhere
+-- 3. anon reaches the four public views and nothing else
 select table_name, privilege_type
 from information_schema.role_table_grants
-where grantee = 'anon' and table_schema = 'public';
+where grantee = 'anon' and table_schema = 'public'
+  and table_name not in ('v_public_opportunity', 'v_public_activity_type',
+                         'v_public_producer_type', 'v_public_product');
 -- expect zero rows
+
+-- and confirm the four are still there, so this check cannot pass by the
+-- public site having been taken away
+select count(*) = 4
+from information_schema.role_table_grants
+where grantee = 'anon' and table_schema = 'public'
+  and privilege_type = 'SELECT'
+  and table_name in ('v_public_opportunity', 'v_public_activity_type',
+                     'v_public_producer_type', 'v_public_product');
+-- expect true
 ```
 
-Then test by hand: sign in as each of the five roles and confirm a `participant` cannot read another person's row, and a `partner_viewer` cannot select from `person`.
+**Check 3 used to read "anon has no access anywhere, expect zero rows", and that
+was this document contradicting itself.** §10 describes a public site that reads
+as `anon` by design, and `0048` and `0056` granted it four views. §9 predates
+that site and was never revisited, so the stated expectation had been wrong for
+every run since — which means either nobody ran it, or somebody ran it, saw four
+rows, and decided they were fine. Both are worse than no check.
+
+It is now an allow-list, and it fails on a **fifth** grant, which is the thing
+worth catching: one more `grant select … to anon` is how programme data reaches
+the open internet. The second query is there because an allow-list alone passes
+happily when the four views have been dropped — a check that can be satisfied by
+deletion is not checking.
+
+The name is also why the contradiction survived: `role_table_grants` lists
+**views** as well as tables, so §10's "no grants on any table" and §9's zero rows
+are not the same claim, and only one of them is true.
+
+Then test by hand: sign in as each of the five roles and confirm a `participant`
+cannot read another person's row, and a `partner_viewer` cannot select from
+`person`. And run §10's `set role anon` test — a grant is not proof that the
+view returns anything, and four grants are not proof that four views work.
 
 ---
 
 ## 10. Public views and the nested-invoker trap
 
-The public site has no sign-in, so it reads as `anon`. `anon` holds **no grants on any table**, and that does not change. It reads exactly one object: `v_public_opportunity`.
+The public site has no sign-in, so it reads as `anon`. `anon` holds **no grants on any table**, and that does not change. It reads four views and nothing else: `v_public_opportunity`, and the three reference lists `0056` added for the exhibition application form — `v_public_activity_type`, `v_public_producer_type` and `v_public_product`.
+
+*(This sentence said "exactly one object" until 2026-08-31. `0056` had added the other three months earlier.)*
 
 ### The rule
 

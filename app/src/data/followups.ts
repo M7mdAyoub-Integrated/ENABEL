@@ -40,6 +40,7 @@ export const followupKeys = {
   list: () => ['followups', 'list'] as const,
   one: (id: string) => ['followups', 'one', id] as const,
   prefill: (nid: string) => ['followups', 'prefill', nid] as const,
+  submit: (id: string) => ['followups', 'submit', id] as const,
 }
 
 /* ── prefill: Q5, Q6, Q30 ─────────────────────────────────────────────────── */
@@ -254,6 +255,8 @@ export type SurveyDetail = {
   q37: string | null
   q38: string | null
   q40: string | null
+  /** Section E. Asked in every round, unlike section D. */
+  q43: string | null
   /** followup_answer, keyed by question code. */
   answers: Record<string, { text: string | null; number: number | null; bool: boolean | null }>
   /** followup_answer_option, option ids per question code. */
@@ -310,6 +313,7 @@ export function useSurveyDetail(id: string | undefined) {
             ' q29_selling_change, q30_events_attended, q30_is_overridden,' +
             ' q31_last_event_sales_band, q34_connection_made,' +
             ' q37_still_engaged, q38_capacity, q40_income_change,' +
+            ' q43_enumerator_notes,' +
             ' person!inner ( full_name, national_id )',
         )
         .eq('id', id!)
@@ -338,6 +342,7 @@ export function useSurveyDetail(id: string | undefined) {
         q37_still_engaged: string | null
         q38_capacity: string | null
         q40_income_change: string | null
+        q43_enumerator_notes: string | null
         person: { full_name: string; national_id: string }
       }
 
@@ -453,6 +458,7 @@ export function useSurveyDetail(id: string | undefined) {
         q37: row.q37_still_engaged,
         q38: row.q38_capacity,
         q40: row.q40_income_change,
+        q43: row.q43_enumerator_notes,
         answers,
         options,
         optionOther,
@@ -840,6 +846,183 @@ export function useSaveSectionD() {
         // Still a draft, so IMP-0 has not moved -- but a stale dashboard figure
         // would be read as this section having done something, and IMP-0 is the
         // one figure nobody should have to wonder about.
+        void qc.invalidateQueries({ queryKey: ['indicators'] })
+      }
+    },
+  })
+}
+
+/* ── section E ────────────────────────────────────────────────────────────── */
+
+export type SectionEInput = {
+  surveyId: string
+  q41Options?: string[]
+  q41Other?: string
+  /**
+   * Sent as `false` as well as `true`.
+   *
+   * "No, do not contact me again" is an answer, not an absence, and it is the
+   * one that has to survive: it is the reason a later round does not ring this
+   * person. `q42 != null` rather than a truthiness test is what carries it.
+   */
+  q42?: boolean
+  q43?: string
+}
+
+export type SectionEResult = {
+  ok: boolean
+  result: 'saved' | 'not_found' | 'not_permitted' | 'invalid'
+  survey_id?: string
+  constraint?: string
+}
+
+/**
+ * One RPC, one transaction, across two tables.
+ *
+ * ── SAVING SECTION E IS NOT SUBMITTING ──
+ *
+ * 0094 never touches `status`. Finishing the last section leaves the survey a
+ * draft, counted by nothing, and submitting is a separate deliberate act with
+ * its own confirmation — `useSubmitFollowup` below.
+ *
+ * ── NOTHING HERE FEEDS AN INDICATOR ──
+ *
+ * A1 reads Q08, B1 reads Q14 and Q16, C1 reads Q17, IMP-0 reads Q37. Q41, Q42
+ * and Q43 are read by a coordinator looking at one producer. The invalidation
+ * below still refreshes the indicator queries, because the submit panel on the
+ * detail screen is driven by the same data and a stale one would name the wrong
+ * sections.
+ */
+export function useSaveSectionE() {
+  const qc = useQueryClient()
+  return useMutation({
+    retry: false,
+    mutationFn: async (input: SectionEInput): Promise<SectionEResult> => {
+      const { data, error } = await supabase.rpc('save_followup_section_e', {
+        p_survey_id: input.surveyId,
+        ...(input.q41Options?.length ? { p_q41_options: input.q41Options } : {}),
+        ...(input.q41Other ? { p_q41_other: input.q41Other } : {}),
+        // Not `input.q42 ? …` — false is an answer.
+        ...(input.q42 != null ? { p_q42: input.q42 } : {}),
+        ...(input.q43 ? { p_q43: input.q43 } : {}),
+      })
+      if (error) throw toAppError(error)
+      return data as SectionEResult
+    },
+    onSuccess: (res, input) => {
+      if (res.result === 'saved') {
+        void qc.invalidateQueries({ queryKey: followupKeys.one(input.surveyId) })
+        void qc.invalidateQueries({ queryKey: followupKeys.list() })
+        void qc.invalidateQueries({ queryKey: followupKeys.submit(input.surveyId) })
+      }
+    },
+  })
+}
+
+/* ── submitting ───────────────────────────────────────────────────────────── */
+
+/** Section letters as `submit_followup` reports them. */
+export type SectionKey = 'A' | 'B' | 'C' | 'D' | 'E'
+
+/** Indicator codes as `submit_followup` reports them, verbatim from 03. */
+export type FedIndicator = 'A1' | 'B1' | 'C1' | 'IMP-0'
+
+export type SubmitResult = {
+  ok: boolean
+  result:
+    | 'preview'
+    | 'submitted'
+    | 'not_found'
+    /** An enumerator asking about a survey that is no longer a draft. */
+    | 'not_permitted'
+    /** A coordinator on a survey that is already submitted, approved or rejected. */
+    | 'not_draft'
+    | 'invalid'
+  survey_id?: string
+  status?: string
+  round?: FollowupRound
+  /** Sections with no answer in them. D is absent unless the round is twelve-month. */
+  empty_sections?: SectionKey[]
+  /** Which indicators will count this survey once it is submitted. */
+  indicators?: FedIndicator[]
+  /** The reporting period the contact date falls in. Null means none of them. */
+  period?: string | null
+  /** False when the person has been soft-deleted: every view would skip it. */
+  person_live?: boolean
+  constraint?: string
+}
+
+/**
+ * What submitting would do, asked before doing it.
+ *
+ * ── THE PREVIEW AND THE ACT ARE ONE FUNCTION ──
+ *
+ * `submit_followup(id, false)` computes the empty sections and the indicator
+ * list and writes nothing; `(id, true)` computes the same things and then
+ * submits. That is deliberate and it is why this hook and `useSubmitFollowup`
+ * call the same RPC rather than a `_preview` sibling: a sentence shown to an
+ * enumerator that is produced by different code from the act it describes will
+ * eventually describe something else. See 0095.
+ *
+ * ── WHY IT IS SAFE TO RUN ON PAGE LOAD ──
+ *
+ * It writes nothing at `p_confirm = false`. It does take a brief row lock —
+ * that lock is how RLS refuses a caller who may not write this survey (0068),
+ * so it is the permission check as well — and the transaction is one statement
+ * long.
+ *
+ * Disabled unless the survey is a draft: for an enumerator the lock filters
+ * anything else and the honest answer is `not_permitted`, which is not
+ * something to show on a survey they have simply finished.
+ */
+export function useSubmitPreview(id: string | undefined, enabled: boolean) {
+  return useQuery({
+    queryKey: followupKeys.submit(id ?? ''),
+    enabled: !!id && enabled,
+    // Never cached across a save: the empty-section list is the whole point.
+    staleTime: 0,
+    queryFn: async (): Promise<SubmitResult> => {
+      const { data, error } = await supabase.rpc('submit_followup', {
+        p_survey_id: id!,
+        p_confirm: false,
+      })
+      if (error) throw toAppError(error)
+      return data as SubmitResult
+    },
+  })
+}
+
+/**
+ * The act itself.
+ *
+ * ── THIS IS THE MOMENT FOUR INDICATORS START COUNTING ──
+ *
+ * 0072 made `v_ind_a1`, `v_ind_b1`, `v_ind_c1` and `v_ind_imp_0` require
+ * `submitted` or `approved`. Everything before this call moved nothing; this
+ * one call moves all four at once, and after it an enumerator cannot edit the
+ * survey again — `fu_update` admits them only while it is a draft, and 0093
+ * stopped them writing `approved` themselves. Reopening is a coordinator's.
+ *
+ * So every indicator query is invalidated here, and unlike the section saves
+ * that is not precautionary: the figures really have changed.
+ */
+export function useSubmitFollowup() {
+  const qc = useQueryClient()
+  return useMutation({
+    retry: false,
+    mutationFn: async (surveyId: string): Promise<SubmitResult> => {
+      const { data, error } = await supabase.rpc('submit_followup', {
+        p_survey_id: surveyId,
+        p_confirm: true,
+      })
+      if (error) throw toAppError(error)
+      return data as SubmitResult
+    },
+    onSuccess: (res, surveyId) => {
+      if (res.result === 'submitted') {
+        void qc.invalidateQueries({ queryKey: followupKeys.one(surveyId) })
+        void qc.invalidateQueries({ queryKey: followupKeys.list() })
+        void qc.invalidateQueries({ queryKey: followupKeys.submit(surveyId) })
         void qc.invalidateQueries({ queryKey: ['indicators'] })
       }
     },

@@ -339,6 +339,50 @@ export function TextBox({
   )
 }
 
+/**
+ * Several lines of free text, for Q43.
+ *
+ * A `textarea` rather than the `TextBox` input above because this is the one
+ * field in the survey that is prose: it is what the enumerator writes when the
+ * forty-two coded answers did not cover something. An input scrolls sideways
+ * and hides what was typed a sentence ago, which on a 320px screen means the
+ * note gets shorter rather than more accurate.
+ *
+ * `dir="auto"` so a note typed in Arabic lays itself out right-to-left and one
+ * typed in English does not, whichever way the interface is set — an enumerator
+ * working in Arabic still writes the odd Latin place name.
+ */
+export function NotesBox({
+  label,
+  value,
+  onChange,
+  placeholder,
+  maxLength = 1000,
+}: {
+  label: string
+  value: string
+  onChange: (v: string) => void
+  placeholder?: string
+  maxLength?: number
+}) {
+  return (
+    <label className="block">
+      <span className="font-narrow text-[12px] font-bold uppercase tracking-[0.12em] text-muted">
+        {label}
+      </span>
+      <textarea
+        dir="auto"
+        rows={4}
+        placeholder={placeholder}
+        className="mt-1.5 block w-full resize-y border-[1.5px] border-border-strong bg-bg px-3 py-2 text-[16px] leading-[1.5] text-ink focus:border-ink focus:outline-none"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        maxLength={maxLength}
+      />
+    </label>
+  )
+}
+
 /* ── Q35, the buyer connections ───────────────────────────────────────────── */
 
 /**

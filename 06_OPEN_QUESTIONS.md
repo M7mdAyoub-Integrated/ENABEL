@@ -291,17 +291,24 @@ No crosswalk exists in any source document.
 
 ## Summary
 
+Rebuilt 2026-08-31 from the headings in this file. It had stopped at OQ-30 and
+was missing five entries, which is the sort of drift that makes a summary worse
+than no summary — a reader counts nine reds and stops looking.
+
 | Priority | Count | Codes |
 |---|---|---|
-| 🔴 Blocks a reported number | 6 | OQ-1, OQ-2, OQ-3, OQ-4, OQ-5, OQ-12 |
-| 🟠 Affects schema or forms | 8 | OQ-6, OQ-7, OQ-8, OQ-9, OQ-10, OQ-11, OQ-13, OQ-14 |
-| 🟡 Wording and policy | 4 | OQ-15, OQ-16, OQ-17, OQ-18 |
-| 🟡 Recorded during Phase 6 | 2 | OQ-19, OQ-20 |
-| 🟠 Public apply flow (Phase 6 step 4) | 2 | OQ-21 *(approved)*, OQ-22 *(resolved)* |
-| 🟢 Eligibility (Phase 6 step 5) | 2 | OQ-23 *(resolved)*, OQ-24 *(fixed)* |
-| 🔴 Reporting integrity | 2 | OQ-25, OQ-26 |
-| 🟠 Linkage (Phase 6 step 6) | 2 | OQ-28, OQ-29 |
-| 🔴 Evidence integrity | 1 | OQ-30 |
+| 🔴 Blocks a reported number | 9 | OQ-1, OQ-2, OQ-3, OQ-4, OQ-5, OQ-12, OQ-25, OQ-30, OQ-32 |
+| 🟠 Affects the schema, the forms or a permission | 14 | OQ-6, OQ-7, OQ-8, OQ-9, OQ-10, OQ-11, OQ-13, OQ-14, OQ-21, OQ-26, OQ-27, OQ-28, OQ-29, OQ-35 |
+| 🟡 Wording and presentation | 8 | OQ-15, OQ-16, OQ-17, OQ-18, OQ-19, OQ-20, OQ-33, OQ-34 |
+| 🟢 Resolved or fixed | 4 | OQ-22, OQ-23, OQ-24, OQ-31 |
+
+**31 open, 4 closed, 35 in total.**
+
+Two of the reds are the ones that stop work rather than merely misreport it:
+**OQ-32** (138 Arabic labels, blocking the survey in the field) and **OQ-25**
+(no period has ever been snapshotted, so no reported figure is protected).
+
+---
 
 ## 🟡 OQ-19 · Cancellation reasons are required for training and advisory, not for exhibitions
 
@@ -662,9 +669,43 @@ Nine of those items name regulatory artefacts — a health certificate, a home-b
 
 `0016` chose nullable `label_ar` over seeded fake Arabic and that was the right call. This is the bill for it, and it comes due the first time an enumerator opens the survey in Arabic.
 
+### Where the line actually falls — added 2026-08-31, so nobody re-derives it
+
+"Do not invent Arabic" is not the rule, and treating it as one is why four
+ordinary questions sat in English for weeks next to nine that genuinely could not
+be written. The rule is narrower:
+
+> **A plain conversational question can be drafted. A named regulatory artefact
+> cannot.**
+
+*"May we contact you again for a follow-up in six months?"* is ordinary Arabic.
+There is one natural way to say it, a wrong choice of phrasing costs nothing, and
+the producer's answer does not depend on which synonym was picked.
+
+*"Health certificate or food safety approval"* names a **document** with an
+official Jordanian wording. The producer will act on what they are read: they
+will go to an office and ask for the thing by name. An approximation sends them
+to the wrong counter, and it does so while sounding fluent — which is worse than
+being read the English, because the English at least signals that a translation
+is needed.
+
+The test is not "is this hard to translate", it is **"will somebody act on the
+exact words?"** A question elicits an answer. An artefact name sends a person
+somewhere.
+
+That is why `ref_safety_item` is still waiting and why Q41, Q42 and Q43 were
+drafted on 2026-08-31 without a coordinator: `q41`, `q42`, `q43` and `q43Ph` were
+the last four English values in the survey's own question text, they are all
+plain questions, and the baseline fell 112 → 108. Section E's option list
+(`ref_support_need`) needed nothing — `0075` seeded it with Arabic already.
+
+The same line applies to `ref_product` in the table above, and it is the reason
+that row is only half a blocker: "Vegetables" is a plain word, "Olive oil /
+olives" is a plain word. None of the eleven names a regulated document.
+
 ### The same shape, in files rather than rows
 
-226 values in `src/locales/ar/*.json` **are** the English string — 113 in `survey.json`, 71 in `forms.json`, 42 in `indicators.json`. Not missing keys: present keys whose value was never translated, which renders as finished English and passes every count-based check.
+221 values in `src/locales/ar/*.json` **are** the English string — 108 in `survey.json`, 71 in `forms.json`, 42 in `indicators.json`. Not missing keys: present keys whose value was never translated, which renders as finished English and passes every count-based check.
 
 `app/scripts/check-untranslated.mjs` now holds those as a per-file baseline that may fall and must never rise, wired into `npm run build`. It compares the **value**, so it cannot be satisfied by adding a key — only by translating one. It was confirmed to fail by sabotaging a key, not by reading it.
 
@@ -761,6 +802,50 @@ A line in `04_DATA_DICTIONARY.md` saying whether Q38 is asked of everyone or onl
 **Decides.** M&E Officer.
 
 **Raised.** 2026-08-30, building Section D.
+
+---
+
+---
+
+## 🟠 OQ-35 · Three tables' policies are addressed to `PUBLIC`, not `authenticated`
+
+**Found 2026-08-31 while correcting §9.3, and it is defence in depth rather than a hole — which is exactly why it needs writing down instead of fixing quietly.**
+
+Every policy in this schema is `for … to authenticated`. Ten are not:
+
+| Table | Policies |
+|---|---|
+| `advisory_session` | `op_read`, `op_insert`, `op_update` |
+| `advisory_enrolment` | `op_read`, `op_insert`, `op_update` |
+| `linkage_request` | `op_read`, `op_read_self`, `op_insert`, `op_update` |
+
+A `create policy` with no `TO` clause defaults to `TO PUBLIC`, and `PUBLIC` includes `anon`. All three tables come from the `0034`–`0049` stretch that was applied through the MCP with no SQL in the repository — the same stretch CLAUDE.md rule 5 exists because of. The `TO authenticated` was simply left off, consistently, across three tables written together.
+
+**`anon` cannot currently reach any of them**, and that was tested rather than assumed — `set role anon`, in a transaction that rolled back:
+
+| | |
+|---|---|
+| `select from advisory_session` | refused 42501, permission denied for table |
+| `select from linkage_request` | refused 42501, permission denied for **function `my_person_id`** |
+| `select from v_public_opportunity` | 4 rows — the public site still works |
+| `select from person` | refused 42501 |
+
+Two independent things are stopping it: `anon` holds no table grant, and the guard functions the policies call are revoked from `anon` (§2, §11).
+
+**Why it still matters.** The role list is the outermost boundary and on these three tables it is doing nothing; the refusal is coming from grants underneath it. Note the second row — `linkage_request` was refused for *lack of EXECUTE on a helper*, not for lack of a table grant. That is a thinner margin than the others and it is not the margin anyone thinks they are relying on.
+
+The failure mode is one migration away: a permissive branch that does not depend on `current_role()` — a published-flag test, an `or is_published` — would be evaluated for `anon` on these three tables and not on any other. `0025` and `0048` are both records of a public-facing filter being got wrong once.
+
+**Interim behaviour.** Left as is. Changing ten policies is `drop`/`create` on live tables and it is not urgent, since nothing reaches them today.
+
+**What the fix is,** when it is taken: recreate the ten with `to authenticated`, then re-run the `set role anon` probe above and the §10 test, and confirm the public site still returns its four views. Not a `alter policy` — that cannot change the role list.
+
+**Decides.** Nobody, really. This is a maintenance item rather than a question; it is here because a comment in a migration would stop the search (CLAUDE.md), and because the next person to run §9.3's check will see these ten in `policies_open_to_anon` and needs to know they are known.
+
+**Grep for it:**
+
+    select tablename, policyname from pg_policies
+     where schemaname='public' and ('anon' = any(roles) or 'public' = any(roles));
 
 ---
 

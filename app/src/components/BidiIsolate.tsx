@@ -44,3 +44,30 @@ export function BidiIsolate({
 }
 
 export default BidiIsolate
+
+/** FIRST STRONG ISOLATE / POP DIRECTIONAL ISOLATE. */
+const FSI = '\u2068'
+const PDI = '\u2069'
+
+/**
+ * The same protection as `BidiIsolate`, for a value going *into* a translated
+ * sentence rather than into JSX.
+ *
+ * `t('…{period}…')` returns a finished string, so there is no element left to
+ * wrap: by the time the value reaches React it is ordinary text inside an
+ * Arabic paragraph, and the bidi algorithm reorders it. Verified on the submit
+ * panel — the reporting period `26/Q3` rendered as `Q3/26`, which is not a
+ * period code, on the one screen where an enumerator is being told which
+ * quarter their work lands in.
+ *
+ * FSI and PDI are the Unicode characters that do what `unicode-bidi: isolate`
+ * does in CSS. They are invisible, they are safe in a left-to-right sentence
+ * too, and they are the only mechanism available inside a plain string.
+ *
+ * Use it for identifiers and codes — period codes, indicator codes, national
+ * IDs, phone numbers. Not for translated prose, which is already in the
+ * paragraph's own direction.
+ */
+export function isolateLtr(value: string): string {
+  return FSI + value + PDI
+}

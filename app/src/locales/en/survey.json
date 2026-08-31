@@ -11,7 +11,38 @@
   "progressLabel": "Survey progress",
   "next": "Next",
   "back": "Back",
-  "submit": "Submit survey",
+  "submit": {
+    "heading": "Submitting",
+    "intro": "Submitting is what puts this survey into the indicators. Until then it counts towards nothing. You will be shown exactly which indicators it feeds before anything is written.",
+    "start": "Submit survey",
+    "confirmEyebrow": "Before you submit",
+    "willFeed": "Once submitted, this survey will be counted by {list}.",
+    "willFeedNothing": "Once submitted, this survey will not be counted by any indicator. Nothing in it answers a question that A1, B1, C1 or IMP-0 reads.",
+    "period": "It will be counted in the {period} reporting period.",
+    "noPeriod": "Its contact date falls outside every reporting period, so it will be stored but counted in no quarter.",
+    "emptyWarning": "These sections have nothing in them: {list}.",
+    "emptyOk": "You can still submit. Not every interview reaches every question, and a survey left open is a survey that never reaches the report.",
+    "oneWay": "After this you will not be able to edit the survey. Reopening one is a coordinator action.",
+    "confirm": "Yes, submit it",
+    "submitting": "Submitting…",
+    "notSubmitted": "Not submitted",
+    "failed": "The survey could not be submitted. Nothing was changed.",
+    "doneTitle": "Survey submitted",
+    "doneSubFed": "Now counted by {list}.",
+    "doneSubNone": "It answers nothing that any indicator reads, so no figure has moved.",
+    "blocked": {
+      "not_permitted": "This survey is no longer yours to submit. An enumerator can change a survey only while it is in progress.",
+      "not_draft": "This survey is not in progress, so there is nothing to submit.",
+      "not_found": "This survey no longer exists. It may have been withdrawn while this page was open.",
+      "error": "Whether this survey can be submitted could not be checked. Nothing has been changed."
+    },
+    "refused": {
+      "not_permitted": "This survey is no longer yours to submit. It may have been submitted from another device while this page was open.",
+      "not_draft": "This survey has already been submitted. Reopening one is a coordinator action.",
+      "not_found": "This survey no longer exists. It may have been withdrawn while this page was open.",
+      "invalid": "The survey was refused and nothing was changed."
+    }
+  },
   "submitted": "Follow-up survey submitted",
   "submittedSub": "{count} of {count} questions recorded",
   "s0": {
@@ -291,11 +322,17 @@
     "sections": "Sections",
     "sectionLabel": "Section {key}",
     "done": "Saved",
-    "toCome": "To come",
     "locked": "Not asked",
     "lockedWhy": "Section D is put only to people at the twelve-month round. The database refuses those answers on any other round.",
-    "noSubmitYet": "There is no submit button yet, and that is deliberate: submitting with five sections empty would put a survey into four percentages that nothing could tell apart from a real one.",
-    "open": "Open"
+    "open": "Open",
+    "empty": "Empty",
+    "unknown": "Not known",
+    "reopenIsCoordinator": "An enumerator cannot change a survey once it is submitted. Reopening one is a coordinator action.",
+    "state": {
+      "submitted": "This survey has been submitted. A1, B1, C1 and IMP-0 count it from now on.",
+      "approved": "This survey has been submitted and approved by a coordinator.",
+      "rejected": "A coordinator has rejected this survey. It is not counted."
+    }
   },
   "backToSurvey": "Back to this survey",
   "selectAll": "Select all that apply.",
@@ -544,6 +581,33 @@
       "not_found": "This survey no longer exists. It may have been withdrawn while this page was open.",
       "not_permitted": "You may not edit this survey. An enumerator can edit a survey only while it is in progress; after that it is a coordinator's to change.",
       "not_twelve_month": "This survey is not a twelve-month round, so it has no section D. The round is set when the survey is started and cannot be changed from here.",
+      "invalid": "One of the answers in this section was refused. Nothing was written — the whole section is saved together or not at all."
+    }
+  },
+  "e": {
+    "title": "Section E — Closing",
+    "intro": "Questions 41 to 43, asked in every round. Saving this section keeps it; it does not submit the survey.",
+    "q41": "What additional support would help you most in the next year?",
+    "q42": "May we contact you again for a follow-up in six months?",
+    "q42Note": "A “no” is recorded as an answer, not left blank — it is what stops the next round calling.",
+    "q42opt": {
+      "yes": "Yes, you may contact me",
+      "no": "No, please do not"
+    },
+    "q43": "Enumerator notes",
+    "q43Note": "For anything the forty-two coded answers did not cover. Nothing here is counted.",
+    "q43Label": "Notes",
+    "q43Ph": "Anything the answers above do not capture",
+    "savesNote": "Saving stores this section now. The survey stays in progress and counts towards nothing until you submit it on the survey page.",
+    "save": "Save this section",
+    "saving": "Saving…",
+    "saved": "Section E saved",
+    "savedSub": "The survey is still in progress. Submit it when you are ready.",
+    "notSaved": "Not saved",
+    "saveFailed": "The section could not be saved. Nothing was written.",
+    "refused": {
+      "not_found": "This survey no longer exists. It may have been withdrawn while this page was open.",
+      "not_permitted": "You may not edit this survey. An enumerator can edit a survey only while it is in progress; after that it is a coordinator’s to change.",
       "invalid": "One of the answers in this section was refused. Nothing was written — the whole section is saved together or not at all."
     }
   }

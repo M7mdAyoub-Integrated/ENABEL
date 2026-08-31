@@ -358,15 +358,33 @@ select code from indicator where data_source is null or view_name is null;
 -- 4. no table with RLS but no policy
 --    (queries in 05_ROLES_AND_RLS.md §9)
 
--- 5. anon reaches nothing, now and for objects created later
+-- 5. anon reaches the public site and nothing else
+--    NOT "anon reaches nothing" -- that was written before the public site
+--    existed and has been false since 0048. See 05 section 9, same correction.
 select
   (select count(*) from information_schema.role_table_grants
-     where grantee='anon' and table_schema='public')            as anon_table_grants,
+     where grantee='anon' and table_schema='public'
+       and table_name not in ('v_public_opportunity','v_public_activity_type',
+                              'v_public_producer_type','v_public_product'))
+                                                                 as unexpected_table_grants,
   (select count(*) from information_schema.role_routine_grants
-     where grantee='anon' and specific_schema='public')          as anon_routine_grants,
+     where grantee='anon' and specific_schema='public'
+       and routine_name not in ('applicant_prefill','apply_for_opportunity',
+                                'my_applications','request_linkage'))
+                                                                 as unexpected_routine_grants,
   (select count(*) from pg_policies where schemaname='public'
-     and ('anon' = any(roles) or 'public' = any(roles)))         as policies_open_to_anon;
+     and ('anon' = any(roles) or 'public' = any(roles))
+     and tablename not in ('advisory_session','advisory_enrolment','linkage_request'))
+                                                                 as unexpected_open_policies;
 -- all three must be 0
+
+-- 5a. and the expected ones are still there, so 5 cannot pass by deletion
+select
+  (select count(*) from information_schema.role_table_grants
+     where grantee='anon' and table_schema='public' and privilege_type='SELECT') = 4  as four_views,
+  (select count(*) from information_schema.role_routine_grants
+     where grantee='anon' and specific_schema='public') = 4                           as four_rpcs;
+-- both must be true
 
 -- 5b. no SECURITY DEFINER function is callable by a client role unless it takes
 --     no arguments and can only report on the caller
@@ -375,8 +393,29 @@ select p.proname, pg_get_function_identity_arguments(p.oid) as args,
 from pg_proc p join pg_namespace n on n.oid=p.pronamespace
 where n.nspname='public' and p.prosecdef
   and has_function_privilege('authenticated', p.oid, 'execute');
--- expect only: current_role, is_staff, is_coordinator, my_person_id — all with empty args.
--- Anything here that takes an argument can be used to ask about another user.
+-- Was: "expect only current_role, is_staff, is_coordinator, my_person_id, all
+-- with empty args". That stopped being true at 0052 and is now nine functions
+-- out of date, so it reported a breach on every run and told nobody anything.
+--
+-- The rule it was reaching for still stands: ANY definer here that takes an
+-- argument can be asked about somebody else, so each one must carry its own
+-- gate inside the function body. Check the list against this, not against zero:
+--
+--   applicant_prefill, apply_for_opportunity, my_applications, request_linkage
+--                            national ID + date of birth or phone, deliberately,
+--                            so an anonymous caller cannot enumerate IDs (0050-0054)
+--   followup_prefill_for_staff, start_followup
+--                            coordinator or enumerator, checked in the body (0074)
+--   count_markets_attended   coordinator or enumerator, moved INSIDE the
+--                            function by 0089 so the grant does not reopen
+--                            what 0086 closed -- see 05 section 14
+--   indicator_figures, overview_counts
+--                            aggregate figures only, no personal data
+--   current_role, is_staff, is_coordinator, my_person_id
+--                            no arguments, report only on the caller
+--
+-- A NEW definer callable by `authenticated` and taking an argument is the thing
+-- to stop at review. Adding one to this list is a decision, not bookkeeping.
 
 -- 6. soft delete works end to end
 --    delete a partner, confirm A1.2 and G0.4 both drop
