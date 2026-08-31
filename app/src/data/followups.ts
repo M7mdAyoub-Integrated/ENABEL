@@ -41,6 +41,7 @@ export const followupKeys = {
   one: (id: string) => ['followups', 'one', id] as const,
   prefill: (nid: string) => ['followups', 'prefill', nid] as const,
   submit: (id: string) => ['followups', 'submit', id] as const,
+  review: (id: string) => ['followups', 'review', id] as const,
 }
 
 /* ── prefill: Q5, Q6, Q30 ─────────────────────────────────────────────────── */
@@ -171,6 +172,15 @@ export type FollowupRow = {
   contactDate: string
   status: string
   enumeratorName: string | null
+  /**
+   * The coordinator's reason, when there is one.
+   *
+   * Read by the enumerator, not only by the coordinator who wrote it: a
+   * rejected survey is frozen to them until it is reopened, and this is the
+   * only thing that says what to fix. See 0097.
+   */
+  reviewNote: string | null
+  reviewedAt: string | null
 }
 
 type FollowupSelect = {
@@ -179,6 +189,8 @@ type FollowupSelect = {
   contact_date: string
   status: string
   enumerator_name: string | null
+  review_note: string | null
+  reviewed_at: string | null
   person: { full_name: string; national_id: string }
 }
 
@@ -193,7 +205,8 @@ export function useFollowups() {
       const res = await supabase
         .from('followup_survey')
         .select(
-          'id, round, contact_date, status, enumerator_name, person!inner ( full_name, national_id )',
+          'id, round, contact_date, status, enumerator_name, review_note, reviewed_at,' +
+            ' person!inner ( full_name, national_id )',
         )
         .is('deleted_at', null)
         .is('person.deleted_at', null)
@@ -208,6 +221,8 @@ export function useFollowups() {
         contactDate: r.contact_date,
         status: r.status,
         enumeratorName: r.enumerator_name,
+        reviewNote: r.review_note,
+        reviewedAt: r.reviewed_at,
       }))
     },
   })
@@ -1023,6 +1038,133 @@ export function useSubmitFollowup() {
         void qc.invalidateQueries({ queryKey: followupKeys.one(surveyId) })
         void qc.invalidateQueries({ queryKey: followupKeys.list() })
         void qc.invalidateQueries({ queryKey: followupKeys.submit(surveyId) })
+        void qc.invalidateQueries({ queryKey: ['indicators'] })
+      }
+    },
+  })
+}
+
+/* ── reviewing: approve, reject, reopen ───────────────────────────────────── */
+
+export type ReviewAction = 'approve' | 'reject' | 'reopen'
+
+export type ReviewResult = {
+  ok: boolean
+  result:
+    | 'preview'
+    | 'reviewed'
+    | 'not_found'
+    /** Not a coordinator, or the survey is not theirs to see. */
+    | 'not_permitted'
+    /** Approve and reject need a submitted survey; reopen needs a non-draft. */
+    | 'not_reviewable'
+    | 'reason_required'
+    /** An approval carries no note. Refused rather than discarded. */
+    | 'note_not_accepted'
+    | 'bad_action'
+    | 'invalid'
+  survey_id?: string
+  action?: ReviewAction
+  /** The status it has now. */
+  status?: string
+  /** The status this action would leave it in. */
+  status_after?: string
+  /** Which indicators count it at its CURRENT status. */
+  indicators_now?: FedIndicator[]
+  /** Which would count it AFTER. */
+  indicators_after?: FedIndicator[]
+  /** now minus after — what this action takes out of the figures. */
+  indicators_removed?: FedIndicator[]
+  /** after minus now. Empty for all three actions today; see below. */
+  indicators_added?: FedIndicator[]
+  period?: string | null
+  person_live?: boolean
+  constraint?: string
+}
+
+/**
+ * What one review action would do, asked before doing it.
+ *
+ * ── WHY EVERY LIST COMES FROM THE SERVER ──
+ *
+ * The four views admit `submitted` and `approved` identically, so approving
+ * moves no figure and rejecting or reopening removes the survey from all four.
+ * That sentence is TRUE TODAY and this file does not know it: `review_followup`
+ * asks `followup_indicator_reach` twice — once at the current status, once at
+ * the status the action would produce — and each of those reads the view's own
+ * admitted statuses out of `pg_get_viewdef` (0098).
+ *
+ * So the screen renders `indicators_removed` rather than deciding for itself
+ * that approval is harmless. If a view were ever narrowed to approved-only,
+ * `indicators_added` would stop being empty and this screen would say so
+ * without anybody editing it.
+ *
+ * Never compute an indicator, or the effect on one, in the front end.
+ *
+ * ── SAFE TO RUN ON DEMAND ──
+ *
+ * `p_confirm = false` writes nothing. It takes a brief row lock, which is how
+ * RLS refuses a caller who may not write this survey (0068), so the preview is
+ * also the permission check.
+ */
+export function useReviewPreview(id: string | undefined, action: ReviewAction | null) {
+  return useQuery({
+    queryKey: followupKeys.review(id ?? '').concat(action ?? 'none'),
+    enabled: !!id && !!action,
+    // Never cached: the status may have moved under this screen.
+    staleTime: 0,
+    queryFn: async (): Promise<ReviewResult> => {
+      const { data, error } = await supabase.rpc('review_followup', {
+        p_survey_id: id!,
+        p_action: action!,
+        p_confirm: false,
+      })
+      if (error) throw toAppError(error)
+      return data as ReviewResult
+    },
+  })
+}
+
+/**
+ * The act itself. Coordinator only.
+ *
+ * The UI hides these buttons from everyone else, and that is not what stops
+ * them. `fu_update`'s USING filters a submitted survey for an enumerator — a
+ * zero-row UPDATE that reports success — and `guard_followup_review` (0097)
+ * raises for any non-coordinator status change even from a connection with no
+ * JWT. Both were verified as an enumerator, through RLS. The hidden button is
+ * a courtesy; the policy is the boundary.
+ *
+ * Indicator queries are invalidated on every outcome, not only the ones that
+ * move a figure: approving genuinely moves nothing today, but this screen must
+ * not be the thing that decides that.
+ */
+export function useReviewFollowup() {
+  const qc = useQueryClient()
+  return useMutation({
+    retry: false,
+    mutationFn: async (v: {
+      surveyId: string
+      action: ReviewAction
+      note?: string
+    }): Promise<ReviewResult> => {
+      const { data, error } = await supabase.rpc('review_followup', {
+        p_survey_id: v.surveyId,
+        p_action: v.action,
+        // Only sent when there is one. An approval that carries a note is
+        // refused by the function rather than having it quietly dropped.
+        ...(v.note && v.note.trim() ? { p_note: v.note.trim() } : {}),
+        p_confirm: true,
+      })
+      if (error) throw toAppError(error)
+      return data as ReviewResult
+    },
+    onSuccess: (res, v) => {
+      if (res.result === 'reviewed') {
+        void qc.invalidateQueries({ queryKey: followupKeys.one(v.surveyId) })
+        void qc.invalidateQueries({ queryKey: followupKeys.list() })
+        void qc.invalidateQueries({ queryKey: followupKeys.submit(v.surveyId) })
+        void qc.invalidateQueries({ queryKey: followupKeys.review(v.surveyId) })
         void qc.invalidateQueries({ queryKey: ['indicators'] })
       }
     },

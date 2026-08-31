@@ -395,6 +395,70 @@ create policy fa_write on public.followup_answer
   ));
 ```
 
+### The review side, and what actually refuses an enumerator
+
+`0099` added `review_followup` — approve, reject and reopen — and `0097` added
+`reviewed_by`, `reviewed_at`, `review_note`, the `rejected_has_a_reason`
+constraint and the `guard_followup_review` trigger.
+
+There are four things between an enumerator and an approval, and **only three
+of them are boundaries**:
+
+| | what it does |
+|---|---|
+| `fu_update` USING | coordinator on any survey, enumerator only while it is a draft |
+| `fu_update` WITH CHECK | enumerator may write only `draft` or `submitted` (0093) |
+| `guard_followup_review` | raises for any non-coordinator status change, including from a connection with no JWT (§12) |
+| the role test inside `review_followup` | **not a boundary.** It exists so the refusal is a readable `not_permitted` instead of a filtered row or a raw 42501 |
+
+Measured as an enumerator, through RLS, writing to the table **directly** rather
+than through the function, in a transaction that rolled back:
+
+| attempt | result |
+|---|---|
+| `SUBMITTED -> approved` | no error, **0 rows**, status unchanged |
+| `SUBMITTED -> rejected` | no error, **0 rows**, status unchanged |
+| `SUBMITTED -> draft` (reopen) | no error, **0 rows**, status unchanged |
+| their own `DRAFT -> approved` | **raised 42501**, status unchanged |
+
+> **Three of those four refusals are silent.** `fu_update`'s USING filters the
+> row; the UPDATE affects nothing and reports success, so a client driving
+> PostgREST directly gets a 200 back. This is the seventh failure in `CLAUDE.md`
+> on the review path, and it is why `review_followup` counts what came back
+> (`GET DIAGNOSTICS`) instead of trusting that the UPDATE did anything.
+
+The fourth is what `guard_followup_review` is for: on a **draft** the enumerator
+passes USING, so the row is not filtered and only the trigger stops them. It got
+there before the WITH CHECK did.
+
+`data_entry`, `partner_viewer` and `participant` receive `not_found` rather than
+`not_permitted`, because `fu_read` does not admit them either — the survey
+genuinely does not exist as far as they can see, and saying so leaks nothing.
+
+### Approving does not move a figure, and the function proves it rather than saying it
+
+All four survey-fed views admit `submitted` and `approved` identically, so
+approval changes no number; rejecting and reopening remove the survey from every
+indicator it feeds. **That sentence is not written down in the function.**
+`followup_indicator_reach` (0098) is asked twice — at the current status and at
+the status the action would produce — and it reads each view's admitted statuses
+out of `pg_get_viewdef` rather than assuming them. The difference between the
+two answers is what the screen renders.
+
+The obvious way to read that gate is wrong, and it is worth knowing why:
+
+```
+'status = ANY \(ARRAY\[([^]]*)\]\)'      -- matches q17_activity_STATUS
+'\mstatus = ANY \(ARRAY\[([^]]*)\]\)'    -- correct; \m is a word boundary
+```
+
+Without `\m` the pattern matches `q17_activity_status` in `v_ind_c1` and returns
+Q17's answer list, from which no `record_status_t` value can be read — so C1
+would have been reported as unaffected by any status change. Wrong, and wrong in
+the reassuring direction. `followup_view_statuses` requires **exactly one** gate
+and raises otherwise; both failure shapes were sabotage-tested against a
+rewritten view before the migration was applied.
+
 ---
 
 ## 8. Storage

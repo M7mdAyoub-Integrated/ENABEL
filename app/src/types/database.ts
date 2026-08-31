@@ -958,6 +958,9 @@ export type Database = {
           q40_income_change: string | null
           q43_enumerator_notes: string | null
           respondent: Database["public"]["Enums"]["respondent_t"]
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
           round: Database["public"]["Enums"]["followup_round_t"]
           status: Database["public"]["Enums"]["record_status_t"]
           updated_at: string
@@ -991,6 +994,9 @@ export type Database = {
           q40_income_change?: string | null
           q43_enumerator_notes?: string | null
           respondent: Database["public"]["Enums"]["respondent_t"]
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           round: Database["public"]["Enums"]["followup_round_t"]
           status?: Database["public"]["Enums"]["record_status_t"]
           updated_at?: string
@@ -1024,6 +1030,9 @@ export type Database = {
           q40_income_change?: string | null
           q43_enumerator_notes?: string | null
           respondent?: Database["public"]["Enums"]["respondent_t"]
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           round?: Database["public"]["Enums"]["followup_round_t"]
           status?: Database["public"]["Enums"]["record_status_t"]
           updated_at?: string
@@ -3890,6 +3899,17 @@ export type Database = {
         Returns: Database["public"]["Enums"]["app_role_t"]
       }
       followup_prefill: { Args: { p_national_id: string }; Returns: Json }
+      followup_indicator_reach: {
+        Args: {
+          p_status: Database["public"]["Enums"]["record_status_t"]
+          p_survey_id: string
+        }
+        Returns: string[]
+      }
+      followup_view_statuses: {
+        Args: { p_view: string }
+        Returns: string[]
+      }
       followup_prefill_for_staff: {
         Args: { p_national_id: string }
         Returns: Json
@@ -4086,6 +4106,15 @@ export type Database = {
       }
       submit_followup: {
         Args: { p_confirm?: boolean; p_survey_id: string }
+        Returns: Json
+      }
+      review_followup: {
+        Args: {
+          p_action: string
+          p_confirm?: boolean
+          p_note?: string
+          p_survey_id: string
+        }
         Returns: Json
       }
       training_session_delete_impact: {

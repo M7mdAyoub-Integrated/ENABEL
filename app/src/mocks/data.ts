@@ -970,6 +970,9 @@ export const SURVEYS: FollowupSurvey[] = [
     q38_capacity: null,
     q40_income_change: null,
     q43_enumerator_notes: null,
+    review_note: null,
+    reviewed_at: '2026-08-20T09:00:00Z',
+    reviewed_by: null,
     client_uuid: null,
 
   },
@@ -1000,6 +1003,9 @@ export const SURVEYS: FollowupSurvey[] = [
     q38_capacity: null,
     q40_income_change: null,
     q43_enumerator_notes: null,
+    review_note: null,
+    reviewed_at: '2026-08-20T09:00:00Z',
+    reviewed_by: null,
     client_uuid: null,
 
   },
@@ -1030,6 +1036,9 @@ export const SURVEYS: FollowupSurvey[] = [
     q38_capacity: null,
     q40_income_change: null,
     q43_enumerator_notes: null,
+    review_note: null,
+    reviewed_at: null,
+    reviewed_by: null,
     client_uuid: null,
 
   },
@@ -1060,6 +1069,11 @@ export const SURVEYS: FollowupSurvey[] = [
     q38_capacity: null,
     q40_income_change: null,
     q43_enumerator_notes: null,
+    review_note:
+      'Not reached after three attempts, but the sections were left part-filled. ' +
+      'Clear them or record the refusal, then submit again.',
+    reviewed_at: '2026-08-21T08:30:00Z',
+    reviewed_by: null,
     client_uuid: null,
 
   },

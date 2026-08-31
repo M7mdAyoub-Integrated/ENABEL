@@ -54,6 +54,14 @@ export type Capability =
   | 'record.delete'
   /** Approve or reject an exhibition registration. Coordinator only -- 05 section 5. */
   | 'registration.review'
+  /**
+   * Approve, reject or reopen a follow-up survey. Coordinator only -- 05
+   * section 7, and enforced by fu_update plus guard_followup_review (0093,
+   * 0097). Separate from registration.review because they are different
+   * decisions on different records: one admits a producer to a market, the
+   * other stands behind forty-three answers about a household.
+   */
+  | 'survey.review'
   /** Use the participant portal. */
   | 'portal.access'
 
@@ -67,6 +75,7 @@ const CAPABILITIES: Record<Role, ReadonlySet<Capability>> = {
     'record.edit',
     'record.delete',
     'registration.review',
+    'survey.review',
   ]),
   data_entry: new Set<Capability>([
     'app.access',
@@ -87,6 +96,8 @@ const CAPABILITIES: Record<Role, ReadonlySet<Capability>> = {
     // the prototype dashboard is a municipal management screen.
     'record.create',
     'record.edit',
+    // No survey.review. An enumerator fills a survey in and submits it once;
+    // approving their own work is the thing 0093 was written to stop.
   ]),
   partner_viewer: new Set<Capability>([
     'app.access',

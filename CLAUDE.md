@@ -118,6 +118,10 @@ Do this instead:
 
 The manifest is a saved snapshot, so a migration applied after it was last generated shows up as `NOT APPLIED` — the check is comparing against a stale list, not reporting a real problem. Append the new line rather than concluding the file is wrong.
 
+**Write migration files with LF endings, and be careful when a script writes one.** `0098` was assembled by a Python script that appended to the file with the default `open(path, 'a')`. On Windows that translates `\n` to `\r\n`, so the second half of the file had CRLF while the half written by the editor had LF. The applied text had LF throughout, so the file and the ledger no longer matched — and the file *read back* identically, because Python's universal-newline mode converts CRLF to LF on the way in. Every line hashed the same; only the whole-file hash differed.
+
+`check_migration_files.sh` caught it, which is the point of it. Two things follow: pass `newline=''` (or write bytes) when a script writes a migration, and when the check reports a difference that no per-line comparison can find, compare the byte counts before looking for anything cleverer.
+
 The recovered files are byte-identical to what was applied, taken from the migration ledger — not reconstructed from the schema. `0030` and `0031` are deliberate exceptions and are listed in the check script: the applied text of `0030` contains a password literal, so repairing it from the ledger would put a credential back into git.
 
 **A secret written into a migration survives a git history rewrite.** `supabase_migrations.schema_migrations` stores the applied SQL verbatim, so anything that has ever been in a migration exists in *two* places. Scrubbing the repository — even with `git-filter-repo`, even verified against the remote — does not touch the ledger copy. That is exactly what happened here: the test-account password was removed from git history, and its original text sat in the ledger unnoticed until the recovery work went looking.
@@ -136,7 +140,7 @@ This is a real municipality with a real donor. If a definition is ambiguous, sto
 
 ## Checks that verify shape, not substance
 
-This has now happened nine times, in nine unrelated parts of the project. It is
+This has now happened ten times, in ten unrelated parts of the project. It is
 one failure mode, and it is worth naming because every instance looked fine.
 
 | | what existed | what was missing |
@@ -150,6 +154,7 @@ one failure mode, and it is worth naming because every instance looked fine.
 | Eight multi-select junctions | a `delete`, a success response, a green toast, and a comment explaining the design | a DELETE **policy** — RLS filtered every row, so unticking a box did nothing, silently, forever |
 | `save_followup_section_a` after `0082` | the file, the function, the right signature, a passing migration check and a passing test of the new behaviour | the read-back guard `0080` had added — `create or replace` was written from `0079`'s text and reverted it |
 | `save_followup_section_c` after `0088` | the function, the right signature, the RLS policies, four seeded option lists, a green build, and a Q30 prefill that worked on screen | `EXECUTE` on the definer it calls — every test ran as the owner, and a privilege check does not fire for the owner. `authenticated` could not save Section C at all |
+| 14 `t(key, { defaultValue })` fallbacks in 9 files | a fallback at every call site that builds a key from a variable, exactly where one is needed | `parseMissingKeyHandler` was `(key) => key` and threw the default away. **Not one of the fourteen had ever fired.** A missing key rendered as `review.blocked.reason_required` on a coordinator's screen |
 
 In each case the thing that would normally be checked *was there*. The file
 existed. The key existed. The comment existed. The translation key existed. Any
@@ -179,6 +184,43 @@ technique for testing it.
 > run it.** `set local role` plus `set local request.jwt.claims`, inside a
 > transaction you roll back. Both directions: the roles that should reach it,
 > and the roles that should not.
+
+**The tenth is the fifth again, wearing the safety net that was supposed to stop
+it.**
+
+Every place this app builds a translation key from a variable —
+`t(\`survey:review.blocked.${result}\`, { defaultValue: … })` — passes a
+`defaultValue`, because a server can always return a result nobody wrote wording
+for. Fourteen of them, across nine files, all correct-looking.
+
+`parseMissingKeyHandler` was `(key: string) => key`. i18next passes the resolved
+default as the **second** argument, and the handler did not take one. So the
+default was discarded at every single site and the raw key was rendered instead.
+None of the fourteen had ever fired, and nothing could have said so: the key is
+built at runtime, so `tsc` cannot see it, the untranslated-value check only looks
+at keys that exist, and the missing-key console warning fires *and then the
+fallback silently fails anyway*.
+
+It surfaced as `review.blocked.reason_required` on a coordinator's screen, found
+by opening the page — the same way `description.os` was found.
+
+> **A fallback that has never fired is not a fallback.** If code exists to
+> handle a case that should not happen, make the case happen once and watch it.
+> Here that is two lines in the browser console:
+>
+>     i18n.t('ns:no.such.key', { defaultValue: 'FALLBACK' })   // must not be the key
+>     i18n.t('ns:no.such.key')                                 // must not be blank
+
+And a rule that came out of the same defect, on the database side:
+
+> **A preview never refuses on the CONTENT of what is being submitted.** It
+> describes what the action would do; refusals about content belong to the act.
+> `review_followup` checked "a rejection needs a reason" before building its
+> payload, so previewing a rejection returned `reason_required` instead of the
+> consequence — and rejecting is the one action of the three that takes a figure
+> out of a quarter that may already have been reported. Approve and reopen need
+> no note, so both previewed correctly and testing them proved nothing. Fixed in
+> `0100`.
 
 The sixth is the one to remember, because the check was a deliberate act rather
 than an oversight. Someone asked "do the survey views filter `status`?", ran

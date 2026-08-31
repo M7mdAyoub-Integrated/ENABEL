@@ -120,7 +120,18 @@ void i18n
         `[i18n] missing key "${ns}:${key}" for locale(s) ${Array.isArray(lngs) ? lngs.join(', ') : String(lngs)} — falling back.`,
       )
     },
-    parseMissingKeyHandler: (key: string) => key,
+    // The second argument is the `defaultValue` the call site passed, and it
+    // MUST be honoured. This read `(key) => key`, which threw it away — so
+    // every `t(dynamicKey, { defaultValue: … })` in the app was decorative and
+    // rendered the raw key instead. Fourteen call sites across nine files were
+    // relying on a fallback that had never once fired.
+    //
+    // Found the way this project's fifth failure was found: a raw
+    // `review.blocked.reason_required` on a live screen, on a panel that had a
+    // defaultValue sitting right next to it. Verified in the console before and
+    // after — missing key with a defaultValue now returns the defaultValue, and
+    // one without still returns the key rather than blank.
+    parseMissingKeyHandler: (key: string, defaultValue?: string) => defaultValue ?? key,
     returnEmptyString: false,
   })
 

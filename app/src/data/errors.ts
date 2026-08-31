@@ -81,6 +81,10 @@ const CONSTRAINT_MESSAGES: Record<string, string> = {
   followup_survey_person_round_live: 'errors:db.followupDuplicate',
   exhibition_booth_capacity_check: 'errors:db.boothCapacityPositive',
   exhibition_dates: 'errors:db.exhibitionDateOrder',
+  // The backstop behind review_followup's own reason_required check (0097).
+  // The function refuses a blank reason first and names the field; this only
+  // surfaces for a write that did not go through it.
+  rejected_has_a_reason: 'errors:db.rejectionNeedsReason',
 }
 
 /** Trigger messages we recognise, matched on a distinctive fragment. */

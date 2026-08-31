@@ -610,5 +610,78 @@
       "not_permitted": "You may not edit this survey. An enumerator can edit a survey only while it is in progress; after that it is a coordinator’s to change.",
       "invalid": "One of the answers in this section was refused. Nothing was written — the whole section is saved together or not at all."
     }
+  },
+  "review": {
+    "heading": "Review",
+    "intro": {
+      "submitted": "This survey has been submitted and is being counted. Approving it records that you have read it. Rejecting or reopening it takes it back out of the figures.",
+      "approved": "You approved this survey. Reopening it returns it to the enumerator as a draft and takes it back out of the figures.",
+      "rejected": "You rejected this survey. Reopening it returns it to the enumerator as a draft so they can correct it and submit it again."
+    },
+    "action": {
+      "approve": "Approve",
+      "reject": "Reject",
+      "reopen": "Reopen"
+    },
+    "confirmEyebrow": {
+      "approve": "Before you approve",
+      "reject": "Before you reject",
+      "reopen": "Before you reopen"
+    },
+    "noMove": "This survey is counted by {list}, and it still will be. Approving does not move any figure.",
+    "noMoveWhy": "The indicators count a survey from the moment it is submitted. Approving records that a coordinator has read it; the numbers were already set.",
+    "willRemove": {
+      "approve": "Approving would take this survey out of {list}.",
+      "reject": "Rejecting takes this survey out of {list}.",
+      "reopen": "Reopening takes this survey out of {list}."
+    },
+    "willAdd": "It would start being counted by {list}.",
+    "removeFromPeriod": "Those figures are for the {period} reporting period, which may already have been reported.",
+    "feedsNothing": "This survey is not counted by any indicator, so nothing in the figures changes either way.",
+    "reasonLabel": {
+      "reject": "Why is it being rejected?",
+      "reopen": "Note for the enumerator (optional)"
+    },
+    "reasonPlaceholder": {
+      "reject": "What is wrong, and what should be checked again",
+      "reopen": "What should be changed before it is submitted again"
+    },
+    "reasonHelp": {
+      "reject": "Required. The enumerator cannot edit a rejected survey, so this is the only thing that tells them what to correct.",
+      "reopen": "Optional. Left blank, any earlier rejection reason stays on the survey."
+    },
+    "confirm": {
+      "approve": "Yes, approve it",
+      "reject": "Yes, reject it",
+      "reopen": "Yes, reopen it"
+    },
+    "working": "Saving…",
+    "notDone": "Not changed",
+    "failed": "The review could not be recorded. Nothing was changed.",
+    "noteHeading": "Coordinator's note",
+    "doneTitle": {
+      "approve": "Survey approved",
+      "reject": "Survey rejected",
+      "reopen": "Survey reopened"
+    },
+    "doneSubRemoved": "No longer counted by {list}.",
+    "doneSubUnchanged": "No figure has moved.",
+    "blocked": {
+      "not_permitted": "Only a coordinator can review a follow-up survey.",
+      "not_reviewable": "This survey is not in a state where that can be done. It may have been changed from another device while this page was open.",
+      "not_found": "This survey no longer exists. It may have been withdrawn while this page was open.",
+      "error": "What this would change could not be checked. Nothing has been changed.",
+      "reason_required": "This rejection has no reason yet. Type one below.",
+      "note_not_accepted": "An approval does not carry a note. Clear it, or reject the survey instead."
+    },
+    "refused": {
+      "not_permitted": "Only a coordinator can review a follow-up survey. Nothing was changed.",
+      "not_reviewable": "This survey is no longer in a state where that can be done. Reload the page to see where it stands.",
+      "not_found": "This survey no longer exists. It may have been withdrawn while this page was open.",
+      "reason_required": "A rejection must say why. Add a reason and try again.",
+      "note_not_accepted": "An approval does not carry a note. Clear it, or reject the survey instead.",
+      "bad_action": "That is not a review action. Nothing was changed.",
+      "invalid": "The review was refused and nothing was changed."
+    }
   }
 }
