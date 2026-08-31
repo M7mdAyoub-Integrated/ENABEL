@@ -298,11 +298,11 @@ than no summary — a reader counts nine reds and stops looking.
 | Priority | Count | Codes |
 |---|---|---|
 | 🔴 Blocks a reported number | 9 | OQ-1, OQ-2, OQ-3, OQ-4, OQ-5, OQ-12, OQ-25, OQ-30, OQ-32 |
-| 🟠 Affects the schema, the forms or a permission | 14 | OQ-6, OQ-7, OQ-8, OQ-9, OQ-10, OQ-11, OQ-13, OQ-14, OQ-21, OQ-26, OQ-27, OQ-28, OQ-29, OQ-35 |
+| 🟠 Affects the schema, the forms or a permission | 15 | OQ-6, OQ-7, OQ-8, OQ-9, OQ-10, OQ-11, OQ-13, OQ-14, OQ-21, OQ-26, OQ-27, OQ-28, OQ-29, OQ-35, OQ-36 |
 | 🟡 Wording and presentation | 8 | OQ-15, OQ-16, OQ-17, OQ-18, OQ-19, OQ-20, OQ-33, OQ-34 |
 | 🟢 Resolved or fixed | 4 | OQ-22, OQ-23, OQ-24, OQ-31 |
 
-**31 open, 4 closed, 35 in total.**
+**32 open, 4 closed, 36 in total.**
 
 Two of the reds are the ones that stop work rather than merely misreport it:
 **OQ-32** (138 Arabic labels, blocking the survey in the field) and **OQ-25**
@@ -852,3 +852,48 @@ The failure mode is one migration away: a permissive branch that does not depend
 **Take OQ-12 to the Coordinator first.** It is the one that undermines the purpose of the programme, and it is a form change, not a database change.
 
 Note: OQ-12 and OQ-13 were briefly marked resolved on 2026-08-24 when the form fields were built, then set back to open when that work was reverted the same day at the project owner's instruction. Each carries a **History** line recording what was built and what survived. Nothing about the underlying questions has changed.
+
+---
+
+## 🟠 OQ-36 · Approving a follow-up survey moves no figure, and that may not be what the M&E lead expects
+
+**Raised 2026-08-31, building the coordinator's review UI (`0097`–`0100`).**
+
+**What the database does.** `v_ind_a1`, `v_ind_b1`, `v_ind_c1` and `v_ind_imp_0`
+all admit `status in ('submitted','approved')`. So a survey enters A1, B1, C1 and
+IMP-0 the moment an **enumerator** submits it. A coordinator's approval records
+that somebody read it and changes no number; rejecting or reopening removes it
+from all four.
+
+**Why that might be wrong.** The alternative reading — approval is the gate, and
+only `approved` counts — is the one most people assume when they see an approval
+step, and it is what `exhibition_registration` does: `E0.2` counts **approved
+only**, and `05_ROLES_AND_RLS.md` §5 says that trigger "is what makes the figure
+defensible to the donor."
+
+So the platform now has two review workflows with opposite semantics, and
+nothing in the source workbook settles which one a follow-up survey should
+follow.
+
+**The case for leaving it.** A survey held out of the figures until a coordinator
+finds time to read it under-reports the quarter, and the enumerator has already
+done the work. Submission is the act of record; review is quality assurance
+after the fact, with the divergence visible.
+
+**The case for changing it.** IMP-0 is the Action Plan's impact indicator and A1,
+B1 and C1 are its three intermediate results. If the donor asks "who checked
+this figure", the honest answer today is "an enumerator, and a coordinator may or
+may not have looked since."
+
+**Interim behaviour.** Unchanged, and **stated on screen rather than left to be
+discovered**: the confirmation panel tells the coordinator, before they approve,
+that the survey is already counted and that approving will not move anything.
+That sentence is computed from `pg_get_viewdef` (`0098`), not written down — so
+if the answer to this question is "approval should be the gate", narrowing the
+four views is the whole change and every screen follows the same day.
+
+**Decides.** M&E lead, with Enabel. It is a reporting-policy question, not a
+schema one.
+
+**Needed.** One sentence: does a follow-up survey count from submission, or from
+approval?
