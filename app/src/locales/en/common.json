@@ -21,7 +21,8 @@
     "dismiss": "Dismiss",
     "expand": "Expand",
     "collapse": "Collapse",
-    "retry": "Try again"
+    "retry": "Try again",
+    "edit": "Edit"
   },
   "toast": {
     "saved": "Saved",
@@ -77,6 +78,14 @@
       "under_review": "Under review",
       "active": "Active",
       "ended": "Ended"
+    },
+    "partnershipType": {
+      "training": "Training",
+      "production_support": "Production support"
+    },
+    "advisoryTrack": {
+      "market": "Market",
+      "home_based": "Home-based production"
     }
   },
   "units": {

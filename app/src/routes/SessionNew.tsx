@@ -7,8 +7,12 @@ import {
   useManagedSession,
   type ManagedSession,
   type SessionKind,
+  type AdvisoryTrack,
 } from '../data/sessions'
-import { usePartnerships } from '../data/partnerships'
+// The merged partner list. A session's delivering partnership may be of either
+// type -- a university that trains, or a processor that hosts an advisory --
+// so this offers all of them with the type shown, rather than one list each.
+import { usePartnershipOptions } from '../data/partnerships'
 import { useRef as useRefTable } from '../data/refTables'
 import { ARROW_START } from '../ui/glyphs'
 
@@ -156,8 +160,12 @@ function SessionForm({
   const update = useUpdateSession()
 
   const topics = useRefTable('training_topic')
-  const partnerships = usePartnerships('training')
+  const partnerships = usePartnershipOptions()
 
+  // Advisory only, and required there. ONE form for both tracks: they take the
+  // same fields and differ only in what the advisory is FOR, so a second form
+  // would be a copy of eighteen fields waiting to drift from this one.
+  const [track, setTrack] = useState<'' | AdvisoryTrack>(initial?.track ?? '')
   const [title, setTitle] = useState(initial?.title ?? '')
   const [topicId, setTopicId] = useState(initial?.topic_id ?? '')
   const [startDate, setStartDate] = useState(initial?.start_date ?? '')
@@ -180,13 +188,14 @@ function SessionForm({
 
   const durationOk = hours !== '' && Number(hours) > 0
   const datesOk = !!startDate && !!endDate && endDate >= startDate
+  const trackOk = kind !== 'advisory' || track !== ''
   const ready =
-    title.trim() && topicId && datesOk && durationOk && venue.trim() && focalPoint.trim()
+    title.trim() && topicId && datesOk && durationOk && venue.trim() && focalPoint.trim() && trackOk
 
   // Warnings, computed from what has been typed so far. None of them block.
   const closesAfterStart = !!closesOn && !!startDate && closesOn > startDate
   const windowInPast = !!closesOn && closesOn < today
-  const noPartners = !partnerships.isLoading && (partnerships.data ?? []).length === 0
+  const noPartners = !partnerships.isLoading && partnerships.options.length === 0
   const endBeforeStart = !!startDate && !!endDate && endDate < startDate
 
   const busy = create.isPending || update.isPending
@@ -206,6 +215,9 @@ function SessionForm({
       plannedSeats: seats === '' ? null : Number(seats),
       applicationOpensOn: opensOn || null,
       applicationClosesOn: closesOn || null,
+      // Undefined on a training session -- training_session has no such column,
+      // and sending it would be rejected by PostgREST for the whole statement.
+      ...(kind === 'advisory' && track !== '' ? { track } : {}),
     }
     if (mode === 'edit' && id) {
       await update.mutateAsync({ ...values, id, kind })
@@ -227,11 +239,25 @@ function SessionForm({
         <span aria-hidden="true" className="inline-block mirror-rtl">
           {ARROW_START}
         </span>
-        <span className="ms-2">{t('forms:session.backToSessions')}</span>
+        <span className="ms-2">
+          {t(kind === 'advisory' ? 'forms:session.backToAdvisory' : 'forms:session.backToSessions')}
+        </span>
       </Link>
 
       <h1 className="mt-1 text-[24px] font-black uppercase leading-[1.08] tracking-[-0.03em] sm:text-[30px]">
-        {mode === 'edit' ? t('forms:newSession.headingEdit') : t('forms:newSession.heading')}
+        {/* This screen serves training AND both advisory tracks, and until now
+            it called itself "New training session" on /advisory/new — on the
+            one form whose whole job is to ask which kind of thing is being
+            created. */}
+        {t(
+          kind === 'advisory'
+            ? mode === 'edit'
+              ? 'forms:newSession.headingEditAdvisory'
+              : 'forms:newSession.headingAdvisory'
+            : mode === 'edit'
+              ? 'forms:newSession.headingEdit'
+              : 'forms:newSession.heading',
+        )}
       </h1>
       <p className="mt-1 max-w-[62ch] text-[14px] leading-[1.5] text-muted">
         {t('forms:newSession.intro')}
@@ -250,6 +276,34 @@ function SessionForm({
             {t('forms:newSession.sectionWhat')}
           </legend>
           <div className="flex flex-col gap-4">
+            {/* First, because it decides what the rest of the form is about --
+                and because it is what the linkage gate reads. A producer may
+                ask to be connected to a buyer only after completing a MARKET
+                advisory (0106); a home-based one covers food safety, licensing
+                and packaging and does not open that door. */}
+            {kind === 'advisory' ? (
+              <Field
+                label={t('forms:newSession.track')}
+                hint={t('forms:newSession.trackHint')}
+                required
+              >
+                <select
+                  className={INPUT}
+                  value={track}
+                  onChange={(e) => setTrack(e.target.value as '' | AdvisoryTrack)}
+                >
+                  <option value="">{t('forms:newSession.choose')}</option>
+                  <option value="market">{t('common:enums.advisoryTrack.market')}</option>
+                  <option value="home_based">{t('common:enums.advisoryTrack.home_based')}</option>
+                </select>
+                {track !== '' ? (
+                  <p className="mt-1 text-[13px] leading-[1.5] text-muted">
+                    {t(`forms:newSession.trackNote.${track}`)}
+                  </p>
+                ) : null}
+              </Field>
+            ) : null}
+
             <Field label={t('forms:newSession.title')} required>
               <input dir="auto" className={INPUT} value={title} onChange={(e) => setTitle(e.target.value)} />
             </Field>
@@ -324,12 +378,24 @@ function SessionForm({
                 onChange={(e) => setPartnershipId(e.target.value)}
               >
                 <option value="">{t('forms:newSession.noPartner')}</option>
-                {(partnerships.data ?? []).map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                    {p.unit ? ` — ${p.unit}` : ''}
-                  </option>
-                ))}
+                {/* The partnership TYPE is shown beside each, because the list
+                    is no longer filtered to one -- a body that trains and a
+                    body that supports production can both deliver a session,
+                    and the coordinator should see which they are choosing. */}
+                {partnerships.options.map((p) => {
+                  // Built here rather than as a locale key: the label is a name
+                  // and a translated type joined by punctuation, so a key for it
+                  // would hold the same string in both languages and read to
+                  // check-untranslated as an untranslated value. It would be
+                  // right about the shape and wrong about the substance.
+                  const type = t(`common:enums.partnershipType.${p.type}`)
+                  const label = `${p.name}${p.unit ? ` — ${p.unit}` : ''} · ${type}`
+                  return (
+                    <option key={p.partnershipId} value={p.partnershipId}>
+                      {label}
+                    </option>
+                  )
+                })}
               </select>
             </Field>
 

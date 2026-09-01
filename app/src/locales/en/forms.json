@@ -30,7 +30,9 @@
     "ex": "New exhibition",
     "rg": "New registration",
     "fu": "Start a follow-up",
-    "os": "Record a visit"
+    "os": "Record a visit",
+    "gd": "Record guidance",
+    "pn": "New partner"
   },
   "description": {
     "tp": "Institutions and organisations contributing to the delivery of the training programme.",
@@ -40,7 +42,9 @@
     "ex": "Municipal markets and exhibitions organised under the Action Plan. Only events already held count towards E0.1.",
     "rg": "Producer registrations per event. Registrations from the producer portal wait for municipality approval.",
     "fu": "Follow-up interviews at six and twelve months. Forty-three questions across six sections.",
-    "os": "One record per visit to the coordination office. B1.2 counts distinct people, not visits — the same farmer coming six times is one person and six records."
+    "os": "One record per visit to the coordination office. B1.2 counts distinct people, not visits — the same farmer coming six times is one person and six records.",
+    "gd": "One record per session of guidance on food safety, licensing, packaging and related requirements. D0.1 counts distinct producers, not sessions — the same producer helped three times is one producer and three records.",
+    "pn": "Every organisation the Municipality works with, listed once. An organisation may hold a training agreement, a production-support agreement, or both — the type is a field on the form, not a separate list."
   },
   "searchPlaceholder": {
     "tp": "Search partner or contact person",
@@ -49,7 +53,10 @@
     "ln": "Search farmer or partner",
     "ex": "Search exhibition or location",
     "rg": "Search participant or national ID",
-    "fu": "Search respondent or national ID"
+    "fu": "Search respondent or national ID",
+    "os": "Search national ID or name",
+    "gd": "Search national ID or name",
+    "pn": "Search partner or contact person"
   },
   "filterAll": {
     "tp": "All partner types",
@@ -59,7 +66,9 @@
     "ex": "All statuses",
     "rg": "All statuses",
     "fu": "All rounds",
-    "os": "All services"
+    "os": "All services",
+    "gd": "All guidance types",
+    "pn": "All partnership types"
   },
   "columns": {
     "tp": [
@@ -121,6 +130,20 @@
       "Service",
       "Date",
       "Adviser"
+    ],
+    "gd": [
+      "National ID",
+      "Producer",
+      "Guidance",
+      "Date",
+      "Delivered by"
+    ],
+    "pn": [
+      "Organisation",
+      "Partnerships held",
+      "Contact",
+      "Phone",
+      "Email"
     ]
   },
   "empty": {
@@ -159,7 +182,25 @@
     "roleTraining": "Primary role in the training programme",
     "roleProduction": "Primary role in supporting local producers",
     "roleHelpTraining": "At least one role is needed for the partnership to count towards A1.2.",
-    "roleHelpProduction": "At least one role is needed for the partnership to count towards C1.1."
+    "roleHelpProduction": "At least one role is needed for the partnership to count towards C1.1.",
+    "unit": "Unit or faculty",
+    "unitHelp": "Optional. Two units of one university are two partners — the name and the unit together are what make an organisation unique.",
+    "oneOrganisation": "One organisation, one record. If this body is already on file under the same name and unit, saving updates it rather than creating a second one.",
+    "agreement": "The agreement",
+    "agreementNote": "Which kind of partnership this is. A1.2 counts training partnerships and C1.1 counts production-support ones, so this choice decides which indicator the record feeds.",
+    "partnershipType": "Partnership type",
+    "partnershipTypeHelp": "To give an organisation the other kind as well, open it again and choose the other type. It keeps one record.",
+    "partnershipTypeRequired": "Choose a partnership type.",
+    "chooseTypeFirst": "Choose a partnership type above. The partner types and roles are different lists for each, so there is nothing to offer until then.",
+    "roleEither": "Primary roles",
+    "noPartnership": "No agreement yet",
+    "agreementsHeading": "Agreements held",
+    "agreementsBody": "One block per partnership. The type is what separates A1.2 from C1.1, so each block names the indicator it feeds.",
+    "noAgreements": "This organisation holds no live agreement, so it feeds no indicator yet.",
+    "feedsIndicator": "Feeds {code}",
+    "removeAgreement": "Remove this agreement",
+    "deleteAgreementWarn": "{code} drops by one. The organisation and its other agreement stay.",
+    "addOtherType": "To add the other kind of agreement to this organisation, edit it and choose the other partnership type — it keeps one record."
   },
   "completion": {
     "identification": "Identification",
@@ -311,7 +352,9 @@
     "tc": "A1.3 and D0.1 are recalculated in the next quarterly return. This cannot be undone.",
     "rg": "E0.2 is recalculated in the next quarterly return. This cannot be undone.",
     "fu": "A1, B1, C1 and IMP-0 are recalculated in the next quarterly return. This cannot be undone.",
-    "os": "B1.2 counts distinct people reaching office services. Removing this visit only changes the figure if it was that person’s only one."
+    "os": "B1.2 counts distinct people reaching office services. Removing this visit only changes the figure if it was that person’s only one.",
+    "gd": "D0.1 counts distinct producers receiving guidance. Removing this record only changes the figure if it was that producer’s only one.",
+    "pn": "This removes the ORGANISATION and every agreement it holds. A1.2, C1.1 and G0.4 all drop, including in quarters already reported. To remove one agreement and keep the other, use the partnerships panel instead."
   },
   "saveChanges": "Save changes",
   "session": {
@@ -343,7 +386,7 @@
     "deliveryRefused": "The database refused this. A session cannot be recorded as delivered before it has ended.",
     "participants": "Participants",
     "pendingCount": "{count, plural, =0 {nothing awaiting review} one {# awaiting review} other {# awaiting review}}",
-    "threeFactsNote": "Accepted, attended and completed are three separate facts. Only completed counts towards indicator A1.3 and unlocks market advisory.",
+    "threeFactsNote": "Accepted, attended and completed are three separate facts. Only completed counts towards indicator A1.3 and unlocks advisory.",
     "noParticipants": "Nobody has applied yet.",
     "colPerson": "Person",
     "colApplication": "Application",
@@ -369,9 +412,9 @@
     "deleteConfirmTitle": "Delete this session?",
     "deleteChecking": "Checking what this would affect…",
     "deleteImpactEnrolments": "{count, plural, =0 {Nobody is enrolled on this session.} one {# person is enrolled on this session.} other {# people are enrolled on this session.}}",
-    "deleteImpactEligibility": "{count, plural, one {# person would lose access to market advisory, because this is the only training they have completed.} other {# people would lose access to market advisory, because this is the only training they have completed.}}",
+    "deleteImpactEligibility": "{count, plural, one {# person would lose access to advisory, because this is the only training they have completed.} other {# people would lose access to advisory, because this is the only training they have completed.}}",
     "deleteImpactKeepAdvisory": "{count, plural, one {# of them already has an advisory place, which they keep.} other {# of them already have advisory places, which they keep.}}",
-    "deleteImpactNone": "Nobody would lose access to market advisory.",
+    "deleteImpactNone": "Nobody would lose access to advisory.",
     "deleteCancel": "Keep this session",
     "deleteConfirm": "Delete anyway",
     "publicFocalPointValue": "— “{value}”",
@@ -388,8 +431,8 @@
       "description": "Description"
     },
     "endedNoPublish": "This session has already ended, so it cannot be published. The public site only lists what is still to come — publishing it would change nothing anyone could see.",
-    "listHeadingAdvisory": "Market advisory sessions",
-    "listIntroAdvisory": "Advisory is for people who have completed a training. Publish a session to open it for applications.",
+    "listHeadingAdvisory": "Advisory sessions",
+    "listIntroAdvisory": "Advisory is for people who have completed a training. Each session is on one of two tracks — market, or home-based production. Publish a session to open it for applications.",
     "newAdvisory": "New advisory session",
     "noAdvisory": "No advisory sessions yet.",
     "colQualified": "Qualified by",
@@ -400,7 +443,7 @@
     "deliveryBodyAdvisory": "Recording delivery says the session actually took place. Unlike a training, this does not feed any indicator — advisory has none of its own, and C1.3 is an open question that is deliberately not wired to it. It is recorded so the programme has an honest account of what was delivered.",
     "deliveredLabelAdvisory": "This session took place",
     "deliveryNotEndedAdvisory": "This session has not ended yet, so it cannot be recorded as delivered.",
-    "threeFactsNoteAdvisory": "Accepted, attended and completed are three separate facts. Only completed unlocks a market linkage request — and unlike a training, completing an advisory does not move any indicator.",
+    "threeFactsNoteAdvisory": "Accepted, attended and completed are three separate facts. Completing a session on the MARKET track unlocks a market linkage request; the home-based track does not. Unlike a training, completing an advisory does not move any indicator.",
     "colCompletedAdvisory": "Completed the advisory",
     "backToAdvisory": "All advisory sessions",
     "publishedBodyAdvisory": "This session is on the public site now. People who have completed a training can see it and apply.",
@@ -447,7 +490,15 @@
     "saveFailed": "Could not save this session. Check your connection and try again.",
     "notPublishedYet": "Once created, the session is a draft. It is not on the public site until you publish it from the session page.",
     "headingEdit": "Edit training session",
-    "saveChanges": "Save changes"
+    "saveChanges": "Save changes",
+    "track": "What this advisory is for",
+    "trackHint": "One form serves both. The choice decides whether completing this session lets a producer ask to be connected to a buyer.",
+    "trackNote": {
+      "market": "Completing a session on this track is what lets a producer ask the Municipality to connect them to a buyer.",
+      "home_based": "Food safety, licensing and packaging for home-based production. Completing this does NOT open a market linkage request."
+    },
+    "headingAdvisory": "New advisory session",
+    "headingEditAdvisory": "Edit advisory session"
   },
   "exhibitionAdmin": {
     "backToList": "All markets",
@@ -491,11 +542,11 @@
   "linkageAdmin": {
     "eyebrow": "Market linkage",
     "queueTitle": "Linkage requests",
-    "queueIntro": "Producers who finished a market advisory session and asked to be connected to a buyer, a processor, a supplier or a market.",
+    "queueIntro": "Producers who finished an advisory session on the market track and asked to be connected to a buyer, a processor, a supplier or a market.",
     "requests": "Requests",
     "openCount": "{count, plural, =0 {nothing awaiting review} one {# awaiting review} other {# awaiting review}}",
     "emptyTitle": "No requests yet",
-    "emptyBody": "Nobody has asked to be connected. A request can only be made by someone who has completed a market advisory session.",
+    "emptyBody": "Nobody has asked to be connected. A request can only be made by someone who has completed an advisory session on the market track.",
     "loadFailedTitle": "Could not load the queue",
     "loadFailed": "Check your connection and try again.",
     "queueNote": "Matching a request creates a production initiative and a market linkage together. The linkage starts as proposed. Indicator C1.2 counts initiatives whose linkage is active or ended, so it does not move until the linkage does.",
@@ -574,7 +625,9 @@
     "toastMatchedAttached": "Matched to the existing initiative",
     "toastProposed": "The linkage starts as proposed, so C1.2 has not moved.",
     "toastLinkStatus": "Linkage is now {status}",
-    "toastClosed": "Request closed"
+    "toastClosed": "Request closed",
+    "approveIsMatch": "Approving this request and choosing a partner are the same act. A linkage always names who the producer was connected to, so there is no way to approve one without saying who — and nothing else on this screen approves it.",
+    "qualifiedBy": "Completed advisory on record"
   },
   "office": {
     "who": "Who came in",
@@ -617,5 +670,96 @@
       "bad_national_id": "A national ID is exactly nine digits.",
       "initiative_details_required": "A new initiative needs a title and an activity type."
     }
+  },
+  "guidance": {
+    "who": "Who was given guidance",
+    "whoNote": "We have no record of this national ID. Filling this in will create a new person record.",
+    "returning": "This producer is already on file. Their details are shown as recorded and are not edited here — D0.1 counts them once however many times they are helped.",
+    "nidHelp": "Ask for the card. D0.1 counts distinct producers, so the national ID is what keeps a returning producer from being counted as a new one.",
+    "name": "Full name",
+    "sex": "Sex",
+    "age": "Age",
+    "phone": "Phone",
+    "village": "Village",
+    "given": "The guidance",
+    "type": "What the guidance was about",
+    "date": "Date of guidance",
+    "deliveredBy": "Delivered by",
+    "deliveredByHelp": "The officer or partner who gave the guidance."
+  },
+  "initiative": {
+    "listHeading": "Production initiatives",
+    "listIntro": "Small-scale and family-based production activities supported under the Action Plan. Mentorship sessions are recorded on the initiative they were delivered to.",
+    "loadFailed": "The initiatives could not be loaded.",
+    "none": "No initiatives yet. One is created when a linkage request is matched, or when a linkage is recorded directly.",
+    "backToList": "Initiatives",
+    "activity": "Activity type",
+    "product": "Main product",
+    "startedOn": "Started on",
+    "statusLabel": "Status",
+    "status": {
+      "planned": "Planned",
+      "operating": "Operating",
+      "paused": "Paused",
+      "stopped": "Stopped"
+    },
+    "linkage": {
+      "proposed": "Linkage proposed",
+      "under_review": "Linkage under review",
+      "active": "Linkage active",
+      "ended": "Linkage ended"
+    },
+    "sessionCount": "{count, plural, one {# session} other {# sessions}}",
+    "mentorshipHeading": "Advisory mentorship sessions",
+    "mentorshipBody": "Every session recorded here adds one to C1.3. Unlike the coordination office and the guidance log, this counts sessions and not people — three sessions with the same producer are three.",
+    "c13Line": "C1.3 in {period}: {actual} of {target}",
+    "noSessions": "No mentorship sessions recorded for this initiative yet.",
+    "addSession": "Record a mentorship session",
+    "editSession": "Edit this session",
+    "saveSession": "Save session",
+    "sessionDate": "Date of session",
+    "topic": "What the session covered",
+    "topicPh": "e.g. Costing and pricing the product",
+    "adviser": "Adviser",
+    "dateRequired": "A date is required.",
+    "topicRequired": "A topic is required.",
+    "deleteWarn": "C1.3 drops by one. This cannot be undone."
+  },
+  "contribution": {
+    "heading": "Contributions this partner has made",
+    "body": "G0.4 counts partners with at least one documented contribution inside the reporting period, and it resets every quarter. A partner with an agreement and no activity this quarter does not count, and a second contribution from the same partner in the same quarter moves nothing.",
+    "g04Line": "G0.4 in {period}: {actual} of {target}",
+    "none": "No contributions recorded for this partner.",
+    "automatic": "Recorded automatically",
+    "from": {
+      "coordination_meeting": "From this partner’s attendance at a coordination meeting. Withdraw the meeting to withdraw the credit.",
+      "market_linkage": "From a market linkage that is active or ended. Take the linkage back to proposed to withdraw the credit.",
+      "training_session": "From a training session marked delivered. Un-mark delivery to withdraw the credit."
+    },
+    "fromUnknown": "Recorded automatically from another record.",
+    "addOne": "Record a contribution",
+    "editOne": "Edit this contribution",
+    "addNote": "Only for what nothing else records. Coordination meetings, market linkages and delivered training sessions already write their own contribution — entering one of those by hand would count the partner twice in the log, though not twice in G0.4.",
+    "date": "Date of the contribution",
+    "dateHelp": "This decides which quarter it counts in — the date it happened, not the date it was entered.",
+    "typeLabel": "Kind of contribution",
+    "type": {
+      "training": "Training",
+      "service": "Service",
+      "referral": "Referral",
+      "market": "Market opportunity",
+      "funding": "Funding",
+      "coordination": "Coordination",
+      "other": "Other"
+    },
+    "description": "What the partner did",
+    "descriptionPh": "e.g. Donated seedlings to four households",
+    "save": "Save contribution",
+    "dateRequired": "A date is required.",
+    "descRequired": "A description is required.",
+    "deleteWarn": "G0.4 drops by one if this was the partner’s only contribution this quarter.",
+    "underWhich": "Under which agreement",
+    "partnershipRequired": "Choose which agreement this was made under.",
+    "noAgreement": "This organisation holds no live agreement. A contribution is always made under one, so there is nowhere to record this until it has one."
   }
 }

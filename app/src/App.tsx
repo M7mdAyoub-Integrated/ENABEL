@@ -31,6 +31,8 @@ import FollowupSectionC from './routes/FollowupSectionC'
 import FollowupSectionD from './routes/FollowupSectionD'
 import FollowupSectionE from './routes/FollowupSectionE'
 import LinkageMatch from './routes/LinkageMatch'
+import InitiativeList from './routes/InitiativeList'
+import InitiativeDetail from './routes/InitiativeDetail'
 import SessionList from './routes/SessionList'
 import SessionNew from './routes/SessionNew'
 import ExhibitionDetail from './routes/ExhibitionDetail'
@@ -136,16 +138,27 @@ const router = createBrowserRouter([
           <RequireCapability capability="dashboard.view">{n}</RequireCapability>
         )),
       },
-      // rg and ln are retired. A link removed from the sidebar is still a live
-      // URL in someone's bookmarks, and these two fake-saved -- so they
-      // redirect to the screen that actually does the work rather than 404.
+      // rg, ln, tp and pp are retired. A link removed from the sidebar is still
+      // a live URL in someone's bookmarks, so they redirect to the screen that
+      // actually does the work rather than 404.
+      //
+      // tp and pp go to the merged Partners LIST rather than to a record,
+      // because their `:id` was a PARTNERSHIP and `/forms/pn/:id` is a PARTNER.
+      // Carrying the id across would open the wrong organisation, or none.
       //
       // Each concrete shape is spelled out rather than using `/forms/rg/*`. A
       // splat scores LOWER than a route ending in a static segment, so
       // `/forms/:module/new` beat `/forms/rg/*` and the retired form kept
       // rendering. Verified by following the URL, not by reading the config.
-      ...(['rg', 'ln', 'fu'] as const).flatMap((m) => {
-        const to = m === 'rg' ? '/forms/ex' : m === 'ln' ? '/linkage-requests' : '/followups'
+      ...(['rg', 'ln', 'fu', 'tp', 'pp'] as const).flatMap((m) => {
+        const to =
+          m === 'rg'
+            ? '/forms/ex'
+            : m === 'ln'
+              ? '/linkage-requests'
+              : m === 'fu'
+                ? '/followups'
+                : '/forms/pn'
         return [`/forms/${m}`, `/forms/${m}/new`, `/forms/${m}/:id`, `/forms/${m}/:id/edit`].map(
           (path) => ({ path, element: <Navigate to={to} replace /> }),
         )
@@ -232,6 +245,23 @@ const router = createBrowserRouter([
       {
         path: '/linkage-requests/:id',
         element: guard(<LinkageMatch />, (n) => (
+          <RequireCapability capability="record.edit">{n}</RequireCapability>
+        )),
+      },
+      // Production initiatives. They existed in the database from 0009 and
+      // could be CREATED by matching a linkage request, but never opened
+      // again -- so C1.3, whose rows hang off one, had nowhere to be entered.
+      // There is no /initiatives/new: an initiative comes from a linkage, and
+      // a second creation path would let one exist with no linkage behind it.
+      {
+        path: '/initiatives',
+        element: guard(<InitiativeList />, (n) => (
+          <RequireCapability capability="record.edit">{n}</RequireCapability>
+        )),
+      },
+      {
+        path: '/initiatives/:id',
+        element: guard(<InitiativeDetail />, (n) => (
           <RequireCapability capability="record.edit">{n}</RequireCapability>
         )),
       },

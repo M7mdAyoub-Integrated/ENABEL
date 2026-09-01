@@ -7,12 +7,15 @@ import { useAuth } from '../auth/AuthProvider'
 import { can, canWriteModule } from '../auth/permissions'
 import { useMutations } from '../hooks/useData'
 import { useModuleDetail } from '../data/moduleDetail'
-import { useDeletePartnership } from '../data/partnerships'
+import { usePartner, useDeletePartner } from '../data/partnerships'
 import { useDeleteExhibition } from '../data/exhibitions'
 import { useDeleteCompletion } from '../data/completions'
 import { useDeleteOfficeService } from '../data/officeServices'
+import { useDeleteGuidanceRecord } from '../data/guidance'
 import { DetailSkeleton, ErrorState, WriteError } from '../ui/states'
 import { BidiIsolate } from '../components/BidiIsolate'
+import { ContributionLog } from '../components/ContributionLog'
+import { PartnershipsPanel } from '../components/PartnershipsPanel'
 import {
   AccentRule,
   BackLink,
@@ -57,26 +60,33 @@ export function DetailScreen() {
   // shift when the :module route param changes. A module with no entry here
   // still falls through to the session-local mock remove -- which is why a
   // delete that looked like it worked did nothing before Exhibitions was added.
-  const delTraining = useDeletePartnership('training')
-  const delProduction = useDeletePartnership('production_support')
+  const delPartner = useDeletePartner()
+  // The agreements this organisation holds, so the contributions log knows
+  // whether it has to ASK which one a hand-entered contribution belongs to.
+  const partnerQ = usePartner(module === 'pn' ? id : undefined, module === 'pn')
+  const heldPartnerships = (partnerQ.data?.partnerships ?? []).map((ps) => ({
+    id: ps.id,
+    type: ps.type as string,
+  }))
   const delExhibition = useDeleteExhibition()
   const delCompletion = useDeleteCompletion()
   const delOffice = useDeleteOfficeService()
+  const delGuidance = useDeleteGuidanceRecord()
   const liveDelete =
-    module === 'tp'
-      ? delTraining
-      : module === 'pp'
-        ? delProduction
-        : module === 'ex'
-          ? delExhibition
-          : module === 'tc'
-            ? delCompletion
-            // `os` was missing here when the module was built, so deleting an
-            // office visit fell through to the session-local mock remove and
-            // fired a "Deleted" toast while B1.2 did not move. That is the
-            // exact failure the comment above this map already warned about.
-            : module === 'os'
-              ? delOffice
+    module === 'pn'
+      ? delPartner
+      : module === 'ex'
+        ? delExhibition
+        : module === 'tc'
+          ? delCompletion
+          // `os` was missing here when the module was built, so deleting an
+          // office visit fell through to the session-local mock remove and
+          // fired a "Deleted" toast while B1.2 did not move. That is the
+          // exact failure the comment above this map already warned about.
+          : module === 'os'
+            ? delOffice
+            : module === 'gd'
+              ? delGuidance
               : null
 
   if (!valid) return <NotFound />
@@ -227,6 +237,14 @@ export function DetailScreen() {
           </div>
         ) : null}
       </dl>
+
+      {/* The agreements this organisation holds, and then G0.4's log across all
+          of them. `id` here is a PARTNER — the module is keyed on the
+          organisation since the merge, which is also what G0.4 counts. */}
+      {module === 'pn' && id ? <PartnershipsPanel partnerId={id} /> : null}
+      {module === 'pn' && id ? (
+        <ContributionLog partnerId={id} partnerships={heldPartnerships} />
+      ) : null}
 
       {liveDelete?.error ? (
         <WriteError error={liveDelete.error} onDismiss={() => liveDelete.reset()} />

@@ -69,8 +69,16 @@ export type LinkageRequestOutcome =
    * indistinguishable on purpose -- see 0066.
    */
   | 'cannot_verify'
-  /** No completed advisory on record. */
+  /** No completed advisory of ANY kind on record. */
   | 'ineligible'
+  /**
+   * A completed advisory, but on the home-based track. Distinct from
+   * `ineligible` on purpose (0106): this producer did the work, and telling
+   * them their record is missing would send them looking for a lost record
+   * instead of for a market advisory. 05 section 13 is the same lesson in the
+   * coordinator's half of this flow.
+   */
+  | 'wrong_track'
   /** This exact submission was received before, and later withdrawn by staff. */
   | 'withdrawn'
   /** Something broke. Deliberately not folded into cannot_verify -- see 0066. */
@@ -351,57 +359,12 @@ export function useSiblingRequests(personId: string | undefined, exceptId: strin
   })
 }
 
-/* ── partnerships to match against ────────────────────────────────────────── */
-
-export type MatchablePartnership = {
-  id: string
-  partnerName: string
-  unit: string | null
-  partnershipType: 'training' | 'production_support'
-  isActive: boolean
-}
-
-type MatchableSelect = {
-  id: string
-  partnership_type: 'training' | 'production_support'
-  is_active: boolean
-  partner: { name: string; unit: string | null }
-}
-
-/**
- * Every live partnership, both types.
- *
- * NOT filtered to production_support. A market linkage against a training
- * partnership looks wrong and may well be, but nothing in the workbook says
- * so, and refusing it would be a rule we invented -- see OQ-29. The type is
- * returned so the screen can show it beside every option and let a coordinator
- * choose knowingly. Ended partnerships are returned too, and labelled: a
- * linkage made under an agreement that has since ended is a real historical
- * fact, and hiding those would make old records unreproducible.
- */
-export function useMatchablePartnerships() {
-  return useQuery({
-    queryKey: linkageKeys.partnerships(),
-    staleTime: 5 * 60_000,
-    queryFn: async (): Promise<MatchablePartnership[]> => {
-      const res = await supabase
-        .from('partnership')
-        .select('id, partnership_type, is_active, partner!inner ( name, unit )')
-        .is('deleted_at', null)
-        .is('partner.deleted_at', null)
-        .order('partnership_type', { ascending: false })
-      return unwrapList(res as unknown as { data: MatchableSelect[] | null; error: unknown }).map(
-        (r) => ({
-          id: r.id,
-          partnerName: r.partner.name,
-          unit: r.partner.unit,
-          partnershipType: r.partnership_type,
-          isActive: r.is_active,
-        }),
-      )
-    },
-  })
-}
+/* ── partnerships to match against ──────────────────────────────────────────
+   Moved to `usePartnershipOptions` in data/partnerships.ts when tp and pp
+   merged. There were two queries returning the same list -- this one and the
+   session form's -- and two copies of "which partners can be chosen" is how
+   they come to disagree. One implementation now, used by the match screen, the
+   direct-linkage screen and the session form. */
 
 /* ── the match ────────────────────────────────────────────────────────────── */
 
@@ -632,6 +595,68 @@ export function useCreateDirectLinkage() {
         void qc.invalidateQueries({ queryKey: linkageKeys.all })
         void qc.invalidateQueries({ queryKey: ['indicators'] })
       }
+    },
+  })
+}
+
+/* ── what made them eligible ──────────────────────────────────────────────── */
+
+/**
+ * The completed advisory sessions behind a linkage request.
+ *
+ * ── WHY THIS IS ON THE MATCHING SCREEN ──
+ *
+ * Since `0106` a request can only exist if the producer completed an advisory
+ * on the MARKET track. That is a fact the system already holds, and the
+ * coordinator approving the request should not have to go and look it up: the
+ * screen shows which session, on which track, and when it was decided.
+ *
+ * It also makes the gate visible rather than implicit. Before 0106 the rule was
+ * stated in the hint, in the public copy and in the queue intro, and enforced
+ * nowhere -- a home-based completer could ask. Printing the qualifying session
+ * is what would have made that obvious.
+ *
+ * Every track is returned, not just `market`. A producer who did both should be
+ * seen to have done both, and filtering to the qualifying one here would make
+ * this a second copy of the gate's rule -- which is the thing `0106` had to fix
+ * in two places at once.
+ */
+export type AdvisoryQualification = {
+  enrolmentId: string
+  sessionTitle: string
+  track: 'market' | 'home_based'
+  decidedOn: string | null
+  endDate: string
+}
+
+type QualificationSelect = {
+  id: string
+  decided_on: string | null
+  advisory_session: { title: string; track: 'market' | 'home_based'; end_date: string }
+}
+
+export function useAdvisoryQualification(personId: string | undefined) {
+  return useQuery({
+    queryKey: [...linkageKeys.all, 'qualification', personId ?? ''],
+    enabled: !!personId,
+    queryFn: async (): Promise<AdvisoryQualification[]> => {
+      const res = await supabase
+        .from('advisory_enrolment')
+        .select('id, decided_on, advisory_session!inner ( title, track, end_date )')
+        .eq('person_id', personId!)
+        .is('met_criteria', true)
+        .is('deleted_at', null)
+        .is('advisory_session.deleted_at', null)
+        .order('decided_on', { ascending: false })
+      return unwrapList(
+        res as unknown as { data: QualificationSelect[] | null; error: unknown },
+      ).map((r) => ({
+        enrolmentId: r.id,
+        sessionTitle: r.advisory_session.title,
+        track: r.advisory_session.track,
+        decidedOn: r.decided_on,
+        endDate: r.advisory_session.end_date,
+      }))
     },
   })
 }

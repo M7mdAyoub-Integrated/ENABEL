@@ -347,6 +347,9 @@ export function useModuleCounts(): Record<ModuleId, number> {
     const alive = (m: ModuleId, ids: string[]) =>
       ids.filter((id) => !s.deleted.has(`${m}:${id}`)).length
     return {
+      // Retired but still in MODULE_IDS for the redirects. `pn` is live and its
+      // real count comes from useNavCounts.
+      pn: 0,
       tp: alive('tp', db.PARTNERSHIPS.filter((p) => p.partnership_type === 'training').map((p) => p.id)),
       pp: alive('pp', db.PARTNERSHIPS.filter((p) => p.partnership_type === 'production_support').map((p) => p.id)),
       tc: alive('tc', db.TRAINING_ENROLMENTS.map((e) => e.id)),
@@ -358,6 +361,9 @@ export function useModuleCounts(): Record<ModuleId, number> {
       // rows. Its real count comes from useNavCounts; a zero here would only
       // ever show for the instant before that query lands.
       os: 0,
+      // Same as `os`: built after the mock era, no mock rows. The real count
+      // comes from useNavCounts.
+      gd: 0,
     }
   }, [s])
 }

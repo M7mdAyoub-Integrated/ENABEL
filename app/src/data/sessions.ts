@@ -115,7 +115,15 @@ export type ManagedSession = {
   delivered_by_partnership_id: string | null
   /** Advisory only. Null on a training row, which has no such column. */
   adviser?: string | null
+  /**
+   * Advisory only, and NOT NULL there (0105). What the advisory is for:
+   * `market` is the only track that satisfies the linkage gate (0106).
+   */
+  track?: AdvisoryTrack
 }
+
+/** `advisory_track_t`. Absent on training, which has no such column. */
+export type AdvisoryTrack = 'market' | 'home_based'
 
 const COMMON_COLS =
   'id, title, topic_id, start_date, end_date, venue, planned_seats, is_published, ' +
@@ -126,7 +134,7 @@ const COMMON_COLS =
 // `origin` is training-only (0063): advisory has no resolveSession equivalent
 // creating rows as a by-product, so there is no provenance to record.
 const colsFor = (kind: SessionKind) =>
-  kind === 'training' ? `${COMMON_COLS}, origin` : `${COMMON_COLS}, adviser`
+  kind === 'training' ? `${COMMON_COLS}, origin` : `${COMMON_COLS}, adviser, track`
 
 /**
  * Can this be published, and if not, what is missing?
@@ -372,6 +380,40 @@ export type NewSession = {
   plannedSeats: number | null
   applicationOpensOn: string | null
   applicationClosesOn: string | null
+  /**
+   * Advisory only, and required there. ONE form serves both tracks: they take
+   * the same eighteen fields and differ only in what the advisory is FOR, so a
+   * second form would be a copy waiting to drift. Undefined on a training
+   * session, which has no such column -- sending it would be rejected.
+   */
+  track?: AdvisoryTrack
+}
+
+/**
+ * The columns both tables share, from one form.
+ *
+ * `track` is NOT here. It exists only on `advisory_session`, and
+ * `.from(TABLES[kind].session)` gives the union of both tables -- so the
+ * generated Insert type intersects them and `track` collapses to `never`.
+ * Casting past that would take the one check that notices a column being sent
+ * to a table which does not have it, so the two writes below branch on the kind
+ * instead and each is typed against its own table.
+ */
+function sessionColumns(v: NewSession) {
+  return {
+    title: v.title.trim(),
+    topic_id: v.topicId,
+    start_date: v.startDate,
+    end_date: v.endDate,
+    duration_hours: v.durationHours,
+    venue: v.venue.trim(),
+    focal_point: v.focalPoint.trim(),
+    description: v.description.trim(),
+    delivered_by_partnership_id: v.partnershipId,
+    planned_seats: v.plannedSeats,
+    application_opens_on: v.applicationOpensOn,
+    application_closes_on: v.applicationClosesOn,
+  }
 }
 
 export function useUpdateSession() {
@@ -379,28 +421,33 @@ export function useUpdateSession() {
   return useMutation({
     mutationKey: ['sessions', 'update'],
     mutationFn: async (v: NewSession & { id: string; kind: SessionKind }) => {
-      const res = await supabase
-        .from(TABLES[v.kind].session)
-        .update({
-          title: v.title.trim(),
-          topic_id: v.topicId,
-          start_date: v.startDate,
-          end_date: v.endDate,
-          duration_hours: v.durationHours,
-          venue: v.venue.trim(),
-          focal_point: v.focalPoint.trim(),
-          description: v.description.trim(),
-          delivered_by_partnership_id: v.partnershipId,
-          planned_seats: v.plannedSeats,
-          application_opens_on: v.applicationOpensOn,
-          application_closes_on: v.applicationClosesOn,
-          // origin is NOT touched. It records how the row came to exist, which
-          // does not change because someone filled in the gaps afterwards.
-        })
-        .eq('id', v.id)
-        .is('deleted_at', null)
-        .select('id')
-        .single()
+      const res =
+        v.kind === 'advisory'
+          ? await supabase
+              .from('advisory_session')
+              .update({
+                ...sessionColumns(v),
+                // NOT NULL since 0105, so it is never cleared here. A form that
+                // could blank it would be a form that can make a session whose
+                // purpose is unknown, and the linkage gate reads this column.
+                ...(v.track ? { track: v.track } : {}),
+              })
+              .eq('id', v.id)
+              .is('deleted_at', null)
+              .select('id')
+              .single()
+          : await supabase
+              .from('training_session')
+              .update({
+                ...sessionColumns(v),
+                // origin is NOT touched. It records how the row came to exist,
+                // which does not change because someone filled in the gaps
+                // afterwards.
+              })
+              .eq('id', v.id)
+              .is('deleted_at', null)
+              .select('id')
+              .single()
       if (res.error) throw toAppError(res.error)
       return res.data
     },
@@ -417,27 +464,39 @@ export function useCreateSession() {
   return useMutation({
     mutationKey: ['sessions', 'create'],
     mutationFn: async (v: NewSession & { kind: SessionKind }) => {
-      const res = await supabase
-        .from(TABLES[v.kind].session)
-        .insert({
-          title: v.title.trim(),
-          topic_id: v.topicId,
-          start_date: v.startDate,
-          end_date: v.endDate,
-          duration_hours: v.durationHours,
-          venue: v.venue.trim(),
-          focal_point: v.focalPoint.trim(),
-          description: v.description.trim(),
-          // Nullable on purpose: there may be no training partnership yet, and
-          // blocking the form on one would stop a municipality recording a
-          // course it ran alone.
-          ...(v.partnershipId ? { delivered_by_partnership_id: v.partnershipId } : {}),
-          ...(v.plannedSeats === null ? {} : { planned_seats: v.plannedSeats }),
-          ...(v.applicationOpensOn ? { application_opens_on: v.applicationOpensOn } : {}),
-          ...(v.applicationClosesOn ? { application_closes_on: v.applicationClosesOn } : {}),
-        })
-        .select('id')
-        .single()
+      // Nullable on purpose: there may be no delivering partnership yet, and
+      // blocking the form on one would stop a municipality recording a course
+      // it ran alone.
+      const optional = {
+        ...(v.partnershipId ? { delivered_by_partnership_id: v.partnershipId } : {}),
+        ...(v.plannedSeats === null ? {} : { planned_seats: v.plannedSeats }),
+        ...(v.applicationOpensOn ? { application_opens_on: v.applicationOpensOn } : {}),
+        ...(v.applicationClosesOn ? { application_closes_on: v.applicationClosesOn } : {}),
+      }
+      // Branched by kind for the reason on sessionColumns: `track` exists only
+      // on advisory_session, and typing the write against the union of both
+      // tables collapses it to `never`.
+      // NOT NULL with no default since 0105, so the generated Insert type makes
+      // it REQUIRED -- which is the type system saying what the column says.
+      // Refuse rather than omitting it: a session with no track is one whose
+      // purpose, and therefore whether it opens the linkage gate, nobody
+      // stated. The form marks it required; this is what happens if that is
+      // ever bypassed.
+      if (v.kind === 'advisory' && !v.track) {
+        throw toAppError({ code: '23502', message: 'an advisory session needs a track' })
+      }
+      const res =
+        v.kind === 'advisory' && v.track
+          ? await supabase
+              .from('advisory_session')
+              .insert({ ...sessionColumns(v), ...optional, track: v.track })
+              .select('id')
+              .single()
+          : await supabase
+              .from('training_session')
+              .insert({ ...sessionColumns(v), ...optional })
+              .select('id')
+              .single()
       if (res.error) throw toAppError(res.error)
       return res.data
     },

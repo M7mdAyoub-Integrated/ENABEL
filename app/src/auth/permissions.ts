@@ -139,8 +139,14 @@ const MODULE_ACCESS: Record<Role, readonly ModuleId[]> = {
   // and linkages on /linkage-requests -- and both fired a "Saved" toast naming
   // the indicator they fed while writing nothing. They stay in MODULE_IDS so
   // the redirects in App.tsx keep working and nothing else has to be unpicked.
-  coordinator: ['tp', 'pp', 'tc', 'ex', 'os'],
-  data_entry: ['tp', 'pp', 'tc', 'ex'],
+  //
+  // `gd` (the guidance log) goes to BOTH, unlike `os`. `guidance_record`'s
+  // policies are the standard operational four -- is_staff() to read,
+  // coordinator-or-data_entry to write -- and nothing about giving a producer
+  // licensing advice is a coordinator-only act. `os` is narrower only because
+  // an office-staff role is expected to own it later.
+  coordinator: ['pn', 'tc', 'ex', 'os', 'gd'],
+  data_entry: ['pn', 'tc', 'ex', 'gd'],
   enumerator: [],
   partner_viewer: [],
   participant: [],

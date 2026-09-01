@@ -2,15 +2,16 @@
  * The form modules, and everything that is the same shape across them.
  *
  * Seven of them are the seven forms of the Action Plan. `os` -- the
- * coordination office -- is the eighth, and is deliberately not counted among
- * them: CLAUDE.md describes seven forms because the workbook does. The office
- * is a municipal record of walk-in advice, and it exists here because B1.2
- * cannot be computed without it.
+ * coordination office -- and `gd` -- the guidance log -- are the eighth and
+ * ninth, and are deliberately not counted among them: CLAUDE.md describes seven
+ * forms because the workbook does. Both are municipal records the workbook has
+ * no sheet for, and they exist here because B1.2 and D0.1 cannot be computed
+ * without them.
  *
  * Labels are NOT here -- they live in locale files, keyed by module id, so this
  * file stays free of user-visible strings.
  */
-export const MODULE_IDS = ['tp', 'pp', 'tc', 'ln', 'ex', 'rg', 'fu', 'os'] as const
+export const MODULE_IDS = ['pn', 'tp', 'pp', 'tc', 'ln', 'ex', 'rg', 'fu', 'os', 'gd'] as const
 export type ModuleId = (typeof MODULE_IDS)[number]
 
 export function isModuleId(value: string | undefined): value is ModuleId {
@@ -31,6 +32,15 @@ export type ModuleMeta = {
 }
 
 export const MODULES: Record<ModuleId, ModuleMeta> = {
+  // ONE organisation, ONE row. `tp` and `pp` below are retired and redirect
+  // here: they listed PARTNERSHIPS, so a body holding both a training and a
+  // production-support agreement appeared twice under two headings with no way
+  // to tell it was the same organisation. G0.4 counts distinct PARTNERS, so
+  // that presentation taught the opposite of what the indicator does.
+  //
+  // The type has not stopped doing work, it has moved onto the form:
+  // `partnership_type` is still what separates A1.2 from C1.1.
+  pn: { id: 'pn', accent: 'teal', indicators: ['A1.2', 'C1.1', 'G0.4'], columnCount: 5, filterColumn: 1 },
   tp: { id: 'tp', accent: 'teal', indicators: ['A1.2', 'G0.4'], columnCount: 5, filterColumn: 1 },
   pp: { id: 'pp', accent: 'green', indicators: ['C1.1', 'G0.4'], columnCount: 5, filterColumn: 1 },
   tc: { id: 'tc', accent: 'teal', indicators: ['A1.3', 'D0.1'], columnCount: 7, filterColumn: 4 },
@@ -41,6 +51,9 @@ export const MODULES: Record<ModuleId, ModuleMeta> = {
   // B1.2 counts distinct PEOPLE, not visits -- which is why this module is
   // national-ID-first. See data/officeServices.ts.
   os: { id: 'os', accent: 'teal', indicators: ['B1.2'], columnCount: 5, filterColumn: 2 },
+  // D0.1 counts distinct PEOPLE receiving guidance, not sessions of it -- the
+  // same reason `os` is national-ID-first. See data/guidance.ts.
+  gd: { id: 'gd', accent: 'green', indicators: ['D0.1'], columnCount: 5, filterColumn: 2 },
 }
 
 /** Tailwind classes per accent. Kept here so no component hardcodes a colour. */

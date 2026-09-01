@@ -14,7 +14,9 @@
     "ex": "Exhibitions",
     "rg": "Registrations",
     "fu": "Post-intervention",
-    "os": "Coordination office"
+    "os": "Coordination office",
+    "gd": "Guidance log",
+    "pn": "Partners"
   },
   "objective": {
     "tp": "Objective 1",
@@ -24,7 +26,9 @@
     "ex": "Objective 3",
     "rg": "Objective 3",
     "fu": "Cross-cutting",
-    "os": "Objective 1"
+    "os": "Objective 1",
+    "gd": "Objective 2",
+    "pn": "Objectives 1 and 2"
   },
   "group": {
     "partnerships": "Partnerships",
@@ -33,14 +37,16 @@
     "markets": "Markets",
     "followup": "Follow-up",
     "noForm": "No form yet",
-    "office": "Coordination office"
+    "office": "Coordination office",
+    "guidance": "Guidance"
   },
   "signedIn": "Signed in",
   "sessions": "Sessions",
-  "advisory": "Market advisory",
+  "advisory": "Advisory sessions",
   "linkageRequests": "Linkage requests",
   "viewPublicSite": "View public site",
   "municipality": "Municipality",
   "participant": "Participant",
-  "followups": "Follow-up surveys"
+  "followups": "Follow-up surveys",
+  "initiatives": "Production initiatives"
 }

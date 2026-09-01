@@ -75,9 +75,11 @@ export type ReportingPeriod = {
  * training partnerships form (A1.2) and the production one (C1.1).
  */
 const BY_CODE: Record<string, string[]> = {
-  'A1.2': ['tp'],
-  'C1.1': ['pp'],
-  'G0.4': ['tp', 'pp'],
+  // One module now. A1.2 and C1.1 still count different partnership TYPES --
+  // the type moved onto the form, it did not stop doing work.
+  'A1.2': ['pn'],
+  'C1.1': ['pn'],
+  'G0.4': ['pn'],
 }
 
 const BY_SOURCE: Record<string, string[]> = {
@@ -86,6 +88,11 @@ const BY_SOURCE: Record<string, string[]> = {
   market_linkage: ['ln'],
   exhibition: ['ex'],
   exhibition_registration: ['rg'],
+  // `office_service` was missing here for as long as /forms/os has existed, so
+  // B1.2 carried a "no entry path yet" tag beside an indicator that had one.
+  // The stale claim is the defect, not the missing screen.
+  office_service: ['os'],
+  guidance_record: ['gd'],
 }
 
 /**
@@ -105,6 +112,9 @@ const BY_CODE_PATH: Record<string, { to: string; labelKey: string }[]> = {
   'F0.1': [{ to: '/manual-entries', labelKey: 'nav:manualEntries' }],
   'G0.2': [{ to: '/manual-entries', labelKey: 'nav:manualEntries' }],
   'G0.3': [{ to: '/manual-entries', labelKey: 'nav:manualEntries' }],
+  // C1.3 hangs off an initiative -- `mentorship_session.initiative_id` is NOT
+  // NULL -- so its entry path is the initiative list, not a form of its own.
+  'C1.3': [{ to: '/initiatives', labelKey: 'nav:initiatives' }],
 }
 
 export type SourceLink = { to: string; labelKey: string }
@@ -112,10 +122,10 @@ export type SourceLink = { to: string; labelKey: string }
 /**
  * Where the source chip on an indicator row points.
  *
- * Returns [] only when the indicator genuinely has NOWHERE to be entered --
- * which after the manual-entries screen is B1.2, D0.1 and C1.3, all three of
- * which count distinct people and need a per-person log that does not exist
- * yet for D0.1.
+ * Returns [] only when the indicator genuinely has NOWHERE to be entered.
+ * That set is now empty: B1.2 goes to the coordination office, D0.1 to the
+ * guidance log, C1.3 to the initiative it hangs off, and G0.4 to the
+ * partnerships whose contributions feed it.
  */
 export function sourceLinks(code: string, dataSource: string): SourceLink[] {
   const byPath = BY_CODE_PATH[code]

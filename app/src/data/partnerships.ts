@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import { toAppError, unwrap, unwrapList } from './errors'
@@ -179,169 +180,153 @@ export type PartnershipInput = {
 }
 
 /**
- * Create a partner + partnership + roles.
+ * Create or update the organisation and ONE of its partnerships.
  *
- * Three inserts with no transaction, because PostgREST has none. The order is
- * chosen so a failure part-way leaves the least mess:
+ * -- WHY ONE FUNCTION AND NOT A CREATE PLUS AN UPDATE --
  *
- *   1. partner       — if this fails nothing was written.
- *   2. partnership   — if this fails an orphan partner row remains. That is
- *                      harmless: a partner with no partnership feeds no
- *                      indicator, and the next attempt with the same name and
- *                      unit reuses it rather than duplicating (the unique key
- *                      makes the reuse detectable).
- *   3. roles         — if this fails the partnership exists with no role, which
- *                      shows on screen as an incomplete record the coordinator
- *                      can edit. It still counts for A1.2/C1.1, which is
- *                      correct: the partnership is real.
+ * The merged form has partnership type as a FIELD, so "save" means four
+ * different things depending on what is already on file:
  *
- * Doing it the other way round — roles first — would leave rows pointing at a
- * partnership that does not exist. An RPC in a real transaction is the right
- * long-term answer and is noted for Phase 5.
+ *   new organisation                  -> insert partner, insert partnership
+ *   known organisation, new type      -> reuse partner, insert partnership
+ *   known organisation, type it holds -> reuse partner, update partnership
+ *   known organisation, details only  -> reuse partner, update partnership
+ *
+ * The second row is the one the merge exists for. Two separate forms made it
+ * awkward to reach: the only way to give a training partner a
+ * production-support agreement was to type its name into the other form, and
+ * that form matched an existing organisation on NAME ALONE while the unique
+ * index is on (name, unit). Two units of one university would have been
+ * collapsed into one partner, and the second unit's details would have
+ * overwritten the first's.
+ *
+ * `partnership_partner_type_live` -- unique on `(partner_id, partnership_type)`
+ * where not deleted -- is what makes "the type it holds" a single row to update
+ * rather than a set. The database has always been shaped for this.
+ *
+ * -- STILL THREE WRITES WITH NO TRANSACTION --
+ *
+ * PostgREST has none, so the order is chosen so a failure part-way leaves the
+ * least mess, exactly as before: partner, then partnership, then roles. A
+ * partner with no partnership feeds no indicator and is picked up by the next
+ * attempt; a partnership with no role still counts for A1.2/C1.1, which is
+ * correct because the partnership is real. An RPC in a real transaction is the
+ * right long-term answer and is noted for Phase 5.
  */
-export function useCreatePartnership(type: PartnershipType) {
-  const qc = useQueryClient()
+export type SavePartnerInput = PartnershipInput & { partnershipType: PartnershipType }
 
-  return useMutation({
-    mutationFn: async (input: PartnershipInput) => {
-      // Reuse an existing partner with the same name + unit rather than
-      // tripping the unique constraint: the same organisation legitimately
-      // holds both a training and a production-support partnership.
-      const found = await supabase
-        .from('partner')
-        .select('id')
-        .eq('name', input.name.trim())
-        .is('deleted_at', null)
-        .limit(1)
-      const existing = unwrapList(found as unknown as { data: { id: string }[] | null; error: unknown })
-
-      let partnerId: string | undefined = existing[0]?.id
-      if (!partnerId) {
-        const created = unwrap(
-          (await supabase
-            .from('partner')
-            .insert({
-              name: input.name.trim(),
-              unit: input.unit?.trim() || null,
-              contact_person: input.contactPerson?.trim() || null,
-              phone: input.phone?.trim() || null,
-              email: input.email?.trim() || null,
-            })
-            .select('id')
-            .single()) as unknown as { data: { id: string } | null; error: unknown },
-        )
-        partnerId = created.id
-      } else {
-        // Keep the contact details current on the shared partner row.
-        const upd = await supabase
-          .from('partner')
-          .update({
-            unit: input.unit?.trim() || null,
-            contact_person: input.contactPerson?.trim() || null,
-            phone: input.phone?.trim() || null,
-            email: input.email?.trim() || null,
-          })
-          .eq('id', partnerId)
-        if (upd.error) throw toAppError(upd.error)
-      }
-
-      const partnership = unwrap(
-        (await supabase
-          .from('partnership')
-          .insert({
-            partner_id: partnerId,
-            partnership_type: type,
-            partner_type_id: input.partnerTypeId,
-            partner_type_other: input.partnerTypeOther?.trim() || null,
-            established_on: input.establishedOn,
-            is_active: true,
-          })
-          .select('id')
-          .single()) as unknown as { data: { id: string } | null; error: unknown },
-      )
-
-      if (input.roleIds.length > 0) {
-        const ins = await supabase.from('partnership_role').insert(
-          input.roleIds.map((roleId) => ({
-            partnership_id: partnership.id,
-            role_id: roleId,
-            role_other: input.roleOther[roleId]?.trim() || null,
-          })),
-        )
-        if (ins.error) throw toAppError(ins.error)
-      }
-
-      return partnership.id
-    },
-
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: qk.partnerships.all })
-    },
-  })
-}
-
-/**
- * Edit an existing partnership.
- *
- * ── Roles are ADD-ONLY, and that is the database's decision, not a shortcut ──
- *
- * `partnership_role` has SELECT, INSERT and UPDATE policies and no DELETE
- * policy. That is consistent with the rest of the schema, which has no DELETE
- * policy anywhere -- CLAUDE.md rule 2, "never hard-delete". But this table is a
- * pure junction: composite primary key, no `id`, and no `deleted_at`, so it
- * cannot be soft-deleted either.
- *
- * The consequence is that a role can be attached to a partnership and never
- * detached. A delete-then-reinsert -- the obvious way to write "these are the
- * roles now" -- fails in a way that reads like a bug: RLS drops the DELETE
- * silently (PostgREST reports success, zero rows), then the INSERT collides
- * with the rows that are still there and returns 23505 "already exists".
- *
- * FIXED IN 0081. `partnership_role` now has a DELETE policy mirroring its
- * update policy, so removals actually happen and this diffs both ways.
- *
- * The delete asks for the removed rows BACK and compares the count. RLS filters
- * a delete it will not permit and PostgREST reports success, so a count is the
- * only way to tell "removed nothing" from "removed nothing because it was not
- * allowed". A comment describing the problem is what this file had instead, for
- * months, and it is why the same defect was still live in three other
- * junctions when someone finally swept for its shape.
- */
-export function useUpdatePartnership(type: PartnershipType) {
+export function useSavePartner() {
   const qc = useQueryClient()
 
   return useMutation({
     mutationFn: async ({
-      id,
       partnerId,
       input,
-      currentRoleIds,
     }: {
-      id: string
-      partnerId: string
-      input: PartnershipInput
-      currentRoleIds: string[]
+      /** Absent when the form is creating an organisation from scratch. */
+      partnerId?: string
+      input: SavePartnerInput
     }) => {
-      const partner = await supabase
-        .from('partner')
-        .update({
-          name: input.name.trim(),
-          unit: input.unit?.trim() || null,
-          contact_person: input.contactPerson?.trim() || null,
-          phone: input.phone?.trim() || null,
-          email: input.email?.trim() || null,
-        })
-        .eq('id', partnerId)
-      if (partner.error) throw toAppError(partner.error)
+      const unit = input.unit?.trim() || null
+      const fields = {
+        unit,
+        contact_person: input.contactPerson?.trim() || null,
+        phone: input.phone?.trim() || null,
+        email: input.email?.trim() || null,
+      }
 
-      const partnership = await supabase
+      // Find or create the ORGANISATION. Matched on (name, unit) because that
+      // is the unique index -- `partner_name_unique` is NULLS NOT DISTINCT on
+      // the pair, so two units of one university are two partners, and matching
+      // on name alone would silently merge them and split nothing back apart.
+      let id = partnerId
+      if (!id) {
+        const q = supabase
+          .from('partner')
+          .select('id')
+          .eq('name', input.name.trim())
+          .is('deleted_at', null)
+        const found = await (unit === null ? q.is('unit', null) : q.eq('unit', unit)).limit(1)
+        id = unwrapList(
+          found as unknown as { data: { id: string }[] | null; error: unknown },
+        )[0]?.id
+      }
+
+      if (!id) {
+        const created = unwrap(
+          (await supabase
+            .from('partner')
+            .insert({ name: input.name.trim(), ...fields })
+            .select('id')
+            .single()) as unknown as { data: { id: string } | null; error: unknown },
+        )
+        id = created.id
+      } else {
+        const upd = await supabase
+          .from('partner')
+          .update({ name: input.name.trim(), ...fields })
+          .eq('id', id)
+          .is('deleted_at', null)
+          .select('id')
+        if (upd.error) throw toAppError(upd.error)
+        // RLS filters an update it will not permit rather than raising, so the
+        // statement reports success having changed nothing. Count what came back.
+        if (!upd.data || upd.data.length === 0) {
+          throw toAppError({ code: '42501', message: 'partner update matched no visible row' })
+        }
+      }
+
+      // Does this organisation already hold a partnership of the chosen type?
+      const held = await supabase
         .from('partnership')
-        .update({
-          partner_type_id: input.partnerTypeId,
-          partner_type_other: input.partnerTypeOther?.trim() || null,
-        })
-        .eq('id', id)
-      if (partnership.error) throw toAppError(partnership.error)
+        .select('id')
+        .eq('partner_id', id)
+        .eq('partnership_type', input.partnershipType)
+        .is('deleted_at', null)
+        .maybeSingle()
+      if (held.error) throw toAppError(held.error)
+      let partnershipId: string | undefined = held.data?.id
+
+      let currentRoleIds: string[] = []
+      if (partnershipId) {
+        const roles = await supabase
+          .from('partnership_role')
+          .select('role_id')
+          .eq('partnership_id', partnershipId)
+        if (roles.error) throw toAppError(roles.error)
+        currentRoleIds = (roles.data ?? []).map((r) => r.role_id as string)
+
+        const upd = await supabase
+          .from('partnership')
+          .update({
+            partner_type_id: input.partnerTypeId,
+            partner_type_other: input.partnerTypeOther?.trim() || null,
+            established_on: input.establishedOn,
+          })
+          .eq('id', partnershipId)
+          .is('deleted_at', null)
+          .select('id')
+        if (upd.error) throw toAppError(upd.error)
+        if (!upd.data || upd.data.length === 0) {
+          throw toAppError({ code: '42501', message: 'partnership update matched no visible row' })
+        }
+      } else {
+        const created = unwrap(
+          (await supabase
+            .from('partnership')
+            .insert({
+              partner_id: id,
+              partnership_type: input.partnershipType,
+              partner_type_id: input.partnerTypeId,
+              partner_type_other: input.partnerTypeOther?.trim() || null,
+              established_on: input.establishedOn,
+              is_active: true,
+            })
+            .select('id')
+            .single()) as unknown as { data: { id: string } | null; error: unknown },
+        )
+        partnershipId = created.id
+      }
 
       const added = input.roleIds.filter((r) => !currentRoleIds.includes(r))
       const removed = currentRoleIds.filter((r) => !input.roleIds.includes(r))
@@ -349,7 +334,7 @@ export function useUpdatePartnership(type: PartnershipType) {
       if (added.length > 0) {
         const ins = await supabase.from('partnership_role').insert(
           added.map((roleId) => ({
-            partnership_id: id,
+            partnership_id: partnershipId,
             role_id: roleId,
             role_other: input.roleOther[roleId]?.trim() || null,
           })),
@@ -361,60 +346,37 @@ export function useUpdatePartnership(type: PartnershipType) {
         // `.select()` so the deleted rows come BACK. Without it PostgREST
         // reports success on a delete RLS filtered to nothing, which is exactly
         // how this table stayed append-only for months while a comment
-        // described the problem instead of a check catching it.
+        // described the problem instead of a check catching it. Fixed in 0081.
         const del = await supabase
           .from('partnership_role')
           .delete()
-          .eq('partnership_id', id)
+          .eq('partnership_id', partnershipId)
           .in('role_id', removed)
           .select('role_id')
         if (del.error) throw toAppError(del.error)
-
         if ((del.data?.length ?? 0) !== removed.length) {
           throw toAppError({
             code: '42501',
             message:
-              `expected to remove ${removed.length} partnership_role rows, removed ` +
-              `${del.data?.length ?? 0} -- a delete RLS refuses reports success`,
+              'expected to remove ' + removed.length + ' partnership_role rows, removed ' +
+              (del.data?.length ?? 0) + ' -- a delete RLS refuses reports success',
           })
         }
       }
 
-      return id
+      return { partnerId: id, partnershipId }
     },
 
-    // Optimistic: the row updates on screen before the server answers, and is
-    // put back exactly as it was if any statement is refused.
-    onMutate: async ({ id, input }) => {
-      await qc.cancelQueries({ queryKey: qk.partnerships.list(type) })
-      const previous = qc.getQueryData<PartnershipRow[]>(qk.partnerships.list(type))
-      qc.setQueryData<PartnershipRow[]>(qk.partnerships.list(type), (cur) =>
-        (cur ?? []).map((r) =>
-          r.id === id
-            ? {
-                ...r,
-                name: input.name,
-                unit: input.unit,
-                contactPerson: input.contactPerson,
-                phone: input.phone,
-                email: input.email,
-                partnerTypeId: input.partnerTypeId,
-                partnerTypeOther: input.partnerTypeOther,
-                roleIds: input.roleIds,
-              }
-            : r,
-        ),
-      )
-      return { previous }
-    },
-    onError: (_e, _v, ctx) => {
-      if (ctx?.previous) qc.setQueryData(qk.partnerships.list(type), ctx.previous)
-    },
-    onSettled: () => {
+    onSuccess: () => {
       void qc.invalidateQueries({ queryKey: qk.partnerships.all })
+      // A1.2 counts training partnerships and C1.1 production-support ones, so
+      // a new partnership moves whichever matches. G0.4 counts the PARTNER and
+      // does not move until that partner contributes.
+      void qc.invalidateQueries({ queryKey: ['indicators'] })
     },
   })
 }
+
 
 /**
  * Soft delete. Never a hard delete — CLAUDE.md rule 2.
@@ -456,6 +418,242 @@ export function useDeletePartnership(type: PartnershipType) {
     },
     onSettled: () => {
       void qc.invalidateQueries({ queryKey: qk.partnerships.all })
+    },
+  })
+}
+
+/* ── the merged partner view ──────────────────────────────────────────────── */
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  ONE ORGANISATION, ONE ROW.
+ *
+ *  Everything above this line is keyed on a PARTNERSHIP. That is the right key
+ *  for A1.2 and C1.1, which count partnerships of one type each — and it was
+ *  the wrong key for a screen, because it showed one organisation twice under
+ *  two headings and gave a coordinator no way to see that they were the same
+ *  body. Worse, it invited a second `partner` row: two forms, two "Name of
+ *  Partner" fields, and only a unique index between them and a split history.
+ *
+ *  So the SCREENS are keyed on the partner and the INDICATORS stay keyed on the
+ *  partnership. The type has not stopped doing work — `partnership_type` is
+ *  still what separates A1.2 from C1.1, and `partnership_partner_type_live`
+ *  (unique on `(partner_id, partnership_type) where deleted_at is null`) is
+ *  still what lets one organisation hold one of each and no more.
+ *
+ *  G0.4 is the reason this matters beyond tidiness: it counts distinct
+ *  PARTNERS, not partnerships, so an organisation that trains and buys is one.
+ *  A screen that presents it as two teaches the opposite.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+/** One partnership held by an organisation, as the merged screens see it. */
+export type HeldPartnership = {
+  id: string
+  type: PartnershipType
+  partnerTypeId: string
+  partnerTypeOther: string | null
+  roleIds: string[]
+  roleOther: Record<string, string | null>
+  establishedOn: string
+  agreementRef: string | null
+  isActive: boolean
+  endedOn: string | null
+}
+
+export type PartnerRow = {
+  /** The PARTNER id. `/forms/pn/:id` is an organisation, not a partnership. */
+  id: string
+  name: string
+  unit: string | null
+  contactPerson: string | null
+  phone: string | null
+  email: string | null
+  createdAt: string
+  /** Live partnerships, newest first. Empty is possible and is not an error. */
+  partnerships: HeldPartnership[]
+}
+
+type PartnerSelect = {
+  id: string
+  name: string
+  unit: string | null
+  contact_person: string | null
+  phone: string | null
+  email: string | null
+  created_at: string
+  partnership: {
+    id: string
+    partnership_type: PartnershipType
+    partner_type_id: string
+    partner_type_other: string | null
+    established_on: string
+    agreement_ref: string | null
+    is_active: boolean
+    ended_on: string | null
+    deleted_at: string | null
+    partnership_role: { role_id: string; role_other: string | null }[]
+  }[] | null
+}
+
+const PARTNER_SELECT = `
+  id, name, unit, contact_person, phone, email, created_at,
+  partnership (
+    id, partnership_type, partner_type_id, partner_type_other, established_on,
+    agreement_ref, is_active, ended_on, deleted_at,
+    partnership_role ( role_id, role_other )
+  )
+`
+
+function toPartnerRow(r: PartnerSelect): PartnerRow {
+  return {
+    id: r.id,
+    name: r.name,
+    unit: r.unit,
+    contactPerson: r.contact_person,
+    phone: r.phone,
+    email: r.email,
+    createdAt: r.created_at,
+    // Soft-deleted partnerships are filtered HERE, not in the select.
+    // PostgREST applies a filter on an embedded table to the PARENT row, so
+    // `.is('partnership.deleted_at', null)` would drop organisations that hold
+    // no live partnership at all -- which are exactly the ones a coordinator
+    // most needs to find. Same trap as useInitiativesForPerson in linkage.ts.
+    partnerships: (r.partnership ?? [])
+      .filter((p) => p.deleted_at === null)
+      .map((p) => ({
+        id: p.id,
+        type: p.partnership_type,
+        partnerTypeId: p.partner_type_id,
+        partnerTypeOther: p.partner_type_other,
+        roleIds: (p.partnership_role ?? []).map((x) => x.role_id),
+        roleOther: Object.fromEntries(
+          (p.partnership_role ?? []).map((x) => [x.role_id, x.role_other]),
+        ),
+        establishedOn: p.established_on,
+        agreementRef: p.agreement_ref,
+        isActive: p.is_active,
+        endedOn: p.ended_on,
+      }))
+      .sort((a, b) => b.establishedOn.localeCompare(a.establishedOn)),
+  }
+}
+
+export function usePartners(enabled = true) {
+  return useQuery({
+    queryKey: [...qk.partnerships.all, 'partners'],
+    enabled,
+    queryFn: async (): Promise<PartnerRow[]> => {
+      const res = await supabase
+        .from('partner')
+        .select(PARTNER_SELECT)
+        .is('deleted_at', null)
+        .order('name', { ascending: true })
+      return unwrapList(
+        res as unknown as { data: PartnerSelect[] | null; error: unknown },
+      ).map(toPartnerRow)
+    },
+  })
+}
+
+export function usePartner(partnerId: string | undefined, enabled = true) {
+  return useQuery({
+    queryKey: [...qk.partnerships.all, 'partner', partnerId ?? ''],
+    enabled: enabled && !!partnerId,
+    queryFn: async (): Promise<PartnerRow> => {
+      const res = await supabase
+        .from('partner')
+        .select(PARTNER_SELECT)
+        .eq('id', partnerId!)
+        .is('deleted_at', null)
+        .maybeSingle()
+      return toPartnerRow(
+        unwrap(res as unknown as { data: PartnerSelect | null; error: unknown }),
+      )
+    },
+  })
+}
+
+/**
+ * Options for a partner dropdown, with the partnership type beside each.
+ *
+ * One entry per PARTNERSHIP, because that is what a market linkage points at
+ * (`market_linkage.partnership_id`). An organisation holding both types
+ * therefore appears twice — correctly, because the two are different
+ * agreements and the coordinator is choosing one of them.
+ *
+ * Nothing is filtered by type. A training partner that also buys is a real
+ * shape the schema anticipates, and refusing it here would be a rule we
+ * invented; the type is SHOWN so the choice is informed instead. See OQ-29.
+ */
+export type PartnershipOption = {
+  partnershipId: string
+  partnerId: string
+  name: string
+  unit: string | null
+  type: PartnershipType
+  isActive: boolean
+}
+
+export function usePartnershipOptions(enabled = true) {
+  const q = usePartners(enabled)
+  const options = useMemo((): PartnershipOption[] => {
+    const out: PartnershipOption[] = []
+    for (const p of q.data ?? []) {
+      for (const ps of p.partnerships) {
+        out.push({
+          partnershipId: ps.id,
+          partnerId: p.id,
+          name: p.name,
+          unit: p.unit,
+          type: ps.type,
+          isActive: ps.isActive,
+        })
+      }
+    }
+    return out.sort((a, b) => a.name.localeCompare(b.name) || a.type.localeCompare(b.type))
+  }, [q.data])
+  return { ...q, options }
+}
+
+/**
+ * Soft delete the ORGANISATION. Coordinator only, via `guard_soft_delete`.
+ *
+ * This is a bigger act than removing one agreement, and the screen has to say
+ * so: every indicator view filters `partner.deleted_at is null`, so deleting
+ * the partner takes ALL its partnerships out of A1.2 and C1.1 at once, and
+ * every contribution it ever made out of G0.4 -- including in quarters that
+ * have already been reported.
+ *
+ * Removing a single agreement is `useDeletePartnership`, offered per block on
+ * the partnerships panel. Two different actions, deliberately not one control.
+ *
+ * The partner row is NOT recreated afterwards if the same name comes back: its
+ * unique index is global on purpose (CLAUDE.md rule 2), so a returning
+ * organisation is RESTORED. That path is still unbuilt -- see 06 OQ-24.
+ */
+export function useDeletePartner() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (partnerId: string) => {
+      const res = await supabase
+        .from('partner')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', partnerId)
+        .is('deleted_at', null)
+        .select('id')
+      if (res.error) throw toAppError(res.error)
+      // RLS filters an update it will not permit rather than raising, so the
+      // statement reports success having changed nothing. Count what came back.
+      if (!res.data || res.data.length === 0) {
+        throw toAppError({ code: '42501', message: 'update matched no visible row' })
+      }
+      return partnerId
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: qk.partnerships.all })
+      void qc.invalidateQueries({ queryKey: ['contributions'] })
+      void qc.invalidateQueries({ queryKey: ['indicators'] })
     },
   })
 }

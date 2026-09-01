@@ -67,21 +67,25 @@ export function useFormSchema(
   const product = useRef('product')
   const producerType = useRef('producer_type')
   const officeServiceType = useRef('office_service_type')
-  // The coordination office looks people up by national ID before anything
-  // else, because B1.2 counts distinct people and a second row for someone
-  // already on file would inflate it permanently. This is the REAL lookup,
-  // not the mock `personByNationalId` the older branches still use.
-  const osNid = typeof values['nid'] === 'string' ? (values['nid'] as string) : ''
-  const osPerson = usePersonByNationalId(module === 'os' ? osNid : '')
+  const guidanceType = useRef('guidance_type')
+  // The coordination office and the guidance log both look people up by
+  // national ID before anything else, because B1.2 and D0.1 count distinct
+  // people and a second row for someone already on file would inflate them
+  // permanently. This is the REAL lookup, not the mock `personByNationalId`
+  // the older branches still use.
+  const idFirstNid = typeof values['nid'] === 'string' ? (values['nid'] as string) : ''
+  const idFirstPerson = usePersonByNationalId(
+    module === 'os' || module === 'gd' ? idFirstNid : '',
+  )
   const refs = useMemo(
     () => ({
       partnerTypeTraining, partnerTypeProduction, partnerRoleTraining,
       partnerRoleProduction, trainingTopic, agriInvolvement, activityType,
-      product, producerType, officeServiceType,
+      product, producerType, officeServiceType, guidanceType,
     }),
     [partnerTypeTraining, partnerTypeProduction, partnerRoleTraining,
      partnerRoleProduction, trainingTopic, agriInvolvement, activityType,
-     product, producerType, officeServiceType],
+     product, producerType, officeServiceType, guidanceType],
   )
 
   return useMemo(() => {
@@ -99,107 +103,184 @@ export function useFormSchema(
       { value: NEW_SESSION, label: t('forms:completion.createNewSession') },
     ]
 
-    if (module === 'tp' || module === 'pp') {
-      const training = module === 'tp'
+    // ONE partner form. The partnership type is a FIELD, not a second form.
+    //
+    // The two ref lists it switches are genuinely different lists, not one list
+    // with two labels: `ref_partner_type_training` has 8 options and
+    // `ref_partner_type_production` has 9, and the roles are 12 against 10.
+    // `check_partnership_type` and `check_partnership_role` reject a value that
+    // belongs to the other kind, so offering the wrong one would produce a
+    // refusal from the database rather than a wrong row -- but a coordinator
+    // should never see it, which is why the form re-derives both lists from the
+    // type chosen above them.
+    //
+    // Until a type is chosen there is nothing to offer. The section renders
+    // with a note saying so rather than an empty select, which reads as broken.
+    if (module === 'pn') {
+      const ptype = str('ptype')
+      const training = ptype === 'training'
+      const chosen = ptype === 'training' || ptype === 'production_support'
+      const accent = training ? 'teal' : 'green'
       return [
         {
           id: 'identity',
           title: t('forms:partner.identity'),
+          note: t('forms:partner.oneOrganisation'),
           fields: [
             { key: 'name', label: t('forms:partner.name'), type: 'text', required: true, placeholder: t('forms:partner.namePh') },
+            { key: 'unit', label: t('forms:partner.unit'), type: 'text', half: true, help: t('forms:partner.unitHelp') },
             { key: 'contact', label: t('forms:partner.contact'), type: 'text', half: true },
             { key: 'phone', label: t('forms:partner.phone'), type: 'tel', half: true, ltr: true, placeholder: t('forms:partner.phonePh') },
             { key: 'email', label: t('forms:partner.email'), type: 'email', half: true, ltr: true, placeholder: t('forms:partner.emailPh') },
           ],
         },
         {
-          id: 'classification',
-          title: t('forms:partner.classification'),
+          id: 'agreement',
+          title: t('forms:partner.agreement'),
+          note: t('forms:partner.agreementNote'),
           fields: [
             {
-              key: 'type',
-              label: t('forms:partner.type'),
+              key: 'ptype',
+              label: t('forms:partner.partnershipType'),
               type: 'select',
-              options: opts(training ? refs.partnerTypeTraining : refs.partnerTypeProduction),
-              help: t('forms:partner.typeHelp'),
+              required: true,
+              options: [
+                { value: 'training', label: t('common:enums.partnershipType.training') },
+                { value: 'production_support', label: t('common:enums.partnershipType.production_support') },
+              ],
+              help: t('forms:partner.partnershipTypeHelp'),
+              ...(touched && !chosen ? { error: t('forms:partner.partnershipTypeRequired') } : {}),
             },
           ],
         },
         {
+          id: 'classification',
+          title: t('forms:partner.classification'),
+          ...(chosen ? {} : { note: t('forms:partner.chooseTypeFirst') }),
+          fields: chosen
+            ? [
+                {
+                  key: 'type',
+                  label: t('forms:partner.type'),
+                  type: 'select',
+                  options: opts(training ? refs.partnerTypeTraining : refs.partnerTypeProduction),
+                  help: t('forms:partner.typeHelp'),
+                },
+              ]
+            : [],
+        },
+        {
           id: 'role',
-          title: training ? t('forms:partner.roleTraining') : t('forms:partner.roleProduction'),
-          pill: t('forms:selectAll'),
-          pillAccent: training ? 'teal' : 'green',
-          fields: [
-            {
-              key: 'role',
-              label: training ? t('forms:partner.roleTraining') : t('forms:partner.roleProduction'),
-              type: 'checks',
-              twoCol: true,
-              accent: training ? 'teal' : 'green',
-              options: opts(training ? refs.partnerRoleTraining : refs.partnerRoleProduction),
-              help: training ? t('forms:partner.roleHelpTraining') : t('forms:partner.roleHelpProduction'),
-            },
-          ],
+          title: chosen
+            ? training
+              ? t('forms:partner.roleTraining')
+              : t('forms:partner.roleProduction')
+            : t('forms:partner.roleEither'),
+          ...(chosen ? { pill: t('forms:selectAll'), pillAccent: accent } : { note: t('forms:partner.chooseTypeFirst') }),
+          fields: chosen
+            ? [
+                {
+                  key: 'role',
+                  label: training ? t('forms:partner.roleTraining') : t('forms:partner.roleProduction'),
+                  type: 'checks',
+                  twoCol: true,
+                  accent,
+                  options: opts(training ? refs.partnerRoleTraining : refs.partnerRoleProduction),
+                  help: training ? t('forms:partner.roleHelpTraining') : t('forms:partner.roleHelpProduction'),
+                },
+              ]
+            : [],
         },
       ]
     }
 
-    if (module === 'os') {
+    // The two national-ID-first forms: the coordination office (B1.2) and the
+    // guidance log (D0.1). Both count DISTINCT PEOPLE, so both identify the
+    // person before asking anything else, and both share this identity section
+    // rather than each growing its own copy -- two copies of "how we identify a
+    // producer" is how one of them ends up trimming a name differently.
+    //
+    // What is NOT shared is the record itself. A visit and a guidance session
+    // are different events with different fields, and folding them into one
+    // form would put a service type on a guidance record.
+    if (module === 'os' || module === 'gd') {
+      const office = module === 'os'
+      const ns = office ? 'office' : 'guidance'
       const nidErr = touched ? nationalIdError(str('nid'), true, tx) : ''
       const mismatch =
         touched && str('nid2') && str('nid') !== str('nid2') ? t('forms:validation.nidMismatch') : ''
-      const found = osPerson.data
+      const found = idFirstPerson.data
 
       // Prefilled and LOCKED when the person is already on file. Two reasons,
-      // and the second is the one that matters: it shows the office that this
-      // is a returning visitor, so nobody re-types a name slightly differently
-      // and wonders later why B1.2 counted them twice. (It would not -- the
-      // national ID is the key -- but the form should not look as though it
+      // and the second is the one that matters: it shows that this is somebody
+      // already known, so nobody re-types a name slightly differently and
+      // wonders later why the indicator counted them twice. (It would not --
+      // the national ID is the key -- but the form should not look as though it
       // might.)
       const personFields: FieldSpec[] = found
         ? [
-            { key: 'foundName', label: t('forms:office.name'), type: 'readonly', text: found.fullName, half: true },
+            { key: 'foundName', label: t(`forms:${ns}.name`), type: 'readonly', text: found.fullName, half: true },
             {
               key: 'foundSex',
-              label: t('forms:office.sex'),
+              label: t(`forms:${ns}.sex`),
               type: 'readonly',
               text: found.sex ? t(`common:enums.sex.${found.sex}`) : '—',
               half: true,
             },
-            { key: 'foundPhone', label: t('forms:office.phone'), type: 'readonly', text: found.phone ?? '—', half: true, ltr: true },
+            { key: 'foundPhone', label: t(`forms:${ns}.phone`), type: 'readonly', text: found.phone ?? '—', half: true, ltr: true },
           ]
         : [
-            { key: 'name', label: t('forms:office.name'), type: 'text', required: true, half: true },
-            { key: 'sex', label: t('forms:office.sex'), type: 'select', half: true, options: [
+            { key: 'name', label: t(`forms:${ns}.name`), type: 'text', required: true, half: true },
+            { key: 'sex', label: t(`forms:${ns}.sex`), type: 'select', half: true, options: [
               { value: 'male', label: t('common:enums.sex.male') },
               { value: 'female', label: t('common:enums.sex.female') },
             ] },
-            { key: 'age', label: t('forms:office.age'), type: 'number', half: true, placeholder: t('forms:completion.agePh') },
-            { key: 'phone', label: t('forms:office.phone'), type: 'tel', half: true, ltr: true },
+            { key: 'age', label: t(`forms:${ns}.age`), type: 'number', half: true, placeholder: t('forms:completion.agePh') },
+            { key: 'phone', label: t(`forms:${ns}.phone`), type: 'tel', half: true, ltr: true },
           ]
 
+      const identity: FormSection = {
+        id: 'who',
+        title: t(`forms:${ns}.who`),
+        pill: t('forms:office.countsToward', { code: office ? 'B1.2' : 'D0.1' }),
+        pillAccent: office ? 'teal' : 'green',
+        note: found ? t(`forms:${ns}.returning`) : t(`forms:${ns}.whoNote`),
+        fields: [
+          { key: 'nid', label: t('forms:completion.nid'), type: 'text', required: true, half: true, ltr: true, placeholder: t('forms:completion.nidPh'), help: t(`forms:${ns}.nidHelp`), ...(nidErr ? { error: nidErr } : {}) },
+          { key: 'nid2', label: t('forms:completion.nidConfirm'), type: 'text', required: true, half: true, ltr: true, placeholder: t('forms:completion.nidConfirmPh'), ...(mismatch ? { error: mismatch } : {}) },
+          ...personFields,
+        ],
+      }
+
+      if (office) {
+        return [
+          identity,
+          {
+            id: 'visit',
+            title: t('forms:office.visit'),
+            fields: [
+              { key: 'svcType', label: t('forms:office.serviceType'), type: 'select', required: true, half: true, options: opts(refs.officeServiceType) },
+              { key: 'date', label: t('forms:office.date'), type: 'date', required: true, half: true },
+              { key: 'adviser', label: t('forms:office.adviser'), type: 'text', half: true, help: t('forms:office.adviserHelp') },
+              { key: 'notes', label: t('forms:office.notes'), type: 'area' },
+            ],
+          },
+        ]
+      }
+
       return [
+        identity,
         {
-          id: 'who',
-          title: t('forms:office.who'),
-          pill: t('forms:office.countsToward', { code: 'B1.2' }),
-          pillAccent: 'teal',
-          note: found ? t('forms:office.returning') : t('forms:office.whoNote'),
+          id: 'guidance',
+          title: t('forms:guidance.given'),
           fields: [
-            { key: 'nid', label: t('forms:completion.nid'), type: 'text', required: true, half: true, ltr: true, placeholder: t('forms:completion.nidPh'), help: t('forms:office.nidHelp'), ...(nidErr ? { error: nidErr } : {}) },
-            { key: 'nid2', label: t('forms:completion.nidConfirm'), type: 'text', required: true, half: true, ltr: true, placeholder: t('forms:completion.nidConfirmPh'), ...(mismatch ? { error: mismatch } : {}) },
-            ...personFields,
-          ],
-        },
-        {
-          id: 'visit',
-          title: t('forms:office.visit'),
-          fields: [
-            { key: 'svcType', label: t('forms:office.serviceType'), type: 'select', required: true, half: true, options: opts(refs.officeServiceType) },
-            { key: 'date', label: t('forms:office.date'), type: 'date', required: true, half: true },
-            { key: 'adviser', label: t('forms:office.adviser'), type: 'text', half: true, help: t('forms:office.adviserHelp') },
-            { key: 'notes', label: t('forms:office.notes'), type: 'area' },
+            { key: 'gdType', label: t('forms:guidance.type'), type: 'select', required: true, half: true, options: opts(refs.guidanceType) },
+            { key: 'date', label: t('forms:guidance.date'), type: 'date', required: true, half: true },
+            // No notes field. `guidance_record` has no column for one, and a
+            // box whose contents are discarded on save is worse than no box --
+            // the same reason the public linkage form does not offer "please
+            // specify" for activity type. See 06 OQ-28.
+            { key: 'deliveredBy', label: t('forms:guidance.deliveredBy'), type: 'text', half: true, help: t('forms:guidance.deliveredByHelp') },
           ],
         },
       ]
@@ -465,10 +546,11 @@ export function useFormSchema(
     // rebuild when it resolves -- otherwise the field renders with only
     // "create a new session" and a coordinator creates one that already exists.
     matchingSessions.data,
-    // Same reason: the office form swaps editable name/sex/phone inputs for a
-    // locked panel once the person is found. Without this the lookup resolves
-    // and the form keeps asking for details the Municipality already holds.
-    osPerson.data,
+    // Same reason: the office and guidance forms swap editable name/sex/phone
+    // inputs for a locked panel once the person is found. Without this the
+    // lookup resolves and the form keeps asking for details the Municipality
+    // already holds.
+    idFirstPerson.data,
   ])
 }
 

@@ -54,7 +54,8 @@ function useNavGroups(): Group[] {
         ? [{ to: '/dashboard', labelKey: 'nav:dashboard', num: '00' }]
         : [],
     },
-    { labelKey: 'nav:group.partnerships', items: [...mod('tp', '01'), ...mod('pp', '02')] },
+    // One entry, not two. `tp` and `pp` are retired and redirect here.
+    { labelKey: 'nav:group.partnerships', items: mod('pn', '01') },
     {
       labelKey: 'nav:group.training',
       items: [
@@ -78,6 +79,11 @@ function useNavGroups(): Group[] {
         ...(can(role, 'record.edit')
           ? [{ to: '/linkage-requests', labelKey: 'nav:linkageRequests', num: '06' } as Dest]
           : []),
+        // Where mentorship sessions are recorded. Without a link here the
+        // screen would be URL-only, which is exactly how /sessions was missed.
+        ...(can(role, 'record.edit')
+          ? [{ to: '/initiatives', labelKey: 'nav:initiatives', num: '06' } as Dest]
+          : []),
         ...mod('ln', '06'),
       ],
     },
@@ -86,6 +92,10 @@ function useNavGroups(): Group[] {
     // it is the only module that is a record of walk-in advice, and B1.2 is the
     // only indicator it feeds.
     { labelKey: 'nav:group.office', items: mod('os', '07') },
+    // The guidance log. Its own group for the same reason the office has one:
+    // it is a record of advice given at the counter, and D0.1 is the only
+    // indicator it feeds.
+    { labelKey: 'nav:group.guidance', items: mod('gd', '07') },
     {
       labelKey: 'nav:group.followup',
       // Its own route, not a /forms module: the survey is used on a phone in a

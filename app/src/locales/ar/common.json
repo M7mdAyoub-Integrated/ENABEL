@@ -21,7 +21,8 @@
     "dismiss": "إغلاق",
     "expand": "توسيع",
     "collapse": "طي",
-    "retry": "أعد المحاولة"
+    "retry": "أعد المحاولة",
+    "edit": "تعديل"
   },
   "toast": {
     "saved": "تم الحفظ",
@@ -77,6 +78,14 @@
       "under_review": "قيد المراجعة",
       "active": "نشط",
       "ended": "منتهٍ"
+    },
+    "partnershipType": {
+      "training": "تدريب",
+      "production_support": "دعم الإنتاج"
+    },
+    "advisoryTrack": {
+      "market": "السوق",
+      "home_based": "الإنتاج المنزلي"
     }
   },
   "units": {

@@ -20,18 +20,22 @@ import { useModuleCounts as useMockCounts } from '../hooks/useData'
  * NOT an indicator. Phase 5 reads `v_indicator_actual` for anything reported;
  * this is a navigation affordance and nothing else.
  */
-function useLiveCount(module: 'tp' | 'pp', enabled: boolean) {
-  const type = module === 'tp' ? 'training' : 'production_support'
+/**
+ * ORGANISATIONS, not partnerships.
+ *
+ * The rail used to carry two numbers, one per partnership type, which summed to
+ * more than the number of bodies the Municipality works with whenever one held
+ * both. G0.4 counts distinct partners, so the count beside a merged list has to
+ * be partners too or the rail and the dashboard describe different things.
+ */
+function usePartnerCount() {
   return useQuery({
-    queryKey: [...qk.partnerships.list(type), 'count'],
-    enabled,
+    queryKey: [...qk.partnerships.all, 'partners', 'count'],
     queryFn: async (): Promise<number> => {
       const res = await supabase
-        .from('partnership')
-        .select('id, partner!inner(deleted_at)', { count: 'exact', head: true })
-        .eq('partnership_type', type)
+        .from('partner')
+        .select('id', { count: 'exact', head: true })
         .is('deleted_at', null)
-        .is('partner.deleted_at', null)
       if (res.error) throw toAppError(res.error)
       return res.count ?? 0
     },
@@ -79,6 +83,22 @@ function useOfficeCount() {
   })
 }
 
+/** Guidance records logged. See the note in useNavCounts. */
+function useGuidanceCount() {
+  return useQuery({
+    queryKey: ['guidance-records', 'count'],
+    queryFn: async (): Promise<number> => {
+      const res = await supabase
+        .from('guidance_record')
+        .select('id, person!inner(deleted_at)', { count: 'exact', head: true })
+        .is('deleted_at', null)
+        .is('person.deleted_at', null)
+      if (res.error) throw toAppError(res.error)
+      return res.count ?? 0
+    },
+  })
+}
+
 /**
  * Counts for the rail.
  *
@@ -89,20 +109,23 @@ function useOfficeCount() {
  */
 export function useNavCounts(): Record<ModuleId, number> {
   const mock = useMockCounts()
-  const tp = useLiveCount('tp', true)
-  const pp = useLiveCount('pp', true)
+  const pn = usePartnerCount()
   const os = useOfficeCount()
+  const gd = useGuidanceCount()
   const ex = useSimpleCount('exhibitions', 'exhibition')
   const tc = useSimpleCount('completions', 'training_enrolment')
 
   return {
     ...mock,
-    tp: tp.data ?? mock.tp,
-    pp: pp.data ?? mock.pp,
+    pn: pn.data ?? mock.pn,
     ex: ex.data ?? mock.ex,
     tc: tc.data ?? mock.tc,
     // Counts VISITS, not people. B1.2 counts people, and the two differ the
     // moment anyone comes twice -- so this number must never be read as B1.2.
     os: os.data ?? mock.os,
+    // Counts RECORDS, not producers. D0.1 counts producers, and the two differ
+    // the moment anyone is helped twice -- so this number must never be read
+    // as D0.1.
+    gd: gd.data ?? mock.gd,
   }
 }

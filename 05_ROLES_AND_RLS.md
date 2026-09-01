@@ -81,6 +81,14 @@ Revoke `execute` from `anon` on all of them.
 | `app_user` | R C U D | R own | R own | R own | R own |
 | `person` | R C U D | R C U | R | via masked view | R U own |
 | `partner`, `partnership`, `partnership_role` | R C U D | R C U | R | R | — |
+
+*(2026-09-01: the two partner FORMS merged into one keyed on the organisation.
+No permission changed — `pn` replaces `tp` and `pp` in `MODULE_ACCESS`, and the
+three tables above keep the policies they had. Worth stating because a merged
+screen looks like a permission change and is not: soft-deleting the PARTNER now
+has a control of its own, and it is still `guard_soft_delete`, still coordinator
+only, and still removes every partnership under it from A1.2, C1.1 and G0.4 at
+once.)*
 | `partner_contribution` | R C U D | R C U | R | R | — |
 | `training_session`, `training_enrolment` | R C U D | R C U | R | R | — |
 | `milestone`, `office_service` | R C U D | R C U | R | R | — |
@@ -114,6 +122,31 @@ figures reach them without the interviews behind them ever doing so.
 > document catching up.** When this file and `pg_policy` disagree, find out
 > which is right before changing either; §15 exists because the assumption ran
 > the other way and two guards turned out never to have been built.
+
+### The same divergence runs through eighteen more rows — see OQ-39
+
+**Added 2026-09-01.** The correction above fixed the one row it was looking at.
+Measured across the whole matrix while testing the guidance log as all five
+roles: **every operational table's SELECT policy is `is_staff()`**, so
+`partner_viewer` reads *nothing* from any of them — not `partner`, not
+`partnership`, not `partner_contribution`, not `attachment` — while this table
+grants them `R` on all eighteen.
+
+Counted through RLS as each role, in a transaction that rolled back:
+`partner_viewer` got 0 rows from `partner`, `partnership`,
+`partner_contribution`, `training_session` and `exhibition`, and all 20 rows
+from `v_indicator_actual`.
+
+It is **not** corrected here, and that is deliberate. Two of those rows are a
+real decision rather than drift — `partner`/`partnership` hold no personal data,
+and `attachment` is the evidence trail for the four indicators whose
+defensibility rests on it. Editing the matrix to match `pg_policy` would turn
+this file back into a description of the code, which is the failure §15 records.
+Recorded as **OQ-39** for the M&E lead, who is the `partner_viewer`.
+
+> **A correction that fixes the row you were looking at, in a table with
+> nineteen rows of the same shape, is half a correction.** The August fix was
+> right and stopped one row short of the sweep.
 
 ---
 

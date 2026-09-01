@@ -163,6 +163,7 @@ export type Database = {
           start_date: string
           title: string
           topic_id: string
+          track: Database["public"]["Enums"]["advisory_track_t"]
           updated_at: string
           venue: string | null
         }
@@ -187,6 +188,7 @@ export type Database = {
           start_date: string
           title: string
           topic_id: string
+          track: Database["public"]["Enums"]["advisory_track_t"]
           updated_at?: string
           venue?: string | null
         }
@@ -211,6 +213,7 @@ export type Database = {
           start_date?: string
           title?: string
           topic_id?: string
+          track?: Database["public"]["Enums"]["advisory_track_t"]
           updated_at?: string
           venue?: string | null
         }
@@ -3898,7 +3901,6 @@ export type Database = {
         Args: never
         Returns: Database["public"]["Enums"]["app_role_t"]
       }
-      followup_prefill: { Args: { p_national_id: string }; Returns: Json }
       followup_indicator_reach: {
         Args: {
           p_status: Database["public"]["Enums"]["record_status_t"]
@@ -3906,14 +3908,12 @@ export type Database = {
         }
         Returns: string[]
       }
-      followup_view_statuses: {
-        Args: { p_view: string }
-        Returns: string[]
-      }
+      followup_prefill: { Args: { p_national_id: string }; Returns: Json }
       followup_prefill_for_staff: {
         Args: { p_national_id: string }
         Returns: Json
       }
+      followup_view_statuses: { Args: { p_view: string }; Returns: string[] }
       indicator_figures: {
         Args: {
           p_age_bands?: string[]
@@ -4003,6 +4003,15 @@ export type Database = {
           p_national_id: string
           p_phone?: string
           p_request: string
+        }
+        Returns: Json
+      }
+      review_followup: {
+        Args: {
+          p_action: string
+          p_confirm?: boolean
+          p_note?: string
+          p_survey_id: string
         }
         Returns: Json
       }
@@ -4108,14 +4117,16 @@ export type Database = {
         Args: { p_confirm?: boolean; p_survey_id: string }
         Returns: Json
       }
-      review_followup: {
+      sync_auto_contribution: {
         Args: {
-          p_action: string
-          p_confirm?: boolean
-          p_note?: string
-          p_survey_id: string
+          p_description: string
+          p_entity_id: string
+          p_entity_type: string
+          p_on: string
+          p_partnership_id: string
+          p_type: string
         }
-        Returns: Json
+        Returns: undefined
       }
       training_session_delete_impact: {
         Args: { p_session_id: string }
@@ -4128,6 +4139,7 @@ export type Database = {
       }
     }
     Enums: {
+      advisory_track_t: "market" | "home_based"
       app_role_t:
         | "coordinator"
         | "data_entry"
@@ -4275,6 +4287,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      advisory_track_t: ["market", "home_based"],
       app_role_t: [
         "coordinator",
         "data_entry",

@@ -140,8 +140,9 @@ This is a real municipality with a real donor. If a definition is ambiguous, sto
 
 ## Checks that verify shape, not substance
 
-This has now happened ten times, in ten unrelated parts of the project. It is
-one failure mode, and it is worth naming because every instance looked fine.
+This has now happened eleven times, in eleven unrelated parts of the project.
+It is one failure mode, and it is worth naming because every instance looked
+fine.
 
 | | what existed | what was missing |
 |---|---|---|
@@ -155,6 +156,7 @@ one failure mode, and it is worth naming because every instance looked fine.
 | `save_followup_section_a` after `0082` | the file, the function, the right signature, a passing migration check and a passing test of the new behaviour | the read-back guard `0080` had added — `create or replace` was written from `0079`'s text and reverted it |
 | `save_followup_section_c` after `0088` | the function, the right signature, the RLS policies, four seeded option lists, a green build, and a Q30 prefill that worked on screen | `EXECUTE` on the definer it calls — every test ran as the owner, and a privilege check does not fire for the owner. `authenticated` could not save Section C at all |
 | 14 `t(key, { defaultValue })` fallbacks in 9 files | a fallback at every call site that builds a key from a variable, exactly where one is needed | `parseMissingKeyHandler` was `(key) => key` and threw the default away. **Not one of the fourteen had ever fired.** A missing key rendered as `review.blocked.reason_required` on a coordinator's screen |
+| `searchPlaceholder.os` | a module live for weeks, its other five per-module key groups all filled in, `en` and `ar` in perfect agreement | the key itself, in **both** locales. The search box on `/forms/os` contained the literal string `searchPlaceholder.os` |
 
 In each case the thing that would normally be checked *was there*. The file
 existed. The key existed. The comment existed. The translation key existed. Any
@@ -210,6 +212,37 @@ by opening the page — the same way `description.os` was found.
 >
 >     i18n.t('ns:no.such.key', { defaultValue: 'FALLBACK' })   // must not be the key
 >     i18n.t('ns:no.such.key')                                 // must not be blank
+
+**The eleventh is the tenth's fix, discovering what it does not cover.**
+
+`parseMissingKeyHandler` now returns the default, so those fourteen call sites
+work. `searchPlaceholder.os` was missing anyway, in both locales, from the day
+the coordination office shipped — and `ListScreen` reads it as
+``t(`forms:searchPlaceholder.${module}`)`` with **no** `defaultValue`, so the
+handler never came into it.
+
+That is not an oversight at the call site. **128 of this app's dynamic-key call
+sites pass no default, and most of them should not:** there is no sensible
+generic fallback for a column heading, a screen description or a search
+placeholder. The right answer is the key, written.
+
+So the tenth's fix protects the 14 sites where a default is genuinely
+meaningful, and nothing protected the other 128. It was found the same way as
+the fifth — by opening the page.
+
+> **`en` and `ar` agreeing proves nothing about whether a key exists.** Both
+> were equally missing, and every check in the build was satisfied: `tsc` cannot
+> see a key built at runtime, and `check-untranslated` compares the *values of
+> keys that exist*, so a key never written is invisible to it.
+
+`check-module-keys.mjs` closes this one class of it: for every id in
+`MODULE_IDS`, every locale group indexed by module id must have an entry, in
+every locale — plus `columns.<id>.length` against `MODULES.<id>.columnCount`.
+**The substance it verifies is that adding a module cannot leave a group
+behind**, which is what happened twice. It was confirmed to fail by deleting
+`searchPlaceholder.gd` and shortening `columns.gd`, not by reading it. It does
+**not** cover dynamic keys built from anything other than a module id; those
+still need somebody to open the screen.
 
 And a rule that came out of the same defect, on the database side:
 
@@ -330,6 +363,43 @@ What that means in practice:
   opening every one of its screens in both languages and reading them. There is
   no automated answer to this one, and pretending otherwise is how four raw keys
   reached a screen that had passed every check in the build.
+
+### A user-facing message is a comment that the user reads
+
+The rule above about comments — *"a comment that asserts is a comment that will
+eventually lie"* — was written about code. On 2026-09-01 the same shape turned
+up in the place where it costs most.
+
+`check_linkage_eligibility` (0057) accepted **any** completed advisory. Its own
+hint read:
+
+>     'The producer must complete a market advisory session first.'
+
+and so did every line of copy around it: the public page's intro, its
+"who can ask" note, the home-page call to action, the queue's introduction, and
+the refusal title *"A market advisory session comes first"*. Six places said
+market. Nothing enforced it, because there was no track to enforce it on until
+`0105`.
+
+Both halves were wrong in opposite directions and both were invisible:
+
+- a producer who completed a **home-based** advisory was let through a gate
+  whose own words said they should not be, and
+- a producer refused for having no advisory at all was told to go and get a
+  *market* one, which was true by accident.
+
+> **Copy is a specification the user can read.** When a message names a rule,
+> either the code enforces exactly that rule or the message is a defect —
+> and it is a worse defect than a wrong comment, because the person acting on it
+> is outside the building. Before writing a rule into copy, grep for the code
+> that has to agree with it; before changing that code, grep the locale files:
+>
+>     grep -rn "market advisory" app/src/locales/
+
+`0106` narrowed the check to `track = 'market'`, in both places the rule lives —
+the trigger and `request_linkage`'s pre-check — and made the two refusals
+distinguishable, because *"our records do not show a completed advisory"* sends a
+home-based completer looking for a lost record instead of for the right session.
 
 The two automated checks above both exist because of this pattern. When you add
 another, write down which substance it verifies — not which shape.

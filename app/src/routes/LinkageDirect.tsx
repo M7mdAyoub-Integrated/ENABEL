@@ -6,9 +6,11 @@ import { useActivityTypes, labelOf, normaliseNationalId, isCompleteNationalId } 
 import {
   useCreateDirectLinkage,
   useInitiativesForPerson,
-  useMatchablePartnerships,
+  // Shared with LinkageMatch and the session form -- one implementation.
+
   type DirectOutcome,
 } from '../data/linkage'
+import { usePartnershipOptions } from '../data/partnerships'
 import { BackLink, PageHead, SectionRule } from '../ui/primitives'
 import { useToast } from '../ui/Toast'
 import { SEP } from '../ui/glyphs'
@@ -73,7 +75,7 @@ export function LinkageDirect() {
 
   const person = usePersonByNationalId(nid)
   const initiatives = useInitiativesForPerson(person.data?.id)
-  const partnerships = useMatchablePartnerships()
+  const partnerships = usePartnershipOptions()
   const activityTypes = useActivityTypes(true)
   const create = useCreateDirectLinkage()
 
@@ -220,7 +222,11 @@ export function LinkageDirect() {
                           {init.title}
                         </span>
                         <span dir="auto" className="mt-0.5 block text-[13px] text-muted">
-                          {locale.startsWith('ar') ? init.activityLabelAr : init.activityLabelEn}
+                          {/* `&&`, so a null label_ar falls back to English
+                              rather than rendering blank. See LinkageMatch. */}
+                          {locale.startsWith('ar') && init.activityLabelAr
+                            ? init.activityLabelAr
+                            : init.activityLabelEn}
                           {init.linkages.length
                             ? ` ${SEP} ${t('forms:linkageDirect.linkageCount', { count: init.linkages.length })}`
                             : ` ${SEP} ${t('forms:linkageAdmin.noLinkagesYet')}`}
@@ -305,11 +311,11 @@ export function LinkageDirect() {
                   onChange={(e) => setPartnershipId(e.target.value)}
                 >
                   <option value="">{t('forms:linkageAdmin.choosePartner')}</option>
-                  {(partnerships.data ?? []).map((p) => (
-                    <option key={p.id} value={p.id}>
+                  {partnerships.options.map((p) => (
+                    <option key={p.partnershipId} value={p.partnershipId}>
                       {[
-                        p.unit ? `${p.partnerName} — ${p.unit}` : p.partnerName,
-                        t(`linkageAdmin.partnershipType.${p.partnershipType}`, { ns: 'forms' }),
+                        p.unit ? `${p.name} — ${p.unit}` : p.name,
+                        t(`linkageAdmin.partnershipType.${p.type}`, { ns: 'forms' }),
                         ...(p.isActive ? [] : [t('forms:linkageAdmin.partnershipEnded')]),
                       ].join(` ${SEP} `)}
                     </option>

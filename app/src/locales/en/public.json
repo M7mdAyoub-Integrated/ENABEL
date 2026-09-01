@@ -10,7 +10,7 @@
     "emptyBody": "There are no courses or markets taking applications today. New ones are added through the year — check back, or ask at the Municipality office.",
     "myApplications": "Check an application I made",
     "loadFailed": "The list could not be loaded. Check your connection and try again.",
-    "linkageCta": "Finished a market advisory session?",
+    "linkageCta": "Finished an advisory session on the market track?",
     "linkageCtaBody": "Ask the Municipality to connect you with a buyer, a processor or a market.",
     "linkageCtaAction": "Ask to be connected",
     "mineCta": "Already applied for something?",
@@ -140,10 +140,10 @@
   "linkage": {
     "backHome": "Home",
     "heading": "Ask to be connected to a buyer",
-    "intro": "If you have finished a market advisory session with the Municipality, you can ask us to connect you with a buyer, a processor, a supplier or a market.",
-    "whoCanAsk": "This is only for people who have completed a market advisory session. If you have not, speak to the Municipality about joining one first.",
+    "intro": "If you have finished an advisory session on the market track with the Municipality, you can ask us to connect you with a buyer, a processor, a supplier or a market.",
+    "whoCanAsk": "This is only for people who have completed an advisory session on the MARKET track. A home-based production advisory does not open this — speak to the Municipality about joining a market one.",
     "identifyIntro": "First, tell us who you are so we can find your record.",
-    "noRecordWhy": "You cannot register on this page. Market linkage is for people who have already completed a Municipality training and then a market advisory session, so everyone who can use it is already on our records. If you have taken part before, check the number or contact the Municipality.",
+    "noRecordWhy": "You cannot register on this page. Market linkage is for people who have already completed a Municipality training and then an advisory session on the market track, so everyone who can use it is already on our records. If you have taken part before, check the number or contact the Municipality.",
     "yesContinue": "Yes, that is me",
     "detailsIntro": "Now tell us what you produce and what you are looking for.",
     "title": "What you produce",
@@ -169,8 +169,8 @@
         "body": "The details you gave do not match a record we hold. Check the national ID number and the date of birth, or contact the Municipality."
       },
       "ineligible": {
-        "title": "A market advisory session comes first",
-        "body": "Market linkage is for people who have completed a market advisory session with the Municipality. Our records do not show one for you. If you think this is wrong, contact the Municipality."
+        "title": "An advisory session comes first",
+        "body": "Market linkage is for people who have completed an advisory session on the market track with the Municipality. Our records do not show one for you. If you think this is wrong, contact the Municipality."
       },
       "withdrawn": {
         "title": "This request was withdrawn",
@@ -179,6 +179,10 @@
       "failed": {
         "title": "Something went wrong",
         "body": "Your request was not sent. This is a problem on our side, not with your details. Please try again."
+      },
+      "wrong_track": {
+        "title": "That was a different kind of advisory",
+        "body": "Our records show you completed an advisory session on the home-based production track — food safety, licensing and packaging. Market linkage needs one on the MARKET track, on pricing, buyers and market access. Speak to the Municipality about joining one."
       }
     }
   },
@@ -195,7 +199,7 @@
     "emptyBody": "We know who you are, and you have not applied for anything so far. Have a look at what is open.",
     "kind": {
       "training": "Training",
-      "advisory": "Market advisory",
+      "advisory": "Advisory session",
       "exhibition": "Market",
       "linkage": "Linkage request"
     },

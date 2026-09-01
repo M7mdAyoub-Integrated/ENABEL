@@ -3,12 +3,8 @@ import type { ModuleId } from '../modules'
 import type { FormValues } from '../forms/useFormSchema'
 import { useEditValues } from '../hooks/useData'
 import { refLabel, useRef } from './refTables'
-import {
-  usePartnership,
-  useCreatePartnership,
-  useUpdatePartnership,
-  type PartnershipInput,
-} from './partnerships'
+import { toAppError } from './errors'
+import { usePartner, useSavePartner, type SavePartnerInput } from './partnerships'
 import {
   useExhibition,
   useCreateExhibition,
@@ -28,6 +24,12 @@ import {
   useUpdateOfficeService,
   type OfficeServiceInput,
 } from './officeServices'
+import {
+  useGuidanceRecord,
+  useCreateGuidanceRecord,
+  useUpdateGuidanceRecord,
+  type GuidanceInput,
+} from './guidance'
 
 /**
  * The form half of the migration seam.
@@ -67,75 +69,84 @@ function arr(v: FormValues, k: string): string[] {
 }
 
 /**
- * Partnerships — module 1.
- *
- * `established_on` is NOT NULL in the schema and the prototype's form has no
- * field for it. Rather than invent a control the design does not have, a new
- * partnership is established today. That is the truthful reading: the record is
- * created when the coordinator registers the relationship. Flagged in the
- * hand-off notes; if the Municipality needs to backdate one, the form needs a
- * date field and this line goes away.
+ * `established_on` is NOT NULL in the schema and the form has no field for it.
+ * Rather than invent a control the design does not have, a NEW partnership is
+ * established today. That is the truthful reading: the record is created when
+ * the coordinator registers the relationship. An existing partnership keeps the
+ * date it already has. Flagged in the hand-off notes; if the Municipality needs
+ * to backdate one, the form needs a date field and this line goes away.
  */
-function usePartnershipWrite(
-  module: 'tp' | 'pp',
-  id: string | undefined,
-  enabled: boolean,
-): ModuleWrite {
-  const type = module === 'tp' ? 'training' : 'production_support'
-  const existing = usePartnership(enabled && id ? id : undefined)
-  const create = useCreatePartnership(type)
-  const update = useUpdatePartnership(type)
+
+/**
+ * Partners (pn) — the merged module 1.
+ *
+ * `:id` here is a PARTNER, not a partnership, so editing opens the organisation
+ * and ONE of its partnerships — whichever type the form is showing. Switching
+ * the type field on an existing organisation and saving is how a second
+ * agreement gets added, and `useSavePartner` reuses the partner row rather than
+ * writing a second one. That is the whole point of the merge: G0.4 counts
+ * distinct partners, so a split organisation reads one too high.
+ *
+ * The type defaults to the first partnership the organisation holds, so opening
+ * an existing partner shows what it already has rather than an empty choice.
+ */
+function usePartnerWrite(id: string | undefined, enabled: boolean): ModuleWrite {
+  const existing = usePartner(enabled && id ? id : undefined, enabled)
+  const save = useSavePartner()
 
   const initialValues = useMemo((): FormValues | null => {
     const p = existing.data
     if (!p) return null
+    const first = p.partnerships[0]
     return {
       name: p.name,
       unit: p.unit ?? '',
       contact: p.contactPerson ?? '',
       phone: p.phone ?? '',
       email: p.email ?? '',
-      type: p.partnerTypeId,
-      typeOther: p.partnerTypeOther ?? '',
-      role: p.roleIds,
+      ptype: first?.type ?? '',
+      type: first?.partnerTypeId ?? '',
+      typeOther: first?.partnerTypeOther ?? '',
+      role: first?.roleIds ?? [],
     }
   }, [existing.data])
 
-  const toInput = (v: FormValues): PartnershipInput => ({
-    name: str(v, 'name'),
-    unit: str(v, 'unit') || null,
-    contactPerson: str(v, 'contact') || null,
-    phone: str(v, 'phone') || null,
-    email: str(v, 'email') || null,
-    partnerTypeId: str(v, 'type'),
-    partnerTypeOther: str(v, 'typeOther') || null,
-    roleIds: arr(v, 'role'),
-    roleOther: {},
-    establishedOn: existing.data?.establishedOn ?? new Date().toISOString().slice(0, 10),
-  })
-
-  const save = async (v: FormValues) => {
-    if (id && existing.data) {
-      return update.mutateAsync({
-        id,
-        partnerId: existing.data.partnerId,
-        input: toInput(v),
-        currentRoleIds: existing.data.roleIds,
-      })
+  const write = async (v: FormValues) => {
+    const ptype = str(v, 'ptype')
+    if (ptype !== 'training' && ptype !== 'production_support') {
+      // The form marks this required, so reaching here means the guard above it
+      // was bypassed. Refuse rather than defaulting: a partnership silently
+      // filed under the wrong type moves A1.2 or C1.1 and nothing says so.
+      throw toAppError({ code: '23514', message: 'partnership type is required' })
     }
-    return create.mutateAsync(toInput(v))
+    const input: SavePartnerInput = {
+      name: str(v, 'name'),
+      unit: str(v, 'unit') || null,
+      contactPerson: str(v, 'contact') || null,
+      phone: str(v, 'phone') || null,
+      email: str(v, 'email') || null,
+      partnerTypeId: str(v, 'type'),
+      partnerTypeOther: str(v, 'typeOther') || null,
+      roleIds: arr(v, 'role'),
+      roleOther: {},
+      partnershipType: ptype,
+      // Only used when the partnership is being CREATED; an existing one keeps
+      // whatever it was established on, which useSavePartner reads for itself.
+      establishedOn:
+        existing.data?.partnerships.find((x) => x.type === ptype)?.establishedOn ??
+        new Date().toISOString().slice(0, 10),
+    }
+    const res = await save.mutateAsync({ ...(id ? { partnerId: id } : {}), input })
+    return res.partnerId
   }
 
   return {
     initialValues,
     isLoadingInitial: existing.isLoading,
-    save,
-    isSaving: create.isPending || update.isPending,
-    error: create.error ?? update.error,
-    reset: () => {
-      create.reset()
-      update.reset()
-    },
+    save: write,
+    isSaving: save.isPending,
+    error: save.error,
+    reset: () => save.reset(),
     isLive: true,
   }
 }
@@ -359,21 +370,93 @@ function useOfficeWrite(id: string | undefined, enabled: boolean): ModuleWrite {
   }
 }
 
+/**
+ * Guidance log — module 9.
+ *
+ * Same shape as the office, and for the same reason: the person fields are
+ * sent on CREATE only. `useUpdateGuidanceRecord` never rewrites person_id,
+ * because moving a record to a different producer moves D0.1 for two people at
+ * once and can drop one of them out of a quarter entirely if it was their
+ * first guidance. Correcting the wrong person is delete-and-re-enter.
+ */
+function useGuidanceWrite(id: string | undefined, enabled: boolean): ModuleWrite {
+  const existing = useGuidanceRecord(enabled && id ? id : undefined, enabled)
+  const create = useCreateGuidanceRecord()
+  const update = useUpdateGuidanceRecord()
+
+  const initialValues = useMemo((): FormValues | null => {
+    const g = existing.data
+    if (!g) return null
+    return {
+      nid: g.nationalId,
+      nid2: g.nationalId,
+      name: g.fullName,
+      sex: g.sex ?? '',
+      phone: g.phone ?? '',
+      gdType: g.guidanceTypeId,
+      date: g.guidanceDate,
+      deliveredBy: g.deliveredBy ?? '',
+    }
+  }, [existing.data])
+
+  const toInput = (v: FormValues): GuidanceInput => {
+    const ageText = str(v, 'age')
+    return {
+      nationalId: str(v, 'nid'),
+      fullName: str(v, 'name'),
+      sex: str(v, 'sex') || null,
+      age: ageText ? Number(ageText) : null,
+      phone: str(v, 'phone') || null,
+      guidanceTypeId: str(v, 'gdType'),
+      guidanceDate: str(v, 'date'),
+      deliveredBy: str(v, 'deliveredBy') || null,
+    }
+  }
+
+  const save = async (v: FormValues) => {
+    const input = toInput(v)
+    if (id && existing.data) {
+      return update.mutateAsync({
+        id,
+        input: {
+          guidanceTypeId: input.guidanceTypeId,
+          guidanceDate: input.guidanceDate,
+          deliveredBy: input.deliveredBy,
+        },
+      })
+    }
+    return create.mutateAsync(input)
+  }
+
+  return {
+    initialValues,
+    isLoadingInitial: existing.isLoading,
+    save,
+    isSaving: create.isPending || update.isPending,
+    error: create.error ?? update.error,
+    reset: () => {
+      create.reset()
+      update.reset()
+    },
+    isLive: true,
+  }
+}
+
 export function useModuleWrite(
   module: ModuleId,
   id: string | undefined,
   locale: string,
 ): ModuleWrite {
   const mockValues = useEditValues(module, id)
-  const tp = usePartnershipWrite('tp', id, module === 'tp')
-  const pp = usePartnershipWrite('pp', id, module === 'pp')
+  const pn = usePartnerWrite(id, module === 'pn')
   const ex = useExhibitionWrite(id, module === 'ex')
   const tc = useCompletionWrite(id, module === 'tc', locale)
   const os = useOfficeWrite(id, module === 'os')
+  const gd = useGuidanceWrite(id, module === 'gd')
 
+  if (module === 'gd') return gd
   if (module === 'os') return os
-  if (module === 'tp') return tp
-  if (module === 'pp') return pp
+  if (module === 'pn') return pn
   if (module === 'ex') return ex
   if (module === 'tc') return tc
   return { ...IDLE, initialValues: mockValues }

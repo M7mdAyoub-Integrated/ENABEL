@@ -52,6 +52,33 @@ The workbook name — *"provided to the selected initiatives"* — points at the
 
 **Interim behaviour.** `v_ind_c1_3` still counts `mentorship_session` and was **deliberately not repointed**. Choosing would mean inventing an indicator definition, which CLAUDE.md rule 1 forbids. `advisory_session` is shaped so it could feed C1.3 later with no change to the table if the answer is the former.
 
+### Added 1 Sep 2026 — it now has a screen, and still no definition
+
+`mentorship_session` rows are entered on the initiative's own detail screen
+(`/initiatives/:id`), because `initiative_id` is NOT NULL and a central form
+would open with a dropdown of every initiative in the programme.
+
+**Nothing about this question changed.** The screen shows the live C1.3 figure
+and renders its target as **"not set"**, never `0` — read off the screen in both
+languages, not assumed. If the answer turns out to be `advisory_session`, the
+screen moves; the table does not.
+
+Verified while building it, as `data_entry` through RLS in a transaction that
+rolled back: three sessions on ONE initiative moved C1.3 from 2 to 5. It counts
+sessions, not people — the opposite of the three screens next to it — and the
+panel says so in words rather than leaving it to be inferred from a family
+resemblance.
+
+### Added 1 Sep 2026, second pass — advisory now has a TRACK, and C1.3 still points elsewhere
+
+`advisory_session.track` (`0105`) splits advisory into `market` and
+`home_based`. That sharpens this question rather than answering it: the reading
+where C1.3 means advisory now has to say WHICH track, and the two tracks are not
+countable the same way. See **OQ-40**, which carries the full comparison.
+
+`v_ind_c1_3` is unchanged and still counts `mentorship_session`. Repointing it
+would answer this question in SQL and orphan the 2 live rows it counts today.
+
 ---
 
 ## 🔴 OQ-2 · G0.2 arithmetic does not add up
@@ -96,6 +123,29 @@ The workbook name — *"provided to the selected initiatives"* — points at the
 **Decides.** M&E lead.
 
 **If they insist on the Completion form**, the formula becomes `count(distinct person_id)` from `training_enrolment` joined to `training_session` where the topic is in the food-processing set — and the `guidance_record` table becomes optional. Say so before changing it.
+
+**Added 1 Sep 2026.** `guidance_record` now has a form of its own — module `gd`,
+the guidance log — built the same way as the coordination office: national-ID
+first, creating people through the one shared `resolvePerson` path, because
+D0.1 counts distinct producers and a second creation path is how one producer
+becomes two.
+
+Verified as `data_entry` through RLS, in a transaction that rolled back: three
+guidance records for one producer moved D0.1 by **one**; a second producer moved
+it by one more; and a later record for a producer already counted moved nothing
+and did not add them to the next quarter — `v_ind_d0_1` places a producer in the
+quarter of their FIRST guidance, which is what makes the eight quarterly targets
+sum to a final target of 40 distinct producers rather than to 40 visits.
+
+**This does not answer the question.** If the M&E lead rules that the Completion
+form is the source after all, the module goes and `v_ind_d0_1` is repointed.
+
+**Added 1 Sep 2026, second pass.** A third candidate source now exists: a
+home-based advisory session (`0105`), which covers food safety, licensing and
+packaging — the same subjects as D0.1. `v_ind_d0_1` was NOT repointed, for the
+same reason as OQ-1. See **OQ-40**, and note especially that D0.1 counts
+DISTINCT PEOPLE while C1.3 counts SESSIONS, so the two advisory tracks cannot be
+given one shared figure.
 
 ---
 
@@ -240,6 +290,37 @@ Note also that follow-up Q5 offers *"Referral or connection to a partner or prog
 
 **Decides.** M&E lead — confirm what counts as a contribution.
 
+### Added 1 Sep 2026 — a log, and three sources that fill it themselves
+
+`partner_contribution` now has a screen: a contributions log on the partnership
+detail screen, because `partnership_id` is NOT NULL.
+
+**Most of it should never be typed, and now is not.** Three parents write their
+own contribution and stamp its provenance in `entity_type`/`entity_id`:
+
+| source | when | migration |
+|---|---|---|
+| `coordination_meeting_partner` | a partner attends a meeting | `0010` |
+| `market_linkage` | the linkage is `active` or `ended` | `0101` |
+| `training_session` | the session is marked delivered | `0102` |
+
+The reasoning is the project owner's: if staff must log by hand what the system
+already knows, they will not, and G0.4 reads lower than the truth. **It already
+did** — `0101`'s backfill moved 26/Q3 from **1 to 2**, because Demo Agro
+Processing held an `active` market linkage dated inside the quarter and earned
+no credit for it, while the only partner counted was the university that had
+attended a meeting.
+
+Derived rows are shown in the log, marked, and are **not editable there**: they
+track their parent in both directions, so an edit would be overwritten the next
+time the parent was touched. The screen names which parent each came from and
+what would have to change to withdraw it.
+
+**Still open, and unchanged:** the question above. "What counts as a
+contribution" now has three concrete answers built in and a fourth
+(hand-entered) left free, but nobody has confirmed that list is right. See
+OQ-37 on which linkage statuses qualify.
+
 ---
 
 ## 🟡 OQ-15 · Terminology is inconsistent across documents
@@ -297,12 +378,24 @@ than no summary — a reader counts nine reds and stops looking.
 
 | Priority | Count | Codes |
 |---|---|---|
-| 🔴 Blocks a reported number | 9 | OQ-1, OQ-2, OQ-3, OQ-4, OQ-5, OQ-12, OQ-25, OQ-30, OQ-32 |
-| 🟠 Affects the schema, the forms or a permission | 15 | OQ-6, OQ-7, OQ-8, OQ-9, OQ-10, OQ-11, OQ-13, OQ-14, OQ-21, OQ-26, OQ-27, OQ-28, OQ-29, OQ-35, OQ-36 |
-| 🟡 Wording and presentation | 8 | OQ-15, OQ-16, OQ-17, OQ-18, OQ-19, OQ-20, OQ-33, OQ-34 |
+| 🔴 Blocks a reported number | 10 | OQ-1, OQ-2, OQ-3, OQ-4, OQ-5, OQ-12, OQ-25, OQ-30, OQ-32, OQ-40 |
+| 🟠 Affects the schema, the forms or a permission | 17 | OQ-6, OQ-7, OQ-8, OQ-9, OQ-10, OQ-11, OQ-13, OQ-14, OQ-21, OQ-26, OQ-27, OQ-28, OQ-29, OQ-35, OQ-36, OQ-37, OQ-39 |
+| 🟡 Wording and presentation | 9 | OQ-15, OQ-16, OQ-17, OQ-18, OQ-19, OQ-20, OQ-33, OQ-34, OQ-38 |
 | 🟢 Resolved or fixed | 4 | OQ-22, OQ-23, OQ-24, OQ-31 |
 
-**32 open, 4 closed, 36 in total.**
+**36 open, 4 closed, 40 in total.**
+
+Updated 2026-09-01, second pass: the partner merge, the advisory track and the
+linkage gate. **OQ-40 is new and it is the one to read** — it is the KPI half of
+the advisory-track work, deliberately not built, and answering it settles OQ-1
+and OQ-4 as a side effect. OQ-29 is unchanged and now visible on three screens
+rather than one, because the partner dropdown became a single implementation.
+
+Updated 2026-09-01, building the last three forms. Three entries were added
+(OQ-37, OQ-38, OQ-39) and none closed — **OQ-1, OQ-4 and OQ-14 each gained a
+screen, which is not the same as gaining an answer.** All three ask what a
+figure MEANS, and building the thing that produces it settles nothing about
+that.
 
 Two of the reds are the ones that stop work rather than merely misreport it:
 **OQ-32** (138 Arabic labels, blocking the survey in the field) and **OQ-25**
@@ -591,6 +684,13 @@ This surfaced while working out whether *restoring a person* should warn about c
 
 **What was done instead.** `match_linkage_request` (0067) does not filter. The matching screen shows the partnership type beside every option, so a coordinator choosing a training partner can see that is what they are doing.
 
+**Added 1 Sep 2026.** The partner dropdown is now ONE implementation —
+`usePartnershipOptions` — shared by the matching screen, the direct-linkage
+screen and the session form, and every one of them shows the partnership type
+beside the option. There were previously two queries returning the same list,
+which is how a filter gets added to one of them and not the other. Still
+unfiltered by type, still deliberately.
+
 **Decides.** Municipal Coordinator — should a market linkage be restricted to production-support partnerships, or is a training partner that also buys a legitimate case?
 
 ---
@@ -645,7 +745,7 @@ Verified after `0085`: `guard_followup_answer` refuses `'yes'` on Q25 with *"val
 | `ref_office_service_type` | 6 | Q15, and the office form | Third |
 | `ref_activity_type` | 5 | production initiatives, linkage | Third |
 | `ref_training_topic` | 6 | training sessions | Third |
-| `ref_guidance_type` | 6 | guidance records | Third |
+| `ref_guidance_type` | 6 | guidance records | **Second — on a live Arabic screen since 1 Sep 2026** |
 | `ref_producer_type` | 9 | market registration | Third |
 | `ref_agri_involvement` | 6 | the applicant form | Third |
 | `ref_nationality` | 4 | the applicant form | Third |
@@ -658,6 +758,20 @@ Verified after `0085`: `guard_followup_answer` refuses `'yes'` on Q25 with *"val
 | `ref_promotional_channel` | 5 | promotion records | Fourth — staff-facing |
 
 The first four tables are 40 labels and unblock the whole follow-up survey. The last six are 50 labels read only by municipal staff, who can work in English if they must.
+
+**`ref_guidance_type` moved up on 1 Sep 2026**, when the guidance log shipped.
+Its six labels are now rendered on `/forms/gd/new` — verified by opening the
+page with `?lng=ar`: heading, note, field labels, help text and buttons are all
+correct Arabic, and the six options in "موضوع الإرشاد" read *Food safety,
+Licensing, Packaging, Labelling, Pricing, Marketing*.
+
+They were **not** drafted, and the line in the section below is why it is worth
+pausing on: by the "will somebody act on the exact words?" test these six are
+closer to *Vegetables* than to *Health certificate*, so they could probably be
+drafted safely. They were left alone anyway, because translating 6 of 138 rows
+would break the one thing that makes this request tractable — it is a single
+ordered list for one person to work through, and picking off the easy rows
+leaves a residue nobody owns. Six labels are not worth fragmenting that.
 
 ### Why it is urgent for the survey specifically
 
@@ -897,3 +1011,218 @@ schema one.
 
 **Needed.** One sentence: does a follow-up survey count from submission, or from
 approval?
+
+---
+
+## 🟠 OQ-37 · Which market linkage statuses count as a contribution to G0.4
+
+**Raised 2026-09-01, building the G0.4 auto-credit (`0101`).**
+
+**What the source says.** G0.4's definition names *"market opportunity"* as one
+of the contributions that count. It says nothing about the state a linkage has
+to be in.
+
+**Why it matters.** `market_linkage.partnership_id` is NOT NULL, so every
+linkage names a partner and could credit them. But a `proposed` linkage is the
+**Municipality proposing** — the partner may not have answered, and G0.4 is
+about what the partner *did*. Crediting on `proposed` would mean a partner
+counts in a quarter for a conversation the Municipality had about them.
+
+`link_status_t` is `proposed`, `under_review`, `active`, `ended`.
+
+**What was built, and on what basis.** `0101` credits on **`active` or
+`ended`**, which is exactly the pair `v_ind_c1_2` uses to decide an initiative is
+"connected to market opportunity". Taking C1.2's own reading rather than
+inventing a second one means the two cannot come to disagree about what a live
+linkage is.
+
+Measured, in a transaction that rolled back: an `active` linkage to a new
+partner moved G0.4 by one; a `proposed` linkage to the same partner moved
+nothing and wrote no contribution.
+
+**What would change the answer.** If the M&E lead reads "contributed to a market
+opportunity" as including a partner who has been approached and is considering
+it, the fix is one line in `contribution_from_linkage` — and `under_review`
+would probably come with it. If it is narrower still (only a linkage that
+produced a sale), that is `market_linkage.outcome`, which is free text today and
+would need a shape first.
+
+**Decides.** M&E lead.
+
+---
+
+## 🟡 OQ-38 · D0.2 counts a training session that is both cancelled and delivered
+
+**Found 2026-09-01 while writing `0102`, in the view it had to agree with.**
+
+**What the code does.** `v_ind_d0_2` admits `deleted_at is null and
+is_delivered`, keyed on `end_date`. It does **not** filter `is_cancelled`.
+Nothing stops a row having `is_cancelled = true` and `is_delivered = true` at
+the same time — `check_delivery_not_future` only compares the delivery flag
+against the end date, and `cancellation_reason` is required when cancelled but
+says nothing about delivery.
+
+**Why it matters.** A session cancelled and then marked delivered by mistake
+counts towards D0.2, whose target is one session per quarter for eight quarters.
+One wrong row is a whole quarter's target.
+
+**Why it was not fixed in `0102`.** `0102` credits the delivering partner for
+G0.4 and had to choose a condition. It uses D0.2's three conditions unchanged,
+deliberately: a stricter copy here would make G0.4 and D0.2 disagree about what
+"delivered" means, and two copies of one rule drift. Fixing the view is a change
+to a reported figure and belongs in its own migration with its own decision, not
+folded into an unrelated one.
+
+**The two ways to close it.** Either `v_ind_d0_2` gains `and not is_cancelled`
+— and then `0102`'s trigger gains it too, in the same migration — or a check
+constraint refuses `is_cancelled and is_delivered` outright, which is cleaner
+because it stops the contradiction existing rather than filtering it afterwards.
+The second needs a sweep of existing rows first; there are none today.
+
+**Grep for it:**
+
+    select id, title, is_cancelled, is_delivered from training_session
+     where is_cancelled and is_delivered and deleted_at is null;
+
+**Decides.** M&E lead, with the Coordinator.
+
+---
+
+## 🟠 OQ-39 · `partner_viewer` reads nothing from any operational table, and the matrix says it reads almost all of them
+
+**Found 1 Sep 2026, testing the guidance log as each of the five roles.**
+
+**This is the same shape `05_ROLES_AND_RLS.md` §3 already records for
+`followup_survey` — but it is eighteen tables, not one, and §3 fixed only the
+row it was looking at.**
+
+**What §3's matrix grants.** `R` to `partner_viewer` on `partner`,
+`partnership`, `partnership_role`, `partner_contribution`, `training_session`,
+`training_enrolment`, `milestone`, `office_service`, `production_initiative`,
+`mentorship_session`, `market_linkage`, `guidance_record`, `exhibition`,
+`exhibition_registration`, `promotional_action`, `coordination_meeting`,
+`coordination_meeting_partner`, `case_study` and `attachment`.
+
+**What the database has.** Every one of those SELECT policies is `is_staff()`,
+and `is_staff()` is `coordinator`, `data_entry`, `enumerator`.
+`exhibition_registration` is the only one that widens it, and it widens it to
+the *participant* who owns the row, not to the donor.
+
+Measured through RLS as all five roles, in a transaction that rolled back:
+
+| role | partner | partnership | partner_contribution | training_session | exhibition | `v_indicator_actual` |
+|---|---|---|---|---|---|---|
+| coordinator | 2 | 2 | 2 | 5 | 2 | 20 |
+| data_entry | 2 | 2 | 2 | 5 | 2 | 20 |
+| enumerator | 2 | 2 | 2 | 5 | 2 | 20 |
+| **partner_viewer** | **0** | **0** | **0** | **0** | **0** | **20** |
+| participant | 0 | 0 | 0 | 0 | 0 | 0 |
+
+**The database is almost certainly the one that is right, for the same reason
+§3 gave.** The donor gets figures, not records: `v_indicator_actual` admits
+`partner_viewer` explicitly and returns all twenty, so every number they are
+entitled to reaches them without a single participant record doing so. That is
+the stronger reading of §6's "never sees a national ID", and several of these
+tables join straight to `person`.
+
+**Why it is amber rather than a documentation fix made on the spot.** Two
+things are genuinely undecided and neither should be guessed:
+
+1. **`partner`, `partnership` and `partnership_role` hold no personal data at
+   all** — an organisation's name, type and role. There is a real argument that
+   an external evaluator should be able to see the partner list behind A1.2,
+   C1.1 and G0.4. That is a decision, not a typo.
+2. `attachment` is the evidence trail for `B1.1`, `G0.1`, `G0.2` and `G0.3`,
+   and "the donor can see the evidence" may well be the intent. Today they
+   cannot.
+
+**Do not fix this by editing the matrix to match the database.** That is what
+makes the document a description of the code instead of a specification, and §15
+is the record of what that costs. Settle 1 and 2 first, then correct whichever
+side is wrong.
+
+**Decides.** M&E lead, with Enabel — they are the `partner_viewer`.
+
+**Grep for it:**
+
+    select tablename, pg_get_expr(polqual, polrelid) from pg_policies pol
+      join pg_policy p on p.polname = pol.policyname
+     where schemaname = 'public' and cmd = 'SELECT';
+
+---
+
+## 🔴 OQ-40 · Advisory now has two tracks, and neither has an indicator
+
+**Raised 2026-09-01, building the track (`0105`) and the linkage gate (`0106`).**
+
+**What was built.** `advisory_session.track` is `market` | `home_based`, NOT
+NULL, chosen on one form. `check_linkage_eligibility` now requires a completed
+advisory on the **market** track before a producer may ask to be connected to a
+buyer; a home-based completer is refused by name.
+
+**What was NOT built, deliberately: any change to any view.** The instruction
+was one form, two tracks, and a KPI for each. The KPI half is the part that
+cannot be done without an answer from the M&E lead, and doing it would have
+answered two open questions by implementation.
+
+### Why market advisory cannot simply be pointed at C1.3
+
+C1.3 counts `mentorship_session` — a DIFFERENT table, hanging off
+`production_initiative` with `initiative_id` **NOT NULL**. Its definition,
+method, formula, disaggregation, data source and every target are blank in the
+source workbook. That is **OQ-1**, still open, and it already asks precisely
+this question: *does "advisory mentorship sessions" mean the new advisory
+sessions people apply to, or mentorship delivered to initiatives already
+selected for support?*
+
+Repointing `v_ind_c1_3` at `advisory_session` would answer OQ-1 by writing SQL,
+and it would **orphan `mentorship_session`, which currently holds 2 live rows
+and is the only thing C1.3 counts today.**
+
+### Why home-based advisory cannot simply be pointed at D0.1
+
+D0.1 counts **distinct people** in `guidance_record`. The workbook names the
+Completion form as its source, which measures training completions — a
+different event. That is **OQ-4**, still open. `guidance_record` holds 2 live
+rows and has had its own module since 2026-09-01.
+
+### The asymmetry, which is the part most likely to be missed
+
+**The two tracks are not symmetrical, even though the form is.**
+
+| | C1.3 | D0.1 |
+|---|---|---|
+| Counts | **SESSIONS** — `count(*)` | **DISTINCT PEOPLE** — `count(distinct person_id)` |
+| Source | `mentorship_session` | `guidance_record` |
+| Target | none — `TBD`, all quarters blank | 5 per quarter, 40 final |
+| Open question | OQ-1 | OQ-4 |
+
+So "a KPI for each track" is two different KPIs of two different KINDS. Three
+market advisories with one producer would be **three** under C1.3's rule and
+**one** under D0.1's. A single generic "advisory sessions delivered" figure
+covering both tracks would be wrong for whichever of the two it did not match,
+and the error would be invisible: the number would look plausible either way.
+
+This is CLAUDE.md rule 4 in its most expensive form — the distinct-person count
+is the single most common way these numbers go wrong.
+
+### What the M&E lead has to answer
+
+1. **Which indicator does each track feed?** Market advisory → C1.3, a new
+   indicator, or nothing? Home-based advisory → D0.1, a new indicator, or
+   nothing?
+2. **Do `mentorship_session` and `guidance_record` continue alongside advisory
+   sessions, or are they replaced?** Both hold live rows and both have screens.
+   If replaced, those rows need migrating, not deleting — they are already in a
+   reported figure.
+3. **If a track feeds C1.3, does a session with a group count once or once per
+   participant?** OQ-1 has been asking this since 26 August and it is the same
+   question in new clothes.
+
+**Interim behaviour.** No view changed. C1.3 still counts `mentorship_session`,
+D0.1 still counts `guidance_record`, and advisory sessions feed **no indicator
+at all** — which is exactly what they did before the track existed. The track
+does real work today regardless: it is what the linkage gate reads.
+
+**Decides.** M&E lead, with Enabel. Answering 1 settles OQ-1 and OQ-4 as a side
+effect, so it is one conversation and not three.

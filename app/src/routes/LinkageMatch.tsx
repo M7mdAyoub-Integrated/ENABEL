@@ -5,7 +5,7 @@ import {
   useInitiativesForPerson,
   useLinkageRequest,
   useMatchLinkageRequest,
-  useMatchablePartnerships,
+  useAdvisoryQualification,
   useSetLinkageStatus,
   useSetRequestStatus,
   useSiblingRequests,
@@ -19,6 +19,13 @@ import {
   currentPeriodCode,
   actualText,
 } from '../data/indicators'
+// The merged partner list, shared with the session form. `market_linkage`
+// points at a PARTNERSHIP, so one entry per agreement -- a body holding both
+// appears twice, correctly, because they are two different agreements and the
+// coordinator is choosing one of them. Nothing is filtered by type: a training
+// partner that also buys is a real shape, and refusing it here would be a rule
+// we invented. See OQ-29.
+import { usePartnershipOptions } from '../data/partnerships'
 import { BackLink, EmptyState, PageHead, SectionRule } from '../ui/primitives'
 import { useToast } from '../ui/Toast'
 import { formatShortDate } from '../lib/format'
@@ -111,7 +118,11 @@ function InitiativeOption({
           {init.title}
         </span>
         <span dir="auto" className="mt-0.5 block text-[13px] text-muted">
-          {locale.startsWith('ar') ? init.activityLabelAr : init.activityLabelEn}
+          {/* See the note below: `&&`, so a null label_ar falls back rather
+              than rendering blank. */}
+          {locale.startsWith('ar') && init.activityLabelAr
+            ? init.activityLabelAr
+            : init.activityLabelEn}
           {init.mainProduct ? ` · ${init.mainProduct}` : ''}
         </span>
         {init.linkages.length === 0 ? (
@@ -147,7 +158,11 @@ export function LinkageMatch() {
 
   const initiatives = useInitiativesForPerson(req?.personId)
   const siblings = useSiblingRequests(req?.personId, id)
-  const partnerships = useMatchablePartnerships()
+  const partnerships = usePartnershipOptions()
+  // What made them eligible. Since 0106 a request can only exist if they
+  // completed a MARKET advisory, and the coordinator should not have to go
+  // and look that up.
+  const qualification = useAdvisoryQualification(req?.personId)
 
   const periods = useReportingPeriods()
   const periodCode = currentPeriodCode(periods.data ?? [])
@@ -265,7 +280,13 @@ export function LinkageMatch() {
               {t('forms:linkageAdmin.theyProduce')}
             </dt>
             <dd dir="auto" className="mt-0.5 text-[15px] text-ink">
-              {locale.startsWith('ar') ? req.activityLabelAr : req.activityLabelEn}
+              {/* `&&` not `?`: every ref_activity_type.label_ar is null today (OQ-32),
+                  and the ternary alone renders a BLANK rather than falling back.
+                  refLabel() in refTables.ts has always done this correctly --
+                  these call sites reimplemented it and dropped the fallback. */}
+              {locale.startsWith('ar') && req.activityLabelAr
+                ? req.activityLabelAr
+                : req.activityLabelEn}
               {req.mainProduct ? ` · ${req.mainProduct}` : ''}
             </dd>
           </div>
@@ -287,6 +308,37 @@ export function LinkageMatch() {
           </div>
         </dl>
       </div>
+
+      {/* ── what qualified them, read from their record ─────────────────
+             Not a claim that they are eligible -- the gate already refused the
+             request if they were not (0106). This is the evidence behind that,
+             so the coordinator can see WHICH session and on which track. */}
+      {(qualification.data ?? []).length > 0 ? (
+        <div className="mt-4 border-[1.5px] border-border-default p-3">
+          <p className="m-0 font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-muted">
+            {t('forms:linkageAdmin.qualifiedBy')}
+          </p>
+          <ul className="mt-2 list-none p-0">
+            {(qualification.data ?? []).map((a) => (
+              <li key={a.enrolmentId} className="flex flex-wrap items-center gap-2 py-1">
+                <span
+                  className={`px-2 py-[2px] font-narrow text-[10.5px] font-bold uppercase tracking-[0.12em] ${
+                    a.track === 'market' ? 'bg-green text-bg' : 'border border-border-strong text-muted'
+                  }`}
+                >
+                  {t(`common:enums.advisoryTrack.${a.track}`)}
+                </span>
+                <span dir="auto" className="text-[14px] text-ink">
+                  {a.sessionTitle}
+                </span>
+                <span className="text-[13px] text-muted">
+                  {formatShortDate(a.decidedOn ?? a.endDate, locale)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
 
       {/* ── their other requests, so the same need is not matched twice ── */}
       {(siblings.data ?? []).length > 0 ? (
@@ -392,6 +444,16 @@ export function LinkageMatch() {
         <section className="mt-8">
           <SectionRule title={t('forms:linkageAdmin.matchIt')} />
 
+          {/* There is no approve-without-a-partner path, because
+              `market_linkage.partnership_id` is NOT NULL -- a linkage always
+              names who the producer was connected to. The queue calls the
+              pending state "awaiting review", which invites looking for an
+              Approve button, so the screen says plainly that approving and
+              choosing a partner are the same act. */}
+          <p className="mt-3 border-s-[3px] border-ink bg-sunken p-3 text-[14px] leading-[1.55] text-body">
+            {t('forms:linkageAdmin.approveIsMatch')}
+          </p>
+
           <form
             className="mt-4 border-[1.5px] border-ink p-4 sm:p-5"
             onSubmit={(e) => {
@@ -471,16 +533,16 @@ export function LinkageMatch() {
                 onChange={(e) => setPartnershipId(e.target.value)}
               >
                 <option value="">{t('forms:linkageAdmin.choosePartner')}</option>
-                {(partnerships.data ?? []).map((p) => (
+                {partnerships.options.map((p) => (
                   // Built as one string rather than as JSX children: an
                   // <option> renders text only, and the type is part of the
                   // label rather than decoration -- a coordinator choosing a
                   // training partner for a market linkage should be able to
                   // see that is what they are doing. See OQ-29.
-                  <option key={p.id} value={p.id}>
+                  <option key={p.partnershipId} value={p.partnershipId}>
                     {[
-                      p.unit ? `${p.partnerName} — ${p.unit}` : p.partnerName,
-                      t(`linkageAdmin.partnershipType.${p.partnershipType}`, { ns: 'forms' }),
+                      p.unit ? `${p.name} — ${p.unit}` : p.name,
+                      t(`linkageAdmin.partnershipType.${p.type}`, { ns: 'forms' }),
                       ...(p.isActive ? [] : [t('forms:linkageAdmin.partnershipEnded')]),
                     ].join(` ${SEP} `)}
                   </option>

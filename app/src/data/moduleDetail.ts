@@ -2,11 +2,12 @@ import { useMemo } from 'react'
 import type { ModuleId } from '../modules'
 import { useDetail, type DetailRecord } from '../hooks/useData'
 import type { Translate } from '../i18n/tx'
-import { usePartnership, type PartnershipType } from './partnerships'
+import { usePartner } from './partnerships'
 import { refLabel, useRef } from './refTables'
-import { formatDate, formatDateRange } from '../lib/format'
+import { formatDateRange } from '../lib/format'
 import { useExhibition, durationDays } from './exhibitions'
 import { useOfficeService } from './officeServices'
+import { useGuidanceRecord } from './guidance'
 import { useCompletion } from './completions'
 import { formatShortDate } from '../lib/format'
 
@@ -24,57 +25,48 @@ export type ModuleDetail = {
   isLive: boolean
 }
 
-function usePartnershipDetail(
-  module: 'tp' | 'pp',
+/**
+ * Partners (pn) — the merged module 1.
+ *
+ * The flat key/value list holds the ORGANISATION only. Partner type, roles and
+ * the established date belong to a partnership, and an organisation may hold
+ * two — so squeezing them in here would mean either showing one of two at
+ * random or repeating every label with a type prefix. They render in their own
+ * panel on the detail screen instead, one block per partnership.
+ *
+ * No status chip. `is_active` is per partnership, and a single chip on a body
+ * holding an active training agreement and an ended production one would be
+ * wrong whichever way it pointed.
+ */
+function usePartnerDetail(
   id: string | undefined,
   enabled: boolean,
   t: Translate,
   locale: string,
 ): ModuleDetail {
-  const type: PartnershipType = module === 'tp' ? 'training' : 'production_support'
-  const q = usePartnership(enabled ? id : undefined)
-  const training = type === 'training'
-  const types = useRef(training ? 'partner_type_training' : 'partner_type_production')
-  const roles = useRef(training ? 'partner_role_training' : 'partner_role_production')
+  const q = usePartner(enabled ? id : undefined, enabled)
 
   const record = useMemo((): DetailRecord | null => {
     const p = q.data
     if (!p) return null
-
-    const typeRow = types.find((r) => r.id === p.partnerTypeId)
-    const typeText =
-      typeRow?.allows_free_text && p.partnerTypeOther
-        ? p.partnerTypeOther
-        : refLabel(typeRow, locale)
-    const roleText = p.roleIds
-      .map((rid) => {
-        const row = roles.find((r) => r.id === rid)
-        if (row?.allows_free_text && p.roleOther[rid]) return p.roleOther[rid] as string
-        return refLabel(row, locale)
-      })
-      .filter(Boolean)
-      .join(', ')
-
     return {
       id: p.id,
       title: p.name,
       subtitle: p.unit ?? '',
-      status: p.isActive
-        ? { text: t('common:chips.active'), tone: 'ok' }
-        : { text: t('common:chips.ended'), tone: 'mute' },
+      status: null,
       fields: [
-        { labelKey: `columns.${module}.0`, value: p.name },
-        { labelKey: `columns.${module}.1`, value: typeText },
-        { labelKey: `columns.${module}.2`, value: roleText },
-        { labelKey: `columns.${module}.3`, value: p.contactPerson ?? '' },
-        { labelKey: `columns.${module}.4`, value: p.phone ?? '', ltr: true },
-        { labelKey: 'partner.email', value: p.email ?? '', ltr: true },
-        { labelKey: 'detail.established', value: formatDate(new Date(p.establishedOn), locale) },
+        { labelKey: 'columns.pn.0', value: p.name },
+        { labelKey: 'partner.unit', value: p.unit ?? '' },
+        { labelKey: 'columns.pn.2', value: p.contactPerson ?? '' },
+        { labelKey: 'columns.pn.3', value: p.phone ?? '', ltr: true },
+        { labelKey: 'columns.pn.4', value: p.email ?? '', ltr: true },
       ],
       by: t('forms:detail.coordinator'),
       at: p.createdAt,
     }
-  }, [q.data, types, roles, locale, module, t])
+  }, [q.data, t])
+
+  void locale
 
   return {
     record,
@@ -244,6 +236,57 @@ function useOfficeDetail(
   }
 }
 
+/**
+ * Guidance log — module 9.
+ *
+ * No status chip, for the same reason as the office: guidance carries no
+ * decision and nothing to approve, and a chip would show a state
+ * `guidance_record` does not have.
+ */
+function useGuidanceDetail(
+  id: string,
+  enabled: boolean,
+  t: Translate,
+  locale: string,
+): ModuleDetail {
+  const q = useGuidanceRecord(enabled ? id : undefined, enabled)
+  const types = useRef('guidance_type')
+
+  const record = useMemo(() => {
+    const g = q.data
+    if (!g) return null
+    return {
+      id: g.id,
+      title: g.fullName,
+      subtitle: g.nationalId,
+      status: null,
+      fields: [
+        { labelKey: 'columns.gd.0', value: g.nationalId, ltr: true },
+        { labelKey: 'columns.gd.1', value: g.fullName },
+        {
+          labelKey: 'columns.gd.2',
+          value: refLabel(types.find((r) => r.id === g.guidanceTypeId), locale),
+        },
+        { labelKey: 'columns.gd.3', value: formatShortDate(g.guidanceDate, locale) },
+        { labelKey: 'columns.gd.4', value: g.deliveredBy ?? '' },
+        { labelKey: 'guidance.village', value: g.village ?? '' },
+        { labelKey: 'guidance.phone', value: g.phone ?? '', ltr: true },
+      ],
+      by: t('forms:detail.coordinator'),
+      at: g.createdAt,
+    }
+  }, [q.data, types, t, locale])
+
+  return {
+    record,
+    isLoading: q.isLoading,
+    isError: q.isError,
+    error: q.error,
+    refetch: () => void q.refetch(),
+    isLive: true,
+  }
+}
+
 export function useModuleDetail(
   module: ModuleId,
   id: string,
@@ -251,15 +294,15 @@ export function useModuleDetail(
   locale: string,
 ): ModuleDetail {
   const mock = useDetail(module, id, t, locale)
-  const tp = usePartnershipDetail('tp', id, module === 'tp', t, locale)
-  const pp = usePartnershipDetail('pp', id, module === 'pp', t, locale)
+  const pn = usePartnerDetail(id, module === 'pn', t, locale)
   const ex = useExhibitionDetail(id, module === 'ex', t, locale)
   const tc = useCompletionDetail(id, module === 'tc', t, locale)
   const os = useOfficeDetail(id, module === 'os', t, locale)
+  const gd = useGuidanceDetail(id, module === 'gd', t, locale)
 
+  if (module === 'gd') return gd
   if (module === 'os') return os
-  if (module === 'tp') return tp
-  if (module === 'pp') return pp
+  if (module === 'pn') return pn
   if (module === 'ex') return ex
   if (module === 'tc') return tc
   return {
