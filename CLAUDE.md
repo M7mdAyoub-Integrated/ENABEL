@@ -157,6 +157,12 @@ fine.
 | `save_followup_section_c` after `0088` | the function, the right signature, the RLS policies, four seeded option lists, a green build, and a Q30 prefill that worked on screen | `EXECUTE` on the definer it calls — every test ran as the owner, and a privilege check does not fire for the owner. `authenticated` could not save Section C at all |
 | 14 `t(key, { defaultValue })` fallbacks in 9 files | a fallback at every call site that builds a key from a variable, exactly where one is needed | `parseMissingKeyHandler` was `(key) => key` and threw the default away. **Not one of the fourteen had ever fired.** A missing key rendered as `review.blocked.reason_required` on a coordinator's screen |
 | `searchPlaceholder.os` | a module live for weeks, its other five per-module key groups all filled in, `en` and `ar` in perfect agreement | the key itself, in **both** locales. The search box on `/forms/os` contained the literal string `searchPlaceholder.os` |
+| The Apply button on `/opportunity/:id` | a styled primary control, correct copy, a comment naming the exact route to swap it for | any way to apply. It was **disabled**, on the branch that runs when applications ARE open, saying "applications open shortly" |
+| The `ELSEWHERE` map on `/manual-entries` | five rows, each with an indicator, a correct description of where it is entered, and a link or a label | agreement between the label and the app. Three of five said "Not built yet" about screens that existed. The prose beside them was already right |
+| `person_restore_candidate` (0107) | the function, the grant, a passing migration check, and a correct result when called | any ability for `authenticated` to call it. It joined `auth.users`, which only the owner can read. **Tested through the MCP, which connects as the owner** |
+| `useSetMilestone` | a write that succeeded, an indicator that moved, a mutation with an `onSuccess` that invalidated queries | the query the SCREEN renders. It invalidated `['indicators']` and not `['manual','milestones']`, so the button still said "Mark achieved" after achieving it |
+| `detail.state.submitted` | a sentence naming the four follow-up indicators, on a page that had just computed the right three | agreement with the computed list one screen earlier. C1 was named for a survey whose C1 denominator was 0 |
+| `cannot_verify` on the three public screens | a clear, sympathetic refusal naming a cause and an action | a true cause. It is also what the RATE LIMITER returns, so a correct national ID was told to check itself against the card and visit the Municipality office |
 
 In each case the thing that would normally be checked *was there*. The file
 existed. The key existed. The comment existed. The translation key existed. Any
@@ -186,6 +192,23 @@ technique for testing it.
 > run it.** `set local role` plus `set local request.jwt.claims`, inside a
 > transaction you roll back. Both directions: the roles that should reach it,
 > and the roles that should not.
+>
+> **It happened again on 1 September 2026, in `0107`, and the reason is worth
+> keeping.** `person_restore_candidate` is a `security invoker` that joined
+> `auth.users` to name who deleted a row. `authenticated` cannot read
+> `auth.users`, so every call from the app died with
+> *42501 permission denied for table users* — on the one screen whose entire
+> purpose is to give a coordinator a way forward from a refusal.
+>
+> `0107` **was** role-tested. Only half of it was: `restore_person` was driven
+> as all five roles and worked; the two lookup functions were checked through
+> the MCP, which connects as the owner. The half that was tested was fine and
+> the half that was not was completely broken. `0108` is the fix — a
+> `security definer` helper for the name, so the lookups stay invoker.
+>
+> So the rule has a second half: **role-test every function you added, not the
+> interesting one.** And the cheapest way to catch this class is not a test at
+> all — it is opening the screen, which is how it was actually found.
 
 **The tenth is the fifth again, wearing the safety net that was supposed to stop
 it.**
@@ -363,6 +386,71 @@ What that means in practice:
   opening every one of its screens in both languages and reading them. There is
   no automated answer to this one, and pretending otherwise is how four raw keys
   reached a screen that had passed every check in the build.
+
+### A placeholder is a claim about the state of the system
+
+Found 1 September 2026, three times in one sweep. It is its own shape and it
+belongs beside the others.
+
+A placeholder — a disabled control, a "not built yet" label, a "coming soon" —
+is not a neutral absence. **It is an assertion about a part of the system the
+screen making it cannot see.** It is written when it is true, and nothing ever
+tells it when it stops being true, because nothing tests copy.
+
+Three at once, all of them stale in the same direction:
+
+- The **Apply** button on `/opportunity/:id` was hard-disabled with
+  *"Applications open shortly. Ask at the Municipality office in the
+  meantime."* `/apply/:id` had existed since `0054`. Worse, that branch is the
+  one that runs when `canApply` is **true** — so a farmer looking at something
+  open that day was told to come back later and go to the office.
+- Three of the five `ELSEWHERE` rows on `/manual-entries` said **"Not built
+  yet"** about `/forms/gd`, `/initiatives/:id` and the contribution log. The
+  DESCRIPTIONS on the same lines already named those screens correctly:
+  somebody updated the prose and not the map beside it.
+- `settings.intro` read *"Visual placeholder. Nothing is configurable in this
+  prototype."* directly above a working language control, and the empty state
+  under it promised the rest "once the platform is built".
+
+The `ELSEWHERE` one is the instructive one, because **a comment warning about
+exactly this drift sat directly above the array, and it drifted anyway, within
+a day.** A warning is not a check.
+
+> **A placeholder must be derived, or checked, or it will lie.** If a screen
+> asserts that something elsewhere does not exist, that assertion needs the
+> same treatment as a constraint name or a locale key: derive it from the
+> thing itself, or add a check that fails when it goes stale.
+> `check-elsewhere-routes.mjs` does this for the one map — it fails when a row
+> says "not built" for a route App.tsx declares. It was confirmed by making it
+> fail in all four directions, not by reading it.
+>
+> And the corollary for the reviewer: **grep for the shape.** `disabled=`,
+> "not yet", "coming", "soon", "ask at", "in the meantime", "for now",
+> "until", "once X exists". Every hit is a claim with a date on it.
+
+### The screen that denies a write that happened
+
+The seventh failure in this register is a delete that reported success and did
+nothing. On 1 September 2026 the mirror image turned up: **a write that
+succeeded while the screen went on saying it had not.**
+
+Marking milestone B1.1 achieved wrote `is_achieved` and `achieved_on`, moved
+the indicator, and left the button reading "Mark achieved". Verified in the
+database while the screen still denied it. `useSetMilestone` invalidated
+`['indicators']` and `['overview']` — and not `['manual','milestones']`, the
+query the screen it lives on actually renders.
+
+Both of its neighbours in the same file invalidate their own list correctly,
+which is precisely why it survived: the file looks consistent.
+
+It is the same cost as the silent delete, arrived at from the other side. The
+user's only available response to a screen that says nothing happened is to do
+it again.
+
+> **A mutation must invalidate the query the user is looking at, not only the
+> ones its result feeds.** After any write, watch the screen you are standing
+> on change. If it does not, the write is not finished — and "it worked, I
+> checked the dashboard" is not the same claim.
 
 ### A user-facing message is a comment that the user reads
 

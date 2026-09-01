@@ -76,7 +76,7 @@
  *
  * Named "requested" because it is only half the condition -- see DEMO_MODE.
  */
-const DEMO_MODE_REQUESTED = false
+const DEMO_MODE_REQUESTED = true
 
 /**
  * Is demo mode actually on?
