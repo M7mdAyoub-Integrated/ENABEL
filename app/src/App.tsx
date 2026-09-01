@@ -8,6 +8,7 @@ import { DEMO_MODE } from './demo/demoMode'
 import { useQueueSync } from './data/useOffline'
 import { useDirection } from './hooks/useDirection'
 import { RequireCapability, RequireModule, RequireSession } from './auth/guards'
+import { RETIRED_MODULE_IDS } from './modules'
 import Landing from './routes/Landing'
 import Dashboard from './routes/Dashboard'
 import ListScreen from './routes/ListScreen'
@@ -150,7 +151,7 @@ const router = createBrowserRouter([
       // splat scores LOWER than a route ending in a static segment, so
       // `/forms/:module/new` beat `/forms/rg/*` and the retired form kept
       // rendering. Verified by following the URL, not by reading the config.
-      ...(['rg', 'ln', 'fu', 'tp', 'pp'] as const).flatMap((m) => {
+      ...RETIRED_MODULE_IDS.flatMap((m) => {
         const to =
           m === 'rg'
             ? '/forms/ex'

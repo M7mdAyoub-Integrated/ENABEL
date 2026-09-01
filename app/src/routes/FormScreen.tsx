@@ -158,10 +158,28 @@ export function FormScreen({ mode }: { mode: 'new' | 'edit' }) {
       return { ...cur, [k]: arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v] }
     })
 
-  // A module whose write branch is still the mock IDLE one. rg, ln and fu are
-  // in this state: the list and detail read mocks/data.ts and there is no save
-  // path at all. Named here rather than tested inline, because the submit
-  // button and the warning band must agree.
+  // A module whose write branch is still the mock IDLE one -- no save path at
+  // all. Named here rather than tested inline, because the submit button and
+  // the warning band must agree.
+  //
+  // ── CURRENTLY UNREACHABLE. DO NOT DELETE AS DEAD CODE. ──
+  //
+  // `useModuleWrite` returns a live branch for pn, ex, tc, os and gd, and IDLE
+  // for the other five: tp, pp, ln, rg and fu. All five of those are retired,
+  // and App.tsx redirects every `/forms/<id>` shape for them (built from
+  // RETIRED_MODULE_IDS) before this component mounts. So `notConnected` cannot
+  // be true today, and none of this band, the disabled submit or the changed
+  // footer text can appear.
+  //
+  // It stays because it is the guard for the NEXT module. The failure it was
+  // written for is one this project has already had: a form that fired
+  // "Saved -- E0.2" and navigated away having written nothing, which is
+  // indistinguishable from success and surfaces a quarter later as a wrong
+  // donor figure. A module wired up with its save still on IDLE gets caught
+  // here rather than shipping.
+  //
+  // If you are removing the last retired module, this is still not dead --
+  // check `useModuleWrite` for an id that falls through to IDLE first.
   const notConnected = !write.isLive
 
   const backToList = () => navigate(`/forms/${module}`)

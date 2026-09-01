@@ -14,8 +14,27 @@
 export const MODULE_IDS = ['pn', 'tp', 'pp', 'tc', 'ln', 'ex', 'rg', 'fu', 'os', 'gd'] as const
 export type ModuleId = (typeof MODULE_IDS)[number]
 
+/**
+ * Modules that still exist as ids but no longer have a screen: every
+ * `/forms/<id>` shape redirects somewhere else (see App.tsx).
+ *
+ * They stay in MODULE_IDS so the redirects keep type-checking and so
+ * check-module-keys.mjs keeps demanding their locale entries — a redirect can
+ * be removed later, and the keys should not have rotted by then.
+ *
+ * This list is the one place that knows. App.tsx builds its redirects from it,
+ * and check-elsewhere-routes.mjs uses it to decide whether a `/forms/<id>`
+ * link on the manual-entries screen actually lands anywhere.
+ */
+export const RETIRED_MODULE_IDS = ['rg', 'ln', 'fu', 'tp', 'pp'] as const
+export type RetiredModuleId = (typeof RETIRED_MODULE_IDS)[number]
+
 export function isModuleId(value: string | undefined): value is ModuleId {
   return !!value && (MODULE_IDS as readonly string[]).includes(value)
+}
+
+export function isRetiredModule(value: string): boolean {
+  return (RETIRED_MODULE_IDS as readonly string[]).includes(value)
 }
 
 export type Accent = 'teal' | 'green' | 'amber' | 'slate' | 'ink'

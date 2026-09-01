@@ -384,22 +384,44 @@ function CaseStudyForm() {
 /* ── the three that belong elsewhere ─────────────────────────────────────── */
 
 /**
- * `to: null` renders "Not built yet". That label is a claim about the rest of
- * the app, made on a screen that cannot verify it, so it goes stale silently --
- * B1.2 sat here saying "not built yet" for the whole of the session in which
- * the coordination office was built, while its own description already said
- * "in the coordination office module".
+ * ── WHY THIS SHAPE, AND NOT `to: string | null` ────────────────────────────
  *
- * G0.4 was not listed at all, which is worse than a stale label: partner
- * contributions have no screen anywhere, and this screen is where a coordinator
- * would come looking. An indicator that is neither here nor pointed at from
- * here is simply invisible.
+ * "Not built yet" is a claim about the REST of the app, made on a screen that
+ * cannot see the rest of the app. It goes stale in silence and nothing tests
+ * copy. It has now gone stale twice:
+ *
+ *  - B1.2 said "not built yet" for the whole of the session in which the
+ *    coordination office was built, while its own description on the same line
+ *    already said "in the coordination office module".
+ *  - D0.1, C1.3 and G0.4 said it the day after /forms/gd, /initiatives/:id and
+ *    the contribution log on /forms/pn/:id all went live. Three of five rows
+ *    were false, and the descriptions beside them were already right — someone
+ *    updated the prose and not the map.
+ *
+ * A comment warning about this sat directly above the old array. It drifted
+ * anyway, within a day. A warning is not a check.
+ *
+ * So the state is no longer hand-maintained. Every row names the route it
+ * belongs to. A row may ALSO say `unbuilt: true` — and `check-elsewhere-routes`
+ * (run by `npm run build`) fails if that claim disagrees with App.tsx:
+ *
+ *   - `to` that is not a declared route      → build fails
+ *   - `to: '/forms/<m>'` for a retired module → build fails
+ *   - `unbuilt: true` on a route that EXISTS  → build fails  ← the drift above
+ *
+ * The last line is the one that matters. It cannot pass while the label is
+ * wrong, which is the whole point.
  */
-const ELSEWHERE: { code: string; to: string | null }[] = [
+type ElsewhereRow = { code: string; to: string; unbuilt?: true }
+
+const ELSEWHERE: ElsewhereRow[] = [
   { code: 'B1.2', to: '/forms/os' },
-  { code: 'D0.1', to: null },
-  { code: 'C1.3', to: null },
-  { code: 'G0.4', to: null },
+  { code: 'D0.1', to: '/forms/gd' },
+  // The mentorship form lives on /initiatives/:id, which needs an initiative
+  // chosen first. The list is the entry point, so that is what is linked.
+  { code: 'C1.3', to: '/initiatives' },
+  // Same shape: the contribution log is on /forms/pn/:id, against one partner.
+  { code: 'G0.4', to: '/forms/pn' },
   { code: 'D0.2', to: '/sessions' },
 ]
 
@@ -407,7 +429,7 @@ function EnteredElsewhere() {
   const { t } = useTranslation('indicators')
   return (
     <div className="flex flex-col gap-2">
-      {ELSEWHERE.map(({ code, to }) => (
+      {ELSEWHERE.map(({ code, to, unbuilt }) => (
         <div
           key={code}
           className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-s-[3px] border-attention-border bg-sunken p-3"
@@ -416,17 +438,17 @@ function EnteredElsewhere() {
           <span className="min-w-0 flex-1 text-[14px] leading-[1.5] text-body">
             {t(`manual.elsewhere.${code}`)}
           </span>
-          {to ? (
+          {unbuilt ? (
+            <span className="font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-amber">
+              {t('manual.notBuiltYet')}
+            </span>
+          ) : (
             <Link
               to={to}
               className="font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-ink"
             >
               {t('manual.goThere')}
             </Link>
-          ) : (
-            <span className="font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-amber">
-              {t('manual.notBuiltYet')}
-            </span>
           )}
         </div>
       ))}

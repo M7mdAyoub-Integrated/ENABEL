@@ -124,20 +124,17 @@ export function OpportunityDetail() {
         <AvailabilityLine o={o} />
         <div className="mt-3">
           {canApply ? (
-            // Inert until the application flow exists. A dead link on the
-            // primary action of a public page is worse than a disabled button:
-            // this way the page can be shown to anyone at any moment without a
-            // dead end. Swap for a Link to /apply/:id when that route lands.
-            <>
-              <button
-                type="button"
-                disabled
-                className="inline-flex min-h-12 w-full cursor-not-allowed items-center justify-center border-[1.5px] border-border-strong bg-sunken px-6 font-narrow text-[13px] font-bold uppercase tracking-[0.12em] text-faint sm:w-auto"
-              >
-                {t('detail.apply')}
-              </button>
-              <p className="mt-2 text-[14px] text-muted">{t('detail.applySoon')}</p>
-            </>
+            // canApply is TRUE here -- places left, or open with no cap. The
+            // only correct thing on this branch is the live application form.
+            // It was a disabled button carrying "applications open shortly"
+            // until /apply/:id landed, which told a farmer to come back later
+            // about something that was open that day.
+            <Link
+              to={`/apply/${o.id}`}
+              className="inline-flex min-h-12 w-full items-center justify-center bg-ink px-6 font-narrow text-[13px] font-bold uppercase tracking-[0.12em] text-bg no-underline hover:text-bg sm:w-auto"
+            >
+              {t('detail.apply')}
+            </Link>
           ) : (
             <p className="m-0 text-[15px] text-body">
               {a.kind === 'full'
