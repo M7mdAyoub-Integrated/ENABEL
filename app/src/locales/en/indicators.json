@@ -1,4 +1,39 @@
 {
+  "disagg": {
+    "heading": "Breakdowns",
+    "warnTag": "Read this before using these figures",
+    "warnBody": "No form in this platform collects refugee status or disability. Fields for both were built onto the completion and registration forms on 24 August 2026 and removed the same day; nothing has asked since. Every participant entered through a real form therefore appears as “not recorded” on those two breakdowns, and will keep doing so until the forms ask.",
+    "warnSeed": "The refugee and disability values shown below come from seeded demonstration records only. They are not a finding about anyone. Refugee disaggregation is the reason this Action Plan exists, so this gap is open question OQ-12 and it is the Coordinator's to close — it is a form change and may need a data-protection review.",
+    "intro": "Only the four indicators that count distinct people can be broken down. “Not recorded” is always shown rather than dropped, so each breakdown adds up to the headline figure.",
+    "loadFailed": "The breakdowns could not be loaded.",
+    "noneInPeriod": "No one is counted towards {code} in {period}, so there is nothing to break down.",
+    "totalLine": "{code} — {count, plural, one {# person} other {# people}} in this period",
+    "noFormCollects": "No form asks",
+    "percent": "{pct}%",
+    "countAndShare": "{count} · {pct}%",
+    "notRecorded": "Not recorded",
+    "barLabel": "{count, plural, one {# person} other {# people}}",
+    "dim": {
+      "sex": "Sex",
+      "age_band": "Age",
+      "refugee_status": "Refugee status",
+      "disability_status": "Disability",
+      "village": "Village"
+    },
+    "bucket": {
+      "male": "Male",
+      "female": "Female",
+      "refugee": "Refugee",
+      "non_refugee": "Not a refugee",
+      "with_disability": "With a disability",
+      "without_disability": "Without a disability",
+      "under_18": "Under 18",
+      "18-24": "18–24",
+      "25-34": "25–34",
+      "35-44": "35–44",
+      "45+": "45 and over"
+    }
+  },
   "quarterLine": "Quarter 3 · 2026 · plan period 2026—2029",
   "whereThePlanStands": "Where the plan stands",
   "exportReturn": "Export quarterly return",

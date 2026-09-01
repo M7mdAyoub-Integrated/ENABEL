@@ -16,6 +16,7 @@ import {
   type IndicatorRow,
 } from '../data/indicators'
 import { AccentRule, PageHead, SectionRule } from '../ui/primitives'
+import { DisaggregationPanel } from '../components/DisaggregationPanel'
 import { ACCENT_BG } from '../modules'
 
 /**
@@ -265,6 +266,13 @@ export function Dashboard() {
               {t('indicators:noPathNotice', { count: noPathCount })}
             </p>
           ) : null}
+
+          {/* The breakdowns the framework asks for. Below the indicator table
+              because it is a second reading of the same four figures, and
+              because its OQ-12 warning has to sit next to the numbers it is
+              about rather than at the top of a screen that is mostly about
+              something else. */}
+          <DisaggregationPanel periodCode={periodCode} />
 
           {groups.map((g) => (
             <section key={g.objectiveCode} className="mt-8">
