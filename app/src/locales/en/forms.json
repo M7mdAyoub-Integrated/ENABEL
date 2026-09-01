@@ -1,4 +1,32 @@
 {
+  "restore": {
+    "title": {
+      "person": "This national ID belongs to a deleted record",
+      "partner": "This organisation is on file, deleted"
+    },
+    "body": {
+      "person": "Records are never removed from this platform, only marked deleted. This person can be brought back with everything attached to them — their trainings, office visits, guidance, market registrations and surveys. Creating a second record under a new number instead would split one person in two, and four indicators count distinct people.",
+      "partner": "Organisations are never removed, only marked deleted. This one can be brought back with its agreements and its contributions. Creating a second record instead would split one organisation in two, and G0.4 counts distinct partners."
+    },
+    "deletedByOn": "Deleted on {date} by {who}.",
+    "deletedOn": "Deleted on {date}. The record does not say by whom.",
+    "willMove": "What restoring this would change",
+    "movesNothing": "No indicator figure moves. Everything attached to this record was deleted separately and stays deleted, so restoring brings back the record itself and nothing that is counted.",
+    "impactFailed": "The figures this would move could not be worked out. Do not restore until they can be.",
+    "delta": "{count, plural, one {goes up by #} other {goes up by #}}",
+    "recomputed": "is recalculated — it is a percentage, and this changes both halves",
+    "confirm": {
+      "person": "I understand this brings back every record attached to this person, and that the figures above will change in the reporting periods named — including any that have already been reported.",
+      "partner": "I understand this brings back this organisation's agreements and contributions, and that the figures above will change in the reporting periods named — including any that have already been reported."
+    },
+    "action": {
+      "person": "Restore this person",
+      "partner": "Restore this organisation"
+    },
+    "coordinatorOnly": "Only a coordinator can restore a record. If this is refused, the database is saying so.",
+    "done": "Restored",
+    "doneSub": "The record is back in the list, with everything attached to it."
+  },
   "requiredMark": " *",
   "selectOption": "Select an option",
   "notSet": "Not set",

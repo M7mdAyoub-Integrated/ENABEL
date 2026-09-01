@@ -27,6 +27,12 @@ import {
 import { useToast } from '../ui/Toast'
 import { NotFound } from './NotFound'
 import { SEP } from '../ui/glyphs'
+import { RestorePanel } from '../components/RestorePanel'
+import {
+  usePersonRestoreCandidate,
+  usePartnerRestoreCandidate,
+} from '../data/restore'
+import { isAppError } from '../data/errors'
 
 /**
  * One form section, copied from the prototype.
@@ -141,6 +147,45 @@ export function FormScreen({ mode }: { mode: 'new' | 'edit' }) {
 
   const valid = isModuleId(module)
   const activeModule = valid ? module : 'tp'
+
+  /**
+   * ── RESTORE, INSTEAD OF A CONSTRAINT ERROR WITH NO WAY FORWARD ──
+   *
+   * `person.national_id` and `partner (name, unit)` are GLOBALLY unique on
+   * purpose -- 0059 deliberately left them so while making the event-shaped
+   * indexes partial -- because recreating an entity moves a figure that has
+   * already been reported. So a save for someone who was soft-deleted is
+   * refused, correctly, and until now the coordinator was simply stuck: the
+   * message named a row they could not see or reach, and the only remaining
+   * move was to type a different national ID, which is the duplicate the
+   * index exists to prevent.
+   *
+   * When the refusal is a DUPLICATE and the key belongs to a SOFT-DELETED row,
+   * this offers to restore it. A duplicate against a LIVE row produces no
+   * candidate and the ordinary constraint message stands, which is the right
+   * answer there.
+   *
+   * Only for the two entity modules. Everything else in MODULE_IDS is
+   * event-shaped, and 0059 made those indexes partial so a re-entry after a
+   * delete is allowed rather than refused.
+   */
+  const isDuplicate = isAppError(write.error) && write.error.kind === 'duplicate'
+  const personKeyModule = module === 'tc' || module === 'os' || module === 'gd'
+  const personCandidate = usePersonRestoreCandidate(
+    typeof values['nid'] === 'string' ? values['nid'] : '',
+    isDuplicate && personKeyModule,
+  )
+  const partnerCandidate = usePartnerRestoreCandidate(
+    typeof values['name'] === 'string' ? values['name'] : '',
+    typeof values['unit'] === 'string' ? values['unit'] : '',
+    isDuplicate && module === 'pn',
+  )
+  const restoreKind: 'person' | 'partner' | null = personCandidate.data
+    ? 'person'
+    : partnerCandidate.data
+      ? 'partner'
+      : null
+  const restoreCandidate = personCandidate.data ?? partnerCandidate.data ?? null
   const sections = useFormSchema(activeModule, values, touched)
   const wizardSections = useWizardSteps(values, step)
 
@@ -333,7 +378,34 @@ export function FormScreen({ mode }: { mode: 'new' | 'edit' }) {
         </>
       ) : null}
 
-      {write.error ? <WriteError error={write.error} onDismiss={write.reset} /> : null}
+      {/* The restore offer REPLACES the raw duplicate message when the key
+          belongs to a soft-deleted row. Showing both would put "someone is
+          already on file with this national ID" directly above "restore
+          them?", which reads as two unrelated problems. */}
+      {write.error && !(restoreKind && restoreCandidate) ? (
+        <WriteError error={write.error} onDismiss={write.reset} />
+      ) : null}
+
+      {restoreKind && restoreCandidate ? (
+        <RestorePanel
+          kind={restoreKind}
+          candidate={restoreCandidate}
+          onDismiss={() => write.reset()}
+          onRestored={() => {
+            write.reset()
+            toast.fire({
+              tag: t('common:toast.updated'),
+              title: t('forms:restore.done'),
+              sub: t('forms:restore.doneSub'),
+            })
+            // Straight to the restored record rather than back into a form
+            // that would now be saving over it. The list is the honest
+            // destination: the row is back in it, which is the thing the
+            // coordinator just asked for.
+            navigate(`/forms/${module}`)
+          }}
+        />
+      ) : null}
 
       {/*
         A module whose write is not connected yet.

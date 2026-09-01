@@ -3993,6 +3993,45 @@ export type Database = {
           villages_reached: number
         }[]
       }
+      partner_restore_candidate: {
+        Args: { p_name: string; p_unit?: string }
+        Returns: {
+          deleted_at: string
+          deleted_by: string
+          id: string
+          name: string
+          unit: string
+        }[]
+      }
+      partner_restore_impact: {
+        Args: { p_partner_id: string }
+        Returns: {
+          code: string
+          delta: number
+          period_code: string
+          recomputed: boolean
+        }[]
+      }
+      person_restore_candidate: {
+        Args: { p_national_id: string }
+        Returns: {
+          deleted_at: string
+          deleted_by: string
+          full_name: string
+          id: string
+          national_id: string
+          village: string
+        }[]
+      }
+      person_restore_impact: {
+        Args: { p_person_id: string }
+        Returns: {
+          code: string
+          delta: number
+          period_code: string
+          recomputed: boolean
+        }[]
+      }
       request_linkage: {
         Args: {
           p_activity_type_id: string
@@ -4006,6 +4045,8 @@ export type Database = {
         }
         Returns: Json
       }
+      restore_partner: { Args: { p_partner_id: string }; Returns: Json }
+      restore_person: { Args: { p_person_id: string }; Returns: Json }
       review_followup: {
         Args: {
           p_action: string
