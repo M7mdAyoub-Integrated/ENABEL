@@ -151,6 +151,42 @@ export function useFormSchema(
               help: t('forms:partner.partnershipTypeHelp'),
               ...(touched && !chosen ? { error: t('forms:partner.partnershipTypeRequired') } : {}),
             },
+            /**
+             * ── established_on WAS DRIVING A1.2 FROM A FIELD NOBODY COULD SEE ──
+             *
+             * The column is NOT NULL and the form had no control for it, so
+             * `usePartnerWrite` filled it with `new Date()`. A1.2 and C1.1
+             * count partnerships established INSIDE the reporting period, so
+             * that default decided which quarter every partnership landed in,
+             * silently, from the day it was typed rather than the day it was
+             * agreed.
+             *
+             * An agreement signed in June and registered in July counted in
+             * the wrong quarter, and nothing on any screen said what date had
+             * been used or that one had been chosen at all. CLAUDE.md's own
+             * rule about this is exact: "a value generated as a side effect,
+             * in a field nobody is looking at, will be wrong."
+             *
+             * Required, because the column is NOT NULL and because a blank
+             * would only bring the invisible default back.
+             *
+             * NO `max` of today, deliberately. An agreement whose term starts
+             * next quarter is a real thing to register, and A1.2 counting it
+             * in that quarter is correct. Constraining to today would refuse a
+             * legitimate record to prevent a typo.
+             */
+            {
+              key: 'established',
+              label: t('forms:partner.established'),
+              type: 'date',
+              required: true,
+              half: true,
+              ltr: true,
+              help: t('forms:partner.establishedHelp'),
+              ...(touched && !str('established')
+                ? { error: t('forms:partner.establishedRequired') }
+                : {}),
+            },
           ],
         },
         {
@@ -235,8 +271,23 @@ export function useFormSchema(
               { value: 'male', label: t('common:enums.sex.male') },
               { value: 'female', label: t('common:enums.sex.female') },
             ] },
-            { key: 'age', label: t(`forms:${ns}.age`), type: 'number', half: true, placeholder: t('forms:completion.agePh') },
-            { key: 'phone', label: t(`forms:${ns}.phone`), type: 'tel', half: true, ltr: true },
+            // ── OQ-22, ON THE STAFF SIDE ──
+            // A person created here with an age and no date of birth can never
+            // afterwards use the public site: `applicant_prefill` verifies on
+            // national ID + date of birth, falls back to phone only when the
+            // date of birth is null, and the phone here is optional. So a
+            // producer entered at the counter could not check their own
+            // application, or apply for anything, ever.
+            //
+            // Asked for, not required -- see PersonDraft.dateOfBirth. A
+            // required field staff cannot answer honestly becomes 01/01/1980
+            // for everyone, which is worse than a null because it looks real
+            // and lands people in the wrong age band. Age stays as the
+            // fallback, and what is left over is made visible on /settings
+            // rather than left silent.
+            { key: 'dob', label: t('forms:completion.dob'), type: 'date', half: true, ltr: true, help: t('forms:completion.dobHelp') },
+            { key: 'age', label: t(`forms:${ns}.age`), type: 'number', half: true, placeholder: t('forms:completion.agePh'), help: t('forms:completion.ageHelp') },
+            { key: 'phone', label: t(`forms:${ns}.phone`), type: 'tel', half: true, ltr: true, help: t('forms:completion.phoneHelp') },
           ]
 
       const identity: FormSection = {
@@ -302,8 +353,12 @@ export function useFormSchema(
               { value: 'male', label: t('common:enums.sex.male') },
               { value: 'female', label: t('common:enums.sex.female') },
             ] },
-            { key: 'age', label: t('forms:completion.age'), type: 'number', half: true, placeholder: t('forms:completion.agePh') },
-            { key: 'phone', label: t('forms:completion.phone'), type: 'tel', half: true, ltr: true, placeholder: t('forms:partner.phonePh') },
+            // See the note on the same field in the shared os/gd identity
+            // section above -- OQ-22. This is the form that creates most
+            // people, so it is the one that mattered most.
+            { key: 'dob', label: t('forms:completion.dob'), type: 'date', half: true, ltr: true, help: t('forms:completion.dobHelp') },
+            { key: 'age', label: t('forms:completion.age'), type: 'number', half: true, placeholder: t('forms:completion.agePh'), help: t('forms:completion.ageHelp') },
+            { key: 'phone', label: t('forms:completion.phone'), type: 'tel', half: true, ltr: true, placeholder: t('forms:partner.phonePh'), help: t('forms:completion.phoneHelp') },
           ],
         },
         {

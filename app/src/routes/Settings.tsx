@@ -1,9 +1,13 @@
 import { useTranslation } from 'react-i18next'
 import { AccentRule, Card, EmptyState, PageHead, SectionRule } from '../ui/primitives'
 import { LocaleSwitcher } from '../components/LocaleSwitcher'
+import { VerificationGaps } from '../components/VerificationGaps'
+import { useAuth } from '../auth/AuthProvider'
+import { can } from '../auth/permissions'
 
 export function Settings() {
   const { t } = useTranslation(['nav', 'common'])
+  const { role } = useAuth()
   return (
     <>
       <PageHead title={t('nav:settings')} description={t('common:settings.intro')} />
@@ -24,6 +28,17 @@ export function Settings() {
           <LocaleSwitcher />
         </div>
       </Card>
+
+      {/* People the public site cannot identify — OQ-22.
+          Here rather than on the dashboard because it counts nothing the donor
+          asked for: it is a data-quality worklist about the platform's own
+          reachability. Settings is the one screen every staff role can open
+          from the rail.
+
+          Gated on record.edit, which matches the database rather than
+          duplicating it: `person_read` is is_staff(), so partner_viewer and a
+          participant get zero rows from RLS either way. */}
+      {can(role, 'record.edit') ? <VerificationGaps /> : null}
 
       <div className="mt-[18px]">
         <EmptyState

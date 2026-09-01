@@ -69,15 +69,6 @@ function arr(v: FormValues, k: string): string[] {
 }
 
 /**
- * `established_on` is NOT NULL in the schema and the form has no field for it.
- * Rather than invent a control the design does not have, a NEW partnership is
- * established today. That is the truthful reading: the record is created when
- * the coordinator registers the relationship. An existing partnership keeps the
- * date it already has. Flagged in the hand-off notes; if the Municipality needs
- * to backdate one, the form needs a date field and this line goes away.
- */
-
-/**
  * Partners (pn) — the merged module 1.
  *
  * `:id` here is a PARTNER, not a partnership, so editing opens the organisation
@@ -105,6 +96,7 @@ function usePartnerWrite(id: string | undefined, enabled: boolean): ModuleWrite 
       phone: p.phone ?? '',
       email: p.email ?? '',
       ptype: first?.type ?? '',
+      established: first?.establishedOn ?? '',
       type: first?.partnerTypeId ?? '',
       typeOther: first?.partnerTypeOther ?? '',
       role: first?.roleIds ?? [],
@@ -119,6 +111,17 @@ function usePartnerWrite(id: string | undefined, enabled: boolean): ModuleWrite 
       // filed under the wrong type moves A1.2 or C1.1 and nothing says so.
       throw toAppError({ code: '23514', message: 'partnership type is required' })
     }
+    // The date is now a field on the form (see useFormSchema). It used to be
+    // `new Date()` here, which chose the quarter A1.2 and C1.1 counted the
+    // partnership in without anyone seeing or confirming a date.
+    //
+    // Refuse rather than falling back to today: the form marks it required, so
+    // reaching here empty means that guard was bypassed, and quietly
+    // substituting today would restore exactly the defect this replaced.
+    const established = str(v, 'established')
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(established)) {
+      throw toAppError({ code: '23502', message: 'established_on is required' })
+    }
     const input: SavePartnerInput = {
       name: str(v, 'name'),
       unit: str(v, 'unit') || null,
@@ -130,11 +133,7 @@ function usePartnerWrite(id: string | undefined, enabled: boolean): ModuleWrite 
       roleIds: arr(v, 'role'),
       roleOther: {},
       partnershipType: ptype,
-      // Only used when the partnership is being CREATED; an existing one keeps
-      // whatever it was established on, which useSavePartner reads for itself.
-      establishedOn:
-        existing.data?.partnerships.find((x) => x.type === ptype)?.establishedOn ??
-        new Date().toISOString().slice(0, 10),
+      establishedOn: established,
     }
     const res = await save.mutateAsync({ ...(id ? { partnerId: id } : {}), input })
     return res.partnerId
@@ -241,6 +240,7 @@ function useCompletionWrite(
       nid2: c.nationalId,
       name: c.fullName,
       sex: c.sex ?? '',
+      dob: c.dateOfBirth ?? '',
       age: c.ageRecorded == null ? '' : String(c.ageRecorded),
       phone: c.phone ?? '',
       topic: c.topicId,
@@ -258,6 +258,10 @@ function useCompletionWrite(
       // Left blank stays null, and `age_or_dob` refuses the insert with a
       // readable message rather than writing a person nobody can age-band.
       age: ageText ? Number(ageText) : null,
+      // OQ-22: a person with an age and no date of birth can never be found by
+      // the public lookup afterwards, so this is asked for wherever the
+      // participant knows it. Blank stays null and age carries the row.
+      dateOfBirth: str(v, 'dob') || null,
       phone: str(v, 'phone') || null,
       topicId: str(v, 'topic'),
       topicLabel: refLabel(
@@ -332,6 +336,10 @@ function useOfficeWrite(id: string | undefined, enabled: boolean): ModuleWrite {
       fullName: str(v, 'name'),
       sex: str(v, 'sex') || null,
       age: ageText ? Number(ageText) : null,
+      // OQ-22: a person with an age and no date of birth can never be found by
+      // the public lookup afterwards, so this is asked for wherever the
+      // participant knows it. Blank stays null and age carries the row.
+      dateOfBirth: str(v, 'dob') || null,
       phone: str(v, 'phone') || null,
       serviceTypeId: str(v, 'svcType'),
       serviceDate: str(v, 'date'),
@@ -406,6 +414,10 @@ function useGuidanceWrite(id: string | undefined, enabled: boolean): ModuleWrite
       fullName: str(v, 'name'),
       sex: str(v, 'sex') || null,
       age: ageText ? Number(ageText) : null,
+      // OQ-22: a person with an age and no date of birth can never be found by
+      // the public lookup afterwards, so this is asked for wherever the
+      // participant knows it. Blank stays null and age carries the row.
+      dateOfBirth: str(v, 'dob') || null,
       phone: str(v, 'phone') || null,
       guidanceTypeId: str(v, 'gdType'),
       guidanceDate: str(v, 'date'),

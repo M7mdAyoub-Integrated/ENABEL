@@ -49,6 +49,8 @@ export type CompletionRow = {
   fullName: string
   sex: string | null
   ageRecorded: number | null
+  /** OQ-22: read back so an edit can ADD one, not blank the existing value. */
+  dateOfBirth: string | null
   phone: string | null
   sessionId: string
   topicId: string
@@ -73,6 +75,7 @@ type Select = {
     full_name: string
     sex: string | null
     age_recorded: number | null
+    date_of_birth: string | null
     phone: string | null
   }
   training_session: { id: string; title: string; topic_id: string; start_date: string }
@@ -80,7 +83,7 @@ type Select = {
 
 const SELECT = `
   id, person_id, session_id, attended, met_criteria, decided_on, created_at,
-  person!inner ( national_id, full_name, sex, age_recorded, phone ),
+  person!inner ( national_id, full_name, sex, age_recorded, date_of_birth, phone ),
   training_session!inner ( id, title, topic_id, start_date )
 `
 
@@ -92,6 +95,7 @@ function toRow(r: Select): CompletionRow {
     fullName: r.person.full_name,
     sex: r.person.sex,
     ageRecorded: r.person.age_recorded,
+    dateOfBirth: r.person.date_of_birth,
     phone: r.person.phone,
     sessionId: r.session_id,
     topicId: r.training_session.topic_id,
@@ -204,6 +208,8 @@ export type CompletionInput = {
   fullName: string
   sex: string | null
   age: number | null
+  /** See PersonDraft.dateOfBirth -- OQ-22. */
+  dateOfBirth: string | null
   phone: string | null
   topicId: string
   /** The topic's label, used to title a newly created session. */
@@ -306,7 +312,36 @@ export type PersonDraft = {
   nationalId: string
   fullName: string
   sex: string | null
+  /**
+   * Recorded age, as a fallback. `age_or_dob` requires one of the two.
+   *
+   * Age is NOT a verification factor -- it changes every year and has about
+   * sixty possible values -- so a person with an age and no date of birth
+   * cannot be found by the public lookup. See dateOfBirth.
+   */
   age: number | null
+  /**
+   * ── WHY THIS FIELD EXISTS, AND WHY IT IS STILL OPTIONAL ──
+   *
+   * `applicant_prefill` (0052) verifies a member of the public on national ID
+   * + date of birth, falling back to national ID + phone only when
+   * `date_of_birth` is null (0053). Staff-entered people got an AGE and no
+   * date of birth, and the completion form's phone is optional -- so every
+   * such person had neither factor and could never afterwards use the public
+   * site at all. Not to apply, not to check an application. That is OQ-22's
+   * one remaining hole, and it was on the staff side.
+   *
+   * Still nullable, deliberately, and that is OQ-22's resolution rather than a
+   * compromise: making it required would block staff who genuinely do not know
+   * a participant's birth date, and a required field that cannot be answered
+   * honestly gets filled with 01/01/1980 for everyone -- which is worse than a
+   * null, because it looks like data and lands people in the wrong age band.
+   *
+   * So: collect it wherever the participant knows it, keep age as the
+   * fallback, and make the remaining gap VISIBLE rather than silent --
+   * `v_person_missing_verification`, surfaced on /settings.
+   */
+  dateOfBirth: string | null
   phone: string | null
 }
 
@@ -344,6 +379,7 @@ export async function resolvePerson(input: PersonDraft): Promise<{ id: string; c
       full_name: input.fullName.trim(),
       sex: asSex(input.sex),
       age_recorded: input.age,
+      date_of_birth: input.dateOfBirth || null,
       phone: input.phone?.trim() || null,
     })
     .select('id')
@@ -479,6 +515,11 @@ export function useUpdateCompletion() {
           full_name: input.fullName.trim(),
           sex: asSex(input.sex),
           age_recorded: input.age,
+          // Correctable, like the rest of the demographics. Adding a date of
+          // birth to someone who only had an age is the single thing that
+          // lets them use the public site afterwards, so an edit has to be
+          // able to do it.
+          date_of_birth: input.dateOfBirth || null,
           phone: input.phone?.trim() || null,
         })
         .eq('id', personId)

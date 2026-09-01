@@ -1,4 +1,14 @@
 {
+  "verification": {
+    "heading": "People the public website cannot identify",
+    "intro": "The public site checks a national ID against a date of birth, and accepts a phone number instead only when no date of birth is on file. Anyone with neither cannot apply, cannot check an application and cannot ask to be connected to a buyer — until a member of staff records one of the two.",
+    "none": "Nobody is in this state. Every person on file has a date of birth, so anyone can look themselves up. This list is checked against the record, not assumed — an empty list means it was checked and found nothing.",
+    "loadFailed": "The list could not be loaded.",
+    "cannotHeading": "{count, plural, one {# person cannot use the site at all} other {# people cannot use the site at all}}",
+    "cannotBody": "No date of birth and no phone number. Ask for either one and add it through the record they appear in — a training completion, an office visit or a guidance record.",
+    "phoneOnlyHeading": "{count, plural, one {# person is verified by phone only} other {# people are verified by phone only}}",
+    "phoneOnlyBody": "No date of birth, but a phone number is on file, so the site can still find them. Adding a date of birth is better: a phone number changes."
+  },
   "appName": "SHM M&E Platform",
   "subtitle": "Sahel Horan Municipality",
   "yes": "Yes",
