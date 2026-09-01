@@ -97,18 +97,11 @@
     "full": "Full",
     "boothsFree": "{count, plural, one {# booth free} other {# booths free}}"
   },
-  "roles": {
-    "intro": "Choose how you are signing in. Authentication arrives in a later phase; for now both doors are open.",
-    "municipality": "Municipality",
-    "municipalityBody": "Record partnerships, completions, exhibitions and follow-up surveys. See every indicator.",
-    "participant": "Producer",
-    "participantBody": "Register for a rural market or exhibition, and track whether your request was approved."
-  },
   "settings": {
-    "intro": "Visual placeholder. Nothing is configurable in this prototype.",
+    "intro": "Language is set here. Targets, roles and reporting periods are still set in the database, not on this screen.",
     "languageHelp": "Switching language also flips the text direction.",
     "emptyTitle": "Nothing to configure yet",
-    "emptyBody": "Indicator targets, roles and reporting periods will live here once the platform is built."
+    "emptyBody": "Indicator targets, user roles and reporting periods are seeded and changed in the database. Nothing else on this screen is configurable yet."
   },
   "appNameShort": "M&E Platform",
   "orgShort": "Sahel Horan",

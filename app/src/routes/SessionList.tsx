@@ -13,7 +13,7 @@ import { SEP } from '../ui/glyphs'
  * out which is which. See the longer note in SessionDetail.
  */
 export function SessionList({ kind = 'training' }: { kind?: SessionKind }) {
-  const { t, i18n } = useTranslation('forms')
+  const { t, i18n } = useTranslation(['forms', 'common'])
   const locale = i18n.resolvedLanguage ?? 'en'
   const base = kind === 'advisory' ? '/advisory' : '/sessions'
   const q = useManagedSessions(kind)
@@ -56,6 +56,20 @@ export function SessionList({ kind = 'training' }: { kind?: SessionKind }) {
                 className="block border-[1.5px] border-border-strong bg-bg p-4 text-ink no-underline hover:bg-sunken"
               >
                 <div className="flex flex-wrap items-center gap-2">
+                  {/* The TRACK, on advisory only.
+                      This list said "Each session is on one of two tracks" and
+                      then showed nothing to tell them apart. The track is not
+                      decoration: `check_linkage_eligibility` (0106) accepts a
+                      completed advisory only when track = 'market', so it is
+                      the field that decides whether finishing this session
+                      lets the producer ask to be connected to a buyer.
+                      A coordinator publishing two of these could not tell
+                      which was which from either screen. */}
+                  {kind === 'advisory' && s.track ? (
+                    <span className="border-[1.5px] border-green px-2 py-[2px] font-narrow text-[10.5px] font-bold uppercase tracking-[0.12em] text-green">
+                      {t(`common:enums.advisoryTrack.${s.track}`)}
+                    </span>
+                  ) : null}
                   {/* Solid teal chip: it is on the public site right now. */}
                   {s.is_published ? (
                     <span className="bg-teal px-2 py-[2px] font-narrow text-[10.5px] font-bold uppercase tracking-[0.12em] text-bg">

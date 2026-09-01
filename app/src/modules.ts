@@ -37,6 +37,17 @@ export function isRetiredModule(value: string): boolean {
   return (RETIRED_MODULE_IDS as readonly string[]).includes(value)
 }
 
+/**
+ * The modules that still have a screen.
+ *
+ * Used as the key type of DetailScreen's delete map, so `tsc` refuses a live
+ * module with no delete wired up. That is not a stylistic preference: a delete
+ * with no live mutation behind it navigates away and fires a "Deleted" toast
+ * having written nothing, which is indistinguishable from success and has
+ * already shipped twice here — `ex` and then `os`.
+ */
+export type LiveModuleId = Exclude<ModuleId, RetiredModuleId>
+
 export type Accent = 'teal' | 'green' | 'amber' | 'slate' | 'ink'
 
 export type ModuleMeta = {

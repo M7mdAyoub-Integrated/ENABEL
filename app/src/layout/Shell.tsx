@@ -84,10 +84,16 @@ function useNavGroups(): Group[] {
         ...(can(role, 'record.edit')
           ? [{ to: '/initiatives', labelKey: 'nav:initiatives', num: '06' } as Dest]
           : []),
-        ...mod('ln', '06'),
+        // `mod('ln')` was here and rendered nothing: `ln` is retired, no role
+        // has it in MODULE_ACCESS, and /forms/ln redirects to
+        // /linkage-requests anyway. A nav call that can only ever return []
+        // reads as a live entry to whoever edits this next.
       ],
     },
-    { labelKey: 'nav:group.markets', items: [...mod('ex', '05'), ...mod('rg', '06')] },
+    // `mod('rg')` was here for the same reason and with the same effect.
+    // Registrations are decided on /exhibitions/:id, reached from the
+    // exhibition record.
+    { labelKey: 'nav:group.markets', items: mod('ex', '05') },
     // The coordination office. Its own group rather than folded into another:
     // it is the only module that is a record of walk-in advice, and B1.2 is the
     // only indicator it feeds.

@@ -139,7 +139,7 @@ function CompletionCell({
 
 export function SessionDetail({ kind = 'training' }: { kind?: SessionKind }) {
   const { id } = useParams()
-  const { t, i18n } = useTranslation('forms')
+  const { t, i18n } = useTranslation(['forms', 'common'])
   const locale = i18n.resolvedLanguage ?? 'en'
 
   const sq = useManagedSession(kind, id)
@@ -214,6 +214,24 @@ export function SessionDetail({ kind = 'training' }: { kind?: SessionKind }) {
           </span>
         ) : null}
       </p>
+
+      {/* The TRACK, on advisory only, stated with what it decides.
+          It was captured on the form and enforced by the database and shown
+          on neither screen. `check_linkage_eligibility` (0106) accepts a
+          completed advisory only when track = 'market', so this one field
+          decides whether the people who finish here can go on to ask for a
+          market linkage. It belongs beside the title, not only in the form
+          that set it. */}
+      {kind === 'advisory' && s.track ? (
+        <p className="mt-2 flex flex-wrap items-baseline gap-2">
+          <span className="border-[1.5px] border-green px-2 py-[2px] font-narrow text-[11px] font-bold uppercase tracking-[0.1em] text-green">
+            {t(`common:enums.advisoryTrack.${s.track}`)}
+          </span>
+          <span className="max-w-[60ch] text-[13.5px] leading-[1.5] text-muted">
+            {t(`forms:newSession.trackNote.${s.track}`)}
+          </span>
+        </p>
+      ) : null}
 
       {/* Publishing needs things a completion-created session never had. Name
           them, say where they came from, and offer the way to fix it -- a

@@ -10,6 +10,7 @@ import {
 } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
+import { queryClient } from '../data/queryClient'
 import { isRole, type Role } from './permissions'
 import { DEMO_MODE, DEMO_ACCOUNT, DEMO_PORTAL_NATIONAL_ID, warnIfDemo } from '../demo/demoMode'
 
@@ -74,6 +75,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Guards against a slow role query landing after the user has signed out or
   // switched account, which would otherwise grant the previous role.
   const requestSeq = useRef(0)
+
+  /**
+   * ── THE CACHE MUST NOT OUTLIVE THE IDENTITY THAT FILLED IT ──
+   *
+   * Every query key in this app describes WHAT is being read and nothing about
+   * WHO is reading it, and `staleTime` is 30 seconds. So a result fetched
+   * under one identity is served to the next one for up to half a minute.
+   *
+   * That is not only a staleness problem, it is the RLS trap from CLAUDE.md
+   * wearing new clothes. **RLS does not raise on a read it will not permit —
+   * it filters the rows.** An unauthenticated request to PostgREST comes back
+   * `200 []`, not an error, so `unwrapList` returns an empty array, the query
+   * succeeds, and the screen renders its EMPTY STATE. "None recorded" is what
+   * a coordinator sees when the truth is "your session is not established
+   * yet" or "your session expired".
+   *
+   * Observed, on /manual-entries: F0.1, G0.2 and G0.3 all read "NONE
+   * RECORDED" and the milestones section rendered nothing, while the database
+   * held two promotional actions, a meeting, a case study and two milestones.
+   * No error anywhere — the auth request had 401'd, the queries went out
+   * unauthenticated, and the empty results sat in the cache.
+   *
+   * Clearing on any change of identity fixes all three shapes of it: the demo
+   * bootstrap (anon then coordinator), a real session expiring and being
+   * refreshed, and one user signing out while another signs in on the same
+   * tab — which in a database holding national ID numbers would otherwise
+   * leave the first user's rows on screen.
+   */
+  const lastIdentity = useRef<string | null | undefined>(undefined)
+  const clearCacheIfIdentityChanged = useCallback((s: Session | null) => {
+    const id = s?.user.id ?? null
+    if (lastIdentity.current === undefined) {
+      lastIdentity.current = id
+      return
+    }
+    if (lastIdentity.current === id) return
+    lastIdentity.current = id
+    queryClient.clear()
+  }, [])
 
   const loadRoleFor = useCallback(async (s: Session | null) => {
     const seq = ++requestSeq.current
@@ -143,12 +183,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         warnIfDemo()
         const s = await demoSignIn(data.session)
         if (cancelled) return
+        clearCacheIfIdentityChanged(s)
         setSession(s)
         setStatus(s ? 'signedIn' : 'signedOut')
         void loadRoleFor(s)
         return
       }
 
+      clearCacheIfIdentityChanged(data.session)
       setSession(data.session)
       setStatus(data.session ? 'signedIn' : 'signedOut')
       void loadRoleFor(data.session)
@@ -156,6 +198,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
       if (cancelled) return
+      // Before setSession, so anything this render reads is fetched fresh.
+      // TOKEN_REFRESHED keeps the same user id, so it does not clear.
+      clearCacheIfIdentityChanged(s)
       setSession(s)
       setStatus(s ? 'signedIn' : 'signedOut')
 
@@ -176,7 +221,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       cancelled = true
       sub.subscription.unsubscribe()
     }
-  }, [loadRoleFor])
+  }, [loadRoleFor, clearCacheIfIdentityChanged])
 
   const signIn = useCallback<AuthState['signIn']>(async (email, password) => {
     setExpired(false)

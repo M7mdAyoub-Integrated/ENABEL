@@ -151,7 +151,7 @@
       }
     },
     "elsewhereHeading": "Entered somewhere else",
-    "elsewhereIntro": "These are not on this screen on purpose. Three of them count distinct people, so a typed total could double-count the same person and could never be corrected afterwards — the identities would not have been captured.",
+    "elsewhereIntro": "These are not on this screen on purpose. Two of them count distinct people and one counts distinct partners, so a typed total could double-count and could never be corrected afterwards — the identities would not have been captured. The other two hang off a record you have to choose first.",
     "elsewhere": {
       "B1.2": "Farmers reaching office services — counts distinct people, so each visit is logged against a national ID in the coordination office module.",
       "D0.1": "Producers guided on food safety and licensing — counts distinct people, so each session is logged against a national ID in the guidance log.",

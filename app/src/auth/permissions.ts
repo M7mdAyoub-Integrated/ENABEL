@@ -179,12 +179,29 @@ export function canWriteModule(role: Role | null, module: ModuleId): boolean {
   return role === 'coordinator' || role === 'data_entry'
 }
 
-/** Where a role lands after signing in. */
+/**
+ * Where a role lands after signing in.
+ *
+ * Two of these were pointing at paths that no longer exist as screens:
+ *
+ *  - `participant` went to `/portal`. The participant portal was RETIRED when
+ *    `/` became the public home page, and `/portal` is not declared in
+ *    App.tsx — so a participant signing in landed on the ShellLayout splat
+ *    route behind a capability they do not hold. Whatever that rendered, it
+ *    was not a page anyone had designed. A participant has no municipal
+ *    screens at all now; the public home page is genuinely where they belong,
+ *    and looking up an application there needs no account.
+ *
+ *  - `enumerator` went to `/forms/fu`, which only works because App.tsx
+ *    redirects it. Pointing at the destination is not a behaviour change, it
+ *    just stops the landing depending on a redirect that exists for old
+ *    bookmarks.
+ */
 export function homeRouteFor(role: Role | null): string {
   // Demo mode always opens on the municipality view.
   if (DEMO_MODE) return '/dashboard'
   if (!role) return '/signin'
-  if (role === 'participant') return '/portal'
-  if (role === 'enumerator') return '/forms/fu'
+  if (role === 'participant') return '/'
+  if (role === 'enumerator') return '/followups'
   return '/dashboard'
 }

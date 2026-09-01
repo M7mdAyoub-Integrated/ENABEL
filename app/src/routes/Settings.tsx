@@ -9,9 +9,14 @@ export function Settings() {
       <PageHead title={t('nav:settings')} description={t('common:settings.intro')} />
       <AccentRule className="bg-ink" />
 
-      {/* The prototype's Settings is a single dead placeholder. Language is real
-          here, so it gets a live panel above the placeholder rather than being
-          hidden behind a screen that says nothing works yet. */}
+      {/* Language is genuinely settable here, and it is the only thing that is.
+          The page description used to read "Visual placeholder. Nothing is
+          configurable in this prototype." directly above this working control,
+          and the empty state below promised the rest "once the platform is
+          built" — which it now is. Both said something untrue about the screen
+          they were on. They now say where those settings actually live:
+          `indicator_target`, `app_user.role` and `reporting_period`, all seeded
+          and changed in the database. */}
       <Card as="section" className="mt-[18px] p-5">
         <SectionRule title={t('common:language.label')} />
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">

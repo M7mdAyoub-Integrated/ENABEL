@@ -5,12 +5,10 @@ import { makeTranslate } from '../i18n/tx'
 import { isModuleId, MODULES, ACCENT_BG } from '../modules'
 import { useAuth } from '../auth/AuthProvider'
 import { can, canWriteModule } from '../auth/permissions'
-import { useMutations } from '../hooks/useData'
 import { useModuleRows } from '../data/moduleRows'
 import { TableSkeleton, ErrorState } from '../ui/states'
 import { DataTable, type RowAction } from '../ui/DataTable'
 import { AccentRule, EmptyState, PageHead, Pill, PrimaryButton, SecondaryButton } from '../ui/primitives'
-import { useToast } from '../ui/Toast'
 import { NotFound } from './NotFound'
 import { SEP } from '../ui/glyphs'
 
@@ -28,8 +26,6 @@ export function ListScreen() {
   const { t, i18n } = useTranslation(['nav', 'common', 'forms'])
   const locale = i18n.resolvedLanguage ?? 'en'
   const { role } = useAuth()
-  const mutations = useMutations()
-  const toast = useToast()
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState('')
 
@@ -66,35 +62,22 @@ export function ListScreen() {
   const writable = canWriteModule(role, module)
 
   /**
-   * Row actions. The prototype gives a pending registration Approve / Reject /
-   * View and everything else View / Edit / Del. Here each is also gated on the
-   * capability from 05 section 4 and 5 -- only a coordinator may approve or
-   * delete -- so a data_entry user sees View and Edit and no more.
+   * Row actions: View, then Edit and Delete when the role allows them --
+   * 05 sections 4 and 5, so a data_entry user sees View and Edit and no more.
    */
-  const rowActions = (rowId: string): RowAction[] => {
+  // ── THE APPROVE / REJECT ROW ACTIONS WERE REMOVED HERE ──
+  //
+  // They rendered on `module === 'rg'`, retired and redirected to /forms/ex
+  // since 2f8edff, so they were unreachable. And they called
+  // `mutations.setRegistrationStatus` — the session-local MOCK — then fired
+  // "Approved". Nothing was written, and E0.2 counts approved registrations,
+  // so had the redirect gone away a coordinator would have approved a producer
+  // into a market and watched the indicator stay still.
+  //
+  // The real decision is on /exhibitions/:id. `pending` is gone with them: it
+  // was only ever `module === 'rg' && …`.
+  const rowActions = (): RowAction[] => {
     const list: RowAction[] = []
-    const pending = module === 'rg' && mutations.registrationStatus(rowId) === 'submitted'
-
-    if (pending && can(role, 'registration.review')) {
-      list.push({
-        id: 'approve',
-        label: t('forms:action.approve'),
-        tone: 'ok',
-        onSelect: (id) => {
-          mutations.setRegistrationStatus(id, 'approved')
-          toast.fire({ tag: t('common:toast.updated'), title: t('forms:toast.approved') })
-        },
-      })
-      list.push({
-        id: 'reject',
-        label: t('forms:action.reject'),
-        tone: 'danger',
-        onSelect: (id) => {
-          mutations.setRegistrationStatus(id, 'rejected')
-          toast.fire({ tag: t('common:toast.updated'), title: t('forms:toast.rejected') })
-        },
-      })
-    }
 
     list.push({
       id: 'view',
@@ -102,14 +85,14 @@ export function ListScreen() {
       onSelect: (id) => navigate(`/forms/${module}/${id}`),
     })
 
-    if (!pending && writable) {
+    if (writable) {
       list.push({
         id: 'edit',
         label: t('forms:action.edit'),
         onSelect: (id) => navigate(`/forms/${module}/${id}/edit`),
       })
     }
-    if (!pending && can(role, 'record.delete')) {
+    if (can(role, 'record.delete')) {
       list.push({
         id: 'delete',
         label: t('forms:action.delete'),
@@ -216,7 +199,7 @@ export function ListScreen() {
         <DataTable
           columns={columns}
           rows={shown}
-          actions={(row) => rowActions(row.id)}
+          actions={() => rowActions()}
           recordLabel={t('forms:record')}
         />
       )}

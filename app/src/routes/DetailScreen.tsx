@@ -2,10 +2,9 @@ import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { makeTranslate } from '../i18n/tx'
-import { isModuleId, MODULES, ACCENT_BG } from '../modules'
+import { isModuleId, isRetiredModule, MODULES, ACCENT_BG, type LiveModuleId } from '../modules'
 import { useAuth } from '../auth/AuthProvider'
 import { can, canWriteModule } from '../auth/permissions'
-import { useMutations } from '../hooks/useData'
 import { useModuleDetail } from '../data/moduleDetail'
 import { usePartner, useDeletePartner } from '../data/partnerships'
 import { useDeleteExhibition } from '../data/exhibitions'
@@ -19,7 +18,6 @@ import { PartnershipsPanel } from '../components/PartnershipsPanel'
 import {
   AccentRule,
   BackLink,
-  Card,
   OutlinePill,
   PageHead,
   Pill,
@@ -31,6 +29,17 @@ import { useToast } from '../ui/Toast'
 import { NotFound } from './NotFound'
 import { formatDate } from '../lib/format'
 import { EMPTY } from '../ui/glyphs'
+
+/**
+ * What every live module's delete hook has in common. Deliberately structural
+ * rather than the full useMutation type: this screen only ever calls `mutate`
+ * with an id, reads `error`, and calls `reset()`.
+ */
+type DeleteMutation = {
+  mutate: (id: string, opts?: { onSuccess?: () => void; onError?: () => void }) => void
+  error: unknown
+  reset: () => void
+}
 
 /**
  * A single record, copied from the prototype.
@@ -45,7 +54,6 @@ export function DetailScreen() {
   const { t, i18n } = useTranslation(['forms', 'common', 'nav'])
   const locale = i18n.resolvedLanguage ?? 'en'
   const toast = useToast()
-  const mutations = useMutations()
   const { role } = useAuth()
   const [confirmDelete, setConfirmDelete] = useState(false)
 
@@ -54,12 +62,23 @@ export function DetailScreen() {
   const detail = useModuleDetail(valid ? module : 'tp', id ?? '', tx, locale)
   const record = detail.record
 
-  // Live soft delete for module 1. Both are created unconditionally so the
-  // hook order is stable when the route's :module param changes.
   // One hook per live module, all called unconditionally so hook order cannot
-  // shift when the :module route param changes. A module with no entry here
-  // still falls through to the session-local mock remove -- which is why a
-  // delete that looked like it worked did nothing before Exhibitions was added.
+  // shift when the :module route param changes.
+  //
+  // ── WHY THIS IS A Record<LiveModuleId, …> AND NOT A CHAIN OF TERNARIES ──
+  //
+  // It was a chain ending in `: null`, and twice a live module was added
+  // without an entry. `ex` first, then `os` -- and the symptom both times was
+  // the worst kind: the delete fell through to the session-local MOCK remove,
+  // the dialog closed, a "Deleted" toast fired, the row vanished from the
+  // screen, and the database was untouched. B1.2 did not move and nothing
+  // anywhere said so. The old comment above this map warned about exactly that
+  // and did not prevent the second one.
+  //
+  // Keying on LiveModuleId makes `tsc` the check: adding a module to
+  // MODULE_IDS without adding it to RETIRED_MODULE_IDS makes this object fail
+  // to compile until a real delete is wired in. Confirmed by removing the `gd`
+  // line -- "Property 'gd' is missing in type" -- and restoring it.
   const delPartner = useDeletePartner()
   // The agreements this organisation holds, so the contributions log knows
   // whether it has to ASK which one a hand-entered contribution belongs to.
@@ -72,22 +91,19 @@ export function DetailScreen() {
   const delCompletion = useDeleteCompletion()
   const delOffice = useDeleteOfficeService()
   const delGuidance = useDeleteGuidanceRecord()
-  const liveDelete =
-    module === 'pn'
-      ? delPartner
-      : module === 'ex'
-        ? delExhibition
-        : module === 'tc'
-          ? delCompletion
-          // `os` was missing here when the module was built, so deleting an
-          // office visit fell through to the session-local mock remove and
-          // fired a "Deleted" toast while B1.2 did not move. That is the
-          // exact failure the comment above this map already warned about.
-          : module === 'os'
-            ? delOffice
-            : module === 'gd'
-              ? delGuidance
-              : null
+  const LIVE_DELETES: Record<LiveModuleId, DeleteMutation> = {
+    pn: delPartner,
+    tc: delCompletion,
+    ex: delExhibition,
+    os: delOffice,
+    gd: delGuidance,
+  }
+  // A retired module has no screen -- App.tsx redirects every /forms/<id>
+  // shape for it before this component mounts -- so there is nothing to
+  // delete and nothing to fall through to.
+  const liveDelete: DeleteMutation | null = isRetiredModule(module ?? '')
+    ? null
+    : (LIVE_DELETES[module as LiveModuleId] ?? null)
 
   if (!valid) return <NotFound />
   if (detail.isLoading) {
@@ -102,8 +118,6 @@ export function DetailScreen() {
   if (!record) return <NotFound />
 
   const meta = MODULES[module]
-  const isRegistration = module === 'rg'
-  const pending = record.status?.tone === 'pending'
   const statusColour =
     record.status?.tone === 'ok'
       ? 'text-success'
@@ -163,43 +177,18 @@ export function DetailScreen() {
         </Link>
       ) : null}
 
-      {/* Coordinator approve / reject, registrations only, pending only. */}
-      {isRegistration && pending && can(role, 'registration.review') ? (
-        <Card
-          dashed
-          className="mt-[26px] flex flex-col gap-3 border-attention-border bg-attention-bg p-4 sm:flex-row sm:items-center sm:justify-between"
-        >
-          <p className="text-[15px] font-semibold text-attention-ink">
-            {t('forms:registration.awaitingApproval')}
-          </p>
-          <div className="flex flex-col gap-2.5 sm:flex-row">
-            <SecondaryButton
-              tone="danger"
-              onClick={() => {
-                mutations.setRegistrationStatus(record.id, 'rejected')
-                toast.fire({
-                  tag: t('common:toast.updated'),
-                  title: t('forms:registration.rejected'),
-                })
-              }}
-            >
-              {t('forms:registration.reject')}
-            </SecondaryButton>
-            <PrimaryButton
-              onClick={() => {
-                mutations.setRegistrationStatus(record.id, 'approved')
-                toast.fire({
-                  tag: t('common:toast.updated'),
-                  title: t('forms:registration.approved'),
-                  sub: t('forms:registration.approvedSub'),
-                })
-              }}
-            >
-              {t('forms:registration.approve')}
-            </PrimaryButton>
-          </div>
-        </Card>
-      ) : null}
+      {/* ── THE REGISTRATION APPROVE / REJECT PANEL WAS REMOVED HERE ──
+          It rendered on `module === 'rg'`, which has been retired and
+          redirected to /forms/ex since 2f8edff, so it was unreachable. Worse
+          than unreachable: its buttons called `mutations.setRegistrationStatus`
+          — the SESSION-LOCAL MOCK — and then fired an "Approved" toast naming
+          E0.2. Nothing was written. Had the redirect ever been removed, a
+          coordinator would have approved a producer into a market and watched
+          E0.2 stay where it was.
+
+          The real decision lives on /exhibitions/:id, which calls
+          `useDecideRegistration` against `exhibition_registration.status` and
+          is where the E0.2 wording now sits. One screen, one write. */}
 
       <dl className="mt-[26px] grid grid-cols-1 gap-x-11 sm:grid-cols-2">
         {record.fields.map((f) => (
@@ -289,8 +278,14 @@ export function DetailScreen() {
             })
             return
           }
-          mutations.remove(module, record.id)
-          done()
+          // No live delete means a retired module, which cannot be reached --
+          // App.tsx redirects it. There is deliberately NO fallback: the
+          // fallback used to be the session-local mock remove, and it is what
+          // made two deletes look exactly like success while writing nothing.
+          // Closing the dialog and doing nothing is the honest outcome if this
+          // is ever reached, and the delete button is only rendered for a
+          // record that loaded, so it cannot be reached silently in practice.
+          setConfirmDelete(false)
         }}
       />
     </>
