@@ -109,7 +109,7 @@
       },
       "cannot_verify": {
         "title": "We could not confirm your details",
-        "body": "Check your national ID and date of birth against your card. If they are right and this keeps happening, please visit the Municipality office — we can sort it out there."
+        "body": "Two things cause this. Either the national ID or the date of birth does not match what we hold — check both against your card — or you have tried several times in a few minutes, in which case wait ten minutes and try once more. If neither fixes it, please visit the Municipality office and we can sort it out there."
       },
       "not_open": {
         "title": "This is no longer open",
@@ -165,7 +165,7 @@
       },
       "cannot_verify": {
         "title": "We could not confirm who you are",
-        "body": "The details you gave do not match a record we hold. Check the national ID number and the date of birth, or contact the Municipality."
+        "body": "Either the details do not match a record we hold — check the national ID and the date of birth — or you have tried several times in a few minutes, in which case wait ten minutes and try once more. If neither fixes it, contact the Municipality."
       },
       "ineligible": {
         "title": "An advisory session comes first",
@@ -193,7 +193,7 @@
     "yours": "What you have applied for",
     "count": "{count, plural, one {# application} other {# applications}}",
     "checkAnother": "Check another number",
-    "cannotVerifyBody": "The details you gave do not match a record we hold. Check the national ID number and the date of birth, or contact the Municipality. We give the same answer whenever we cannot confirm who you are, so this page can never be used to find out whether a number is registered.",
+    "cannotVerifyBody": "Either the details do not match a record we hold — check the national ID and the date of birth — or you have looked up several times in a few minutes, in which case wait ten minutes and try once more. We give the same answer whenever we cannot confirm who you are, so this page can never be used to find out whether a number is registered.",
     "emptyTitle": "Nothing yet",
     "emptyBody": "We know who you are, and you have not applied for anything so far. Have a look at what is open.",
     "kind": {

@@ -330,6 +330,8 @@
     "reopenIsCoordinator": "An enumerator cannot change a survey once it is submitted. Reopening one is a coordinator action.",
     "state": {
       "submitted": "This survey has been submitted. A1, B1, C1 and IMP-0 count it from now on.",
+      "submittedCounted": "This survey has been submitted. It is counted by {list}.",
+      "submittedCountedNone": "This survey has been submitted. None of the four follow-up indicators counts it — the questions each one reads were left unanswered, or the respondent does not meet their conditions.",
       "approved": "This survey has been submitted and approved by a coordinator.",
       "rejected": "A coordinator has rejected this survey. It is not counted."
     }

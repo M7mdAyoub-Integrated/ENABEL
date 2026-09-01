@@ -41,6 +41,7 @@ export const followupKeys = {
   one: (id: string) => ['followups', 'one', id] as const,
   prefill: (nid: string) => ['followups', 'prefill', nid] as const,
   submit: (id: string) => ['followups', 'submit', id] as const,
+  reach: (id: string, status: string) => ['followups', 'reach', id, status] as const,
   review: (id: string) => ['followups', 'review', id] as const,
 }
 
@@ -1003,6 +1004,43 @@ export function useSubmitPreview(id: string | undefined, enabled: boolean) {
       })
       if (error) throw toAppError(error)
       return data as SubmitResult
+    },
+  })
+}
+
+/**
+ * Which indicators actually count THIS survey, at its current status.
+ *
+ * ── WHY THIS EXISTS, AND WHAT IT REPLACED ──
+ *
+ * The submitted survey page said, in a fixed string:
+ *
+ *     "This survey has been submitted. A1, B1, C1 and IMP-0 count it from
+ *      now on."
+ *
+ * That is four indicators asserted by a sentence, and it is wrong whenever the
+ * respondent does not answer one of them. Observed on the first survey put
+ * through this platform: the SUBMIT PREVIEW correctly said "A1 · B1 · IMP-0",
+ * the survey was submitted, and the page then claimed C1 as well. C1's
+ * denominator stayed 0, because C1 requires an initiative started at least six
+ * months before the contact date and this respondent has no initiative at all.
+ *
+ * The preview was computed and the confirmation was hardcoded, one screen
+ * apart, disagreeing. `followup_indicator_reach` -- which the preview already
+ * uses inside `submit_followup` -- gives the true list for any status, so the
+ * sentence is built from it instead of asserted.
+ */
+export function useIndicatorReach(id: string | undefined, status: string | undefined) {
+  return useQuery({
+    queryKey: followupKeys.reach(id ?? '', status ?? ''),
+    enabled: !!id && !!status && status !== 'draft',
+    queryFn: async (): Promise<string[]> => {
+      const { data, error } = await supabase.rpc('followup_indicator_reach', {
+        p_survey_id: id!,
+        p_status: status as 'submitted' | 'approved' | 'rejected',
+      })
+      if (error) throw toAppError(error)
+      return (data ?? []) as string[]
     },
   })
 }

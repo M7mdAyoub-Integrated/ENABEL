@@ -121,7 +121,28 @@ export function useSetMilestone() {
       if (res.error) throw toAppError(res.error)
       return res.data
     },
-    onSuccess: () => invalidateIndicators(qc),
+    /**
+     * ── THE MILESTONE LIST ITSELF, NOT JUST THE DASHBOARD ──
+     *
+     * This read `onSuccess: () => invalidateIndicators(qc)`, which invalidates
+     * `['indicators']` and `['overview']` and NOT `['manual','milestones']` --
+     * the query the screen you are standing on is rendering.
+     *
+     * So marking B1.1 achieved wrote `is_achieved = true` and `achieved_on`,
+     * moved the indicator, and left the button still reading "Mark achieved".
+     * Verified in the database while the screen still denied it. The
+     * coordinator's only signal that it worked was to reload the page.
+     *
+     * This is the "delete that looks like success" family with the signs
+     * reversed: the write happened and the screen said it had not, which
+     * invites the same click again. Both neighbours in this file --
+     * useCreateManualRecord and useWithdrawManualRecord -- invalidate their own
+     * list correctly, which is exactly why this one went unnoticed.
+     */
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: manualKeys.milestones() })
+      invalidateIndicators(qc)
+    },
   })
 }
 

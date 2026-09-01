@@ -7,11 +7,13 @@ import {
   useReviewPreview,
   useSubmitFollowup,
   useSubmitPreview,
+  useIndicatorReach,
   type ReviewAction,
   type SectionKey,
 } from '../data/followups'
 import { BackLink, EmptyState, PageHead, SectionRule } from '../ui/primitives'
 import { formatShortDate } from '../lib/format'
+import { SEP } from '../ui/glyphs'
 import { useToast } from '../ui/Toast'
 import { isolateLtr } from '../components/BidiIsolate'
 import { NotesBox } from '../ui/surveyControls'
@@ -88,6 +90,9 @@ export function FollowupDetail() {
   const isDraft = survey?.status === 'draft'
   const preview = useSubmitPreview(id, isDraft)
   const submit = useSubmitFollowup()
+  // What actually counts this survey now, asked of the database rather than
+  // written into a sentence. See useIndicatorReach.
+  const reach = useIndicatorReach(id, survey?.status)
 
   const [confirming, setConfirming] = useState(false)
   const [refusal, setRefusal] = useState<string | null>(null)
@@ -222,10 +227,21 @@ export function FollowupDetail() {
           </>
         ) : (
           <>
+            {/* The indicator list is COMPUTED, not asserted. This sentence
+                used to name A1, B1, C1 and IMP-0 unconditionally, one screen
+                away from a submit preview that correctly named only the ones
+                that apply -- and they disagreed on the very first survey put
+                through the platform. See useIndicatorReach. */}
             <p className="m-0 text-[15px] leading-[1.55] text-body">
-              {t(`survey:detail.state.${survey.status}`, {
-                defaultValue: t('survey:detail.state.submitted'),
-              })}
+              {survey.status === 'submitted' && reach.data
+                ? reach.data.length > 0
+                  ? t('survey:detail.state.submittedCounted', {
+                      list: reach.data.join(` ${SEP} `),
+                    })
+                  : t('survey:detail.state.submittedCountedNone')
+                : t(`survey:detail.state.${survey.status}`, {
+                    defaultValue: t('survey:detail.state.submitted'),
+                  })}
             </p>
             {/* Not shown to a coordinator: they have the buttons below, and
                 telling the person who can reopen it that reopening is

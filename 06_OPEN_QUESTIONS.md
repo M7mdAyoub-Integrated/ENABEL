@@ -1226,3 +1226,60 @@ does real work today regardless: it is what the linkage gate reads.
 
 **Decides.** M&E lead, with Enabel. Answering 1 settles OQ-1 and OQ-4 as a side
 effect, so it is one conversation and not three.
+
+---
+
+## 🟠 OQ-41 · The rate limiter and a wrong national ID are the same answer to the applicant
+
+**Found 1 September 2026, by applying to three things in a row as an anonymous
+visitor.**
+
+`bump_lookup_throttle` (0050) allows **5 attempts per national ID per 10
+minutes** and 20 per client. All four public functions call it —
+`applicant_prefill`, `apply_for_opportunity`, `my_applications`,
+`request_linkage` — and every one of them turns a refusal into the same
+`cannot_verify` they return when the identity check itself fails.
+
+**Why the blur is wrong here, when the other blur is right.** Returning one
+answer for "this ID is not on file" and "this ID is on file but the date is
+wrong" is deliberate and correct: telling them apart is an existence oracle,
+and OQ-22 settled it. **Being over a rate limit reveals nothing about whether
+an ID exists**, so folding it into the same answer buys no privacy and costs
+the applicant the truth. Every rate limiter in general use says so plainly.
+
+**What it cost, measured.** The screen said:
+
+> *We could not confirm your details. Check your national ID and date of birth
+> against your card. If they are right and this keeps happening, please visit
+> the Municipality office.*
+
+The details were correct. The applicant had simply used their five attempts:
+two per application (lookup, then apply) and one for "my applications". Three
+ordinary actions in ten minutes is five attempts — **a normal session reaches
+the limit**, and the message then sends the person to the Municipality office
+to fix a problem they do not have.
+
+**What was done now.** The copy on all three public screens stops asserting one
+cause and names both, in both languages, with "wait ten minutes" as the action.
+That removes the false statement.
+
+**What was NOT done, and why.** Making the two results distinguishable means
+returning a separate `too_many_attempts` from the four RPCs. That is the right
+fix, and it is four `create or replace` on security-definer functions that
+stand between `anon` and a table of national IDs — each last touched by a
+different migration (0062, 0060, 0071, 0106), each carrying the `0082`
+reversion risk. It was judged too large to do at the end of an audit pass
+without a dedicated review. Two of the four (`apply_for_opportunity`,
+`request_linkage`) also catch `others`, so fixing it inside
+`bump_lookup_throttle` by raising would be swallowed by them — the callers have
+to change either way.
+
+**Needed.** A migration adding `too_many_attempts` to all four, each body taken
+from `pg_get_functiondef` rather than from the newest migration file, plus
+copy for the new result. Verified as `anon`, not as the owner.
+
+**Also worth the M&E lead's view:** whether 5 per identifier per 10 minutes is
+the right limit at all. It was chosen against a credential-stuffing threat, and
+the observed cost is that an ordinary applicant hits it.
+
+**Decides.** Developer for the mechanism; Coordinator on the limit.
