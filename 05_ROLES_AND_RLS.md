@@ -160,13 +160,28 @@ alter table public.ref_product enable row level security;
 create policy ref_product_read on public.ref_product
   for select to authenticated using (true);
 
-create policy ref_product_write on public.ref_product
-  for all to authenticated
+-- INSERT and UPDATE named separately. NOT `for all` -- see below.
+create policy ref_product_insert on public.ref_product
+  for insert to authenticated
+  with check (public.is_coordinator());
+
+create policy ref_product_update on public.ref_product
+  for update to authenticated
   using (public.is_coordinator())
   with check (public.is_coordinator());
 ```
 
 Repeat for every `ref_*` table.
+
+**This pattern said `for all` until 2026-09-03, and `for all` includes DELETE.**
+A `ref_*` table carries `deleted_at`, `is_active` and `guard_soft_delete`, so
+the intended retirement path is `is_active = false` — and the policy quietly
+granted a coordinator a way round all three. Eight of the tables (`0075`'s
+survey option lists) were built from this pattern literally and had exactly one
+`for all` policy; the other eighteen had a separate `ref_delete`. Both were
+removed in `0109`. The lesson is small and worth keeping: **`for all` is four
+verbs, and one of them is the one this project does not do.** Name the verbs
+you mean. See §16.
 
 ### Operational tables — the standard four
 
@@ -542,13 +557,23 @@ where schemaname = 'public'
   );
 -- expect zero rows
 
--- 2. no table with RLS on but no policy
+-- 2. RLS on with no policy, other than the two where that is the design
 select c.relname
 from pg_class c
 join pg_namespace n on n.oid = c.relnamespace
 where n.nspname = 'public' and c.relkind = 'r' and c.relrowsecurity
-  and not exists (select 1 from pg_policy p where p.polrelid = c.oid);
+  and not exists (select 1 from pg_policy p where p.polrelid = c.oid)
+  and c.relname not in ('applicant_lookup_secret', 'applicant_lookup_throttle');
 -- expect zero rows
+
+-- and confirm the two are still there, so this cannot pass by their being dropped
+select count(*) = 2
+from pg_class c
+join pg_namespace n on n.oid = c.relnamespace
+where n.nspname = 'public' and c.relrowsecurity
+  and c.relname in ('applicant_lookup_secret', 'applicant_lookup_throttle')
+  and not exists (select 1 from pg_policy p where p.polrelid = c.oid);
+-- expect true
 
 -- 3. anon reaches the four public views and nothing else
 select table_name, privilege_type
@@ -568,6 +593,17 @@ where grantee = 'anon' and table_schema = 'public'
                      'v_public_producer_type', 'v_public_product');
 -- expect true
 ```
+
+**Check 2 was corrected on 2026-09-03, for the same reason check 3 was.** It
+read "expect zero rows" and returned two — `applicant_lookup_secret` and
+`applicant_lookup_throttle` — and had done since `0050`. Zero policies denies
+every role, which is *stricter* than any policy could be and is the right shape
+for a table nothing may touch except a `security definer`; adding one to satisfy
+the check would weaken both. So the expectation was wrong, not the schema. It is
+now an allow-list with a second query that fails if the two are dropped, because
+an exception list alone passes happily when the exceptions have been deleted.
+The thing worth catching is a **third** — a new table with RLS on and no policy
+is usually an unfinished migration. See OQ-42.
 
 **Check 3 used to read "anon has no access anywhere, expect zero rows", and that
 was this document contradicting itself.** §10 describes a public site that reads
@@ -869,3 +905,150 @@ One thing found while checking, and **not** resolved: `evidence_staff_update` ex
 `attachment` carries `uploaded_by`/`uploaded_at` rather than the standard `created_by`. Functionally the same thing under a different name; noted so the next person does not go looking for `created_by`.
 
 > **Anything specified in this file is a claim until a query says otherwise.** `check-soft-delete-guards.mjs` now fails the build if a table carrying `deleted_at` has no guard, and `check-constraint-names.mjs` does the same for error mappings. Neither existed when this document was written, and both were added after the thing they check turned out to be missing.
+
+---
+
+## 16. Deletion: which tables may lose a row, and which may not
+
+Added 2026-09-03 with migration `0109`. §4 says *"no delete policy at all: rows
+are never removed"* and §15 records that `guard_soft_delete` was missing
+entirely until `0069`. Both were about the **soft** delete path. Neither asked
+whether anything could take the **hard** one.
+
+### What was found
+
+`guard_soft_delete` is a `before update` trigger. That is correct — a soft
+delete *is* an update — and it means the guard cannot see a `DELETE`. Measured
+through RLS as a real coordinator, `set local role authenticated` with the
+claims set, in a transaction that rolled back:
+
+| statement | rows |
+|---|---|
+| `delete from ref_safety_item where code = <first>` | **1** |
+| `delete from indicator_target` | **260** |
+| `delete from reporting_period where code = '29/Q3'` | **1** |
+
+260 rows is the donor's entire quarterly target matrix, and `indicator_target`
+has no `deleted_at` to reverse it with. The period went next because the foreign
+keys protecting it now pointed at rows that were gone.
+
+`check-soft-delete-guards.mjs` passed throughout. It asks whether a table with
+`deleted_at` has a guard; all 32 do. It never asks whether deletion goes through
+that guard, and on all 32 it did not have to.
+
+> **A guard on one verb is not a guard.** `deleted_at` plus a trigger describes
+> the path you intend people to take. It says nothing about the paths you left
+> open beside it. Ask which statements can remove a row, not whether the
+> intended one is guarded.
+
+### The classification
+
+Every table falls into one of four cases. `0109` acts on the first three.
+
+**1 — Rewritten by delete-then-insert. DELETE is correct; leave them.** Eight
+tables, every multi-select and every follow-up child:
+
+```
+exhibition_registration_product   person_activity_type
+partnership_role                  coordination_meeting_partner
+followup_answer                   followup_answer_option
+followup_safety_item              followup_buyer_connection
+```
+
+A `deleted_at` here would be a defect, not a tightening: re-ticking a box would
+find the soft-deleted row and either fail the unique key or resurrect a row with
+the wrong provenance. Their history is safe because of the two things below,
+both confirmed from the catalogue rather than assumed:
+
+- all eight carry an **AFTER INSERT OR UPDATE OR DELETE** `audit_row` trigger,
+  which writes `old_data`, `actor` and `actor_role` for every row removed;
+- all eight hang off a parent that **is** soft-deleted and audited —
+  `exhibition_registration`, `person`, `partnership`, `coordination_meeting`,
+  `followup_survey` — by an `on delete cascade` that can now never fire, because
+  the parent can no longer be hard-deleted.
+
+Note for anyone reading `audit_log` afterwards: `person_activity_type` and
+`coordination_meeting_partner` have composite primary keys and no `id` column,
+so `audit_log.row_id` is **null** for them. The whole removed row is in
+`old_data`; the identity is in there, not in `row_id`.
+
+**2 — Never lose a row. `deleted_at` already present.** The 26 `ref_*` tables
+and every operational table. They had the column, the guard and — until `0109` —
+a `ref_delete` policy admitting a coordinator straight past both. Retirement is
+`is_active = false` (OQ-20).
+
+**3 — Never lose a row, and no `deleted_at` is wanted.** `objective`,
+`activity`, `indicator`, `indicator_target`, `reporting_period`,
+`indicator_snapshot`, `app_user`, `audit_log`, `applicant_lookup_secret`.
+
+The framework five are the *definition* of the report rather than data about it;
+a `deleted_at` would let an indicator vanish from the framework while its rows
+still existed. `app_user` has `is_active`, which `current_role()` already
+honours (`0032`). `indicator_snapshot` is argued in `0109`'s header: a snapshot
+is one half of the reconciliation OQ-25 exists to make possible, and a column
+that hides it would remove the half that says what was reported.
+
+**4 — Deletion is the design.** `applicant_lookup_throttle` only — OQ-21,
+approved 26 August 2026 and written into `CLAUDE.md` rule 2.
+
+### What `0109` does, and why a policy alone was not enough
+
+`guard_no_hard_delete()` is a `before delete` trigger attached to all 57 tables
+outside cases 1 and 4, by walking `pg_class` rather than from a written list, so
+a table added later without one is an omission the migration's own verification
+block fails on rather than a typo nobody sees. The DELETE-capable policies
+(`ref_delete`, `au_delete`, and the `for all` inside `ref_write` on the eight
+`0075` option lists) come off the same tables.
+
+**The trigger is the boundary; the policy change is housekeeping.** RLS does not
+apply to the table owner, so dropping `ref_delete` protects `authenticated` and
+leaves every migration, support script and MCP session able to do it anyway —
+which is the connection the three deletes above were first reproduced from.
+
+### Testing it
+
+Both directions, as §14 requires, and **counting rows rather than catching
+exceptions** — which is the mistake this pass made first time and had to redo:
+
+> An RLS-filtered delete raises nothing. It affects zero rows and reports
+> success. So a test that only catches exceptions reads "no error" as "deleted",
+> and a test that only counts rows cannot tell a guard from a missing policy.
+> You need both numbers, and you need the owner path, where RLS is not there to
+> flatter the result.
+
+| as | statement | result |
+|---|---|---|
+| owner | `delete from indicator_target` | **refused, 23001** |
+| owner | `delete from audit_log` | **refused, 23001** |
+| owner | `delete from app_user where role='partner_viewer'` | **refused, 23001** |
+| owner | `delete from indicator_snapshot` (20 rows seeded first) | **refused, 23001** |
+| owner + `app.allow_hard_delete='on'` | same | 20 rows — the escape works |
+| owner + `app.allow_hard_delete='off'` | same | **refused, 23001** |
+| owner | `delete from partnership_role` | 2 rows — the junction still works |
+| coordinator | `delete from ref_safety_item` | 0 rows — policy gone |
+| coordinator | `update person set deleted_at = now()` | 1 row — soft delete unaffected |
+| coordinator | `delete from partnership_role` | 2 rows — junction unaffected |
+| `anon`, through `applicant_prefill` | throttle purge | stale bucket gone |
+
+The seeded-snapshot row matters: a **row-level** `before delete` trigger fires
+once per row, so an empty table returns "0 rows, no error" and proves nothing.
+The first run of this test read `indicator_snapshot` as unprotected for exactly
+that reason.
+
+The last case that needed constructing: after `0109` there is no table where
+`authenticated` can reach a DELETE at all, so the policy would always stop them
+first and the trigger would never be exercised. DDL is transactional, so a
+delete policy was created for `authenticated` inside the transaction and thrown
+away with it:
+
+```sql
+create policy tmp_probe_delete on public.promotional_action
+  for delete to authenticated using (true);
+set local role authenticated;              -- with a coordinator's claims
+select set_config('app.allow_hard_delete','on',true);
+delete from public.promotional_action;     -- ERROR 23001
+```
+
+Refused with the switch thrown, because `authenticated` is not the table owner.
+That is the property worth having: the escape hatch is not reachable from the
+application at any role, whatever a policy later says.

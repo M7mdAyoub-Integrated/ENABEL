@@ -1283,3 +1283,183 @@ the right limit at all. It was chosen against a credential-stuffing threat, and
 the observed cost is that an ordinary applicant hits it.
 
 **Decides.** Developer for the mechanism; Coordinator on the limit.
+
+---
+
+## 🟢 OQ-42 · The RLS verification's second check has always returned two rows — RESOLVED as a doc fix
+
+**Found 3 September 2026**, during the table audit.
+
+`05_ROLES_AND_RLS.md` §9 check 2 reads *"no table with RLS on but no policy —
+expect zero rows"*. It returns **two**, and always has:
+`applicant_lookup_secret` and `applicant_lookup_throttle`.
+
+Both are correct as they stand. RLS enabled with **zero policies** denies every
+role — it is *stricter* than any policy could be, and it is the right shape for
+a table nothing may touch except a `security definer` (`bump_lookup_throttle`).
+Adding a policy to satisfy the check would weaken both tables: one holds the
+HMAC salt for the public applicant lookup, the other the lookup counters.
+
+**This is §9 check 3 again.** That one said "anon has no access anywhere,
+expect zero rows" while `0048` and `0056` had granted `anon` four views — so
+for every run since, either nobody ran it or somebody saw four rows and decided
+they were fine. It was fixed by turning it into an allow-list. Check 2 has the
+same defect and the same fix: name the two tables, and fail on a **third**.
+
+**Resolved:** the expectation is wrong, not the schema. §9 check 2 should read
+"expect exactly `applicant_lookup_secret` and `applicant_lookup_throttle`", and
+fail on anything else — because a *new* table with RLS on and no policy is
+usually an unfinished migration, which is the thing the check was written for.
+
+**Decides.** Settled — it is a correction to the document, not a schema change.
+
+---
+
+## 🔴 OQ-43 · Four indicators require evidence and nothing in the platform can upload a file
+
+**Found 3 September 2026**, during the table audit.
+
+`05_ROLES_AND_RLS.md` §8 and the source workbook both make an evidence document
+**mandatory** for four indicators:
+
+| | Evidence the workbook names |
+|---|---|
+| **B1.1** | municipal decision, service schedule, record of sessions delivered |
+| **G0.1** | formation decision, membership list, terms of reference, minutes |
+| **G0.2** | meeting minutes and attendance records |
+| **G0.3** | the case study itself |
+
+**What exists.** The private bucket `evidence` (`0013`). Storage policies for
+staff read and staff insert. The `attachment` table, with `entity_type`,
+`entity_id`, `storage_path`, its audit trigger, its soft-delete guard, and a
+generated row type in `app/src/types/database.ts`.
+
+**What does not exist.** Any code that uses it. `supabase.storage` appears
+**nowhere** in `app/src`. `attachment` holds 0 rows, is written by nothing, and
+is read by nothing — no view, no function, no screen.
+
+**Why it matters more than an empty table normally would.** B1.1 and G0.1 are
+milestones: `/manual-entries` will set `is_achieved` and move the indicator from
+0 to 1 today, with no document anywhere, and nothing on the screen asks for one.
+§8 says *"Enforce with a check on the milestone and case study tables that at
+least one attachment exists before the record can be marked complete."* That
+check was never built, and could not be satisfied if it were.
+
+These are the four indicators whose defensibility to the donor rests entirely on
+a file existing. Today the platform can assert all four and evidence none.
+
+**What is NOT recommended.** Adding the §8 constraint now. It would make B1.1
+and G0.1 unachievable rather than unevidenced, which is worse: it blocks
+recording something that really happened, and the workaround is a coordinator
+being told the software is broken.
+
+**Needed, in order.** An upload path first (storage client, signed URLs, an
+`attachment` write on the four owning screens), then the constraint. Note
+**OQ-30** sits underneath this: `evidence_staff_update` lets any staff member
+overwrite an uploaded file in place, which destroys evidence as surely as a
+delete would. Both should be settled together, because building the upload path
+on top of an unresolved overwrite hole is how the evidence trail ends up
+looking complete and not being.
+
+**Decides.** M&E lead — is evidence a hard precondition for marking a milestone
+achieved, or a record attached afterwards? The answer changes whether the
+constraint or the upload path is the blocking piece.
+
+---
+
+## 🔴 OQ-44 · `snapshot_period` is correct and the application cannot call it
+
+**Found 3 September 2026.** This is the other half of **OQ-25**, which records
+that no period has ever been snapshotted. It is now clear that this was not an
+oversight of process.
+
+**The function works.** Run on the owner path against the current period it
+returned **20 rows**, one per indicator, matching `v_indicator_actual` exactly,
+then rolled back. It honours `is_locked`, refuses an unknown period, and
+upserts with `where is_final = false`.
+
+**Nobody who could want to call it can.** `snapshot_period` is
+`security definer` with `EXECUTE` revoked from `authenticated` **and** `anon`.
+`authenticated` is the only role the application ever connects as. Measured:
+
+```
+set local role authenticated;  set local request.jwt.claims = '{"sub":"<a coordinator>"}';
+select public.snapshot_period('26/Q3');
+ERROR:  42501: permission denied for function snapshot_period
+```
+
+**The gate inside it has therefore never been reachable.** Its first statement
+is `if auth.uid() is not null and not is_coordinator() then raise`, which only
+means anything for a signed-in caller — and a signed-in caller is refused by the
+grant before reaching it. Every caller that gets through has no `auth.uid()` at
+all, so the branch that runs is the one that permits everything.
+
+This is `05_ROLES_AND_RLS.md` §14 from the other side: there a definer's grant
+was too narrow for the invoker that called it; here it is too narrow for the
+only role that exists. Both were invisible because the function is perfect when
+run as the owner, which is how it was tested.
+
+**Why it was not fixed here.** Granting `EXECUTE` to `authenticated` is one
+line and is probably right — the coordinator gate is already inside the body and
+would start working the moment the grant existed. But snapshotting is the act
+that *creates* a reported figure, and OQ-25 records that **who may do it and
+when is an unanswered process question**. Granting first would put the button in
+reach before anyone has decided whose finger goes on it.
+
+**Needed.** OQ-25's answer, then a one-line grant, then a screen. Verified as a
+coordinator *and* as the four other roles — not as the owner.
+
+**Decides.** M&E lead with the Municipal Coordinator, as OQ-25.
+
+---
+
+## 🟠 OQ-45 · The completion form collects two fields and writes neither
+
+**Found 3 September 2026**, during the table audit.
+
+Section 3 of `04_DATA_DICTIONARY.md` maps two fields of the `Completion_form`:
+
+| Source field | → |
+|---|---|
+| What is your current involvement in agriculture? | `person.agri_involvement_id` |
+| What type of agricultural activity are you involved in? *(select all)* | `person_activity_type` junction |
+
+**Both are on the screen.** `/forms/tc` renders an "Agricultural profile"
+section containing exactly these two controls — `useFormSchema.ts:393-394`, an
+`involve` select over `ref_agri_involvement` and an `act` checkbox group over
+`ref_activity_type`. The option lists load, the controls tick, the form
+submits, the toast is green.
+
+**Neither reaches the database.** `CompletionInput` has no field for either.
+`useCreateCompletion` inserts a `person` without `agri_involvement_id` and never
+touches `person_activity_type`; `useUpdateCompletion` does the same. Confirmed
+in the data rather than in the code: `person_activity_type` holds **0 rows**,
+and `agri_involvement_id` is **null for all 7 people on file**.
+
+**This is CLAUDE.md's seventh shape without the RLS.** There, a delete RLS
+filtered reported success and the box stayed ticked. Here there is no delete and
+no policy — the values simply never leave the browser. The symptom is identical
+and so is the cost: an enumerator answers a question, is told it saved, and the
+answer is not anywhere.
+
+**What it costs.** `ref_activity_type` and `ref_agri_involvement` are seeded and
+correct. Nothing in `03_INDICATORS.md` computes a figure from either, so **no
+indicator is wrong today** — this is lost disaggregation, not a bad number.
+A1.3 disaggregates by sex, age, refugee status, disability and training topic,
+all of which are collected.
+
+**Why it is amber rather than red.** No donor figure moves. But the longer it
+runs the worse it gets: every completion recorded from now on is a person whose
+activity profile was asked for, answered, and discarded, and there is no way to
+recover the answers later.
+
+**What would settle it.** Either wire both fields through — two lines on
+`CompletionInput`, a `person.agri_involvement_id` on the insert and update, and
+a delete-then-insert on `person_activity_type` matching the eight junctions
+already in the platform — or take both controls off the form. **Taking them off
+is a real option**: neither feeds an indicator, and a question nobody answers
+honestly because it never mattered is worse than no question. What must not
+continue is the third state, where the form asks and the database does not hear.
+
+**Decides.** M&E lead — is the activity profile wanted for reporting at all? If
+yes it is a small piece of work; if no, the two controls should go.
