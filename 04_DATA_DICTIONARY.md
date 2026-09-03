@@ -417,3 +417,186 @@ Seed clean text. Recorded here so nobody thinks the source was misread.
 | `evidance` | evidence |
 
 Also note: the framework SVG spells the municipality **"Sahel Houran"**; every other document says **"Sahel Horan"**. Use *Sahel Horan*.
+
+---
+
+# 10. Table audit — every table, what writes it, what reads it
+
+**Taken 3 September 2026** against the live database (`ocjdsqwhcekyzeqrrznc`) and
+the application in `app/src`. **66 tables: 40 non-reference, 26 `ref_`.**
+
+The method matters, because the register in `CLAUDE.md` is a list of checks that
+passed while the thing they checked was wrong. Nothing here is inferred from a
+table's name or from a comment:
+
+- **written** — a `.insert(`/`.update(` in `app/src` against that table, or an
+  `insert into` inside a `pg_proc` body. Both were enumerated from the live
+  catalogue, with SQL comments stripped first (a name in a comment is not a
+  write — `05_ROLES_AND_RLS.md` §14 records the six false positives that
+  produced).
+- **read** — the table appears in a view's dependency graph (`pg_depend` →
+  `pg_rewrite`, not a text search of the definition), or in a `.select(` in
+  `app/src`, or is read by a trigger function.
+- **rows** — `count(*)`, split live / soft-deleted. Not `reltuples`.
+
+## EARNS ITS PLACE — written and read, serving a named indicator or journey
+
+| Table | What it is for | Indicator / journey | Written at | Read at | Rows (live/del) |
+|---|---|---|---|---|---|
+| `person` | The participant registry. One person, one row. | Every distinct-person indicator: A1.3, B1.2, D0.1, E0.2 | `/forms/tc`, public `/apply/:id` via `apply_for_opportunity` | every `v_ind_*` that disaggregates; `v_person_public` | 4 / 3 |
+| `partner` | The organisation. One body, one row. | A1.2, C1.1, G0.4 | `/forms/pn` | `v_ind_a1_2`, `v_ind_c1_1`, `v_ind_g0_4` | 3 / 3 |
+| `partnership` | One agreement of one type with one partner. | A1.2 (`training`), C1.1 (`production_support`) | `/forms/pn` | `v_ind_a1_2`, `v_ind_c1_1`, `v_ind_g0_4` | 3 / 2 |
+| `partner_contribution` | A dated act by a partner in a period. | **G0.4** — unmeasurable without it | `/forms/pn` detail; auto by `contribution_from_meeting`, `contribution_from_linkage`, `sync_auto_contribution` | `v_ind_g0_4` | 2 / 1 |
+| `training_session` | A course occurrence. | **D0.2**; gives A1.3 a parent | `/sessions/new`, `/sessions/:id/edit`; `resolveSession()` as a by-product | `v_ind_d0_2`, `v_ind_a1_3`, `v_opportunity` | 6 / 3 |
+| `training_enrolment` | One person on one session, with the completion decision. | **A1.3** | `/forms/tc`; public apply | `v_ind_a1_3`, `v_opportunity`, `v_recent_activity` | 5 / 5 |
+| `office_service` | One visit to the coordination office. | **B1.2** | `/forms/os` | `v_ind_b1_2`, `v_indicator_disaggregated` | 1 / 3 |
+| `guidance_record` | One guidance contact with a producer. | **D0.1** | `/forms/gd` | `v_ind_d0_1`, `v_indicator_disaggregated` | 2 / 1 |
+| `exhibition` | A market or seasonal exhibition. | **E0.1** | `/forms/ex` | `v_ind_e0_1`, `v_ind_e0_2`, `v_public_opportunity` | 2 / 1 |
+| `exhibition_registration` | One producer at one event. | **E0.2** | public `/apply/:id`; approved at `/exhibitions/:id` | `v_ind_e0_2`, `v_opportunity`, `v_upcoming_exhibitions` | 2 / 0 |
+| `production_initiative` | A supported production activity. | **C1.2**, C1.3 parent, C1's six-month window | `attach_or_create_linkage` (from a linkage) | `v_ind_c1`, `v_ind_c1_2`, `v_ind_c1_3` | 1 / 0 |
+| `market_linkage` | An initiative connected to a buyer. | **C1.2** | `create_direct_linkage`, `match_linkage_request`; updated at `/linkage-requests/:id` | `v_ind_c1_2`, `v_recent_activity` | 2 / 0 |
+| `mentorship_session` | An advisory session on a funded initiative. | **C1.3** | `/initiatives/:id` | `v_ind_c1_3` | 2 / 1 |
+| `milestone` | Achieved / not achieved, with the date that fixes the quarter. | **B1.1**, **G0.1** | `/manual-entries` | `v_ind_b1_1`, `v_ind_g0_1` | 2 / 0 |
+| `promotional_action` | A campaign or promotional act. | **F0.1** | `/manual-entries` | `v_ind_f0_1` | 2 / 0 |
+| `coordination_meeting` | A meeting with partners. | **G0.2** | `/manual-entries` | `v_ind_g0_2` | 1 / 0 |
+| `case_study` | A documented change story. | **G0.3** | `/manual-entries` | `v_ind_g0_3` | 1 / 0 |
+| `linkage_request` | A producer asking to be connected. | Journey: public `/linkage` to queue to match | `request_linkage` (public); `/linkage-requests/:id` | `/linkage-requests`, `my_applications` | 1 / 1 |
+| `advisory_session` | A market or home-based advisory session. | Journey: the gate on C1.2's linkage (`0106`) | `/advisory/new`, `/advisory/:id/edit` | `v_opportunity`, `v_public_opportunity`, `check_linkage_eligibility` | 2 / 0 |
+| `advisory_enrolment` | A producer's place on an advisory session. | Journey: the linkage gate | public `/apply/:id` | `v_opportunity`, `check_linkage_eligibility`, `my_applications` | 1 / 1 |
+| `indicator` | The 20 framework rows. | All | seed | `v_indicator_progress` | 20 / 0 |
+| `indicator_target` | The quarterly target matrix. | All | seed | `v_indicator_progress` | 260 / 0 |
+| `reporting_period` | The 13 quarters. | All | seed | every `v_ind_*` | 13 / 0 |
+| `objective` | The four objectives plus impact. | Grouping on the dashboard | seed | `v_indicator_progress` | 5 / 0 |
+| `partnership_role` | Multi-select: roles under a partnership. | A1.2 / C1.1 disaggregation | `/forms/pn` (delete-then-insert) | `/forms/pn` detail | 5 / 0 |
+| `followup_survey` | The 43-question instrument. | **A1, B1, C1, IMP-0** | `/followups/*` via `start_followup`, five section saves, `submit_followup` | `v_ind_a1`, `v_ind_b1`, `v_ind_c1`, `v_ind_imp_0` | 0 / 0 |
+| `followup_answer` | Single-value answers. | A1/B1/C1 context | section saves A–E | `/followups/:id` | 0 / 0 |
+| `followup_answer_option` | Multi-select answers. | disaggregation | section saves A–E | `/followups/:id` | 0 / 0 |
+| `followup_safety_item` | Q23, tri-state across 9 items. | Section B | `save_followup_section_b` | `/followups/:id` | 0 / 0 |
+| `followup_buyer_connection` | Q35, up to 3 buyers. | Section C | `save_followup_section_c` | `/followups/:id`, `submit_followup` | 0 / 0 |
+
+The five `followup_*` tables hold **0 rows** and that is not a defect: the
+survey shipped on 31 August and no interview has been conducted. Every one has a
+working write path and a working read path, exercised in `0090`–`0100`.
+
+## WRITTEN BUT NEVER READ — data going in that nothing uses
+
+| Table | Rows | The gap |
+|---|---|---|
+| `indicator_snapshot` | 0 | `snapshot_period()` writes it. **Nothing reads it** — no view, no screen, no function. See the confirmation below; this is **OQ-25**. |
+| `exhibition_registration_product` | 0 | Written by `apply_for_opportunity` (`0058`), read by the exhibitor list on `/exhibitions/:id`. Both halves exist; it is empty only because both registrations predate `0058`. Listed here rather than above because **nothing had ever exercised the pair** until Part 4 of this session did. |
+
+## READ BUT NEVER WRITTEN — something depends on it and nothing can fill it
+
+| Table | Rows | What depends on it |
+|---|---|---|
+| `coordination_meeting_partner` | 1 | Read by trigger `contribution_from_meeting`, which creates the `partner_contribution` that **feeds G0.4**. `03_INDICATORS.md` names it as G0.2's partner-type disaggregation. `/manual-entries` inserts the meeting and **no partners** — the single row came from `0024_seed_demo`. So one of G0.4's automatic contribution sources, and all of G0.2's disaggregation, cannot be reached from any screen. |
+| `attachment` | 0 | Nothing writes it and nothing reads it — but `05_ROLES_AND_RLS.md` §8 makes evidence **mandatory** for B1.1, G0.1, G0.2 and G0.3, and the workbook names the required document for each. See below. |
+
+## NEITHER — dead
+
+| Table | Rows | Finding |
+|---|---|---|
+| `person_activity_type` | 0 | No view reads it, no function names it, no screen writes it. See below — the form **appears** to collect it. |
+| `activity` | 7 | Parent of `indicator.activity_id`. No view, function or screen reads it. Structural only: it is the framework's Activity A–G level, seeded and correct, waiting for a screen that groups by activity rather than by objective. Not dead in the sense of wrong — dead in the sense of unused. |
+
+## INFRASTRUCTURE — no indicator by design
+
+Judged on whether each is doing its job, not on row count.
+
+| Table | Rows | Doing its job? |
+|---|---|---|
+| `audit_log` | 1 511 | **Yes.** Insert-only, one policy (SELECT, coordinator). 45 audit triggers attached. It is also load-bearing beyond audit: `person_restore_candidate` and `partner_restore_candidate` read it to name who deactivated a row. |
+| `app_user` | 6 | **Yes.** Written by `handle_new_user` on signup; read by `current_role()`, which every policy in the schema depends on. Carries `is_active` — deactivation, not deletion. |
+| `applicant_lookup_secret` | 1 | **Yes.** RLS on, **zero policies** — deliberate: nothing reaches it except `bump_lookup_throttle`, a definer. Holds the HMAC salt. |
+| `applicant_lookup_throttle` | 2 | **Yes.** Same shape. Rows are hard-deleted per **OQ-21**, approved 26 Aug 2026 and written into `CLAUDE.md` rule 2. |
+
+> **Note on `05_ROLES_AND_RLS.md` §9 check 2** ("no table with RLS on but no
+> policy — expect zero rows"). It returns **two** rows, and always has:
+> `applicant_lookup_secret` and `applicant_lookup_throttle`. Zero policies is
+> *stricter* than one policy, and it is the correct design for a table only a
+> `security definer` may touch. The check's stated expectation is wrong, in the
+> same way §9 check 3's was before it was made an allow-list. Recorded as
+> **OQ-42**.
+
+## The six asked about by name
+
+**`attachment` — 0 rows, and there is no upload path at all.**
+`supabase.storage` appears nowhere in `app/src`. The bucket exists (`0013`), the
+policies exist (§8, minus the delete policy), the table exists with its audit and
+soft-delete triggers, and `types/database.ts` has the generated row type. Nothing
+calls any of it. **B1.1, G0.1, G0.2 and G0.3 have an evidence requirement that
+nothing in the platform can satisfy** — and B1.1 and G0.1 are togglable to
+achieved today from `/manual-entries` with no document anywhere. Recorded as
+**OQ-43**.
+
+**`indicator_snapshot` — 0 rows, and `snapshot_period` cannot be called by the
+application.** The function is correct: run on the owner path it returned **20
+rows matching the live figures exactly**, then rolled back. But it is
+`security definer` with `EXECUTE` revoked from `authenticated` *and* `anon`, so
+the only role the application connects as cannot call it. Its own coordinator
+gate — `if auth.uid() is not null and not is_coordinator()` — has therefore never
+been reachable: a signed-in coordinator is refused by the grant before the gate
+runs, and the only callers that get through are the ones with no `auth.uid()` at
+all. This is the §14 shape again, from the other side. Recorded as **OQ-44**.
+
+**`person_activity_type` — 0 rows, and the form appears to collect it.**
+Section 3 of this document maps *"What type of agricultural activity are you
+involved in? (select all)"* to this junction. The `tc` form renders exactly that
+control — `useFormSchema.ts:394`, `key: 'act'`, a `checks` group over
+`ref_activity_type`. `CompletionInput` has no field for it and neither
+`useCreateCompletion` nor `useUpdateCompletion` writes the junction. The same is
+true of the `involve` select beside it: `person.agri_involvement_id` is **null
+for all 7 people**. Two fields in the "agricultural profile" section are
+collected, validated, submitted, confirmed — and discarded. This is the register's
+seventh shape without the RLS: a control that reports success having written
+nothing. Recorded as **OQ-45**.
+
+**`exhibition_registration_product` — 0 rows despite two registrations, and the
+junction is being written.** Both registrations are dated 2026-08-24;
+`0058_apply_accepts_products` landed 2026-08-27. The path is complete —
+`ApplyForm.tsx` to `p_product_ids` to `apply_for_opportunity` to the junction —
+and `/exhibitions/:id` reads it back through an embed. It is empty because no
+registration has been taken since the feature existed, not because anything is
+broken. Exercised end to end in Part 4.
+
+**`mentorship_session` and `guidance_record` — both now have a working screen.**
+`guidance_record` is module `gd` at `/forms/gd`, national-ID-first because D0.1
+counts distinct people. `mentorship_session` is on `/initiatives/:id`, because
+`initiative_id` is `NOT NULL` and the parent has to be chosen first. Both have
+insert, update and soft-delete wired. The `ELSEWHERE` map on `/manual-entries`
+that claimed otherwise was corrected on 1 September and is now checked by
+`check-elsewhere-routes.mjs`.
+
+**`milestone` — `/manual-entries` does write it.** `useSetMilestone` updates
+`is_achieved` and `achieved_on` together (the `achieved_needs_date` constraint
+requires it), and since 1 September it invalidates `['manual','milestones']` —
+the query the screen renders — as well as the indicator queries. Both rows
+(B1.1, G0.1) are present and currently `is_achieved = false`, which is why
+`v_ind_b1_1` and `v_ind_g0_1` both read 0.
+
+## Reference tables
+
+All 26 have RLS, four policies each (read-all / write-coordinator), `label_en`
+and `label_ar`, `is_active` for retirement and `deleted_at`. 23 of the 26 are
+reachable from a screen through `useRefTable`. **Three are not:**
+
+| Table | Rows | Why it is unreachable |
+|---|---|---|
+| `ref_stakeholder_type` | 6 | The only consumer is `coordination_meeting_partner`, which has no write path. Consistent with the row above, not a separate defect. |
+| `ref_nationality` | 4 | `person.nationality_id` is null for all 7 people. No form offers it. |
+| `ref_disability_type` | 6 | `person.disability_type_id` is null for all 7. `has_disability` **is** collected (3 of 4 live people); the *type* is not. |
+
+`ref_nationality` and `ref_disability_type` are not dead — they are the
+disaggregation depth the framework asks for and no form has reached yet.
+Neither is required by a formula in `03_INDICATORS.md`: A1.3, D0.1 and E0.2
+disaggregate by *refugee status* and *disability*, both of which are boolean
+columns on `person` and both of which are collected.
+
+## Data provenance
+
+**Every row in this database is demo or test residue. There is no real
+programme data.** All 7 `person` rows are either in the reserved demo range
+`300000000`–`300000099` (4, live) or test accounts from build-phase work (3, all
+deactivated). Everything else hangs off those people or off `0024_seed_demo`.
+`07_BUILD_CHECKLIST.md`'s "retire the demo data and draw the audit boundary
+before go-live" is still outstanding and is the correct place to deal with it.
