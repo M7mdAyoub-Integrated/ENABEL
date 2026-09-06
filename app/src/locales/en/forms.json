@@ -806,7 +806,7 @@
       "partnership": "This organisation held an agreement of this type before, and it was withdrawn"
     },
     "onBy": "Withdrawn on {{date}} by {{who}}.",
-    "on": "Withdrawn on {{date}}. Only a coordinator can see who did it.",
+    "on": "Withdrawn on {{date}}. The record does not say by whom.",
     "more": "{{count, plural, one {There is # withdrawn record for this pair.} other {There are # withdrawn records for this pair.}}}",
     "body": "This is not a block. Entering it again is allowed and the save will go through — withdrawal is not a ban. It is shown because staff withdrew the earlier one for a reason, and that reason is not on this screen."
   }
