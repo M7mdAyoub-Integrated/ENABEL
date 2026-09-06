@@ -1,0 +1,37 @@
+# Netlify build configuration.
+#
+# The app is in app/, not at the repo root, so `base` points there. Everything
+# else in this file is relative to that base -- `publish = "dist"` means
+# app/dist.
+#
+# The build checks in package.json read committed snapshots from ../supabase
+# (.constraint_names, .soft_delete_guards) rather than querying the database,
+# so no credentials are needed at build time. Netlify clones the whole repo,
+# so those paths resolve.
+
+[build]
+  base    = "app"
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  # Vite 8 needs Node 20+.
+  NODE_VERSION = "22"
+
+# React Router does client-side routing. Without this, a hard refresh or a
+# pasted link to /dashboard, /forms/tc or /opportunity/<id> returns 404 --
+# Netlify looks for a file at that path and there isn't one. Real files are
+# served before this rule is consulted, so assets are unaffected.
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
+
+# This app serves Jordanian national ID numbers, refugee status and disability
+# status. These are cheap and worth having.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options        = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy        = "strict-origin-when-cross-origin"
