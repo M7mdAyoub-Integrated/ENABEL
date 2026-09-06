@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "node scripts/check-no-demo-credential.mjs && node scripts/check-constraint-names.mjs && node scripts/check-soft-delete-guards.mjs && node scripts/check-untranslated.mjs && node scripts/check-module-keys.mjs && node scripts/check-elsewhere-routes.mjs && tsc -b && eslint . --max-warnings=0 && vite build",
+    "postbuild": "node scripts/check-no-demo-credential.mjs --bundle",
     "lint": "eslint . --max-warnings=0",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",

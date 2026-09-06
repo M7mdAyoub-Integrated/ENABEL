@@ -1,0 +1,9 @@
+# Same SPA rule as netlify.toml, but inside the published folder.
+#
+# netlify.toml lives at the repo root and only applies to a git-connected
+# build. A drag-and-drop deploy uploads dist/ alone, so it never sees it --
+# and every route except / would 404. Vite copies public/ into dist/, so this
+# travels with the build either way.
+#
+# Real files are served before this is consulted, so assets are unaffected.
+/*  /index.html  200
