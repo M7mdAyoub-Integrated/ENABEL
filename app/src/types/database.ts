@@ -4178,6 +4178,14 @@ export type Database = {
           live_enrolments: number
         }[]
       }
+      withdrawn_predecessor: {
+        Args: { p_a: string; p_b: string; p_kind: string }
+        Returns: {
+          how_many: number
+          withdrawn_at: string
+          withdrawn_by: string
+        }[]
+      }
     }
     Enums: {
       advisory_track_t: "market" | "home_based"

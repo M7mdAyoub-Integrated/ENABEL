@@ -163,3 +163,66 @@ export function useRestore(kind: 'person' | 'partner') {
     },
   })
 }
+
+/* ── the other direction: a key that PERMITS re-entry ──────────────────────── */
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  "There was an earlier one, and it was withdrawn."
+ *
+ *  The five `_live` indexes (0059) exclude soft-deleted rows on purpose, so a
+ *  withdrawn enrolment, registration, survey or partnership may be entered
+ *  again. Withdrawal is not a ban — OQ-24 settled that.
+ *
+ *  But the re-entry then succeeds SILENTLY, which is the mirror of the defect
+ *  RestorePanel above exists to fix. There a global key refuses and offers no
+ *  way forward, so a correct rule looks like a bug. Here a partial key permits
+ *  and says nothing, so a deliberate decision looks like the system having
+ *  forgotten. Someone re-entering a withdrawn record is often doing it BECAUSE
+ *  they do not know it was withdrawn.
+ *
+ *  0110 answers it. `security invoker`, so a role that cannot read the table
+ *  gets nothing — verified as all five.
+ *
+ *  ── WHY THE NAME IS OFTEN ABSENT, AND WHY THAT IS RIGHT ──
+ *
+ *  `withdrawn_by` comes from `audit_log`, whose only policy is SELECT for a
+ *  coordinator. So `data_entry` and `enumerator` get the DATE and a null name.
+ *  That is the audit boundary doing its job, not a lookup failing, and the
+ *  component has a separate sentence for each case — the same split
+ *  RestorePanel already makes.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+export type WithdrawnKind =
+  | 'training_enrolment'
+  | 'advisory_enrolment'
+  | 'exhibition_registration'
+  | 'followup_survey'
+  | 'partnership'
+
+export type WithdrawnPredecessor = {
+  withdrawn_at: string
+  withdrawn_by: string | null
+  how_many: number
+}
+
+export function useWithdrawnPredecessor(
+  kind: WithdrawnKind,
+  a: string | null | undefined,
+  b: string | null | undefined,
+) {
+  return useQuery({
+    queryKey: ['withdrawn', kind, a ?? '', b ?? ''],
+    enabled: !!a && !!b,
+    queryFn: async (): Promise<WithdrawnPredecessor | null> => {
+      const { data, error } = await supabase.rpc('withdrawn_predecessor', {
+        p_kind: kind,
+        p_a: a as string,
+        p_b: b as string,
+      })
+      if (error) throw toAppError(error)
+      const rows = (data ?? []) as WithdrawnPredecessor[]
+      return rows[0] ?? null
+    },
+  })
+}

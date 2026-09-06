@@ -12,6 +12,8 @@ import {
 } from '../data/followups'
 import { BackLink, PageHead } from '../ui/primitives'
 import { formatShortDate } from '../lib/format'
+import { WithdrawnNotice } from '../components/WithdrawnNotice'
+import { usePersonByNationalId } from '../data/completions'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -97,6 +99,11 @@ export function FollowupStart() {
   const [existing, setExisting] = useState<{ round?: string; contactDate?: string } | null>(null)
 
   const prefill = useFollowupPrefill(nid)
+  // `followup_prefill_for_staff` deliberately returns no person_id -- 0062
+  // stripped the fields the screen could not use. The withdrawn-predecessor
+  // lookup needs one, so it comes from the same national-ID lookup the
+  // completion and office forms already use.
+  const personRow = usePersonByNationalId(nid)
   const start = useStartFollowup()
 
   // One id per attempt, reused across retries. Resending the same one returns
@@ -229,6 +236,15 @@ export function FollowupStart() {
                   { value: 'annual', label: t('survey:round.annual') },
                 ]}
               />
+              {/* `followup_survey_person_round_live` is partial (0059), so a
+                  round whose earlier survey was withdrawn may be recorded
+                  again -- and `start_followup` returns `already_exists` only
+                  for a LIVE one, so a withdrawn predecessor is silent. This is
+                  the only place the enumerator can still ask about it: after
+                  this screen they are four sections into an interview. */}
+              {personRow.data ? (
+                <WithdrawnNotice kind="followup_survey" a={personRow.data.id} b={round} />
+              ) : null}
             </div>
 
             {/* Q4 */}

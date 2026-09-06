@@ -127,7 +127,24 @@ for (const file of readdirSync(migrationsDir)
   const loopRe = /array\s*\[([^\]]+)\]([\s\S]{0,2000}?)end\s+(?:loop|\$)/gi
   let lm
   while ((lm = loopRe.exec(sql)) !== null) {
+    // BOTH conditions, and `create table` is the one that means it.
+    //
+    // This tested `deleted_at` alone until 2026-09-03, which asks "is this
+    // block ABOUT soft delete" rather than "does this block CREATE tables".
+    // 0110 verifies that five partial indexes still exclude soft-deleted rows,
+    // so it has an array of INDEX names and the words `deleted_at is null`
+    // within a `do $verify$ ... end $verify$` block -- and all five index
+    // names were reported as unguarded tables. They are not tables at all.
+    //
+    // The check was right to fail loudly rather than guess (its own header
+    // says a false positive gets looked at), but a heuristic that fires on any
+    // migration mentioning deleted_at near an array literal will keep crying
+    // wolf, and the seventh time nobody looks. `create table` is what every
+    // real loop here does -- 0002 and 0075 both `execute format($f$ create
+    // table if not exists public.%I ...` -- so requiring it is narrower AND
+    // closer to the thing being detected.
     if (!/\bdeleted_at\b/.test(lm[2])) continue
+    if (!/\bcreate\s+table\b/i.test(lm[2])) continue
     for (const q of lm[1].matchAll(/'([a-z0-9_]+)'/g)) declared.add(q[1])
   }
 

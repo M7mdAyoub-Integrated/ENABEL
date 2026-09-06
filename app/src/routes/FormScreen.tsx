@@ -28,10 +28,13 @@ import { useToast } from '../ui/Toast'
 import { NotFound } from './NotFound'
 import { SEP } from '../ui/glyphs'
 import { RestorePanel } from '../components/RestorePanel'
+import { WithdrawnNotice } from '../components/WithdrawnNotice'
 import {
   usePersonRestoreCandidate,
   usePartnerRestoreCandidate,
 } from '../data/restore'
+import { usePersonByNationalId, NEW_SESSION } from '../data/completions'
+import { usePartners } from '../data/partnerships'
 import { isAppError } from '../data/errors'
 
 /**
@@ -186,6 +189,42 @@ export function FormScreen({ mode }: { mode: 'new' | 'edit' }) {
       ? 'partner'
       : null
   const restoreCandidate = personCandidate.data ?? partnerCandidate.data ?? null
+
+  /**
+   * The other direction — a key that PERMITS re-entry and would say nothing.
+   *
+   * `training_enrolment_person_session_live` and `partnership_partner_type_live`
+   * are partial on purpose (0059), so re-entering the pair succeeds. Silently,
+   * until 0110. See components/WithdrawnNotice.tsx.
+   *
+   * Both need the row's OWN id, which the form does not have while it is still
+   * holding a national ID and an organisation name. So both are looked up here
+   * on the same keys the form already resolves for its own duplicate check —
+   * `usePersonByNationalId` for tc, and the partner lookup for pn. Neither is a
+   * new query shape.
+   *
+   * Deliberately NOT gated on `isDuplicate`: nothing is going to be refused, so
+   * waiting for an error would mean waiting for one that never comes. It has to
+   * appear while the form is being filled in, which is the only moment it can
+   * still change what somebody does.
+   */
+  const tcNid = module === 'tc' && typeof values['nid'] === 'string' ? values['nid'] : ''
+  const tcPerson = usePersonByNationalId(tcNid)
+  const tcSession = typeof values['session'] === 'string' ? values['session'] : ''
+
+  // The LIVE partner behind the name being typed. `partner_name_unique` is on
+  // (name, unit) NULLS NOT DISTINCT, so an empty unit is part of the key rather
+  // than a wildcard -- matched the same way here.
+  const pnPartners = usePartners(module === 'pn')
+  const pnName = typeof values['name'] === 'string' ? values['name'].trim() : ''
+  const pnUnit = typeof values['unit'] === 'string' ? values['unit'].trim() : ''
+  const pnPartnerId =
+    module === 'pn' && pnName
+      ? ((pnPartners.data ?? []).find(
+          (p) => p.name.trim() === pnName && (p.unit ?? '').trim() === pnUnit,
+        )?.id ?? null)
+      : null
+  const pnType = typeof values['ptype'] === 'string' ? values['ptype'] : ''
   const sections = useFormSchema(activeModule, values, touched)
   const wizardSections = useWizardSteps(values, step)
 
@@ -376,6 +415,18 @@ export function FormScreen({ mode }: { mode: 'new' | 'edit' }) {
             <span>{t(`survey:qRange.${step}`)}</span>
           </div>
         </>
+      ) : null}
+
+      {/* Withdrawn predecessor on a partial key — see 0110. Above the error
+          band rather than below it, because it is not an error: nothing has
+          been refused and nothing is going to be. NEW_SESSION is excluded
+          because it is a sentinel meaning "create one", not a session id, and
+          casting it would ask the database about a uuid that does not exist. */}
+      {module === 'tc' && tcPerson.data && tcSession && tcSession !== NEW_SESSION ? (
+        <WithdrawnNotice kind="training_enrolment" a={tcPerson.data.id} b={tcSession} />
+      ) : null}
+      {module === 'pn' && pnPartnerId && pnType ? (
+        <WithdrawnNotice kind="partnership" a={pnPartnerId} b={pnType} />
       ) : null}
 
       {/* The restore offer REPLACES the raw duplicate message when the key

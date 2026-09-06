@@ -796,5 +796,18 @@
     "underWhich": "Under which agreement",
     "partnershipRequired": "Choose which agreement this was made under.",
     "noAgreement": "This organisation holds no live agreement. A contribution is always made under one, so there is nowhere to record this until it has one."
+  },
+  "withdrawn": {
+    "title": {
+      "training_enrolment": "This person was on this course before, and was withdrawn",
+      "advisory_enrolment": "This person held a place on this session before, and it was withdrawn",
+      "exhibition_registration": "This person was registered for this event before, and was withdrawn",
+      "followup_survey": "A survey of this round was recorded for this person before, and was withdrawn",
+      "partnership": "This organisation held an agreement of this type before, and it was withdrawn"
+    },
+    "onBy": "Withdrawn on {{date}} by {{who}}.",
+    "on": "Withdrawn on {{date}}. Only a coordinator can see who did it.",
+    "more": "{{count, plural, one {There is # withdrawn record for this pair.} other {There are # withdrawn records for this pair.}}}",
+    "body": "This is not a block. Entering it again is allowed and the save will go through — withdrawal is not a ban. It is shown because staff withdrew the earlier one for a reason, and that reason is not on this screen."
   }
 }
