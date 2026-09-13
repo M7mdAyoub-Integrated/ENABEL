@@ -38,7 +38,8 @@
     "followup": "Follow-up",
     "noForm": "No form yet",
     "office": "Coordination office",
-    "guidance": "Guidance"
+    "guidance": "Guidance",
+    "admin": "Administration"
   },
   "signedIn": "Signed in",
   "sessions": "Sessions",
@@ -48,5 +49,10 @@
   "municipality": "Municipality",
   "participant": "Participant",
   "followups": "Follow-up surveys",
-  "initiatives": "Production initiatives"
+  "initiatives": "Production initiatives",
+  "accounts": "Accounts",
+  "allMunicipalities": "All municipalities",
+  "allMunicipalitiesLine": "Both programmes — choose a municipality to enter records",
+  "switchMunicipality": "Working in",
+  "switchFailed": "Could not switch"
 }

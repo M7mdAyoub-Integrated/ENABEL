@@ -2,11 +2,18 @@ import type { ModuleId } from '../modules'
 import { DEMO_MODE } from '../demo/demoMode'
 
 /**
- * The five application roles, from `app_role_t`.
+ * The six application roles, from `app_role_t`.
  *
  * The role ALWAYS comes from `app_user.role`, read from the database for the
  * signed-in user. Never from a JWT claim, a query string, localStorage, or
  * anything else the client can set.
+ *
+ * `super_admin` arrived with the second municipality (migration 0116). It is
+ * a coordinator in whichever municipality it is switched into, plus the one
+ * thing no coordinator has: it manages accounts and sees both programmes.
+ * `data_entry`, `enumerator`, `partner_viewer` and `participant` are still
+ * here, still have every policy they had, and are simply not assigned to
+ * anyone at the moment — RAMTHA_IMPLEMENTATION_PLAN.md §2.1.
  */
 export const ROLES = [
   'coordinator',
@@ -14,6 +21,7 @@ export const ROLES = [
   'enumerator',
   'partner_viewer',
   'participant',
+  'super_admin',
 ] as const
 export type Role = (typeof ROLES)[number]
 
@@ -64,6 +72,12 @@ export type Capability =
   | 'survey.review'
   /** Use the participant portal. */
   | 'portal.access'
+  /**
+   * Create, deactivate and re-assign staff accounts, and create other super
+   * admins. Super admin only — plan §2.5. The database is the boundary:
+   * `au_*` (0118) and `guard_app_user` (0117).
+   */
+  | 'accounts.manage'
 
 const CAPABILITIES: Record<Role, ReadonlySet<Capability>> = {
   coordinator: new Set<Capability>([
@@ -105,13 +119,31 @@ const CAPABILITIES: Record<Role, ReadonlySet<Capability>> = {
     // Read-only. No create, edit, delete, review, or manual entry.
   ]),
   participant: new Set<Capability>(['portal.access']),
+  super_admin: new Set<Capability>([
+    'app.access',
+    'dashboard.view',
+    'manual.view',
+    'manual.write',
+    'record.create',
+    'record.edit',
+    'record.delete',
+    'registration.review',
+    'survey.review',
+    'accounts.manage',
+  ]),
 }
 
 export function can(role: Role | null, capability: Capability): boolean {
   // Demo mode: no roles exist in the UI, so every capability is granted and
   // nothing is hidden. RLS is unchanged underneath -- the session is the
   // coordinator, which really can do all of this. See src/demo/demoMode.ts.
-  if (DEMO_MODE) return true
+  //
+  // Except account management. The demo coordinator really cannot do that
+  // -- manage-account refuses anyone but a super admin -- so showing the
+  // link would be the placeholder shape from CLAUDE.md: a control that
+  // exists and cannot work. `node scripts/demo-as.mjs superadmin@shm.test`
+  // is how to see it in development.
+  if (DEMO_MODE && capability !== 'accounts.manage') return true
   if (!role) return false
   return CAPABILITIES[role].has(capability)
 }
@@ -150,6 +182,9 @@ const MODULE_ACCESS: Record<Role, readonly ModuleId[]> = {
   enumerator: [],
   partner_viewer: [],
   participant: [],
+  // The same list as a coordinator: a super admin switched into a
+  // municipality works its forms as that municipality's coordinator would.
+  super_admin: ['pn', 'tc', 'ex', 'os', 'gd'],
 }
 
 export function modulesFor(role: Role | null): readonly ModuleId[] {
@@ -175,8 +210,8 @@ export function canWriteModule(role: Role | null, module: ModuleId): boolean {
   if (DEMO_MODE) return true
   if (!role) return false
   if (!canAccessModule(role, module)) return false
-  if (module === 'fu') return role === 'coordinator' || role === 'enumerator'
-  return role === 'coordinator' || role === 'data_entry'
+  if (module === 'fu') return role === 'coordinator' || role === 'enumerator' || role === 'super_admin'
+  return role === 'coordinator' || role === 'data_entry' || role === 'super_admin'
 }
 
 /**

@@ -38,7 +38,8 @@
     "followup": "المتابعة",
     "noForm": "بلا نموذج بعد",
     "office": "مكتب التنسيق",
-    "guidance": "الإرشاد"
+    "guidance": "الإرشاد",
+    "admin": "الإدارة"
   },
   "signedIn": "مسجّل الدخول",
   "sessions": "الدورات",
@@ -48,5 +49,10 @@
   "municipality": "البلدية",
   "participant": "مشارك",
   "followups": "استبيانات المتابعة",
-  "initiatives": "المبادرات الإنتاجية"
+  "initiatives": "المبادرات الإنتاجية",
+  "accounts": "الحسابات",
+  "allMunicipalities": "كل البلديات",
+  "allMunicipalitiesLine": "البرنامجان معًا — اختر بلدية لإدخال السجلات",
+  "switchMunicipality": "العمل في",
+  "switchFailed": "تعذّر التبديل"
 }

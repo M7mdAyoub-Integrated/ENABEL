@@ -27,6 +27,25 @@ export type AuthState = {
   roleResolved: boolean
   /** person.id for a linked participant. Null when no person row is linked. */
   personId: string | null
+  /**
+   * The municipality this account works in: `app_user.municipality_id` for a
+   * municipal account, the acting municipality for a super admin who has
+   * switched into one, null for a super admin who has not (and for a
+   * participant, who has none). Mirrors `my_municipality()` in the database,
+   * which is what every scoped policy and column default actually reads —
+   * this value is for the screens, never for authorisation.
+   */
+  municipalityId: string | null
+  /** True for `super_admin`. Convenience over `role === 'super_admin'`. */
+  isSuperAdmin: boolean
+  /**
+   * Super admin only: switch into a municipality (or out of all of them with
+   * null). Writes `app_user.acting_municipality_id` through
+   * `set_acting_municipality`, then clears every cached query — the same rule
+   * as a change of identity, because every scoped read now answers
+   * differently.
+   */
+  setActingMunicipality: (id: string | null) => Promise<{ error: string | null }>
   /** Set when the session ended on its own (expiry), so the UI can explain. */
   expired: boolean
   signIn: (email: string, password: string) => Promise<{ error: string | null }>
@@ -70,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [role, setRole] = useState<Role | null>(null)
   const [roleResolved, setRoleResolved] = useState(false)
   const [personId, setPersonId] = useState<string | null>(null)
+  const [municipalityId, setMunicipalityId] = useState<string | null>(null)
   const [expired, setExpired] = useState(false)
 
   // Guards against a slow role query landing after the user has signed out or
@@ -120,11 +140,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!s?.user) {
       setRole(null)
       setPersonId(null)
+      setMunicipalityId(null)
       setRoleResolved(true)
       return
     }
     const [{ data: appUser }, { data: person }] = await Promise.all([
-      supabase.from('app_user').select('role, is_active').eq('id', s.user.id).maybeSingle(),
+      supabase
+        .from('app_user')
+        .select('role, is_active, municipality_id, acting_municipality_id')
+        .eq('id', s.user.id)
+        .maybeSingle(),
       // Demo mode: the coordinator is not a participant, so `auth_user_id`
       // matches nobody and `my_person_id()` returns null. Look the demo person
       // up by national ID instead so the portal has someone to represent.
@@ -148,6 +173,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const active = appUser?.is_active !== false
     setRole(active && isRole(appUser?.role) ? appUser.role : null)
     setPersonId(person?.id ?? null)
+    // coalesce(municipality_id, acting_municipality_id): the same expression
+    // as my_municipality() in 0117, so the header and the database agree.
+    setMunicipalityId(
+      active ? (appUser?.municipality_id ?? appUser?.acting_municipality_id ?? null) : null,
+    )
     setRoleResolved(true)
   }, [])
 
@@ -210,6 +240,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (event === 'SIGNED_OUT' && !s) {
         setRole(null)
         setPersonId(null)
+        setMunicipalityId(null)
         setRoleResolved(true)
         return
       }
@@ -233,6 +264,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut()
     setRole(null)
     setPersonId(null)
+    setMunicipalityId(null)
     setExpired(false)
   }, [])
 
@@ -255,6 +287,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setRoleResolved(false)
     await loadRoleFor(session)
   }, [loadRoleFor, session])
+
+  const setActingMunicipality = useCallback<AuthState['setActingMunicipality']>(
+    async (id) => {
+      // The generated type reads the parameter as non-null; the function accepts null (0117).
+      const { data, error } = await supabase.rpc('set_acting_municipality', {
+        p_municipality_id: id as unknown as string,
+      })
+      if (error) return { error: error.message }
+      const res = data as { ok?: boolean; result?: string } | null
+      if (!res?.ok) return { error: res?.result ?? 'failed' }
+      // Every scoped read answers differently now. Same treatment as a change
+      // of identity — see clearCacheIfIdentityChanged above.
+      queryClient.clear()
+      await loadRoleFor(session)
+      return { error: null }
+    },
+    [loadRoleFor, session],
+  )
 
   // A role change made by a coordinator mid-session must take effect without a
   // reload. Re-read on focus and on a timer rather than trusting the cached
@@ -279,16 +329,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       role,
       roleResolved,
       personId,
+      municipalityId,
+      isSuperAdmin: role === 'super_admin',
       expired,
       signIn,
       signOut,
       requestPasswordReset,
       updatePassword,
       refreshRole,
+      setActingMunicipality,
     }),
     [
-      status, session, role, roleResolved, personId, expired,
-      signIn, signOut, requestPasswordReset, updatePassword, refreshRole,
+      status, session, role, roleResolved, personId, municipalityId, expired,
+      signIn, signOut, requestPasswordReset, updatePassword, refreshRole, setActingMunicipality,
     ],
   )
 

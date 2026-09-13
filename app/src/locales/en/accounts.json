@@ -1,0 +1,92 @@
+{
+  "intro": "Staff accounts for both municipalities. Create an admin, assign a municipality, create another super admin, or deactivate an account. The rules — you cannot change your own role, deactivate yourself or remove the last super admin — are enforced by the database and shown here when they refuse.",
+  "record": "account",
+  "you": "This is you",
+  "allMunicipalities": "All municipalities",
+  "list": {
+    "title": "Accounts"
+  },
+  "columns": {
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "municipality": "Municipality",
+    "status": "Status"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Deactivated"
+  },
+  "actions": {
+    "edit": "Change role or municipality",
+    "setPassword": "Set a new password",
+    "deactivate": "Deactivate",
+    "reactivate": "Reactivate"
+  },
+  "fields": {
+    "fullName": "Full name",
+    "email": "Email address",
+    "role": "Role",
+    "municipality": "Municipality",
+    "municipalityNoneForSuper": "A super admin belongs to no municipality and switches between them from the header.",
+    "password": "Initial password",
+    "passwordHelp": "Generated here. Hand it over in person or by a channel you trust; it is shown once and not stored."
+  },
+  "create": {
+    "open": "Create an account",
+    "title": "New account",
+    "help": "The person signs in with this email address and the initial password, and should change the password afterwards.",
+    "regenerate": "Generate another",
+    "submit": "Create account",
+    "working": "Creating…"
+  },
+  "edit": {
+    "title": "Change {name}",
+    "selfNote": "Your own role cannot be changed from your own account. Another super admin can change it.",
+    "submit": "Save changes"
+  },
+  "password": {
+    "title": "One-time password",
+    "body": "This is the only time this password is shown. Hand it to {name} and ask them to change it after signing in.",
+    "done": "Done — I have passed it on"
+  },
+  "deactivate": {
+    "title": "Deactivate this account?",
+    "body": "{name} will be refused at the next request and can no longer sign in. Everything they recorded stays, with their name on it.",
+    "note": "Deactivation is reversible. The last active super admin cannot be deactivated."
+  },
+  "toast": {
+    "tag": "Accounts",
+    "created": "Account created",
+    "deactivated": "Account deactivated",
+    "reactivated": "Account reactivated"
+  },
+  "errors": {
+    "nameRequired": "Enter the person's name.",
+    "emailInvalid": "Enter a valid email address.",
+    "roleRequired": "Choose a role.",
+    "municipalityRequired": "Choose the municipality this account works in."
+  },
+  "result": {
+    "not_signed_in": "Your session has ended. Sign in again.",
+    "not_permitted": "Only a super admin can manage accounts.",
+    "bad_request": "The request could not be read.",
+    "bad_email": "That email address is not valid.",
+    "password_too_short": "The password must be at least 12 characters.",
+    "name_required": "Enter the person's name.",
+    "bad_role": "That role does not exist.",
+    "super_admin_has_no_municipality": "A super admin has no municipality. Leave it empty.",
+    "municipality_required": "Choose a municipality for this role.",
+    "unknown_municipality": "That municipality is not active.",
+    "email_taken": "An account with that email address already exists.",
+    "create_failed": "The account could not be created.",
+    "app_user_update_failed": "The login was created but its role could not be set. Check the accounts list and edit it.",
+    "app_user_mismatch": "The login was created but its role is not what was asked for. Check the accounts list and edit it.",
+    "user_required": "No account was chosen.",
+    "not_found": "That account no longer exists.",
+    "update_failed": "The password could not be set.",
+    "bad_action": "Unknown action.",
+    "method_not_allowed": "Unknown action.",
+    "misconfigured": "The account service is not configured."
+  }
+}

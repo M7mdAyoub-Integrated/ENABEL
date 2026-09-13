@@ -9,6 +9,8 @@ import { useAuth } from '../auth/AuthProvider'
 import { can, modulesFor } from '../auth/permissions'
 import { DEMO_MODE } from '../demo/demoMode'
 import { EXTERNAL } from '../ui/glyphs'
+import { MunicipalitySwitcher } from '../components/MunicipalitySwitcher'
+import { useCurrentMunicipality, useMunicipalityName, useProgrammeLine } from '../data/municipalities'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -118,6 +120,14 @@ function useNavGroups(): Group[] {
         // one session, and a hardcoded badge is a claim that goes stale
         // silently. See CLAUDE.md, checks that verify shape not substance.
         ? [{ to: '/manual-entries', labelKey: 'nav:manualEntries', num: '08' }]
+        : [],
+    },
+    {
+      labelKey: 'nav:group.admin',
+      // Super admin only. The database is the boundary (au_* policies, 0118;
+      // guard_app_user, 0117); this is where the screen is reachable from.
+      items: can(role, 'accounts.manage')
+        ? [{ to: '/accounts', labelKey: 'nav:accounts', num: '10' } as Dest]
         : [],
     },
     { labelKey: null, items: [{ to: '/settings', labelKey: 'nav:settings', num: '09' }] },
@@ -230,13 +240,28 @@ function SignedInAs({ compact = false }: { compact?: boolean }) {
   )
 }
 
-/** The rail's masthead. Two lines, 2px rule under. */
+/**
+ * The rail's masthead. Two lines, 2px rule under.
+ *
+ * The first line is the municipality the account is working in, read from
+ * the `municipality` row rather than from a locale string: the locale string
+ * said "Sahel Horan" to everyone, and from 0111 there are two. A super admin
+ * who has not switched into one sees "all municipalities".
+ */
 function Brand() {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation(['common', 'nav'])
+  const municipality = useCurrentMunicipality()
+  const name = useMunicipalityName()
+  const { isSuperAdmin, municipalityId } = useAuth()
+  const first = municipality
+    ? name(municipality)
+    : isSuperAdmin && !municipalityId
+      ? t('nav:allMunicipalities')
+      : t('common:orgShort')
   return (
     <div className="border-b-2 border-ink px-[18px] pb-4 pt-5">
       <div className="font-narrow text-[10.5px] font-bold uppercase tracking-[0.2em] text-muted">
-        {t('orgShort')}
+        {first}
       </div>
       <div className="mt-[5px] text-[20px] font-black uppercase leading-none tracking-[-0.03em]">
         {t('appNameShort')}
@@ -296,6 +321,24 @@ function ViewPublicSite() {
 export function Shell({ children }: { children: ReactNode }) {
   const { t } = useTranslation(['nav', 'common'])
   const groups = useNavGroups()
+  const municipality = useCurrentMunicipality()
+  const name = useMunicipalityName()
+  const programme = useProgrammeLine()
+  const { isSuperAdmin, municipalityId } = useAuth()
+  // The header names the municipality on EVERY screen (plan §3.4). From the
+  // municipality row, so a Ramtha admin does not read Sahel Horan's programme
+  // above Ramtha's data; the locale strings remain the fallback while the
+  // row is still loading.
+  const headerName = municipality
+    ? name(municipality)
+    : isSuperAdmin && !municipalityId
+      ? t('nav:allMunicipalities')
+      : t('common:orgName')
+  const headerProgramme = municipality
+    ? programme(municipality)
+    : isSuperAdmin && !municipalityId
+      ? t('nav:allMunicipalitiesLine')
+      : t('common:programmeLine')
   const all = useFlatDests(groups)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [moreOpen, setMoreOpen] = useState(false)
@@ -331,14 +374,15 @@ export function Shell({ children }: { children: ReactNode }) {
             </button>
             <div className="min-w-0">
               <div className="truncate text-[15px] font-extrabold uppercase tracking-[-0.015em]">
-                {t('common:orgName')}
+                {headerName}
               </div>
               <div className="mt-[2px] hidden font-narrow text-[11.5px] font-medium uppercase tracking-[0.07em] text-muted sm:block">
-                {t('common:programmeLine')}
+                {headerProgramme}
               </div>
             </div>
           </div>
           <div className="flex flex-none items-stretch gap-[10px]">
+            <MunicipalitySwitcher />
             <div className="hidden sm:flex">
               <ViewPublicSite />
             </div>

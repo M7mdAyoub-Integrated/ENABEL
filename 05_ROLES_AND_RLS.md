@@ -1052,3 +1052,47 @@ delete from public.promotional_action;     -- ERROR 23001
 Refused with the switch thrown, because `authenticated` is not the table owner.
 That is the property worth having: the escape hatch is not reachable from the
 application at any role, whatever a policy later says.
+
+---
+
+## 17. A second municipality, and the sixth role
+
+Added 13 September 2026 with migrations 0111–0119. The full account is
+`09_MULTI_MUNICIPALITY.md`; this section is what changes for a reader of
+**this** document.
+
+**The enum is six values.** `super_admin` was added (0116). The five roles in
+§1 are unchanged and keep every policy in §3; `data_entry`, `enumerator`,
+`partner_viewer` and `participant` are simply unassigned at the moment.
+
+**Every policy in §3 now has a second condition.** On the 35 scoped tables —
+the framework six, the seventeen Sahel Horan operational tables, the three
+partner tables, their seven child tables and `attachment` — every USING and
+every WITH CHECK also requires
+
+    public.can_see_municipality(municipality_id)
+
+which is: a super admin not switched into a municipality sees everything; a
+super admin switched into one, or anyone else, sees only their own. The
+matrix in §3 is therefore read per municipality: a Sahel Horan coordinator has
+`R C U D` on Sahel Horan's `partnership` rows and nothing on Ramtha's. §2's
+helpers `is_coordinator()` and `is_staff()` admit `super_admin`; `can_write()`
+now exists and is what every insert/update policy calls.
+
+**Three tables are addressed by hand.** `person` and `person_activity_type` are
+shared and keep §6 as it stands. `app_user`: own row, a coordinator's own
+municipality, a super admin everything — and `guard_app_user` (0117) refuses
+what a policy cannot express: changing your own role, deactivating yourself,
+removing the last super admin, or a non-super-admin minting one. `audit_log`:
+a coordinator reads rows about their municipality and rows about shared tables.
+
+**The three exposed views carry the municipality gate in their WHERE**, next to
+the role gate §7 of `07_BUILD_CHECKLIST.md` describes, because they are security
+definer and table RLS does nothing for them.
+
+**OQ-35 is closed.** 0118 recreated every policy `to authenticated`.
+
+**§14's technique now has a third account shape to run.** The isolation test in
+0118 is the template: as the Sahel Horan admin, as the Ramtha admin, and as the
+super admin both switched in and not, in a savepoint that is discarded — every
+scoped table, not a sample.

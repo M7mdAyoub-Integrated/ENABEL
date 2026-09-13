@@ -7,7 +7,7 @@ import { queryClient } from './data/queryClient'
 import { DEMO_MODE } from './demo/demoMode'
 import { useQueueSync } from './data/useOffline'
 import { useDirection } from './hooks/useDirection'
-import { RequireCapability, RequireModule, RequireSession } from './auth/guards'
+import { MunicipalityGate, RequireCapability, RequireModule, RequireSession } from './auth/guards'
 import { RETIRED_MODULE_IDS } from './modules'
 import Landing from './routes/Landing'
 import Dashboard from './routes/Dashboard'
@@ -16,6 +16,7 @@ import FormScreen from './routes/FormScreen'
 import DetailScreen from './routes/DetailScreen'
 import ManualEntries from './routes/ManualEntries'
 import Settings from './routes/Settings'
+import Accounts from './routes/Accounts'
 import NotFound from './routes/NotFound'
 import PublicHome from './routes/public/PublicHome'
 import ApplyForm from './routes/public/ApplyForm'
@@ -53,7 +54,9 @@ import ResetPassword from './routes/auth/ResetPassword'
 function ShellLayout() {
   const inner = (
     <Shell>
-      <Outlet />
+      <MunicipalityGate>
+        <Outlet />
+      </MunicipalityGate>
     </Shell>
   )
   // Demo mode drops the capability check but still waits for the silent
@@ -345,6 +348,14 @@ const router = createBrowserRouter([
         path: '/manual-entries',
         element: guard(<ManualEntries />, (n) => (
           <RequireCapability capability="manual.view">{n}</RequireCapability>
+        )),
+      },
+      // Staff accounts. Super admin only; the guard renders the refusal for
+      // everyone else, and the database refuses the writes regardless.
+      {
+        path: '/accounts',
+        element: guard(<Accounts />, (n) => (
+          <RequireCapability capability="accounts.manage">{n}</RequireCapability>
         )),
       },
       { path: '/settings', element: <Settings /> },

@@ -1,0 +1,22 @@
+-- ═══════════════════════════════════════════════════════════════════════════
+--  0116 — the sixth role: super_admin
+--
+--  RAMTHA_IMPLEMENTATION_PLAN.md §2.1: do not collapse `app_role_t`. Five
+--  roles and 199 policies are built on it; a rewrite would be a large blast
+--  radius for no benefit. One value is added and, for now, only three roles
+--  are assigned to anyone:
+--
+--      Sahel Horan admin   coordinator   municipality SHM
+--      Ramtha admin        coordinator   municipality RMTH
+--      Integrated          super_admin   municipality null (all)
+--
+--  `data_entry`, `enumerator`, `partner_viewer` and `participant` STAY in the
+--  enum, keep every policy they have, and are simply not assigned. They were
+--  not removed. The six existing test accounts keep their roles.
+--
+--  This migration adds the value and nothing else, because PostgreSQL will
+--  not let a transaction USE an enum value it has just added — 0117 is where
+--  the helpers, the constraint and the policies start referring to it.
+-- ═══════════════════════════════════════════════════════════════════════════
+
+alter type public.app_role_t add value if not exists 'super_admin';

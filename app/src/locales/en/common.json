@@ -127,5 +127,9 @@
     "syncNow": "Send now",
     "failedToSend": "Could not be sent",
     "failedCount": "{count, plural, one {# change could not be sent} other {# changes could not be sent}}"
+  },
+  "municipalityGate": {
+    "title": "Choose a municipality",
+    "body": "You are signed in as a super admin and are not working in either municipality yet. Choose one from the header to see its dashboard and enter its records. The accounts screen and settings are available without choosing."
   }
 }

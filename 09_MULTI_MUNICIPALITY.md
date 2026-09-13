@@ -111,3 +111,128 @@ views over `followup_survey`, and 07_BUILD_CHECKLIST.md's step b says
 and 0098 and regained the schema's default grant; nothing revoked it and nothing
 checked. Aggregates only — but the check existed and had been false for a month.
 0114 revokes all twenty and asserts it. See the CLAUDE.md register.
+
+---
+
+## Part 2 — roles and accounts (migrations 0116–0119, `manage-account`)
+
+### The sixth role, and what did not change
+
+`app_role_t` gained `super_admin` (0116). Nothing was collapsed: `coordinator`,
+`data_entry`, `enumerator`, `partner_viewer` and `participant` are all still in
+the enum with every policy they had; the last four are simply unassigned at the
+moment, as the plan says. Three accounts are assigned today:
+
+| account | role | municipality |
+|---|---|---|
+| `coordinator@shm.test` | `coordinator` | Sahel Horan |
+| `admin@ramtha.test` | `coordinator` | Ramtha |
+| `superadmin@shm.test` | `super_admin` | none — switches |
+
+The five other build-phase test accounts keep their roles and are Sahel Horan's.
+
+### The helpers (0117)
+
+| | |
+|---|---|
+| `is_super_admin()` | `role = 'super_admin'` |
+| `my_municipality()` | `coalesce(app_user.municipality_id, app_user.acting_municipality_id)` — the municipality the caller is working in |
+| `can_see_municipality(m)` | super admin not switched in → true; super admin switched into X → `m = X`; anyone else → `m = their own` |
+
+`is_coordinator()`, `is_staff()` and the newly created `can_write()` (05 §2 had
+specified it; §15 records that it was never built) all admit `super_admin`, so
+a super admin is a coordinator everywhere without a seventh literal in 199
+policies.
+
+**One deviation from the plan's letter.** The plan reads `my_municipality()` as
+"null for super admin". Here a super admin who has *switched into* a
+municipality gets that municipality back, because the switch is held in
+`app_user.acting_municipality_id` — a fact the database knows — rather than in
+browser state. §3.4 says the current municipality must be visible on every
+screen "so nobody enters data against the wrong one"; if the choice lived only
+in the browser, every query and every insert would have to carry it and the one
+that forgot would write a Ramtha row into Sahel Horan with a green toast. With
+the acting municipality on the account, the column default from 0112 fills it
+into every insert and `can_see_municipality` narrows every read to it. A super
+admin who has not switched in sees both programmes and can insert nothing
+(NOT NULL refuses); the `MunicipalityGate` in `App.tsx` holds them at a chooser
+until they pick one. The accounts screen and settings need no municipality.
+
+### The account shape
+
+`app_user.municipality_id` is null **iff** the role is `super_admin`, required
+for every other staff role, and free for a `participant` — the one exception
+taken here, because a participant is a person and person is shared (the plan's
+own first decision). `acting_municipality_id` may be set only on a super admin.
+Both are check constraints.
+
+`guard_app_user()` (BEFORE UPDATE, fires for the owner too) refuses: changing
+your own role; deactivating your own account; demoting or deactivating the last
+active super admin; and, for a non-super-admin, minting a super admin, moving an
+account between municipalities, or touching a super admin's row at all. The
+accounts screen renders these refusals with their own words (`errors.ts` maps
+the five messages) rather than the generic "your role does not allow this",
+which was the first thing the screen showed and was true and useless.
+
+### Every scoped policy, by catalogue walk (0118)
+
+All 202 policies in `public` were dropped and recreated from their own
+catalogue expression with three textual changes: role literals became the
+helpers; on the 35 scoped tables `can_see_municipality(municipality_id)` was
+ANDed onto USING **and** WITH CHECK (a USING-only change would let an admin
+write into the other municipality — the `fu_update` shape); and every policy
+became `to authenticated`, which closes OQ-35. Three policies with an own-row
+branch for a participant were rewritten by hand so the municipality test sits on
+the staff branch only.
+
+`app_user` and `audit_log` were rewritten by hand. The three exposed indicator
+views gained the municipality gate in their WHERE (they are security definer, so
+table RLS does nothing for them). `indicator_figures` and `overview_counts` —
+security definer, exposed, uncalled by the app — gained `p_municipality_id`
+and a gate. `review_followup`'s period lookup now says whose period.
+
+**Verified inside the migration as all three account shapes**, through RLS with
+`set local role authenticated` and the claims set, in a savepoint that was
+discarded: the Ramtha admin sees zero rows of every scoped table and cannot
+write a row carrying Sahel Horan's id; the Sahel Horan admin sees no Ramtha row
+and cannot write one; the super admin sees both, and only Sahel Horan once
+switched into it. 0118 created the two probe accounts itself, as auth rows with
+app metadata, which is where the next finding came from.
+
+### Creating accounts, and the finding
+
+`manage-account` (an Edge Function, `supabase/functions/manage-account/`) is the
+one place a login is created or a password set, because both need the Auth
+admin API and therefore the service-role key, which never reaches a browser.
+Only an active super admin may call it, checked against `app_user` and never
+against the request. Everything else about an account — role, municipality,
+active or not — is a plain UPDATE on `app_user` from the accounts screen, under
+RLS and the guard.
+
+The first super admin was bootstrapped out of band (an auth row inserted
+directly, the shape 0031 repaired), because nobody existed who could call the
+function. Its password, and the Ramtha admin's, live in `app/.env.local` under
+`SHM_TEST_PW_*` with the six that were already there. `scripts/demo-as.mjs`
+switches which of them demo mode signs in as.
+
+**The finding.** 0118's probe inserted an auth row with `app_role` and
+`municipality_id` already in `raw_app_meta_data`, and `handle_new_user` shaped
+the account from it, and the probe passed. GoTrue's admin API does not insert
+that way: it writes the row first and applies the caller's `app_metadata`
+afterwards, so the AFTER INSERT trigger saw `{provider, providers}` and shaped
+the first real account as a participant with no municipality. The function's
+read-back — *not assumed* — is what caught it, on its first real call. It now
+shapes `app_user` explicitly as the service role and reads it back before
+reporting success; the trigger stays as a default for rows created with the
+metadata present. Recorded in the CLAUDE.md register.
+
+### What the screens do
+
+The header of every municipal screen names the municipality and its programme
+line from the `municipality` row (0119 added `programme_en/ar`; the locale
+strings said "Sahel Horan" to everyone). A super admin gets the switcher there;
+a municipal account has no switcher, because its municipality comes from its
+account and never from the URL. `/accounts` lists every account (email is now
+on `app_user`, copied from `auth.users` where `authenticated` cannot read),
+creates one with a generated one-time password shown once, changes role or
+municipality, sets a password, deactivates and reactivates.

@@ -45,6 +45,7 @@ const locales = join(here, '..', 'src', 'locales')
 
 /** Untranslated values per file. May fall. Must never rise. */
 const BASELINE = {
+  'accounts.json': 0,
   'auth.json': 0,
   'common.json': 0,
   'errors.json': 0,

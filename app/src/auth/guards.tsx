@@ -123,6 +123,26 @@ export function RequireCapability({
   return <>{children}</>
 }
 
+/**
+ * A super admin who has not switched into a municipality has nowhere to put
+ * a record: every scoped column default is null and NOT NULL refuses (0112,
+ * 0117). Rather than let every form fail on submit, the municipal screens
+ * are held behind this until one is chosen from the header. The accounts
+ * screen and settings need no municipality and are let through.
+ *
+ * A municipal account always has one, so this never fires for them.
+ */
+export function MunicipalityGate({ children }: { children: ReactNode }) {
+  const { isSuperAdmin, municipalityId, roleResolved } = useAuth()
+  const { t } = useTranslation('common')
+  const location = useLocation()
+  const exempt = location.pathname === '/accounts' || location.pathname === '/settings'
+  if (roleResolved && isSuperAdmin && !municipalityId && !exempt) {
+    return <Denied title={t('municipalityGate.title')} body={t('municipalityGate.body')} />
+  }
+  return <>{children}</>
+}
+
 /** Guards `/forms/:module`, matching the role's module list. */
 export function RequireModule({ children }: { children: ReactNode }) {
   const { module } = useParams()

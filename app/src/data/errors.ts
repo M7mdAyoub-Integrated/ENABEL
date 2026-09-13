@@ -110,6 +110,18 @@ const TRIGGER_MESSAGES: { match: RegExp; key: string }[] = [
   { match: /national_id/i, key: 'errors:db.nationalIdImmutable' },
 ]
 
+/**
+ * guard_app_user's refusals (0117). They arrive as 42501 like an RLS refusal,
+ * but each names its rule, and the rule is what the person needs to read.
+ */
+const ACCOUNT_GUARD_MESSAGES: { match: RegExp; key: string }[] = [
+  { match: /cannot change your own role/i, key: 'errors:db.ownRole' },
+  { match: /cannot deactivate your own account/i, key: 'errors:db.ownAccount' },
+  { match: /last active super admin/i, key: 'errors:db.lastSuperAdmin' },
+  { match: /only a super admin may change a super admin account/i, key: 'errors:db.superAdminOnlyRow' },
+  { match: /only a super admin may move an account/i, key: 'errors:db.superAdminOnlyMove' },
+]
+
 function constraintOf(e: PostgrestError): string | null {
   // PostgREST puts the constraint name in `details` or inside `message`.
   const haystack = `${e.message} ${e.details ?? ''}`
@@ -145,6 +157,17 @@ export function toAppError(error: unknown): AppError {
   }
 
   if (code === '42501') {
+    // guard_app_user (0117) raises insufficient_privilege with a reason of
+    // its own -- your own role, your own account, the last super admin. A
+    // generic "your role does not allow this" would be true and useless:
+    // the super admin's role allows everything, and what refused them was the
+    // rule, which the message names. Found on /accounts by deactivating
+    // oneself and reading "ask the Coordinator" as a super admin.
+    for (const t of ACCOUNT_GUARD_MESSAGES) {
+      if (t.match.test(message)) {
+        return { kind: 'forbidden', messageKey: t.key, code, detail: message }
+      }
+    }
     return { kind: 'forbidden', messageKey: 'errors:db.forbidden', code, detail: message }
   }
 

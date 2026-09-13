@@ -99,7 +99,12 @@ export const DEMO_MODE: boolean = DEMO_MODE_REQUESTED && import.meta.env.DEV
  * and 0031 no longer create them.
  */
 export const DEMO_ACCOUNT = {
-  email: 'coordinator@shm.test',
+  // Which account demo mode signs in as. Defaults to the Sahel Horan
+  // coordinator; `VITE_DEMO_EMAIL` in .env.local picks another (the Ramtha
+  // admin, the super admin) so the other municipality and the switcher can
+  // be exercised in development without a sign-in screen. Its password
+  // still comes from VITE_DEMO_PASSWORD, same rules as before.
+  email: import.meta.env['VITE_DEMO_EMAIL'] || 'coordinator@shm.test',
   password: import.meta.env['VITE_DEMO_PASSWORD'] ?? '',
 } as const
 

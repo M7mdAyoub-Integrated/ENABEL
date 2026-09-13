@@ -707,7 +707,9 @@ export type Database = {
       }
       app_user: {
         Row: {
+          acting_municipality_id: string | null
           created_at: string
+          email: string | null
           full_name: string
           id: string
           is_active: boolean
@@ -717,7 +719,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          acting_municipality_id?: string | null
           created_at?: string
+          email?: string | null
           full_name: string
           id: string
           is_active?: boolean
@@ -727,7 +731,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          acting_municipality_id?: string | null
           created_at?: string
+          email?: string | null
           full_name?: string
           id?: string
           is_active?: boolean
@@ -737,6 +743,153 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "app_user_acting_municipality_id_fkey"
+            columns: ["acting_municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_user_acting_municipality_id_fkey"
+            columns: ["acting_municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_acting_municipality_id_fkey"
+            columns: ["acting_municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_acting_municipality_id_fkey"
+            columns: ["acting_municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_acting_municipality_id_fkey"
+            columns: ["acting_municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_acting_municipality_id_fkey"
+            columns: ["acting_municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_acting_municipality_id_fkey"
+            columns: ["acting_municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_acting_municipality_id_fkey"
+            columns: ["acting_municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_acting_municipality_id_fkey"
+            columns: ["acting_municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_acting_municipality_id_fkey"
+            columns: ["acting_municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_acting_municipality_id_fkey"
+            columns: ["acting_municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_acting_municipality_id_fkey"
+            columns: ["acting_municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_acting_municipality_id_fkey"
+            columns: ["acting_municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_acting_municipality_id_fkey"
+            columns: ["acting_municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_acting_municipality_id_fkey"
+            columns: ["acting_municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_acting_municipality_id_fkey"
+            columns: ["acting_municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_acting_municipality_id_fkey"
+            columns: ["acting_municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_acting_municipality_id_fkey"
+            columns: ["acting_municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_acting_municipality_id_fkey"
+            columns: ["acting_municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_acting_municipality_id_fkey"
+            columns: ["acting_municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_acting_municipality_id_fkey"
+            columns: ["acting_municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
           {
             foreignKeyName: "app_user_municipality_id_fkey"
             columns: ["municipality_id"]
@@ -5492,6 +5645,8 @@ export type Database = {
           is_active: boolean
           name_ar: string | null
           name_en: string
+          programme_ar: string | null
+          programme_en: string | null
           slug: string
           updated_at: string
         }
@@ -5504,6 +5659,8 @@ export type Database = {
           is_active?: boolean
           name_ar?: string | null
           name_en: string
+          programme_ar?: string | null
+          programme_en?: string | null
           slug: string
           updated_at?: string
         }
@@ -5516,6 +5673,8 @@ export type Database = {
           is_active?: boolean
           name_ar?: string | null
           name_en?: string
+          programme_ar?: string | null
+          programme_en?: string | null
           slug?: string
           updated_at?: string
         }
@@ -9467,6 +9626,7 @@ export type Database = {
           is_cancelled: boolean | null
           is_published: boolean | null
           location: string | null
+          municipality_id: string | null
           opportunity_type: string | null
           seats_taken: number | null
           start_date: string | null
@@ -9621,6 +9781,7 @@ export type Database = {
           id: string | null
           kind: string | null
           module: string | null
+          municipality_id: string | null
           person_id: string | null
           subject: string | null
           village: string | null
@@ -9702,6 +9863,11 @@ export type Database = {
         }
         Returns: boolean
       }
+      can_see_municipality: {
+        Args: { p_municipality: string }
+        Returns: boolean
+      }
+      can_write: { Args: never; Returns: boolean }
       count_markets_attended: { Args: { p_person_id: string }; Returns: number }
       create_direct_linkage: {
         Args: {
@@ -9739,6 +9905,7 @@ export type Database = {
         Args: {
           p_age_bands?: string[]
           p_disability?: string[]
+          p_municipality_id?: string
           p_objectives?: string[]
           p_period_from?: string
           p_period_to?: string
@@ -9771,6 +9938,7 @@ export type Database = {
       }
       is_coordinator: { Args: never; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
+      is_super_admin: { Args: never; Returns: boolean }
       match_linkage_request: {
         Args: {
           p_create_new_initiative?: boolean
@@ -9797,6 +9965,7 @@ export type Database = {
         Args: {
           p_age_bands?: string[]
           p_disability?: string[]
+          p_municipality_id?: string
           p_period_from?: string
           p_period_to?: string
           p_refugee?: string[]
@@ -9964,6 +10133,10 @@ export type Database = {
         }
         Returns: Json
       }
+      set_acting_municipality: {
+        Args: { p_municipality_id: string }
+        Returns: Json
+      }
       snapshot_period: {
         Args: { p_municipality_id?: string; p_period_code: string }
         Returns: number
@@ -10021,6 +10194,7 @@ export type Database = {
         | "enumerator"
         | "partner_viewer"
         | "participant"
+        | "super_admin"
       contact_mode_t: "telephone" | "site_visit" | "municipal_office"
       followup_round_t: "six_month" | "twelve_month" | "annual"
       initiative_status_t: "planned" | "operating" | "paused" | "stopped"
@@ -10169,6 +10343,7 @@ export const Constants = {
         "enumerator",
         "partner_viewer",
         "participant",
+        "super_admin",
       ],
       contact_mode_t: ["telephone", "site_visit", "municipal_office"],
       followup_round_t: ["six_month", "twelve_month", "annual"],
