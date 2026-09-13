@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { LocaleSwitcher } from '../../components/LocaleSwitcher'
 import { useAuth } from '../../auth/AuthProvider'
 import { ARROW_START } from '../../ui/glyphs'
+import { useMunicipalityName } from '../../data/municipalities'
+import { usePublicProgrammeLine, usePublicSiteOptional } from './PublicSite'
 
 /**
  * The other half of the preview.
@@ -70,7 +72,10 @@ function PreviewBar() {
  *      still nothing about accounts anywhere on the page.
  *    • The masthead says who this is and what the programme is, on every page,
  *      because someone may arrive on a detail page from a shared link with no
- *      idea what they are looking at.
+ *      idea what they are looking at. The name is the municipality row's, the
+ *      same one the staff header shows; the programme line is public copy
+ *      (see usePublicProgrammeLine). Outside a municipality -- the chooser,
+ *      the not-found page -- the masthead is the platform's own line.
  *    • The language switch is the only control, and it is large enough to hit
  *      with a thumb.
  *
@@ -80,6 +85,9 @@ function PreviewBar() {
  */
 export function PublicShell({ children }: { children: ReactNode }) {
   const { t } = useTranslation('public')
+  const site = usePublicSiteOptional()
+  const name = useMunicipalityName()
+  const programme = usePublicProgrammeLine()
 
   return (
     <div className="flex min-h-dvh flex-col bg-bg">
@@ -89,12 +97,12 @@ export function PublicShell({ children }: { children: ReactNode }) {
         style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >
         <div className="mx-auto flex w-full max-w-[900px] items-center justify-between gap-3 px-4 py-3 sm:px-6">
-          <Link to="/" className="min-w-0 text-ink no-underline hover:text-ink">
+          <Link to={site ? site.path() : '/'} className="min-w-0 text-ink no-underline hover:text-ink">
             <div className="font-narrow text-[10.5px] font-bold uppercase tracking-[0.18em] text-muted">
-              {t('siteName')}
+              {site ? name(site.municipality) : t('chooser.siteName')}
             </div>
             <div className="mt-0.5 text-[15px] font-extrabold uppercase leading-[1.15] tracking-[-0.02em] sm:text-[17px]">
-              {t('programme')}
+              {site ? programme(site.municipality) : t('chooser.programme')}
             </div>
           </Link>
           <LocaleSwitcher />

@@ -303,13 +303,23 @@ function Brand() {
  * with identity, so it works the same either way. The public pages read
  * `v_public_opportunity`, which `anon` is granted, so a coordinator sees
  * exactly what a visitor sees.
+ *
+ * Since 0120 the public site is one page per municipality, so this goes to
+ * the current municipality's -- or to the chooser for a super admin who has
+ * not switched into one.
  */
+function usePublicSitePath(): string {
+  const municipality = useCurrentMunicipality()
+  return municipality ? `/${municipality.slug}` : '/'
+}
+
 function ViewPublicSite() {
   const { t } = useTranslation('nav')
+  const publicPath = usePublicSitePath()
 
   return (
     <NavLink
-      to="/"
+      to={publicPath}
       className="flex min-h-11 flex-none items-center gap-2 whitespace-nowrap border-[1.5px] border-ink bg-bg px-[11px] py-[5px] font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-ink no-underline hover:bg-ink hover:text-bg sm:min-h-0"
     >
       <span aria-hidden="true" className="inline-block mirror-rtl">{EXTERNAL}</span>
@@ -322,6 +332,7 @@ export function Shell({ children }: { children: ReactNode }) {
   const { t } = useTranslation(['nav', 'common'])
   const groups = useNavGroups()
   const municipality = useCurrentMunicipality()
+  const publicPath = usePublicSitePath()
   const name = useMunicipalityName()
   const programme = useProgrammeLine()
   const { isSuperAdmin, municipalityId } = useAuth()
@@ -474,7 +485,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 reason to press it. */}
             <div className="border-t border-border-default px-[18px] py-3 md:hidden">
               <NavLink
-                to="/"
+                to={publicPath}
                 onClick={() => setMoreOpen(false)}
                 className="flex min-h-11 items-center gap-2 border-[1.5px] border-ink px-3 font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-ink no-underline"
               >

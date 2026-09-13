@@ -1,13 +1,16 @@
 {
-  "siteName": "Sahel Horan Municipality",
-  "programme": "Agriculture and Food Production Programme",
+  "programmeSHM": "Agriculture and Food Production Programme",
+  "programmeRMTH": "Employment and Entrepreneurship Programme",
   "home": {
     "heading": "Training and markets, open to apply",
+    "headingGeneric": "Open to apply",
     "intro": "The Municipality runs free training courses and rural markets for people who farm, keep livestock, or make and sell food. Anything open to apply for is listed here. You do not need an account.",
+    "introGeneric": "The Municipality lists here anything from its programme that is open to apply for. You do not need an account.",
     "openNow": "Open now",
     "count": "{count, plural, =0 {Nothing open at the moment} one {# opportunity open} other {# opportunities open}}",
     "emptyTitle": "Nothing open right now",
     "emptyBody": "There are no courses or markets taking applications today. New ones are added through the year — check back, or ask at the Municipality office.",
+    "emptyBodyGeneric": "There is nothing taking applications today. New opportunities are added through the year — check back, or ask at the Municipality office.",
     "myApplications": "Check an application I made",
     "loadFailed": "The list could not be loaded. Check your connection and try again.",
     "linkageCta": "Finished an advisory session on the market track?",
@@ -15,7 +18,8 @@
     "linkageCtaAction": "Ask to be connected",
     "mineCta": "Already applied for something?",
     "mineCtaBody": "Check what has happened with it.",
-    "mineCtaAction": "My applications"
+    "mineCtaAction": "My applications",
+    "otherMunicipality": "Looking for another municipality?"
   },
   "type": {
     "training": "Training course",
@@ -218,5 +222,19 @@
     "title": "Previewing the public site",
     "note": "Only you can see this bar. Visitors do not.",
     "back": "Back to the Municipality"
+  },
+  "chooser": {
+    "siteName": "Municipal programmes",
+    "programme": "Enhancing Local Economic Participation",
+    "heading": "Choose your municipality",
+    "intro": "Each municipality runs its own programme and lists what is open to apply for on its own page. Choose yours.",
+    "empty": "No municipality has a public page at the moment.",
+    "open": "Open the page",
+    "loadFailed": "The list of municipalities could not be loaded. Check your connection and try again."
+  },
+  "notFound": {
+    "title": "There is no page here",
+    "body": "Check the link you were given, or choose a municipality from the list.",
+    "action": "Choose a municipality"
   }
 }

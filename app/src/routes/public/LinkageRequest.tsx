@@ -12,6 +12,7 @@ import {
 } from '../../data/apply'
 import { useRequestLinkage, type LinkageRequestOutcome } from '../../data/linkage'
 import { PublicShell } from './PublicShell'
+import { PublicNotFound, hasLinkageJourney, usePublicSite } from './PublicSite'
 import { ARROW_START } from '../../ui/glyphs'
 
 /**
@@ -94,6 +95,7 @@ export function LinkageRequest() {
   const { t, i18n } = useTranslation('public')
   const locale = i18n.resolvedLanguage ?? 'en'
 
+  const site = usePublicSite()
   const lookup = useApplicantLookup()
   const submitRequest = useRequestLinkage()
   const activityTypes = useActivityTypes(true)
@@ -123,11 +125,16 @@ export function LinkageRequest() {
   const canLookup = idReady && !!dob
   const detailsReady = !!title.trim() && !!activityTypeId && !!request.trim()
 
+  // After every hook. The journey is Sahel Horan's (see hasLinkageJourney);
+  // on any other municipality's site this address is not a page.
+  if (!hasLinkageJourney(site.municipality.code)) return <PublicNotFound />
+
   async function runLookup(withPhone: boolean) {
     const res = await lookup.mutateAsync({
       nationalId: nid,
       dateOfBirth: withPhone ? null : dob,
       phone: withPhone ? phone : null,
+      municipalitySlug: site.slug,
     })
     setUsedPhone(withPhone)
     if (res.found) {
@@ -150,6 +157,7 @@ export function LinkageRequest() {
       request,
       ...(mainProduct.trim() ? { mainProduct } : {}),
       clientUuid,
+      municipalitySlug: site.slug,
     })
     setOutcome(res.result)
     setStep('done')
@@ -160,7 +168,7 @@ export function LinkageRequest() {
   return (
     <PublicShell>
       <Link
-        to="/"
+        to={site.path()}
         className="mt-5 inline-flex min-h-11 items-center font-narrow text-[12px] font-bold uppercase tracking-[0.14em] text-muted no-underline hover:text-ink"
       >
         <span aria-hidden="true" className="inline-block mirror-rtl">
@@ -450,7 +458,7 @@ export function LinkageRequest() {
           </p>
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
-              to="/"
+              to={site.path()}
               className={`${PRIMARY} no-underline hover:text-bg`}
             >
               {t('apply.backToList')}

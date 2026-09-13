@@ -14,7 +14,12 @@ import { toAppError, unwrap, unwrapList } from './errors'
  *
  *  NOTHING HERE FILTERS FOR SECURITY. If an unpublished or deleted record ever
  *  appeared on the public site, the fix would be in SQL, not in this file. The
- *  filtering below is only ever for what the visitor asked to see.
+ *  filtering below is only ever for what the visitor asked to see -- and since
+ *  0120 that includes WHICH MUNICIPALITY'S page they are on: every row of the
+ *  view says whose it is (`municipality_slug`), and both reads here ask for
+ *  the page's slug, so a Ramtha page never lists, or resolves by id, a Sahel
+ *  Horan opportunity. The view carries every active municipality; the slug
+ *  is the page's choice, not a boundary.
  *
  *  No personal data arrives here. No applicant names, no national IDs, no
  *  applicant counts -- `capacity` and `places_remaining`, never `seats_taken`.
@@ -41,38 +46,41 @@ export type PublicOpportunity = {
   capacity: number | null
   places_remaining: number | null
   is_full: boolean
+  municipality_slug: string
 }
 
 const SELECT =
   'id, opportunity_type, title, description, topic_en, topic_ar, start_date, end_date, ' +
   'location, focal_point, duration_hours, application_opens_on, application_closes_on, ' +
-  'applications_open, capacity, places_remaining, is_full'
+  'applications_open, capacity, places_remaining, is_full, municipality_slug'
 
-/** Everything currently open, soonest first. */
-export function usePublicOpportunities() {
+/** Everything currently open in one municipality, soonest first. */
+export function usePublicOpportunities(slug: string) {
   return useQuery({
-    queryKey: ['public', 'opportunities'],
+    queryKey: ['public', 'opportunities', slug],
     // A farmer refreshing the page should see a market that opened this morning.
     staleTime: 60_000,
     queryFn: async (): Promise<PublicOpportunity[]> => {
       const res = await supabase
         .from('v_public_opportunity')
         .select(SELECT)
+        .eq('municipality_slug', slug)
         .order('start_date', { ascending: true })
       return unwrapList(res as unknown as { data: PublicOpportunity[] | null; error: unknown })
     },
   })
 }
 
-export function usePublicOpportunity(id: string | undefined) {
+export function usePublicOpportunity(id: string | undefined, slug: string) {
   return useQuery({
-    queryKey: ['public', 'opportunity', id],
+    queryKey: ['public', 'opportunity', slug, id],
     enabled: !!id,
     queryFn: async (): Promise<PublicOpportunity> => {
       const res = await supabase
         .from('v_public_opportunity')
         .select(SELECT)
         .eq('id', id!)
+        .eq('municipality_slug', slug)
         .maybeSingle()
       if (res.error) throw toAppError(res.error)
       return unwrap(res as unknown as { data: PublicOpportunity | null; error: unknown })

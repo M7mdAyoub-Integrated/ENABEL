@@ -81,6 +81,8 @@ export type LookupInput = {
   nationalId: string
   dateOfBirth?: string | null
   phone?: string | null
+  /** The public page's municipality. The RPC answers {found:false} for a slug that is not live (0120). */
+  municipalitySlug: string
 }
 
 /**
@@ -101,6 +103,7 @@ export function useApplicantLookup() {
       // and an absent argument is what makes Postgres apply the DEFAULT.
       const { data, error } = await supabase.rpc('applicant_prefill', {
         p_national_id: normaliseNationalId(input.nationalId),
+        p_municipality_slug: input.municipalitySlug,
         ...(input.dateOfBirth ? { p_date_of_birth: input.dateOfBirth } : {}),
         ...(input.phone ? { p_phone: normalisePhone(input.phone) } : {}),
       })
@@ -158,6 +161,12 @@ export type ApplyInput = {
   /** Exhibitions only. Optional -- a producer may not have decided yet. */
   productIds?: string[]
   clientUuid: string
+  /**
+   * The public page's municipality. The opportunity's own municipality is
+   * what the row is written with; this is the page saying which one it is,
+   * and a page for the other municipality is answered `not_open` (0115).
+   */
+  municipalitySlug: string
 }
 
 export type ApplyResult = {
@@ -189,6 +198,7 @@ export function useApplyForOpportunity() {
         p_opportunity_type: input.opportunityType,
         p_national_id: normaliseNationalId(input.nationalId),
         p_client_uuid: input.clientUuid,
+        p_municipality_slug: input.municipalitySlug,
         ...(input.dateOfBirth ? { p_date_of_birth: input.dateOfBirth } : {}),
         ...(input.phone ? { p_phone: normalisePhone(input.phone) } : {}),
         ...(input.fullName?.trim() ? { p_full_name: input.fullName.trim() } : {}),
@@ -202,7 +212,8 @@ export function useApplyForOpportunity() {
     },
     onSuccess: (res) => {
       // A successful application can change places_remaining once a coordinator
-      // approves it, and the visitor may go straight back to the list.
+      // approves it, and the visitor may go straight back to the list. The key
+      // is a prefix: every municipality's list sits under it.
       if (res.result === 'applied') {
         void qc.invalidateQueries({ queryKey: ['public', 'opportunities'] })
       }

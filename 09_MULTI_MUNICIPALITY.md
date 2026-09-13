@@ -236,3 +236,106 @@ account and never from the URL. `/accounts` lists every account (email is now
 on `app_user`, copied from `auth.users` where `authenticated` cannot read),
 creates one with a generated one-time password shown once, changes role or
 municipality, sets a password, deactivates and reactivates.
+
+---
+
+## Part 3 — routing and the public side (migrations 0120–0121)
+
+### One public site per municipality
+
+```
+/                          the chooser; redirects when only one municipality is active
+/sahel-horan               Sahel Horan's public home
+/sahel-horan/opportunity/:id
+/sahel-horan/apply/:id
+/sahel-horan/linkage
+/sahel-horan/my-applications
+/ramtha                    Ramtha's
+/ramtha/my-applications
+```
+
+The prefix is the `slug` of an active `municipality` row, resolved on every
+public page through `v_public_municipality`; anything else under `/:slug` is
+the public site's own not-found page, which is also where a mistyped
+single-segment path now lands instead of on the staff sign-in. The four paths
+the site had before — `/opportunity/:id`, `/apply/:id`, `/linkage`,
+`/my-applications` — redirect to `/sahel-horan/…`, because every link printed
+or sent before 13 September 2026 was Sahel Horan's.
+
+The masthead names the municipality from its row (0121 made the English name
+the organisation's, "Sahel Horan Municipality", to match the Arabic) and gives
+a plain-language programme line from public copy — Sahel Horan's page keeps
+"Agriculture and Food Production Programme", the wording it has always had;
+Ramtha's is its plan's own description. The staff header's "View public site"
+goes to the current municipality's page.
+
+### One more view than the plan's letter
+
+§3.2 of the plan: *"anon still reaches exactly the four public views and the
+two RPCs. Do not widen the surface."* The surface is now **five views and
+four RPCs** (the plan's "two" predates `my_applications` and
+`request_linkage`). The fifth view, `v_public_municipality`, carries slug,
+code, the two names and the two programme lines of each active municipality:
+the text on the poster and nothing else — no id, no counts, no person.
+
+The alternative was a list of municipalities in the bundle. That is a claim
+about the database that nothing checks (CLAUDE.md, *a placeholder is a claim*):
+the public masthead would name a municipality from a locale string while the
+staff header names it from the row, and a municipality deactivated in the table
+would keep a live public page. The rule the widening bends exists to keep
+personal data off the open internet; this carries none. `05 §9` check 3, `05
+§10` and `07` check 5/5a were changed to the allow-list of five in the same
+commit, so the check still fails on a sixth. 0111's header had already named
+the view as the way the public site would read the two columns.
+
+### Identity is shared; history is not
+
+`person` is one table for both programmes, so a Ramtha page may confirm that
+a national ID and date of birth belong to someone on file (`applicant_prefill`
+returns the same four identity fields on either page). It may never say what
+that person did in Sahel Horan's programme, and before 0120 three things
+said exactly that:
+
+| | before | after 0120 |
+|---|---|---|
+| `my_applications` | every application the person ever made | those in the asking municipality |
+| `request_linkage` | `wrong_track` / `ineligible` / `requested` from advisories anywhere — which told a Ramtha page whether the person had completed one in Sahel Horan, and would have created a Ramtha linkage request on the strength of it | the page's municipality's advisories only |
+| `apply_for_opportunity`, advisory branch | a completed training anywhere | a completed training in the opportunity's municipality |
+
+The two triggers that decide — `check_advisory_eligibility`,
+`check_linkage_eligibility` — moved in the same migration as their RPC
+copies, as 0106 did, so the two copies of each rule still agree.
+
+Every RPC takes `p_municipality_slug`; the page passes its own. Unsaid means
+Sahel Horan (0115's decision, for the same reason as the redirects); unknown or
+inactive means the same byte-identical miss as a wrong date of birth, so a page
+that is not live learns nothing. `apply_for_opportunity` keeps 0115's shape:
+the row is written with the opportunity's municipality, and a page for the
+other one is answered `not_open`.
+
+Verified in 0120 as `anon`, in a discarded savepoint, with the one person on
+file who completed a Sahel Horan market advisory: found on the Ramtha page,
+no history on the Ramtha page, all of it on the Sahel Horan page;
+`ineligible` (not `wrong_track`) from the Ramtha linkage page and through the
+gate on Sahel Horan's; both triggers refusing a Ramtha row on Sahel Horan
+history and accepting the same person on a Sahel Horan session; the public
+list separating a probe Ramtha session from Sahel Horan's unchanged eight rows.
+
+### What Ramtha's public page is
+
+Nothing in Ramtha's seventeen forms is a public journey: its residents are
+recorded by staff at events, in training cycles, in incubators. So
+`/ramtha` today is a masthead, an empty "open now" list drawn live from the
+same view as Sahel Horan's, and "check an application I made". The
+market-linkage panel and `/ramtha/linkage` are not offered — `hasLinkageJourney`
+in `PublicSite.tsx` is the one place that says which programme runs that
+journey, and the database answers `ineligible` on a Ramtha page regardless.
+If Ramtha is later given something to apply to, it publishes through the same
+three tables and appears on its page with no further routing work.
+
+### Not changed
+
+Sahel Horan's public list returns the same eight rows, asserted inside 0120
+against a copy taken at its start; the baseline hashes of
+`v_indicator_disaggregated` and `v_indicator_progress` match after 0120 and
+0121. No indicator view was touched.

@@ -9716,6 +9716,33 @@ export type Database = {
         }
         Relationships: []
       }
+      v_public_municipality: {
+        Row: {
+          code: string | null
+          name_ar: string | null
+          name_en: string | null
+          programme_ar: string | null
+          programme_en: string | null
+          slug: string | null
+        }
+        Insert: {
+          code?: string | null
+          name_ar?: string | null
+          name_en?: string | null
+          programme_ar?: string | null
+          programme_en?: string | null
+          slug?: string | null
+        }
+        Update: {
+          code?: string | null
+          name_ar?: string | null
+          name_en?: string | null
+          programme_ar?: string | null
+          programme_en?: string | null
+          slug?: string | null
+        }
+        Relationships: []
+      }
       v_public_opportunity: {
         Row: {
           application_closes_on: string | null
@@ -9729,6 +9756,8 @@ export type Database = {
           id: string | null
           is_full: boolean | null
           location: string | null
+          municipality_id: string | null
+          municipality_slug: string | null
           opportunity_type: string | null
           places_remaining: number | null
           start_date: string | null
@@ -9812,6 +9841,7 @@ export type Database = {
       applicant_prefill: {
         Args: {
           p_date_of_birth?: string
+          p_municipality_slug?: string
           p_national_id: string
           p_phone?: string
         }
@@ -9954,6 +9984,7 @@ export type Database = {
       my_applications: {
         Args: {
           p_date_of_birth?: string
+          p_municipality_slug?: string
           p_national_id: string
           p_phone?: string
         }

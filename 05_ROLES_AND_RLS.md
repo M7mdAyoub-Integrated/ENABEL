@@ -575,22 +575,24 @@ where n.nspname = 'public' and c.relrowsecurity
   and not exists (select 1 from pg_policy p where p.polrelid = c.oid);
 -- expect true
 
--- 3. anon reaches the four public views and nothing else
+-- 3. anon reaches the five public views and nothing else
 select table_name, privilege_type
 from information_schema.role_table_grants
 where grantee = 'anon' and table_schema = 'public'
   and table_name not in ('v_public_opportunity', 'v_public_activity_type',
-                         'v_public_producer_type', 'v_public_product');
+                         'v_public_producer_type', 'v_public_product',
+                         'v_public_municipality');
 -- expect zero rows
 
--- and confirm the four are still there, so this check cannot pass by the
+-- and confirm the five are still there, so this check cannot pass by the
 -- public site having been taken away
-select count(*) = 4
+select count(*) = 5
 from information_schema.role_table_grants
 where grantee = 'anon' and table_schema = 'public'
   and privilege_type = 'SELECT'
   and table_name in ('v_public_opportunity', 'v_public_activity_type',
-                     'v_public_producer_type', 'v_public_product');
+                     'v_public_producer_type', 'v_public_product',
+                     'v_public_municipality');
 -- expect true
 ```
 
@@ -612,11 +614,18 @@ that site and was never revisited, so the stated expectation had been wrong for
 every run since — which means either nobody ran it, or somebody ran it, saw four
 rows, and decided they were fine. Both are worse than no check.
 
-It is now an allow-list, and it fails on a **fifth** grant, which is the thing
+It is now an allow-list, and it fails on a grant outside it, which is the thing
 worth catching: one more `grant select … to anon` is how programme data reaches
 the open internet. The second query is there because an allow-list alone passes
-happily when the four views have been dropped — a check that can be satisfied by
+happily when the views have been dropped — a check that can be satisfied by
 deletion is not checking.
+
+**The list grew from four to five on 13 September 2026** (`0120`,
+`v_public_municipality`: slug, code, names and programme line of each active
+municipality, the text on the poster and nothing else). That is exactly the
+kind of grant this check exists to make somebody argue for; the argument is in
+`0120`'s header and `09_MULTI_MUNICIPALITY.md` Part 3, and both queries above
+were changed in the same commit, so the check still fails on a **sixth**.
 
 The name is also why the contradiction survived: `role_table_grants` lists
 **views** as well as tables, so §10's "no grants on any table" and §9's zero rows
@@ -631,9 +640,20 @@ view returns anything, and four grants are not proof that four views work.
 
 ## 10. Public views and the nested-invoker trap
 
-The public site has no sign-in, so it reads as `anon`. `anon` holds **no grants on any table**, and that does not change. It reads four views and nothing else: `v_public_opportunity`, and the three reference lists `0056` added for the exhibition application form — `v_public_activity_type`, `v_public_producer_type` and `v_public_product`.
+The public site has no sign-in, so it reads as `anon`. `anon` holds **no grants on any table**, and that does not change. It reads five views and nothing else: `v_public_opportunity`, the three reference lists `0056` added for the exhibition application form — `v_public_activity_type`, `v_public_producer_type` and `v_public_product` — and, since `0120`, `v_public_municipality`, which names the active municipalities so the public site can be one page per municipality.
 
-*(This sentence said "exactly one object" until 2026-08-31. `0056` had added the other three months earlier.)*
+*(This sentence said "exactly one object" until 2026-08-31. `0056` had added the other three months earlier. It said "four" until 2026-09-13.)*
+
+Since `0120` every one of those views and every one of the four public RPCs
+answers for **one municipality**: `v_public_opportunity` carries
+`municipality_slug` and the page filters on it; `applicant_prefill`,
+`my_applications` and `request_linkage` take `p_municipality_slug` (Sahel
+Horan when unsaid, the same miss as a wrong date of birth when unknown);
+`apply_for_opportunity` takes the opportunity's. Identity is shared — one
+`person` table — but **history is the asking municipality's only**: a Ramtha
+page never lists a Sahel Horan enrolment, and the linkage and advisory gates
+read only the page's municipality's advisories and trainings, in both the RPC
+copy and the trigger copy.
 
 ### The rule
 

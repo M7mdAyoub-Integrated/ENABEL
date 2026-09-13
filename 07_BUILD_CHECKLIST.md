@@ -361,11 +361,15 @@ select code from indicator where data_source is null or view_name is null;
 -- 5. anon reaches the public site and nothing else
 --    NOT "anon reaches nothing" -- that was written before the public site
 --    existed and has been false since 0048. See 05 section 9, same correction.
+--    Five views since 0120 (v_public_municipality). No policy is addressed
+--    to anon or public since 0118 recreated every policy `to authenticated`
+--    (OQ-35), so the third count has no exceptions any more.
 select
   (select count(*) from information_schema.role_table_grants
      where grantee='anon' and table_schema='public'
        and table_name not in ('v_public_opportunity','v_public_activity_type',
-                              'v_public_producer_type','v_public_product'))
+                              'v_public_producer_type','v_public_product',
+                              'v_public_municipality'))
                                                                  as unexpected_table_grants,
   (select count(*) from information_schema.role_routine_grants
      where grantee='anon' and specific_schema='public'
@@ -373,16 +377,15 @@ select
                                 'my_applications','request_linkage'))
                                                                  as unexpected_routine_grants,
   (select count(*) from pg_policies where schemaname='public'
-     and ('anon' = any(roles) or 'public' = any(roles))
-     and tablename not in ('advisory_session','advisory_enrolment','linkage_request'))
+     and ('anon' = any(roles) or 'public' = any(roles)))
                                                                  as unexpected_open_policies;
 -- all three must be 0
 
 -- 5a. and the expected ones are still there, so 5 cannot pass by deletion
 select
   (select count(*) from information_schema.role_table_grants
-     where grantee='anon' and table_schema='public' and privilege_type='SELECT') = 4  as four_views,
-  (select count(*) from information_schema.role_routine_grants
+     where grantee='anon' and table_schema='public' and privilege_type='SELECT') = 5  as five_views,
+  (select count(distinct routine_name) from information_schema.role_routine_grants
      where grantee='anon' and specific_schema='public') = 4                           as four_rpcs;
 -- both must be true
 

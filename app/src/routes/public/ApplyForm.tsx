@@ -15,6 +15,7 @@ import {
   type ApplyOutcome,
 } from '../../data/apply'
 import { PublicShell } from './PublicShell'
+import { usePublicSite } from './PublicSite'
 import { ARROW_START } from '../../ui/glyphs'
 
 /**
@@ -104,7 +105,8 @@ export function ApplyForm() {
   const { id } = useParams()
   const { t, i18n } = useTranslation('public')
   const locale = i18n.resolvedLanguage ?? 'en'
-  const q = usePublicOpportunity(id)
+  const site = usePublicSite()
+  const q = usePublicOpportunity(id, site.slug)
   const o = q.data
 
   const lookup = useApplicantLookup()
@@ -163,7 +165,7 @@ export function ApplyForm() {
             {t('detail.notFoundBody')}
           </p>
           <Link
-            to="/"
+            to={site.path()}
             className="mt-5 inline-flex min-h-11 items-center bg-ink px-5 font-narrow text-[12.5px] font-bold uppercase tracking-[0.12em] text-bg no-underline hover:text-bg"
           >
             {t('detail.back')}
@@ -183,7 +185,7 @@ export function ApplyForm() {
             {a.kind === 'full' ? t('detail.applyFull') : t('detail.applyClosed')}
           </p>
           <Link
-            to="/"
+            to={site.path()}
             className="mt-5 inline-flex min-h-11 items-center bg-ink px-5 font-narrow text-[12.5px] font-bold uppercase tracking-[0.12em] text-bg no-underline hover:text-bg"
           >
             {t('detail.back')}
@@ -200,6 +202,7 @@ export function ApplyForm() {
       nationalId: nid,
       dateOfBirth: withPhone ? null : dob,
       phone: withPhone ? phone : null,
+      municipalitySlug: site.slug,
     })
     if (res.found) {
       setFoundName(res.full_name)
@@ -224,6 +227,7 @@ export function ApplyForm() {
       ...(isNew ? { fullName, sex, village } : {}),
       ...(isExhibition ? { producerTypeId, productIds } : {}),
       clientUuid,
+      municipalitySlug: site.slug,
     })
     setOutcome(res.result)
     setStep('done')
@@ -247,7 +251,7 @@ export function ApplyForm() {
   return (
     <PublicShell>
       <Link
-        to={`/opportunity/${o.id}`}
+        to={site.path(`/opportunity/${o.id}`)}
         className="mt-5 inline-flex min-h-11 items-center font-narrow text-[12px] font-bold uppercase tracking-[0.14em] text-muted no-underline hover:text-ink"
       >
         <span aria-hidden="true" className="inline-block mirror-rtl">{ARROW_START}</span>
@@ -669,7 +673,7 @@ export function ApplyForm() {
           </p>
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
-              to="/"
+              to={site.path()}
               className="inline-flex min-h-12 items-center justify-center bg-ink px-6 font-narrow text-[13px] font-bold uppercase tracking-[0.12em] text-bg no-underline hover:text-bg"
             >
               {t('apply.backToList')}

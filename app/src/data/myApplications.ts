@@ -37,6 +37,8 @@ export type MyApplicationsInput = {
   nationalId: string
   dateOfBirth?: string | null
   phone?: string | null
+  /** The public page's municipality: identity is shared, history is this municipality's only (0120). */
+  municipalitySlug: string
 }
 
 export function useMyApplications() {
@@ -50,6 +52,7 @@ export function useMyApplications() {
       // and an absent argument is what makes Postgres apply the DEFAULT.
       const { data, error } = await supabase.rpc('my_applications', {
         p_national_id: normaliseNationalId(input.nationalId),
+        p_municipality_slug: input.municipalitySlug,
         ...(input.dateOfBirth ? { p_date_of_birth: input.dateOfBirth } : {}),
         ...(input.phone ? { p_phone: normalisePhone(input.phone) } : {}),
       })

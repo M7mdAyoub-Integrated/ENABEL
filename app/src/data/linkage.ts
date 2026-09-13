@@ -93,6 +93,8 @@ export type LinkageRequestInput = {
   request: string
   mainProduct?: string
   clientUuid: string
+  /** The public page's municipality. The gate reads that municipality's advisories only (0120). */
+  municipalitySlug: string
 }
 
 export type LinkageRequestResult = {
@@ -118,6 +120,7 @@ export function useRequestLinkage() {
         p_activity_type_id: input.activityTypeId,
         p_request: input.request.trim(),
         p_client_uuid: input.clientUuid,
+        p_municipality_slug: input.municipalitySlug,
         ...(input.dateOfBirth ? { p_date_of_birth: input.dateOfBirth } : {}),
         ...(input.phone ? { p_phone: normalisePhone(input.phone) } : {}),
         ...(input.mainProduct?.trim() ? { p_main_product: input.mainProduct.trim() } : {}),

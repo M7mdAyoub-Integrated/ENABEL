@@ -4,6 +4,7 @@ import { usePublicOpportunities } from '../../data/publicOpportunities'
 import { PublicShell } from './PublicShell'
 import { OpportunityCard } from './OpportunityCard'
 import { PrimaryButton } from '../../ui/primitives'
+import { hasLinkageJourney, usePublicSite } from './PublicSite'
 
 /**
  * The public home page.
@@ -21,10 +22,19 @@ import { PrimaryButton } from '../../ui/primitives'
  * Single column at every width. It gets more comfortable as the screen grows,
  * it does not become a different layout -- a farmer on a 320px phone and a
  * coordinator on a laptop are reading the same thing for the same reason.
+ *
+ * One page, two programmes. The list is the municipality's own (the view is
+ * filtered on the slug). The three sentences that describe the programme are
+ * Sahel Horan's for Sahel Horan -- unchanged -- and a plainer set for any
+ * other municipality, because "people who farm, keep livestock, or make and
+ * sell food" is a description of one action plan, not of the platform. The
+ * linkage panel is offered only where the journey exists.
  */
 export function PublicHome() {
   const { t } = useTranslation('public')
-  const q = usePublicOpportunities()
+  const site = usePublicSite()
+  const shm = site.municipality.code === 'SHM'
+  const q = usePublicOpportunities(site.slug)
   const items = q.data ?? []
 
   return (
@@ -34,10 +44,10 @@ export function PublicHome() {
           className="text-[26px] font-black uppercase leading-[1.05] tracking-[-0.03em] sm:text-[38px]"
           style={{ textWrap: 'balance' }}
         >
-          {t('home.heading')}
+          {t(shm ? 'home.heading' : 'home.headingGeneric')}
         </h1>
         <p className="mt-3 max-w-[52ch] text-[15px] leading-[1.55] text-body sm:text-[16px]">
-          {t('home.intro')}
+          {t(shm ? 'home.intro' : 'home.introGeneric')}
         </p>
       </section>
 
@@ -77,7 +87,7 @@ export function PublicHome() {
               {t('home.emptyTitle')}
             </p>
             <p className="mx-auto mt-2 max-w-[42ch] text-[15px] leading-[1.55] text-body">
-              {t('home.emptyBody')}
+              {t(shm ? 'home.emptyBody' : 'home.emptyBodyGeneric')}
             </p>
           </div>
         ) : (
@@ -95,21 +105,23 @@ export function PublicHome() {
           so it sits below the list with its condition stated rather than
           pretending to be another item in it. It stays visible when the list
           is empty -- that is exactly when someone still has a reason to be
-          here. */}
-      <section className="mt-8 border-[1.5px] border-ink p-5 sm:mt-10 sm:p-6">
-        <h2 className="m-0 text-[19px] font-extrabold tracking-[-0.02em] sm:text-[22px]">
-          {t('home.linkageCta')}
-        </h2>
-        <p className="mt-2 max-w-[46ch] text-[15px] leading-[1.55] text-body">
-          {t('home.linkageCtaBody')}
-        </p>
-        <Link
-          to="/linkage"
-          className="mt-4 inline-flex min-h-12 items-center bg-ink px-5 font-narrow text-[12.5px] font-bold uppercase tracking-[0.12em] text-bg no-underline hover:text-bg"
-        >
-          {t('home.linkageCtaAction')}
-        </Link>
-      </section>
+          here. Only where the journey exists: see hasLinkageJourney. */}
+      {hasLinkageJourney(site.municipality.code) ? (
+        <section className="mt-8 border-[1.5px] border-ink p-5 sm:mt-10 sm:p-6">
+          <h2 className="m-0 text-[19px] font-extrabold tracking-[-0.02em] sm:text-[22px]">
+            {t('home.linkageCta')}
+          </h2>
+          <p className="mt-2 max-w-[46ch] text-[15px] leading-[1.55] text-body">
+            {t('home.linkageCtaBody')}
+          </p>
+          <Link
+            to={site.path('/linkage')}
+            className="mt-4 inline-flex min-h-12 items-center bg-ink px-5 font-narrow text-[12.5px] font-bold uppercase tracking-[0.12em] text-bg no-underline hover:text-bg"
+          >
+            {t('home.linkageCtaAction')}
+          </Link>
+        </section>
+      ) : null}
 
       {/* Last, and quieter than the rest. Someone arriving to apply should not
           have to step past a "check your existing application" panel to reach
@@ -120,12 +132,20 @@ export function PublicHome() {
           {t('home.mineCtaBody')}
         </p>
         <Link
-          to="/my-applications"
+          to={site.path('/my-applications')}
           className="mt-4 inline-flex min-h-12 items-center border-[1.5px] border-border-strong px-5 font-narrow text-[12.5px] font-bold uppercase tracking-[0.12em] text-ink no-underline hover:bg-sunken"
         >
           {t('home.mineCtaAction')}
         </Link>
       </section>
+
+      {/* The other door. Someone sent a Sahel Horan link who lives in Ramtha
+          has no other way to the right page than the address bar. */}
+      <p className="mt-8 text-[13px] text-muted">
+        <Link to="/" className="text-muted underline hover:text-ink">
+          {t('home.otherMunicipality')}
+        </Link>
+      </p>
     </PublicShell>
   )
 }

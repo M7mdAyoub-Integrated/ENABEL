@@ -9,6 +9,7 @@ import {
 } from '../../data/apply'
 import { useMyApplications, type ApplicationRow } from '../../data/myApplications'
 import { PublicShell } from './PublicShell'
+import { usePublicSite } from './PublicSite'
 import { ARROW_START } from '../../ui/glyphs'
 import { formatShortDate } from '../../lib/format'
 
@@ -103,6 +104,7 @@ function Row({ a, locale }: { a: ApplicationRow; locale: string }) {
 export function MyApplications() {
   const { t, i18n } = useTranslation('public')
   const locale = i18n.resolvedLanguage ?? 'en'
+  const site = usePublicSite()
   const lookup = useMyApplications()
 
   const [step, setStep] = useState<Step>('identify')
@@ -121,6 +123,7 @@ export function MyApplications() {
       nationalId: nid,
       dateOfBirth: withPhone ? null : dob,
       phone: withPhone ? phone : null,
+      municipalitySlug: site.slug,
     })
     setResult(res)
     setStep('results')
@@ -138,7 +141,7 @@ export function MyApplications() {
   return (
     <PublicShell>
       <Link
-        to="/"
+        to={site.path()}
         className="mt-5 inline-flex min-h-11 items-center font-narrow text-[12px] font-bold uppercase tracking-[0.14em] text-muted no-underline hover:text-ink"
       >
         <span aria-hidden="true" className="inline-block mirror-rtl">
@@ -290,7 +293,7 @@ export function MyApplications() {
               <button type="button" onClick={startOver} className={PRIMARY}>
                 {t('apply.tryAgain')}
               </button>
-              <Link to="/" className={`${SECONDARY} no-underline`}>
+              <Link to={site.path()} className={`${SECONDARY} no-underline`}>
                 {t('apply.backToList')}
               </Link>
             </div>
@@ -304,7 +307,7 @@ export function MyApplications() {
               {t('mine.emptyBody')}
             </p>
             <Link
-              to="/"
+              to={site.path()}
               className="mt-5 inline-flex min-h-11 items-center bg-ink px-5 font-narrow text-[12.5px] font-bold uppercase tracking-[0.12em] text-bg no-underline hover:text-bg"
             >
               {t('apply.backToList')}

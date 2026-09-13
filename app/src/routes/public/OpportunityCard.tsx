@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { availabilityOf, type PublicOpportunity } from '../../data/publicOpportunities'
 import { formatShortDate, formatDateRange } from '../../lib/format'
 import { SEP } from '../../ui/glyphs'
+import { usePublicSite } from './PublicSite'
 
 /**
  * One opportunity, as a card.
@@ -71,13 +72,14 @@ export function AvailabilityLine({ o }: { o: PublicOpportunity }) {
 
 export function OpportunityCard({ o }: { o: PublicOpportunity }) {
   const { t, i18n } = useTranslation('public')
+  const site = usePublicSite()
   const locale = i18n.resolvedLanguage ?? 'en'
   const topic = locale.startsWith('ar') ? (o.topic_ar ?? o.topic_en) : o.topic_en
 
   return (
     <li>
       <Link
-        to={`/opportunity/${o.id}`}
+        to={site.path(`/opportunity/${o.id}`)}
         className="block border-[1.5px] border-ink bg-bg p-4 text-ink no-underline hover:bg-sunken sm:p-5"
       >
         <div className="flex flex-wrap items-center gap-2">

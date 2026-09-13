@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { availabilityOf, usePublicOpportunity } from '../../data/publicOpportunities'
 import { PublicShell } from './PublicShell'
+import { usePublicSite } from './PublicSite'
 import { AvailabilityLine } from './OpportunityCard'
 import { formatDateRange, formatShortDate } from '../../lib/format'
 import { ARROW_START } from '../../ui/glyphs'
@@ -45,7 +46,8 @@ export function OpportunityDetail() {
   const { id } = useParams()
   const { t, i18n } = useTranslation('public')
   const locale = i18n.resolvedLanguage ?? 'en'
-  const q = usePublicOpportunity(id)
+  const site = usePublicSite()
+  const q = usePublicOpportunity(id, site.slug)
   const o = q.data
 
   if (q.isLoading) {
@@ -74,7 +76,7 @@ export function OpportunityDetail() {
             {t('detail.notFoundBody')}
           </p>
           <Link
-            to="/"
+            to={site.path()}
             className="mt-5 inline-flex min-h-11 items-center bg-ink px-5 font-narrow text-[12.5px] font-bold uppercase tracking-[0.12em] text-bg no-underline hover:text-bg"
           >
             {t('detail.back')}
@@ -91,7 +93,7 @@ export function OpportunityDetail() {
   return (
     <PublicShell>
       <Link
-        to="/"
+        to={site.path()}
         className="mt-5 inline-flex min-h-11 items-center font-narrow text-[12px] font-bold uppercase tracking-[0.14em] text-muted no-underline hover:text-ink"
       >
         <span aria-hidden="true" className="inline-block mirror-rtl">{ARROW_START}</span>
@@ -130,7 +132,7 @@ export function OpportunityDetail() {
             // until /apply/:id landed, which told a farmer to come back later
             // about something that was open that day.
             <Link
-              to={`/apply/${o.id}`}
+              to={site.path(`/apply/${o.id}`)}
               className="inline-flex min-h-12 w-full items-center justify-center bg-ink px-6 font-narrow text-[13px] font-bold uppercase tracking-[0.12em] text-bg no-underline hover:text-bg sm:w-auto"
             >
               {t('detail.apply')}

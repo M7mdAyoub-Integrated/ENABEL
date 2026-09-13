@@ -19,6 +19,8 @@ import Settings from './routes/Settings'
 import Accounts from './routes/Accounts'
 import NotFound from './routes/NotFound'
 import PublicHome from './routes/public/PublicHome'
+import { PublicChooser, PublicNotFound, PublicSite } from './routes/public/PublicSite'
+import { LegacyPublicRedirect } from './routes/public/LegacyPublicRedirect'
 import ApplyForm from './routes/public/ApplyForm'
 import LinkageRequest from './routes/public/LinkageRequest'
 import MyApplications from './routes/public/MyApplications'
@@ -104,25 +106,47 @@ const authRoutes = DEMO_MODE
 const router = createBrowserRouter([
   ...authRoutes,
 
-  // Landing decides where a signed-in user belongs.
   // ── The public site ──────────────────────────────────────────────────────
-  // No session, no guard, no Shell. `/` is now the PUBLIC home page: this is a
-  // programme about participation, so the front door belongs to the public
-  // rather than to staff. Municipal screens keep their own paths below.
+  // No session, no guard, no Shell. The front door belongs to the public: this
+  // is a programme about participation. Municipal screens keep their own
+  // paths below.
   //
-  // These must stay OUTSIDE RequireSession. They read v_public_opportunity,
-  // which anon is granted, and a farmer has no account to wait for.
-  { path: '/', element: <PublicHome /> },
-  { path: '/opportunity/:id', element: <OpportunityDetail /> },
-  { path: '/apply/:id', element: <ApplyForm /> },
-  // Linkage has no opportunity to hang off -- it is not something the
-  // Municipality publishes and people apply to, it is a standing offer to
-  // anyone who has finished an advisory. So it is a page, not a /apply/:id.
-  { path: '/linkage', element: <LinkageRequest /> },
-  // No session, by design: someone who applied through the public site has no
-  // account to sign in to. Identity is the same national ID plus date of birth
-  // check as everywhere else, in its own RPC. See 0070.
-  { path: '/my-applications', element: <MyApplications /> },
+  // One public site PER MUNICIPALITY, under a path prefix (plan §3.1):
+  // /sahel-horan, /ramtha. `/` is the chooser, which redirects when only one
+  // municipality is active. PublicSite resolves the slug against
+  // v_public_municipality and renders the not-found page for anything else --
+  // so a mistyped single-segment path lands on the public 404 rather than on
+  // the staff sign-in, which is the right answer for a visitor.
+  //
+  // These must stay OUTSIDE RequireSession. They read the public views, which
+  // anon is granted, and a farmer has no account to wait for.
+  { path: '/', element: <PublicChooser /> },
+  {
+    path: '/:slug',
+    element: <PublicSite />,
+    children: [
+      { index: true, element: <PublicHome /> },
+      { path: 'opportunity/:id', element: <OpportunityDetail /> },
+      { path: 'apply/:id', element: <ApplyForm /> },
+      // Linkage has no opportunity to hang off -- it is not something the
+      // Municipality publishes and people apply to, it is a standing offer to
+      // anyone who has finished an advisory. So it is a page, not an
+      // apply/:id. Only where the journey exists; see hasLinkageJourney.
+      { path: 'linkage', element: <LinkageRequest /> },
+      // No session, by design: someone who applied through the public site
+      // has no account to sign in to. Identity is the same national ID plus
+      // date of birth check as everywhere else, in its own RPC. See 0070.
+      { path: 'my-applications', element: <MyApplications /> },
+      { path: '*', element: <PublicNotFound /> },
+    ],
+  },
+  // The paths the public site had before 0120, kept for every poster and
+  // WhatsApp link that carries one. All of them predate Ramtha, so all of
+  // them are Sahel Horan's.
+  { path: '/opportunity/:id', element: <LegacyPublicRedirect to="opportunity" /> },
+  { path: '/apply/:id', element: <LegacyPublicRedirect to="apply" /> },
+  { path: '/linkage', element: <LegacyPublicRedirect to="linkage" /> },
+  { path: '/my-applications', element: <LegacyPublicRedirect to="my-applications" /> },
 
   // Where staff used to land. Kept so an existing bookmark still works.
   { path: '/home', element: <Landing /> },
