@@ -448,6 +448,7 @@ export function useMutations() {
             updated_at: new Date().toISOString(),
             created_by: null,
             deleted_at: null,
+            municipality_id: db.SHM_MUNICIPALITY_ID,
             exhibition_id: exhibitionId,
             person_id: db.PORTAL_PERSON_ID,
             producer_type_id: producerTypeId,

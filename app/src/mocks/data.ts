@@ -24,12 +24,20 @@ export type FollowupSurvey = T['followup_survey']['Row']
 /** The prototype pins "today" so held/upcoming states are deterministic. */
 export const TODAY = new Date('2026-08-23T00:00:00Z')
 
+/**
+ * Every scoped table carries `municipality_id` since 0112. Mock rows are all
+ * Sahel Horan's, the same as every real row was on the day of the backfill.
+ * The id is 0111's fixed one.
+ */
+export const SHM_MUNICIPALITY_ID = '00000000-0000-4000-8000-00000000005a'
+
 const base = (id: string, at: string) => ({
   id,
   created_at: at,
   updated_at: at,
   created_by: null,
   deleted_at: null,
+  municipality_id: SHM_MUNICIPALITY_ID,
 })
 
 /* ── reference lookups ──────────────────────────────────────────────────────

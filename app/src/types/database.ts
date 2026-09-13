@@ -19,6 +19,7 @@ export type Database = {
           code: string
           created_at: string
           id: string
+          municipality_id: string
           name_ar: string | null
           name_en: string
           objective_id: string
@@ -29,6 +30,7 @@ export type Database = {
           code: string
           created_at?: string
           id?: string
+          municipality_id?: string
           name_ar?: string | null
           name_en: string
           objective_id: string
@@ -39,6 +41,7 @@ export type Database = {
           code?: string
           created_at?: string
           id?: string
+          municipality_id?: string
           name_ar?: string | null
           name_en?: string
           objective_id?: string
@@ -47,11 +50,165 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "activity_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "activity_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "activity_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "activity_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "activity_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "activity_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "activity_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "activity_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "activity_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "activity_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "activity_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "activity_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "activity_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "activity_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "activity_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "activity_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "activity_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "activity_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "activity_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "activity_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
+          {
             foreignKeyName: "activity_objective_id_fkey"
             columns: ["objective_id"]
             isOneToOne: false
             referencedRelation: "objective"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_objective_municipality_fkey"
+            columns: ["objective_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "objective"
+            referencedColumns: ["id", "municipality_id"]
           },
         ]
       }
@@ -68,6 +225,7 @@ export type Database = {
           deleted_at: string | null
           id: string
           met_criteria: boolean | null
+          municipality_id: string
           person_id: string
           registered_on: string
           session_id: string
@@ -86,6 +244,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           met_criteria?: boolean | null
+          municipality_id?: string
           person_id: string
           registered_on?: string
           session_id: string
@@ -104,6 +263,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           met_criteria?: boolean | null
+          municipality_id?: string
           person_id?: string
           registered_on?: string
           session_id?: string
@@ -111,6 +271,153 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "advisory_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "advisory_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
           {
             foreignKeyName: "advisory_enrolment_person_id_fkey"
             columns: ["person_id"]
@@ -139,6 +446,13 @@ export type Database = {
             referencedRelation: "advisory_session"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "advisory_enrolment_session_municipality_fkey"
+            columns: ["session_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "advisory_session"
+            referencedColumns: ["id", "municipality_id"]
+          },
         ]
       }
       advisory_session: {
@@ -159,6 +473,7 @@ export type Database = {
           is_cancelled: boolean
           is_delivered: boolean
           is_published: boolean
+          municipality_id: string
           planned_seats: number | null
           start_date: string
           title: string
@@ -184,6 +499,7 @@ export type Database = {
           is_cancelled?: boolean
           is_delivered?: boolean
           is_published?: boolean
+          municipality_id?: string
           planned_seats?: number | null
           start_date: string
           title: string
@@ -209,6 +525,7 @@ export type Database = {
           is_cancelled?: boolean
           is_delivered?: boolean
           is_published?: boolean
+          municipality_id?: string
           planned_seats?: number | null
           start_date?: string
           title?: string
@@ -226,6 +543,160 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "advisory_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "advisory_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "advisory_session_partnership_municipality_fkey"
+            columns: ["delivered_by_partnership_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "partnership"
+            referencedColumns: ["id", "municipality_id"]
+          },
+          {
             foreignKeyName: "advisory_session_topic_id_fkey"
             columns: ["topic_id"]
             isOneToOne: false
@@ -240,6 +711,7 @@ export type Database = {
           full_name: string
           id: string
           is_active: boolean
+          municipality_id: string | null
           phone: string | null
           role: Database["public"]["Enums"]["app_role_t"]
           updated_at: string
@@ -249,6 +721,7 @@ export type Database = {
           full_name: string
           id: string
           is_active?: boolean
+          municipality_id?: string | null
           phone?: string | null
           role?: Database["public"]["Enums"]["app_role_t"]
           updated_at?: string
@@ -258,11 +731,160 @@ export type Database = {
           full_name?: string
           id?: string
           is_active?: boolean
+          municipality_id?: string | null
           phone?: string | null
           role?: Database["public"]["Enums"]["app_role_t"]
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "app_user_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_user_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "app_user_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
+        ]
       }
       applicant_lookup_secret: {
         Row: {
@@ -312,6 +934,7 @@ export type Database = {
           file_name: string
           id: string
           mime_type: string | null
+          municipality_id: string
           size_bytes: number | null
           storage_path: string
           updated_at: string
@@ -326,6 +949,7 @@ export type Database = {
           file_name: string
           id?: string
           mime_type?: string | null
+          municipality_id?: string
           size_bytes?: number | null
           storage_path: string
           updated_at?: string
@@ -340,13 +964,162 @@ export type Database = {
           file_name?: string
           id?: string
           mime_type?: string | null
+          municipality_id?: string
           size_bytes?: number | null
           storage_path?: string
           updated_at?: string
           uploaded_at?: string
           uploaded_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "attachment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attachment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "attachment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "attachment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "attachment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "attachment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "attachment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "attachment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "attachment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "attachment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "attachment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "attachment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "attachment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "attachment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "attachment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "attachment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "attachment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "attachment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "attachment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "attachment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "attachment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
+        ]
       }
       audit_log: {
         Row: {
@@ -357,6 +1130,7 @@ export type Database = {
           changed_fields: string[] | null
           created_at: string
           id: number
+          municipality_id: string | null
           new_data: Json | null
           old_data: Json | null
           row_id: string | null
@@ -371,6 +1145,7 @@ export type Database = {
           changed_fields?: string[] | null
           created_at?: string
           id?: number
+          municipality_id?: string | null
           new_data?: Json | null
           old_data?: Json | null
           row_id?: string | null
@@ -385,13 +1160,162 @@ export type Database = {
           changed_fields?: string[] | null
           created_at?: string
           id?: number
+          municipality_id?: string | null
           new_data?: Json | null
           old_data?: Json | null
           row_id?: string | null
           table_name?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "audit_log_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_log_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "audit_log_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "audit_log_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "audit_log_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "audit_log_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "audit_log_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "audit_log_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "audit_log_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "audit_log_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "audit_log_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "audit_log_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "audit_log_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "audit_log_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "audit_log_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "audit_log_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "audit_log_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "audit_log_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "audit_log_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "audit_log_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "audit_log_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
+        ]
       }
       case_study: {
         Row: {
@@ -402,6 +1326,7 @@ export type Database = {
           documented_on: string
           id: string
           initiative_id: string | null
+          municipality_id: string
           person_id: string | null
           summary: string
           title: string
@@ -415,6 +1340,7 @@ export type Database = {
           documented_on: string
           id?: string
           initiative_id?: string | null
+          municipality_id?: string
           person_id?: string | null
           summary: string
           title: string
@@ -428,6 +1354,7 @@ export type Database = {
           documented_on?: string
           id?: string
           initiative_id?: string | null
+          municipality_id?: string
           person_id?: string | null
           summary?: string
           title?: string
@@ -440,6 +1367,160 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "production_initiative"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_study_initiative_municipality_fkey"
+            columns: ["initiative_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "production_initiative"
+            referencedColumns: ["id", "municipality_id"]
+          },
+          {
+            foreignKeyName: "case_study_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_study_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "case_study_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "case_study_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "case_study_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "case_study_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "case_study_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "case_study_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "case_study_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "case_study_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "case_study_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "case_study_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "case_study_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "case_study_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "case_study_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "case_study_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "case_study_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "case_study_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "case_study_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "case_study_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "case_study_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
           },
           {
             foreignKeyName: "case_study_person_id_fkey"
@@ -472,6 +1553,7 @@ export type Database = {
           id: string
           meeting_date: string
           minutes_ref: string | null
+          municipality_id: string
           subject: string
           updated_at: string
         }
@@ -482,6 +1564,7 @@ export type Database = {
           id?: string
           meeting_date: string
           minutes_ref?: string | null
+          municipality_id?: string
           subject: string
           updated_at?: string
         }
@@ -492,10 +1575,159 @@ export type Database = {
           id?: string
           meeting_date?: string
           minutes_ref?: string | null
+          municipality_id?: string
           subject?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "coordination_meeting_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
+        ]
       }
       coordination_meeting_partner: {
         Row: {
@@ -503,6 +1735,7 @@ export type Database = {
           external_name: string | null
           id: string
           meeting_id: string
+          municipality_id: string
           partnership_id: string | null
           stakeholder_type_id: string | null
           updated_at: string
@@ -512,6 +1745,7 @@ export type Database = {
           external_name?: string | null
           id?: string
           meeting_id: string
+          municipality_id?: string
           partnership_id?: string | null
           stakeholder_type_id?: string | null
           updated_at?: string
@@ -521,6 +1755,7 @@ export type Database = {
           external_name?: string | null
           id?: string
           meeting_id?: string
+          municipality_id?: string
           partnership_id?: string | null
           stakeholder_type_id?: string | null
           updated_at?: string
@@ -534,11 +1769,172 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "coordination_meeting_partner_meeting_municipality_fkey"
+            columns: ["meeting_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "coordination_meeting"
+            referencedColumns: ["id", "municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
+          {
             foreignKeyName: "coordination_meeting_partner_partnership_id_fkey"
             columns: ["partnership_id"]
             isOneToOne: false
             referencedRelation: "partnership"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coordination_meeting_partner_partnership_municipality_fkey"
+            columns: ["partnership_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "partnership"
+            referencedColumns: ["id", "municipality_id"]
           },
           {
             foreignKeyName: "coordination_meeting_partner_stakeholder_type_id_fkey"
@@ -565,6 +1961,7 @@ export type Database = {
           is_cancelled: boolean
           is_published: boolean
           location: string
+          municipality_id: string
           name: string
           start_date: string
           updated_at: string
@@ -584,6 +1981,7 @@ export type Database = {
           is_cancelled?: boolean
           is_published?: boolean
           location: string
+          municipality_id?: string
           name: string
           start_date: string
           updated_at?: string
@@ -603,11 +2001,160 @@ export type Database = {
           is_cancelled?: boolean
           is_published?: boolean
           location?: string
+          municipality_id?: string
           name?: string
           start_date?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "exhibition_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exhibition_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
+        ]
       }
       exhibition_registration: {
         Row: {
@@ -618,6 +2165,7 @@ export type Database = {
           exhibition_id: string
           id: string
           is_first_time: boolean
+          municipality_id: string
           person_id: string
           producer_type_id: string
           producer_type_other: string | null
@@ -635,6 +2183,7 @@ export type Database = {
           exhibition_id: string
           id?: string
           is_first_time: boolean
+          municipality_id?: string
           person_id: string
           producer_type_id: string
           producer_type_other?: string | null
@@ -652,6 +2201,7 @@ export type Database = {
           exhibition_id?: string
           id?: string
           is_first_time?: boolean
+          municipality_id?: string
           person_id?: string
           producer_type_id?: string
           producer_type_other?: string | null
@@ -675,6 +2225,160 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_upcoming_exhibitions"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_exhibition_municipality_fkey"
+            columns: ["exhibition_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "exhibition"
+            referencedColumns: ["id", "municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
           },
           {
             foreignKeyName: "exhibition_registration_person_id_fkey"
@@ -716,23 +2420,173 @@ export type Database = {
       exhibition_registration_product: {
         Row: {
           created_at: string
+          municipality_id: string
           product_id: string
           registration_id: string
           updated_at: string
         }
         Insert: {
           created_at?: string
+          municipality_id?: string
           product_id: string
           registration_id: string
           updated_at?: string
         }
         Update: {
           created_at?: string
+          municipality_id?: string
           product_id?: string
           registration_id?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "exhibition_registration_product_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_product_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_product_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_product_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_product_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_product_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_product_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_product_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_product_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_product_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_product_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_product_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_product_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_product_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_product_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_product_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_product_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_product_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_product_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_product_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "exhibition_registration_product_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
           {
             foreignKeyName: "exhibition_registration_product_product_id_fkey"
             columns: ["product_id"]
@@ -754,11 +2608,19 @@ export type Database = {
             referencedRelation: "exhibition_registration"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "exhibition_registration_product_registration_municipality_fkey"
+            columns: ["registration_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "exhibition_registration"
+            referencedColumns: ["id", "municipality_id"]
+          },
         ]
       }
       followup_answer: {
         Row: {
           created_at: string
+          municipality_id: string
           question_code: string
           survey_id: string
           updated_at: string
@@ -768,6 +2630,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          municipality_id?: string
           question_code: string
           survey_id: string
           updated_at?: string
@@ -777,6 +2640,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          municipality_id?: string
           question_code?: string
           survey_id?: string
           updated_at?: string
@@ -786,17 +2650,172 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "followup_answer_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "followup_answer_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
+          {
             foreignKeyName: "followup_answer_survey_id_fkey"
             columns: ["survey_id"]
             isOneToOne: false
             referencedRelation: "followup_survey"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "followup_answer_survey_municipality_fkey"
+            columns: ["survey_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "followup_survey"
+            referencedColumns: ["id", "municipality_id"]
+          },
         ]
       }
       followup_answer_option: {
         Row: {
           created_at: string
+          municipality_id: string
           option_id: string
           option_other: string | null
           question_code: string
@@ -805,6 +2824,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          municipality_id?: string
           option_id: string
           option_other?: string | null
           question_code: string
@@ -813,6 +2833,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          municipality_id?: string
           option_id?: string
           option_other?: string | null
           question_code?: string
@@ -821,11 +2842,165 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "followup_answer_option_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "followup_answer_option_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_option_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_option_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_option_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_option_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_option_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_option_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_option_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_option_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_option_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_option_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_option_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_option_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_option_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_option_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_option_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_option_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_option_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_option_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_answer_option_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
+          {
             foreignKeyName: "followup_answer_option_survey_id_fkey"
             columns: ["survey_id"]
             isOneToOne: false
             referencedRelation: "followup_survey"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "followup_answer_option_survey_municipality_fkey"
+            columns: ["survey_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "followup_survey"
+            referencedColumns: ["id", "municipality_id"]
           },
         ]
       }
@@ -839,6 +3014,7 @@ export type Database = {
           how_connected: string
           how_connected_other: string | null
           id: string
+          municipality_id: string
           seq: number
           still_active: string
           survey_id: string
@@ -853,6 +3029,7 @@ export type Database = {
           how_connected: string
           how_connected_other?: string | null
           id?: string
+          municipality_id?: string
           seq: number
           still_active: string
           survey_id: string
@@ -867,6 +3044,7 @@ export type Database = {
           how_connected?: string
           how_connected_other?: string | null
           id?: string
+          municipality_id?: string
           seq?: number
           still_active?: string
           survey_id?: string
@@ -881,11 +3059,165 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "followup_buyer_connection_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "followup_buyer_connection_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_buyer_connection_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_buyer_connection_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_buyer_connection_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_buyer_connection_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_buyer_connection_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_buyer_connection_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_buyer_connection_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_buyer_connection_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_buyer_connection_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_buyer_connection_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_buyer_connection_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_buyer_connection_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_buyer_connection_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_buyer_connection_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_buyer_connection_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_buyer_connection_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_buyer_connection_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_buyer_connection_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_buyer_connection_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
+          {
             foreignKeyName: "followup_buyer_connection_survey_id_fkey"
             columns: ["survey_id"]
             isOneToOne: false
             referencedRelation: "followup_survey"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "followup_buyer_connection_survey_municipality_fkey"
+            columns: ["survey_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "followup_survey"
+            referencedColumns: ["id", "municipality_id"]
           },
         ]
       }
@@ -893,6 +3225,7 @@ export type Database = {
         Row: {
           created_at: string
           item_id: string
+          municipality_id: string
           obstacle: string | null
           status: Database["public"]["Enums"]["tri_status_t"]
           survey_id: string
@@ -901,6 +3234,7 @@ export type Database = {
         Insert: {
           created_at?: string
           item_id: string
+          municipality_id?: string
           obstacle?: string | null
           status: Database["public"]["Enums"]["tri_status_t"]
           survey_id: string
@@ -909,6 +3243,7 @@ export type Database = {
         Update: {
           created_at?: string
           item_id?: string
+          municipality_id?: string
           obstacle?: string | null
           status?: Database["public"]["Enums"]["tri_status_t"]
           survey_id?: string
@@ -923,11 +3258,165 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "followup_safety_item_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "followup_safety_item_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_safety_item_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_safety_item_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_safety_item_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_safety_item_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_safety_item_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_safety_item_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_safety_item_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_safety_item_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_safety_item_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_safety_item_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_safety_item_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_safety_item_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_safety_item_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_safety_item_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_safety_item_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_safety_item_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_safety_item_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_safety_item_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_safety_item_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
+          {
             foreignKeyName: "followup_safety_item_survey_id_fkey"
             columns: ["survey_id"]
             isOneToOne: false
             referencedRelation: "followup_survey"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "followup_safety_item_survey_municipality_fkey"
+            columns: ["survey_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "followup_survey"
+            referencedColumns: ["id", "municipality_id"]
           },
         ]
       }
@@ -941,6 +3430,7 @@ export type Database = {
           deleted_at: string | null
           enumerator_name: string | null
           id: string
+          municipality_id: string
           person_id: string
           q08_applied_knowledge: string | null
           q14_used_office: string | null
@@ -977,6 +3467,7 @@ export type Database = {
           deleted_at?: string | null
           enumerator_name?: string | null
           id?: string
+          municipality_id?: string
           person_id: string
           q08_applied_knowledge?: string | null
           q14_used_office?: string | null
@@ -1013,6 +3504,7 @@ export type Database = {
           deleted_at?: string | null
           enumerator_name?: string | null
           id?: string
+          municipality_id?: string
           person_id?: string
           q08_applied_knowledge?: string | null
           q14_used_office?: string | null
@@ -1041,6 +3533,153 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "followup_survey_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "followup_survey_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_survey_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_survey_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_survey_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_survey_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_survey_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_survey_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_survey_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_survey_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_survey_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_survey_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_survey_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_survey_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_survey_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_survey_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_survey_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_survey_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_survey_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_survey_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "followup_survey_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
           {
             foreignKeyName: "followup_survey_person_id_fkey"
             columns: ["person_id"]
@@ -1074,6 +3713,7 @@ export type Database = {
           guidance_date: string
           guidance_type_id: string
           id: string
+          municipality_id: string
           person_id: string
           updated_at: string
         }
@@ -1086,6 +3726,7 @@ export type Database = {
           guidance_date: string
           guidance_type_id: string
           id?: string
+          municipality_id?: string
           person_id: string
           updated_at?: string
         }
@@ -1098,6 +3739,7 @@ export type Database = {
           guidance_date?: string
           guidance_type_id?: string
           id?: string
+          municipality_id?: string
           person_id?: string
           updated_at?: string
         }
@@ -1108,6 +3750,153 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "ref_guidance_type"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guidance_record_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guidance_record_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "guidance_record_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "guidance_record_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "guidance_record_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "guidance_record_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "guidance_record_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "guidance_record_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "guidance_record_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "guidance_record_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "guidance_record_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "guidance_record_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "guidance_record_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "guidance_record_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "guidance_record_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "guidance_record_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "guidance_record_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "guidance_record_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "guidance_record_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "guidance_record_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "guidance_record_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
           },
           {
             foreignKeyName: "guidance_record_person_id_fkey"
@@ -1145,6 +3934,7 @@ export type Database = {
           formula: string | null
           id: string
           indicator_type: string
+          municipality_id: string
           name_ar: string | null
           name_en: string
           objective_id: string
@@ -1165,6 +3955,7 @@ export type Database = {
           formula?: string | null
           id?: string
           indicator_type: string
+          municipality_id?: string
           name_ar?: string | null
           name_en: string
           objective_id: string
@@ -1185,6 +3976,7 @@ export type Database = {
           formula?: string | null
           id?: string
           indicator_type?: string
+          municipality_id?: string
           name_ar?: string | null
           name_en?: string
           objective_id?: string
@@ -1202,11 +3994,172 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "indicator_activity_municipality_fkey"
+            columns: ["activity_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "activity"
+            referencedColumns: ["id", "municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
+          {
             foreignKeyName: "indicator_objective_id_fkey"
             columns: ["objective_id"]
             isOneToOne: false
             referencedRelation: "objective"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indicator_objective_municipality_fkey"
+            columns: ["objective_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "objective"
+            referencedColumns: ["id", "municipality_id"]
           },
         ]
       }
@@ -1218,6 +4171,7 @@ export type Database = {
           created_at: string
           indicator_id: string
           is_final: boolean
+          municipality_id: string
           note: string | null
           period_id: string
           updated_at: string
@@ -1229,6 +4183,7 @@ export type Database = {
           created_at?: string
           indicator_id: string
           is_final?: boolean
+          municipality_id?: string
           note?: string | null
           period_id: string
           updated_at?: string
@@ -1240,6 +4195,7 @@ export type Database = {
           created_at?: string
           indicator_id?: string
           is_final?: boolean
+          municipality_id?: string
           note?: string | null
           period_id?: string
           updated_at?: string
@@ -1253,11 +4209,172 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "indicator_snapshot_indicator_municipality_fkey"
+            columns: ["indicator_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "indicator"
+            referencedColumns: ["id", "municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_snapshot_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indicator_snapshot_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_snapshot_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_snapshot_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_snapshot_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_snapshot_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_snapshot_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_snapshot_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_snapshot_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_snapshot_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_snapshot_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_snapshot_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_snapshot_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_snapshot_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_snapshot_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_snapshot_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_snapshot_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_snapshot_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_snapshot_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_snapshot_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_snapshot_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
+          {
             foreignKeyName: "indicator_snapshot_period_id_fkey"
             columns: ["period_id"]
             isOneToOne: false
             referencedRelation: "reporting_period"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indicator_snapshot_period_municipality_fkey"
+            columns: ["period_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "reporting_period"
+            referencedColumns: ["id", "municipality_id"]
           },
         ]
       }
@@ -1265,6 +4382,7 @@ export type Database = {
         Row: {
           created_at: string
           indicator_id: string
+          municipality_id: string
           period_id: string
           target_value: number | null
           updated_at: string
@@ -1272,6 +4390,7 @@ export type Database = {
         Insert: {
           created_at?: string
           indicator_id: string
+          municipality_id?: string
           period_id: string
           target_value?: number | null
           updated_at?: string
@@ -1279,6 +4398,7 @@ export type Database = {
         Update: {
           created_at?: string
           indicator_id?: string
+          municipality_id?: string
           period_id?: string
           target_value?: number | null
           updated_at?: string
@@ -1292,11 +4412,172 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "indicator_target_indicator_municipality_fkey"
+            columns: ["indicator_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "indicator"
+            referencedColumns: ["id", "municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_target_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indicator_target_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_target_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_target_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_target_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_target_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_target_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_target_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_target_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_target_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_target_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_target_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_target_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_target_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_target_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_target_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_target_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_target_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_target_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_target_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_target_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
+          {
             foreignKeyName: "indicator_target_period_id_fkey"
             columns: ["period_id"]
             isOneToOne: false
             referencedRelation: "reporting_period"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indicator_target_period_municipality_fkey"
+            columns: ["period_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "reporting_period"
+            referencedColumns: ["id", "municipality_id"]
           },
         ]
       }
@@ -1313,6 +4594,7 @@ export type Database = {
           main_product: string | null
           matched_initiative_id: string | null
           matched_linkage_id: string | null
+          municipality_id: string
           person_id: string
           request: string
           requested_on: string
@@ -1334,6 +4616,7 @@ export type Database = {
           main_product?: string | null
           matched_initiative_id?: string | null
           matched_linkage_id?: string | null
+          municipality_id?: string
           person_id: string
           request: string
           requested_on?: string
@@ -1355,6 +4638,7 @@ export type Database = {
           main_product?: string | null
           matched_initiative_id?: string | null
           matched_linkage_id?: string | null
+          municipality_id?: string
           person_id?: string
           request?: string
           requested_on?: string
@@ -1380,6 +4664,20 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "linkage_request_initiative_municipality_fkey"
+            columns: ["matched_initiative_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "production_initiative"
+            referencedColumns: ["id", "municipality_id"]
+          },
+          {
+            foreignKeyName: "linkage_request_linkage_municipality_fkey"
+            columns: ["matched_linkage_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "market_linkage"
+            referencedColumns: ["id", "municipality_id"]
+          },
+          {
             foreignKeyName: "linkage_request_matched_initiative_id_fkey"
             columns: ["matched_initiative_id"]
             isOneToOne: false
@@ -1392,6 +4690,153 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "market_linkage"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "linkage_request_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "linkage_request_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "linkage_request_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "linkage_request_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "linkage_request_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "linkage_request_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "linkage_request_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "linkage_request_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "linkage_request_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "linkage_request_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "linkage_request_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "linkage_request_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "linkage_request_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "linkage_request_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "linkage_request_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "linkage_request_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "linkage_request_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "linkage_request_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "linkage_request_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "linkage_request_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "linkage_request_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
           },
           {
             foreignKeyName: "linkage_request_person_id_fkey"
@@ -1424,6 +4869,7 @@ export type Database = {
           id: string
           initiative_id: string
           linked_on: string
+          municipality_id: string
           outcome: string | null
           partnership_id: string
           request: string | null
@@ -1438,6 +4884,7 @@ export type Database = {
           id?: string
           initiative_id: string
           linked_on?: string
+          municipality_id?: string
           outcome?: string | null
           partnership_id: string
           request?: string | null
@@ -1452,6 +4899,7 @@ export type Database = {
           id?: string
           initiative_id?: string
           linked_on?: string
+          municipality_id?: string
           outcome?: string | null
           partnership_id?: string
           request?: string | null
@@ -1468,11 +4916,172 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "market_linkage_initiative_municipality_fkey"
+            columns: ["initiative_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "production_initiative"
+            referencedColumns: ["id", "municipality_id"]
+          },
+          {
+            foreignKeyName: "market_linkage_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "market_linkage_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "market_linkage_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "market_linkage_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "market_linkage_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "market_linkage_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "market_linkage_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "market_linkage_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "market_linkage_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "market_linkage_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "market_linkage_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "market_linkage_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "market_linkage_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "market_linkage_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "market_linkage_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "market_linkage_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "market_linkage_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "market_linkage_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "market_linkage_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "market_linkage_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "market_linkage_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
+          {
             foreignKeyName: "market_linkage_partnership_id_fkey"
             columns: ["partnership_id"]
             isOneToOne: false
             referencedRelation: "partnership"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "market_linkage_partnership_municipality_fkey"
+            columns: ["partnership_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "partnership"
+            referencedColumns: ["id", "municipality_id"]
           },
         ]
       }
@@ -1485,6 +5094,7 @@ export type Database = {
           deleted_at: string | null
           id: string
           initiative_id: string
+          municipality_id: string
           session_date: string
           topic: string
           updated_at: string
@@ -1497,6 +5107,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           initiative_id: string
+          municipality_id?: string
           session_date: string
           topic: string
           updated_at?: string
@@ -1509,6 +5120,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           initiative_id?: string
+          municipality_id?: string
           session_date?: string
           topic?: string
           updated_at?: string
@@ -1520,6 +5132,160 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "production_initiative"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentorship_session_initiative_municipality_fkey"
+            columns: ["initiative_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "production_initiative"
+            referencedColumns: ["id", "municipality_id"]
+          },
+          {
+            foreignKeyName: "mentorship_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentorship_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "mentorship_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "mentorship_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "mentorship_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "mentorship_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "mentorship_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "mentorship_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "mentorship_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "mentorship_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "mentorship_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "mentorship_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "mentorship_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "mentorship_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "mentorship_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "mentorship_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "mentorship_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "mentorship_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "mentorship_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "mentorship_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "mentorship_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
           },
         ]
       }
@@ -1533,6 +5299,7 @@ export type Database = {
           deleted_at: string | null
           id: string
           is_achieved: boolean
+          municipality_id: string
           name: string
           notes: string | null
           updated_at: string
@@ -1546,6 +5313,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           is_achieved?: boolean
+          municipality_id?: string
           name: string
           notes?: string | null
           updated_at?: string
@@ -1559,8 +5327,196 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           is_achieved?: boolean
+          municipality_id?: string
           name?: string
           notes?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "milestone_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "milestone_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "milestone_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "milestone_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "milestone_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "milestone_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "milestone_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "milestone_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "milestone_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "milestone_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "milestone_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "milestone_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "milestone_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "milestone_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "milestone_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "milestone_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "milestone_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "milestone_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "milestone_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "milestone_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "milestone_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
+        ]
+      }
+      municipality: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          is_active: boolean
+          name_ar: string | null
+          name_en: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          name_ar?: string | null
+          name_en: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          name_ar?: string | null
+          name_en?: string
+          slug?: string
           updated_at?: string
         }
         Relationships: []
@@ -1570,6 +5526,7 @@ export type Database = {
           code: string
           created_at: string
           id: string
+          municipality_id: string
           name_ar: string | null
           name_en: string
           result_statement_en: string | null
@@ -1580,6 +5537,7 @@ export type Database = {
           code: string
           created_at?: string
           id?: string
+          municipality_id?: string
           name_ar?: string | null
           name_en: string
           result_statement_en?: string | null
@@ -1590,13 +5548,162 @@ export type Database = {
           code?: string
           created_at?: string
           id?: string
+          municipality_id?: string
           name_ar?: string | null
           name_en?: string
           result_statement_en?: string | null
           sort_order?: number
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "objective_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "objective_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "objective_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "objective_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "objective_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "objective_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "objective_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "objective_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "objective_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "objective_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "objective_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "objective_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "objective_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "objective_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "objective_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "objective_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "objective_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "objective_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "objective_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "objective_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "objective_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
+        ]
       }
       office_service: {
         Row: {
@@ -1606,6 +5713,7 @@ export type Database = {
           created_by: string | null
           deleted_at: string | null
           id: string
+          municipality_id: string
           notes: string | null
           person_id: string
           service_date: string
@@ -1619,6 +5727,7 @@ export type Database = {
           created_by?: string | null
           deleted_at?: string | null
           id?: string
+          municipality_id?: string
           notes?: string | null
           person_id: string
           service_date: string
@@ -1632,6 +5741,7 @@ export type Database = {
           created_by?: string | null
           deleted_at?: string | null
           id?: string
+          municipality_id?: string
           notes?: string | null
           person_id?: string
           service_date?: string
@@ -1639,6 +5749,153 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "office_service_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "office_service_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "office_service_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "office_service_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "office_service_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "office_service_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "office_service_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "office_service_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "office_service_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "office_service_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "office_service_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "office_service_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "office_service_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "office_service_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "office_service_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "office_service_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "office_service_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "office_service_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "office_service_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "office_service_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "office_service_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
           {
             foreignKeyName: "office_service_person_id_fkey"
             columns: ["person_id"]
@@ -1677,6 +5934,7 @@ export type Database = {
           deleted_at: string | null
           email: string | null
           id: string
+          municipality_id: string
           name: string
           phone: string | null
           unit: string | null
@@ -1689,6 +5947,7 @@ export type Database = {
           deleted_at?: string | null
           email?: string | null
           id?: string
+          municipality_id?: string
           name: string
           phone?: string | null
           unit?: string | null
@@ -1701,12 +5960,161 @@ export type Database = {
           deleted_at?: string | null
           email?: string | null
           id?: string
+          municipality_id?: string
           name?: string
           phone?: string | null
           unit?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
+        ]
       }
       partner_contribution: {
         Row: {
@@ -1719,6 +6127,7 @@ export type Database = {
           entity_id: string | null
           entity_type: string | null
           id: string
+          municipality_id: string
           partnership_id: string
           updated_at: string
         }
@@ -1732,6 +6141,7 @@ export type Database = {
           entity_id?: string | null
           entity_type?: string | null
           id?: string
+          municipality_id?: string
           partnership_id: string
           updated_at?: string
         }
@@ -1745,16 +6155,171 @@ export type Database = {
           entity_id?: string | null
           entity_type?: string | null
           id?: string
+          municipality_id?: string
           partnership_id?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "partner_contribution_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_contribution_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_contribution_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_contribution_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_contribution_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_contribution_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_contribution_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_contribution_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_contribution_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_contribution_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_contribution_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_contribution_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_contribution_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_contribution_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_contribution_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_contribution_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_contribution_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_contribution_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_contribution_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_contribution_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partner_contribution_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
           {
             foreignKeyName: "partner_contribution_partnership_id_fkey"
             columns: ["partnership_id"]
             isOneToOne: false
             referencedRelation: "partnership"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_contribution_partnership_municipality_fkey"
+            columns: ["partnership_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "partnership"
+            referencedColumns: ["id", "municipality_id"]
           },
         ]
       }
@@ -1768,6 +6333,7 @@ export type Database = {
           established_on: string
           id: string
           is_active: boolean
+          municipality_id: string
           partner_id: string
           partner_type_id: string
           partner_type_other: string | null
@@ -1783,6 +6349,7 @@ export type Database = {
           established_on: string
           id?: string
           is_active?: boolean
+          municipality_id?: string
           partner_id: string
           partner_type_id: string
           partner_type_other?: string | null
@@ -1798,6 +6365,7 @@ export type Database = {
           established_on?: string
           id?: string
           is_active?: boolean
+          municipality_id?: string
           partner_id?: string
           partner_type_id?: string
           partner_type_other?: string | null
@@ -1806,17 +6374,172 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "partnership_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partnership_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
+          {
             foreignKeyName: "partnership_partner_id_fkey"
             columns: ["partner_id"]
             isOneToOne: false
             referencedRelation: "partner"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "partnership_partner_municipality_fkey"
+            columns: ["partner_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "partner"
+            referencedColumns: ["id", "municipality_id"]
+          },
         ]
       }
       partnership_role: {
         Row: {
           created_at: string
+          municipality_id: string
           partnership_id: string
           role_id: string
           role_other: string | null
@@ -1824,6 +6547,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          municipality_id?: string
           partnership_id: string
           role_id: string
           role_other?: string | null
@@ -1831,6 +6555,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          municipality_id?: string
           partnership_id?: string
           role_id?: string
           role_other?: string | null
@@ -1838,11 +6563,165 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "partnership_role_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partnership_role_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_role_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_role_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_role_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_role_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_role_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_role_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_role_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_role_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_role_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_role_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_role_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_role_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_role_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_role_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_role_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_role_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_role_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_role_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "partnership_role_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
+          {
             foreignKeyName: "partnership_role_partnership_id_fkey"
             columns: ["partnership_id"]
             isOneToOne: false
             referencedRelation: "partnership"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partnership_role_partnership_municipality_fkey"
+            columns: ["partnership_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "partnership"
+            referencedColumns: ["id", "municipality_id"]
           },
         ]
       }
@@ -2001,6 +6880,7 @@ export type Database = {
           is_women_led: boolean | null
           is_youth_led: boolean | null
           main_product: string | null
+          municipality_id: string
           person_id: string
           started_on: string | null
           status: Database["public"]["Enums"]["initiative_status_t"]
@@ -2017,6 +6897,7 @@ export type Database = {
           is_women_led?: boolean | null
           is_youth_led?: boolean | null
           main_product?: string | null
+          municipality_id?: string
           person_id: string
           started_on?: string | null
           status?: Database["public"]["Enums"]["initiative_status_t"]
@@ -2033,6 +6914,7 @@ export type Database = {
           is_women_led?: boolean | null
           is_youth_led?: boolean | null
           main_product?: string | null
+          municipality_id?: string
           person_id?: string
           started_on?: string | null
           status?: Database["public"]["Enums"]["initiative_status_t"]
@@ -2054,6 +6936,153 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_public_activity_type"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "production_initiative_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "production_initiative_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "production_initiative_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "production_initiative_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "production_initiative_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "production_initiative_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "production_initiative_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "production_initiative_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "production_initiative_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "production_initiative_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "production_initiative_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "production_initiative_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "production_initiative_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "production_initiative_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "production_initiative_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "production_initiative_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "production_initiative_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "production_initiative_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "production_initiative_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "production_initiative_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "production_initiative_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
           },
           {
             foreignKeyName: "production_initiative_person_id_fkey"
@@ -2087,6 +7116,7 @@ export type Database = {
           deleted_at: string | null
           description: string | null
           id: string
+          municipality_id: string
           reach_estimate: number | null
           title: string
           updated_at: string
@@ -2099,6 +7129,7 @@ export type Database = {
           deleted_at?: string | null
           description?: string | null
           id?: string
+          municipality_id?: string
           reach_estimate?: number | null
           title: string
           updated_at?: string
@@ -2111,6 +7142,7 @@ export type Database = {
           deleted_at?: string | null
           description?: string | null
           id?: string
+          municipality_id?: string
           reach_estimate?: number | null
           title?: string
           updated_at?: string
@@ -2122,6 +7154,153 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "ref_promotional_channel"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promotional_action_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promotional_action_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "promotional_action_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "promotional_action_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "promotional_action_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "promotional_action_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "promotional_action_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "promotional_action_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "promotional_action_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "promotional_action_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "promotional_action_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "promotional_action_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "promotional_action_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "promotional_action_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "promotional_action_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "promotional_action_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "promotional_action_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "promotional_action_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "promotional_action_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "promotional_action_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "promotional_action_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
           },
         ]
       }
@@ -3227,6 +8406,7 @@ export type Database = {
           end_date: string
           id: string
           is_locked: boolean
+          municipality_id: string
           start_date: string
           updated_at: string
         }
@@ -3236,6 +8416,7 @@ export type Database = {
           end_date: string
           id?: string
           is_locked?: boolean
+          municipality_id?: string
           start_date: string
           updated_at?: string
         }
@@ -3245,10 +8426,159 @@ export type Database = {
           end_date?: string
           id?: string
           is_locked?: boolean
+          municipality_id?: string
           start_date?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "reporting_period_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reporting_period_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "reporting_period_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "reporting_period_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "reporting_period_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "reporting_period_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "reporting_period_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "reporting_period_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "reporting_period_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "reporting_period_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "reporting_period_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "reporting_period_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "reporting_period_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "reporting_period_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "reporting_period_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "reporting_period_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "reporting_period_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "reporting_period_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "reporting_period_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "reporting_period_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "reporting_period_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
+        ]
       }
       training_enrolment: {
         Row: {
@@ -3263,6 +8593,7 @@ export type Database = {
           deleted_at: string | null
           id: string
           met_criteria: boolean | null
+          municipality_id: string
           person_id: string
           registered_on: string
           session_id: string
@@ -3281,6 +8612,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           met_criteria?: boolean | null
+          municipality_id?: string
           person_id: string
           registered_on?: string
           session_id: string
@@ -3299,6 +8631,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           met_criteria?: boolean | null
+          municipality_id?: string
           person_id?: string
           registered_on?: string
           session_id?: string
@@ -3306,6 +8639,153 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "training_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_enrolment_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
           {
             foreignKeyName: "training_enrolment_person_id_fkey"
             columns: ["person_id"]
@@ -3334,6 +8814,13 @@ export type Database = {
             referencedRelation: "training_session"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "training_enrolment_session_municipality_fkey"
+            columns: ["session_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "training_session"
+            referencedColumns: ["id", "municipality_id"]
+          },
         ]
       }
       training_session: {
@@ -3353,6 +8840,7 @@ export type Database = {
           is_cancelled: boolean
           is_delivered: boolean
           is_published: boolean
+          municipality_id: string
           origin: string
           planned_seats: number | null
           start_date: string
@@ -3377,6 +8865,7 @@ export type Database = {
           is_cancelled?: boolean
           is_delivered?: boolean
           is_published?: boolean
+          municipality_id?: string
           origin?: string
           planned_seats?: number | null
           start_date: string
@@ -3401,6 +8890,7 @@ export type Database = {
           is_cancelled?: boolean
           is_delivered?: boolean
           is_published?: boolean
+          municipality_id?: string
           origin?: string
           planned_seats?: number | null
           start_date?: string
@@ -3418,6 +8908,160 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "training_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_session_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "training_session_partnership_municipality_fkey"
+            columns: ["delivered_by_partnership_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "partnership"
+            referencedColumns: ["id", "municipality_id"]
+          },
+          {
             foreignKeyName: "training_session_topic_id_fkey"
             columns: ["topic_id"]
             isOneToOne: false
@@ -3432,6 +9076,7 @@ export type Database = {
         Row: {
           actual: number | null
           denominator: number | null
+          municipality_id: string | null
           period_code: string | null
         }
         Relationships: []
@@ -3440,6 +9085,7 @@ export type Database = {
         Row: {
           actual: number | null
           denominator: number | null
+          municipality_id: string | null
           period_code: string | null
         }
         Relationships: []
@@ -3448,6 +9094,7 @@ export type Database = {
         Row: {
           actual: number | null
           denominator: number | null
+          municipality_id: string | null
           period_code: string | null
         }
         Relationships: []
@@ -3456,6 +9103,7 @@ export type Database = {
         Row: {
           actual: number | null
           denominator: number | null
+          municipality_id: string | null
           period_code: string | null
         }
         Relationships: []
@@ -3464,6 +9112,7 @@ export type Database = {
         Row: {
           actual: number | null
           denominator: number | null
+          municipality_id: string | null
           period_code: string | null
         }
         Relationships: []
@@ -3472,6 +9121,7 @@ export type Database = {
         Row: {
           actual: number | null
           denominator: number | null
+          municipality_id: string | null
           period_code: string | null
         }
         Relationships: []
@@ -3480,6 +9130,7 @@ export type Database = {
         Row: {
           actual: number | null
           denominator: number | null
+          municipality_id: string | null
           period_code: string | null
         }
         Relationships: []
@@ -3488,6 +9139,7 @@ export type Database = {
         Row: {
           actual: number | null
           denominator: number | null
+          municipality_id: string | null
           period_code: string | null
         }
         Relationships: []
@@ -3496,6 +9148,7 @@ export type Database = {
         Row: {
           actual: number | null
           denominator: number | null
+          municipality_id: string | null
           period_code: string | null
         }
         Relationships: []
@@ -3504,6 +9157,7 @@ export type Database = {
         Row: {
           actual: number | null
           denominator: number | null
+          municipality_id: string | null
           period_code: string | null
         }
         Relationships: []
@@ -3512,6 +9166,7 @@ export type Database = {
         Row: {
           actual: number | null
           denominator: number | null
+          municipality_id: string | null
           period_code: string | null
         }
         Relationships: []
@@ -3520,6 +9175,7 @@ export type Database = {
         Row: {
           actual: number | null
           denominator: number | null
+          municipality_id: string | null
           period_code: string | null
         }
         Relationships: []
@@ -3528,6 +9184,7 @@ export type Database = {
         Row: {
           actual: number | null
           denominator: number | null
+          municipality_id: string | null
           period_code: string | null
         }
         Relationships: []
@@ -3536,6 +9193,7 @@ export type Database = {
         Row: {
           actual: number | null
           denominator: number | null
+          municipality_id: string | null
           period_code: string | null
         }
         Relationships: []
@@ -3544,6 +9202,7 @@ export type Database = {
         Row: {
           actual: number | null
           denominator: number | null
+          municipality_id: string | null
           period_code: string | null
         }
         Relationships: []
@@ -3552,6 +9211,7 @@ export type Database = {
         Row: {
           actual: number | null
           denominator: number | null
+          municipality_id: string | null
           period_code: string | null
         }
         Relationships: []
@@ -3560,6 +9220,7 @@ export type Database = {
         Row: {
           actual: number | null
           denominator: number | null
+          municipality_id: string | null
           period_code: string | null
         }
         Relationships: []
@@ -3568,6 +9229,7 @@ export type Database = {
         Row: {
           actual: number | null
           denominator: number | null
+          municipality_id: string | null
           period_code: string | null
         }
         Relationships: []
@@ -3576,6 +9238,7 @@ export type Database = {
         Row: {
           actual: number | null
           denominator: number | null
+          municipality_id: string | null
           period_code: string | null
         }
         Relationships: []
@@ -3584,6 +9247,7 @@ export type Database = {
         Row: {
           actual: number | null
           denominator: number | null
+          municipality_id: string | null
           period_code: string | null
         }
         Relationships: []
@@ -3593,6 +9257,7 @@ export type Database = {
           actual: number | null
           code: string | null
           denominator: number | null
+          municipality_id: string | null
           period_code: string | null
         }
         Relationships: []
@@ -3602,6 +9267,7 @@ export type Database = {
           age_band: string | null
           code: string | null
           disability_status: string | null
+          municipality_id: string | null
           period_code: string | null
           refugee_status: string | null
           sex: string | null
@@ -3620,6 +9286,7 @@ export type Database = {
           indicator_type: string | null
           is_disaggregable: boolean | null
           is_manual: boolean | null
+          municipality_id: string | null
           name_ar: string | null
           name_en: string | null
           objective_code: string | null
@@ -3634,7 +9301,155 @@ export type Database = {
           target: number | null
           unit: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_a1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_b1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_c1_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_d0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_e0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_f0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_1"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_2"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_3"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_g0_4"
+            referencedColumns: ["municipality_id"]
+          },
+          {
+            foreignKeyName: "indicator_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "v_ind_imp_0"
+            referencedColumns: ["municipality_id"]
+          },
+        ]
       }
       v_opportunity: {
         Row: {
@@ -3828,6 +9643,7 @@ export type Database = {
       }
     }
     Functions: {
+      actor_display_name: { Args: { p_actor: string }; Returns: string }
       age_band: {
         Args: { p: Database["public"]["Tables"]["person"]["Row"] }
         Returns: string
@@ -3845,6 +9661,7 @@ export type Database = {
           p_client_uuid?: string
           p_date_of_birth?: string
           p_full_name?: string
+          p_municipality_slug?: string
           p_national_id: string
           p_opportunity_id: string
           p_opportunity_type: string
@@ -3870,6 +9687,10 @@ export type Database = {
           p_scope: string
         }
         Returns: Json
+      }
+      attach_standard_triggers: {
+        Args: { p_allow_hard_delete?: boolean; p_table: string }
+        Returns: undefined
       }
       attach_updated_at: { Args: { p_table: string }; Returns: undefined }
       bump_lookup_throttle: {
@@ -3970,6 +9791,7 @@ export type Database = {
         }
         Returns: Json
       }
+      my_municipality: { Args: never; Returns: string }
       my_person_id: { Args: never; Returns: string }
       overview_counts: {
         Args: {
@@ -4039,6 +9861,7 @@ export type Database = {
           p_date_of_birth?: string
           p_initiative_title: string
           p_main_product?: string
+          p_municipality_slug?: string
           p_national_id: string
           p_phone?: string
           p_request: string
@@ -4141,7 +9964,10 @@ export type Database = {
         }
         Returns: Json
       }
-      snapshot_period: { Args: { p_period_code: string }; Returns: number }
+      snapshot_period: {
+        Args: { p_municipality_id?: string; p_period_code: string }
+        Returns: number
+      }
       start_followup: {
         Args: {
           p_client_uuid?: string
@@ -4224,12 +10050,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -4253,11 +10079,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -4278,11 +10104,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -4303,11 +10129,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -4320,11 +10146,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }

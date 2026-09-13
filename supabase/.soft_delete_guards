@@ -11,6 +11,7 @@ linkage_request guarded
 market_linkage guarded
 mentorship_session guarded
 milestone guarded
+municipality guarded
 office_service guarded
 partner guarded
 partner_contribution guarded

@@ -163,6 +163,7 @@ fine.
 | `useSetMilestone` | a write that succeeded, an indicator that moved, a mutation with an `onSuccess` that invalidated queries | the query the SCREEN renders. It invalidated `['indicators']` and not `['manual','milestones']`, so the button still said "Mark achieved" after achieving it |
 | `detail.state.submitted` | a sentence naming the four follow-up indicators, on a page that had just computed the right three | agreement with the computed list one screen earlier. C1 was named for a survey whose C1 denominator was 0 |
 | `cannot_verify` on the three public screens | a clear, sympathetic refusal naming a cause and an action | a true cause. It is also what the RATE LIMITER returns, so a correct national ID was told to check itself against the card and visit the Municipality office |
+| The twenty `v_ind_*` leaf views | a checklist step saying `authed_select` must be false for all 20, and a loop in `0015` that revoked them | the revoke, on the four survey views. Each was recreated by `0080`–`0098`, regained the schema's default SELECT grant to `authenticated`, and nobody re-ran the step. A `create view` **re-grants**; a revoke done once is a snapshot of the day it ran. Found by `0114`, which recreates all twenty and asserts the grant is gone |
 
 In each case the thing that would normally be checked *was there*. The file
 existed. The key existed. The comment existed. The translation key existed. Any
