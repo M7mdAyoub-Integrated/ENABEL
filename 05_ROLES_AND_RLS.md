@@ -1127,3 +1127,27 @@ definer and table RLS does nothing for them.
 0118 is the template: as the Sahel Horan admin, as the Ramtha admin, and as the
 super admin both switched in and not, in a savepoint that is discarded — every
 scoped table, not a sample.
+
+**A person's own rows are not gated by municipality — decided 14 September
+2026.** Two policies read a row by its person rather than its municipality:
+`linkage_request.op_read_self` (`person_id = my_person_id()`) and the first
+half of `exhibition_registration.er_select`. Part 7 of the Ramtha work asked
+whether that is a gap. It is not, and it stays:
+
+- the reader only ever sees rows that are about themself. The gate above
+  exists to keep one municipality's *staff* out of the other's records; a
+  participant reading their own application is the case the gate was never
+  about;
+- the identity is one row in `person` for both programmes ("identity is
+  shared", `09_MULTI_MUNICIPALITY.md` Part 3). Hiding a person's own Ramtha
+  request from the same person signed in on Sahel Horan's side would be
+  hiding their record from them;
+- both policies are dormant today: no account holds the `participant` role
+  and the portal is retired. If a portal returns, the *page* decides which
+  municipality it lists — as `my_applications` already does for the public
+  side, by slug — and the policy stays the person's.
+
+Verified as `producer@shm.test` (the one participant fixture) in a discarded
+transaction: one linkage request visible and it is their own, one
+registration visible and it is their own, one `person` row (self), no Ramtha
+table row, no `v_indicator_progress` row.

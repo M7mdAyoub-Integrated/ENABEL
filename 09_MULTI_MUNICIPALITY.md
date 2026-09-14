@@ -642,3 +642,145 @@ switcher exists (Part 2); a comparison across municipalities would need a
 row per municipality per indicator with targets to compare against, and
 every Ramtha target is null, so there would be nothing to compare. Left for
 when targets exist.
+
+---
+
+## Part 7 — verification (migration 0133)
+
+Everything below was run against the live project on 14 September 2026,
+as the role named, in transactions that were rolled back unless the row
+was made through the screen — and every row made through the screen was
+removed at the end. The statements are in
+`supabase/verification/2026-09-14_part7_probes.sql`.
+
+### Isolation — every scoped table, four account shapes
+
+The 61 tables with a `municipality_id` column, counted as the owner and
+then as each account (`set local role authenticated` + the account's
+claims), the count read through `query_to_xml` so one statement covers the
+catalogue rather than a sample:
+
+| as | Sahel Horan tables | Ramtha tables | shared |
+|---|---|---|---|
+| owner | 20 indicators, 260 targets, 13 periods, every operational count as the baseline | 18, 234, 13, and the probe rows then live | — |
+| `coordinator@shm.test` | **every table equal to its Sahel Horan count** | **0 in all 26** | `person` all rows; `audit_log` Sahel Horan rows plus the 904 rows about shared tables (`person`, `app_user`, `ref_*`, `municipality`), none of Ramtha's |
+| `admin@ramtha.test` | **0 in all** | **every table equal to its Ramtha count** | `person` all rows; `audit_log` Ramtha's 377 plus the same 904 shared |
+| `superadmin@shm.test`, acting Ramtha | 0 | Ramtha's | `app_user` all 8 |
+| `superadmin@shm.test`, acting nowhere | all | all | all |
+
+`rmth_reference_counter` answers `NOSELECT` to every client role: it has no
+grant at all, and only the reference trigger reads it. The views: a Sahel
+Horan coordinator reads 260 rows of `v_indicator_progress`, 260 of
+`v_indicator_actual` (20 codes), 7 of `v_indicator_disaggregated`, and
+**zero** of `v_rmth_indicator_status` and `v_rmth_indicator_unique`; the
+Ramtha admin 234 / 221 (17 codes) / 0 / 18 / 39; a Sahel Horan partner
+viewer 260 progress rows and no Ramtha row; a participant nothing at all.
+None of the 37 `v_ind_*` leaf views is selectable by `authenticated`.
+
+Writes, both directions, counting rows as §16 of `05` insists: a Sahel Horan
+coordinator updating Ramtha's events, thresholds, enrolments or targets —
+**0 rows** each; the Ramtha admin updating Sahel Horan's partners,
+enrolments, targets, milestones or registrations — **0 rows** each. An
+INSERT that names the other municipality outright — `partner`, `rmth_event`,
+`rmth_incubator` — is refused with `42501` from either side.
+
+**One thing the database allows that the screens do not:** a Sahel Horan
+coordinator calling `save_rmth_record` creates a Ramtha-*shaped* row under
+*Sahel Horan's* municipality (it was allocated `SHM-EV-2026-001` before the
+transaction was discarded). Ramtha cannot see it, no Sahel Horan indicator
+reads the table, and no screen offers it — `RequireRamtha` refuses the
+route. It is not blocked at the database because the `rmth_*` tables are the
+*programme's* tables scoped by municipality, and a third municipality
+adopting the same forms would need exactly this. Recorded here so nobody
+reads it as a leak later; if it should be a hard rule, it is one check
+constraint per table naming the municipality, and it is deliberately not
+written.
+
+### The public side
+
+As `anon`: `v_public_opportunity` returns Sahel Horan's eight rows and no
+Ramtha row, with no filter and with either slug; `/sahel-horan` lists them
+and `/ramtha` reads *nothing open at the moment*, as in Part 3.
+
+### Every Ramtha form, through its screen
+
+The seventeen records Part 5 created through the screens as the Ramtha admin
+were used as the "create" step (each was already read back and its
+indicator seen to move on the dashboard). In this part each was **edited**
+through its screen and the figure checked in `v_indicator_actual`, then
+**soft-deleted** through its detail page and the figure checked again. The
+seven open items were answered first, through the Open items screen, so
+that every indicator computed (numeric, text, yes/no and both two-word
+choices, one Decide each):
+
+| form | edit made | figure moved | after delete |
+|---|---|---|---|
+| IMP-0 | consecutive months 2 → 6 (X = 6) | 0 → **1** in 26/Q3 | 0 |
+| SO1-0 | contact date into 26/Q4 | 26/Q3 → **26/Q4** | 0 |
+| A1.2 | event dates into 26/Q4 | 26/Q3 → **26/Q4**; A1.3 unmoved | 0; the session held inside it still counts 1 for A1.3 |
+| A1.3 | session date into 26/Q4 | → **26/Q4** | 0 |
+| B1 | interview date into 26/Q4 | 100/1 → **26/Q4 100/1** | ∅/0 |
+| B1.1 | completed date into 26/Q4 | → **26/Q4** | 0 |
+| B1.2 | decision → *Rejected*, dated 26/Q4 | **stays 26/Q3 = 1** — counted once, on first approval, as the sheet says | 0 |
+| SO2-0 | contact date to three months after the cycle end | `three_month_reached` derived to true; ∅/0 → **26/Q4 100/1** | ∅/0 |
+| C1 | headline → *No, not at all* | 100/1 → **0.0/1** | ∅/0 |
+| C1.1 | cycle dates into 26/Q3 (it had ended in June, before any period) | 0 → **1**; C1.2 followed it, 0 → 1 | 0, and C1.2 with it |
+| C1.2 | completion criteria → *No* | 1 → **0**, unique 1 → 0 | 0 |
+| SO3-0 | months of six 5 → 3 (rule = 4) | 1 → **0** | 0 |
+| E0.1 | achieved date into 26/Q4 | → **26/Q4** | 0; **restored through the screen: 1 again** |
+| E0.2 | admission date into 26/Q4 | → **26/Q4** | 0 |
+| E0.3 | completion criteria → *No* | 1 → **0**, unique → 0 | 0 |
+| F0.1 | completed → *No* | 1 → **0**, unique → 0 | 0 |
+| F0.2 | development complete → *In development* | 1 → **0** (programmes reading); under *sessions* the one delivery counts 1 | 0 |
+
+At the end every one of Ramtha's 221 `v_indicator_actual` rows read zero or
+∅/0.
+
+### The counting rules, in discarded transactions as the Ramtha admin
+
+- **C1.2, one person on three cycles** = **3**, `v_rmth_indicator_unique`
+  = **1**, and `save_rmth_record` derived `counted_under_id` on the second
+  and third (null, then the first record's id twice). A 13-week cycle among
+  them fails C1.1's *no more than 12 weeks* and C1.1 reads 2, not 3.
+- **A1.2 and A1.3 never both count the same event.** With both probe events
+  live, 1 and 1. The networking event marked *solely a vocational guidance
+  session*: A1.2 0, A1.3 still 1. The decision cleared to undecided: A1.2 0.
+- **E0.2 counts unique participants** (the sheet's line, not the plan's
+  "one record per participant per incubator" — OQ-48): the same person
+  admitted to a second incubator is two service rows and **1**.
+
+### Found: the unique-completer view read a derived field (0133)
+
+The first run of the C1.2 probe inserted the three enrolments directly and
+`v_rmth_indicator_unique` answered **3**: it counted enrolments whose
+`counted_under_id` was null, and that field is worked out by the RPC at the
+moment a record is saved. A row that reaches the table any other way, an
+earlier completion later withdrawn, an earlier record edited from *No* to
+*Yes* after a later one was saved — each leaves the field saying something
+the rows no longer do. 0133 recreates the view to count people from the
+spine, as every other person-level view here already does: a person is
+unique in the quarter of their first qualifying completion by cycle end
+date. The probe in the migration withdraws completions one by one and
+watches the person move. `counted_under_id` stays on the form as the
+enumerator's note. The register in `CLAUDE.md` has the row.
+
+### `linkage_request.op_read_self`
+
+Kept. The decision and the probe are in `05_ROLES_AND_RLS.md` §17.
+
+### Clean-up, and both municipalities back at their baselines
+
+Every test row was removed as the owner with `app.allow_hard_delete = on`,
+per the one sanctioned exception in `07_BUILD_CHECKLIST.md` (build-phase
+rows are not records of anything): the 23 `rmth_*` data tables emptied,
+children before parents (76 rows), the nine reference-counter rows, the four
+probe persons `399000101`–`399000104`, and the ten threshold rows set back
+to null with no decision date. `audit_log` keeps every row, as it must.
+
+Afterwards: Sahel Horan's 20-indicator matrix and both whole-view hashes on
+the original projections equal `supabase/baselines/2026-09-13`; every
+Sahel Horan table's live and soft-deleted counts equal the baseline's
+(`applicant_lookup_throttle` 2 → 3 is a rate-limit counter from the public
+probes, OQ-21); Ramtha's 221 view rows are all zero or ∅/0, its status view
+reads 9 `threshold_unset` and 1 `no_statement` as seeded, and `person` is
+back at 7 rows, 3 deleted.
