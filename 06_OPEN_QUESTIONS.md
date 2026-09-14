@@ -1463,3 +1463,72 @@ continue is the third state, where the form asks and the database does not hear.
 
 **Decides.** M&E lead — is the activity profile wanted for reporting at all? If
 yes it is a small piece of work; if no, the two controls should go.
+
+---
+
+## 🟡 OQ-46 · The 613 Ramtha option labels carry drafted Arabic, not the Municipality's
+
+**Added 14 September 2026**, with migration `0122`.
+
+`RMTH_indicator_forms.xlsx` gives every response option in English and none
+in Arabic. The 106 `ref_rmth_*` lists were seeded with English verbatim from
+the sheets and Arabic drafted for this platform — the alternative, null
+`label_ar` as `0016` chose for Sahel Horan, would have put 613 English options
+in front of an Arabic-speaking enumerator on day one, which is the position
+OQ-32 describes as blocking a survey in the field.
+
+The line OQ-32 draws was applied: a plain phrase or category ("Job fair",
+"Private company", "Yes, to some extent") is drafted; nothing here names a
+Jordanian regulatory document that a beneficiary would be sent to fetch. The
+rows closest to that line are the **evidence lists** — what the enumerator
+ticks as "on file" — which name record types rather than instruct a person:
+
+| list | rows naming a document or record |
+|---|---|
+| `ref_rmth_imp0_verification`, `ref_rmth_so20_verification`, `ref_rmth_so30_verification` | social security record; business registration or licence; sales, invoice or wallet records; employer confirmation letter |
+| `ref_rmth_b1_evidence`, `ref_rmth_b12_evidence` | approval or licence copy; signed approval decision; conditions letter |
+| `ref_rmth_c11_joint_evidence`, `ref_rmth_e01_evidence` | memorandum of understanding; governance document or terms of reference; municipal decision establishing the incubator |
+| `ref_rmth_a12_evidence`, `ref_rmth_a13_evidence`, `ref_rmth_c12_evidence`, `ref_rmth_e03_evidence`, `ref_rmth_f01_evidence` | attendance sheet with names and National IDs; certificate copy |
+
+These are filing categories for staff, not questions a beneficiary acts on,
+so they were drafted too; they are listed so the review starts there.
+
+**What would settle it.** The Municipality reads the Arabic of the 106 lists
+(`select code, label_en, label_ar from ref_rmth_<list> order by sort_order`,
+or the form screens with the interface set to Arabic) and corrects any label
+by updating the row. No migration is needed; `label_ar` is data.
+
+**Decides.** Ramtha Municipality's M&E focal point.
+
+---
+
+## 🔴 OQ-47 · Seven Ramtha definitions are undecided, and the indicators that read them say so
+
+**Added 14 September 2026**, with migration `0123`. This is the forms index's
+own "Open items — decide these before the forms go into use" list, restated
+as the questions the M&E lead has to answer, and the place the answers go.
+
+Each lives in `rmth_threshold` as a row with a null value. Every indicator
+view that reads one returns **not computable** — null, with the missing
+definition named — until the value is set. Never zero. Answering is an
+UPDATE on the row (`value_numeric` / `value_text` / `value_bool`, with
+`decided_by` and `decided_on`), which a coordinator of Ramtha or a super
+admin may do from SQL today and from a screen when one is built; it is not a
+migration.
+
+| # | question | key(s) | blocks |
+|---|---|---|---|
+| 1 | **Sustained engagement.** How many consecutive months (X) count as sustained? And the Action Plan writes the calculation as a ratio while the target is 65 persons — is a **count** what is reported? | `imp0_sustained_months` | RMTH-IMP-0 |
+| 2 | **Short-term intensive.** No definition exists. No more than how many weeks, and at least how many contact hours per week? | `c11_max_weeks`, `c11_min_hours_per_week` | RMTH-SO2-C1.1 |
+| 3 | **Regular income.** The form proposes income in at least four of the last six months. Confirm, or change the number. | `so30_income_months_of_six` | RMTH-SO3-0 |
+| 4 | **Completion criteria.** For each of C1.2, E0.3 and F0.1: what attendance threshold, which assessment result, and (C1.2) job-ready, so that two enumerators produce the same total? E0.3's rule must include at least one incubator-design module; F0.1's at least one of production practices, quality standards or business management. | `c12_completion_rule`, `e03_completion_rule`, `f01_completion_rule` | RMTH-SO2-C1.2, RMTH-SO3-E0.3, RMTH-SO3-F0.1 |
+| 5 | **Self-employment as placement.** The indicator says employment or internship; the form keeps "Yes - into self-employment" on its own line. Does it count? | `so20_self_employment_counts` | RMTH-SO2-0 |
+| 6 | **Programmes or sessions.** The framework counts programmes developed; the Action Plan counts training sessions delivered. Which reading governs F0.2? | `f02_counting_reading` (`programmes` / `sessions`) | RMTH-SO3-F0.2 |
+| 7 | **Employability threshold.** The form counts a confirmed placement, or one verifiable step plus one other; the Action Plan's equivalent counts confirmed employment only. Which? | `so10_employability_threshold` (`form_rule` / `placement_only`) | RMTH-SO1-0 |
+
+Until these are answered, nine of Ramtha's 18 indicators cannot produce a
+number. Eight do not depend on them (A1.2, A1.3, B1, B1.1, B1.2, SO2-C1,
+E0.1, E0.2), and SO1-A1 has no statement at all (OQ-48, Part 6).
+
+**Decides.** Ramtha's M&E lead with ENABEL, for the count-versus-ratio half of
+item 1 and for item 6, where the two source documents disagree.

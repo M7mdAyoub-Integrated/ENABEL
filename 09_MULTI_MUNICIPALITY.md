@@ -339,3 +339,132 @@ Sahel Horan's public list returns the same eight rows, asserted inside 0120
 against a copy taken at its start; the baseline hashes of
 `v_indicator_disaggregated` and `v_indicator_progress` match after 0120 and
 0121. No indicator view was touched.
+
+---
+
+## Part 4 — Ramtha's domain tables (migrations 0122–0126)
+
+### What the seventeen sheets said, read in full first
+
+Every sheet of `RMTH_indicator_forms.xlsx` states its unit of observation,
+who completes it, when, **how the indicator is calculated from it** (that line
+is the specification, quoted in the migration headers and never paraphrased),
+the required disaggregation, and its fields with the response options. The
+index adds seven open items, the identifiers it issues, the never-sum rule for
+A1.2/A1.3, and two gaps in the framework (SO1-A1 has no statement; E0.3 is a
+proposed code). The Framework workbook's `English_form` has no targets at all;
+its `English Copy` has targets against a different indicator list.
+
+### Seventeen forms onto ten record tables (0125)
+
+| table | forms | what one row is |
+|---|---|---|
+| `rmth_event` | A1.2, A1.3 | a networking event or a guidance session — `event_kind`, one kind each, a session may name its parent networking event |
+| `rmth_proposal` | B1.2 | a proposal, which on approval *is* the project B1 and B1.1 quote |
+| `rmth_training_programme` | B1.1, F0.2 | a specialised or an entrepreneurship programme |
+| `rmth_training_cycle` | C1.1, E0.3, F0.2's delivery log | an employability cycle (RMTH-TC), an incubator-design cycle (RMTH-ID), or one delivery of an entrepreneurship programme |
+| `rmth_training_enrolment` | C1.2, E0.3, F0.1 | a person on a cycle, kind copied from the cycle |
+| `rmth_project_implementer` | B1 | one implementer (not one project), with `rmth_implementer_support` as its grid |
+| `rmth_incubator` | E0.1 | an incubator, with `rmth_incubator_service_live` as criterion 5 |
+| `rmth_enterprise` | — | the RMTH-EN entity E0.2 and SO3-0 issue |
+| `rmth_incubation_service` | E0.2 | one participant in one incubator |
+| `rmth_outcome_survey` | IMP-0, SO1-0, SO2-0, SO2-C1, SO3-0 | one follow-up, `survey_kind`, each kind kept to its own columns by check constraint |
+
+Departures from the plan's list, each argued in 0125's header: no
+`rmth_project` (the approved proposal is the project — B1.2's own words); an
+`rmth_enterprise` is added (E0.2: "one ID per ENTERPRISE, not per person");
+incubator-design training is a cycle kind, not a programme type (E0.3 quotes
+RMTH-ID cycle references); F0.1 enrolments hang off a delivery row rather than
+the programme, so F0.2's log and F0.1's roster are one set of dates. The five
+outcome surveys are one table, as the plan read them and as the sheets bear
+out: the identification block is identical, the questions are not.
+
+Every multi-select is a row in the table's single `rmth_<table>_option`
+junction — the shape 0075 gave the follow-up survey — guarded by
+`guard_rmth_option` (0124), which knows which lists belong on which table and
+refuses an "Other" with nothing specified. Every single-select is a real
+foreign key into its own `ref_rmth_*` list, and `guard_rmth_other` enforces the
+companion `*_other` column in both directions.
+
+### The 106 option lists (0122)
+
+One `ref_rmth_*` table per response list, 613 options, English **verbatim**
+from the sheets in the sheets' order — checked by script against the workbook
+text, not by eye (every one of the 613 labels was found in the workbook after
+normalising the `_______` blanks). Seven lists serve more than one sheet and
+exist once; where two sheets' lists differ by a single option they are two
+tables, and no Sahel Horan list was borrowed (Ramtha's nationality list is
+three options, not `ref_nationality`'s four). `supabase/ramtha/lists.py` is
+the catalogue; `gen_0122.py` wrote the migration from it.
+
+**Arabic.** The workbook has no Arabic for the forms. The 613 labels carry
+Arabic drafted for this platform under OQ-32's rule (a plain phrase may be
+drafted; a named regulatory artefact may not be invented) rather than null,
+because a Ramtha enumerator reading a form in Arabic with English options is
+not using a bilingual form. OQ-46 lists them for the Municipality's review and
+names the evidence lists that mention documents.
+
+### The counting fields (plan §5.3)
+
+Six are judgements and are stored as decisions with who and when, stamped by
+`rmth_stamp_decision` whenever the value changes: `solely_guidance` (A1.2 —
+`false` is "No, record it here" and counts; `true` belongs under A1.3 and does
+not), `tailoring_met` (B1.1), `development_complete_id` (F0.2),
+`joint_development_met` (C1.1), `met_criteria` (C1.2, E0.3, F0.1),
+`established_id` (E0.1). Four "must follow arithmetically" from numbers the
+form records (IMP-0's months, SO3-0's months of six, C1.1's weeks and hours,
+SO2-0's placement date): the recorded answer is kept as the sheet has it and
+the view (Part 6) recomputes from the numbers and the threshold, so a
+disagreement is visible. Two derive from other answers (SO1-0's threshold from
+its three questions; B1's numerator and denominator from the grid and three
+conditions) and are computed by the save function into their columns.
+
+B1.2's "counted once, on first approval" is `first_approved_on`, set by
+trigger the first time the decision is an approval and refused any later
+change, so a proposal later rejected stays in the quarter it was counted in.
+
+### The seven open items (0123)
+
+`rmth_threshold` holds ten rows for the index's seven items, every value
+null, each with the open item's text in both languages. The views read the
+value through `rmth_threshold_numeric/text/bool`; a null makes the indicator
+**not computable**, named, never zero. Answering is an UPDATE with
+`decided_by` and `decided_on` — a data change, not a migration. OQ-47.
+
+### Identifiers (0124)
+
+`rmth_next_reference` issues `RMTH-EV-2026-001`-shaped references per
+municipality code, prefix and year under a row lock; `rmth_assign_reference`
+fills a null `reference` on insert (EV/VG by event kind, TP/EP by programme
+type, TC/ID by cycle kind, PP, IN, EN), taking the year from the record's own
+date where it has one. A reference typed from a paper form is kept if it has
+the shape. Entrepreneurship deliveries are numbered within their programme
+(`cycle_no`) instead, as F0.2's log has it.
+
+### Evidence (0126)
+
+The `evidence` bucket's three policies said `is_staff()` and nothing about
+municipality: a Ramtha enumerator who knew the path could read a Sahel Horan
+photograph. Every object now lives under `<municipality_id>/<entity_type>/
+<entity_id>/`, the first folder is what the bucket policies check through
+`can_see_municipality`, `attachment.storage_path` must start with its row's
+municipality, `entity_type` is constrained to the tables that carry evidence,
+and removal is a coordinator's (soft-delete the row, then the object). The
+0012 update policy is dropped: an object is replaced, never edited. Verified
+as both admins in a discarded savepoint. The screen half is Part 5.
+
+### Verified
+
+Inside each migration, as the owner for the mechanics and as the two admins
+for the gate, all discarded: references issue per kind and year and carry the
+municipality's code; a session cannot parent a session; a guidance session
+refuses a networking column; an "Other" without its text is refused; the
+option junction refuses a survey question on an event and an option from the
+wrong list; a deferred proposal is not counted, an approval sets
+`first_approved_on`, a later rejection does not move it; a delivery row gets no
+reference and an employability cycle refuses a programme; an enrolment takes
+its cycle's kind and its decision is stamped; the Sahel Horan admin sees no
+Ramtha row and cannot write one; the Ramtha admin sees the probe rows, the
+column default fills Ramtha, and the junction DELETE is permitted. Sahel
+Horan's baseline hashes are unchanged after 0122–0126; every Ramtha table has
+zero rows.
