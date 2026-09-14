@@ -54,6 +54,7 @@ const BASELINE = {
   'nav.json': 0,
   'portal.json': 0,
   'public.json': 0,
+  'rmth.json': 0,
   'survey.json': 108,
 }
 
@@ -63,6 +64,24 @@ const BASELINE = {
  * be an argued exception rather than an assumption.
  */
 const ALLOWED_IDENTICAL = new Set(['Enabel', 'EU', 'SHM', 'JOD', 'M&E'])
+
+/**
+ * Values that are entirely an identifier, not a sentence: an indicator code
+ * (`RMTH-SO1-A1.2`, `SHM-SO1-B1.2`) or a reference format shown to the user as
+ * the shape a reference takes (`(RMTH-EV-YYYY-000)`).
+ *
+ * These are argued, not assumed. A code is the same string in both languages
+ * by design — it is what appears on the paper form, in the donor return and in
+ * `indicator.code` — and "translating" one would make the Arabic screen
+ * disagree with the database. The digits are rendered Western in both
+ * languages already (the latnDigits post-processor), so there is nothing
+ * language-specific left in them.
+ *
+ * The pattern is deliberately narrow: the WHOLE value must be the code,
+ * optionally in parentheses. `RMTH-SO1-A1.2 events held` is prose containing a
+ * code and still has to be translated.
+ */
+const CODE_ONLY = /^\(?(?:RMTH|SHM)(?:-[A-Z0-9.]+)+\)?$/
 
 const flatten = (obj, prefix = '', out = {}) => {
   for (const [k, v] of Object.entries(obj)) {
@@ -96,6 +115,7 @@ for (const file of readdirSync(join(locales, 'en')).sort()) {
     // no language and cannot be translated.
     if (!/\p{L}/u.test(v)) return false
     if (ALLOWED_IDENTICAL.has(v.trim())) return false
+    if (CODE_ONLY.test(v.trim())) return false
     return ar[k] === v
   })
 

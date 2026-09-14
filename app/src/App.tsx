@@ -17,6 +17,11 @@ import DetailScreen from './routes/DetailScreen'
 import ManualEntries from './routes/ManualEntries'
 import Settings from './routes/Settings'
 import Accounts from './routes/Accounts'
+import { RMTH_FORM_IDS } from './rmth/forms.generated'
+import { RequireRamtha } from './rmth/RequireRamtha'
+import { RmthListScreen } from './rmth/RmthListScreen'
+import { RmthFormScreen } from './rmth/RmthFormScreen'
+import { RmthDetailScreen } from './rmth/RmthDetailScreen'
 import NotFound from './routes/NotFound'
 import PublicHome from './routes/public/PublicHome'
 import { PublicChooser, PublicNotFound, PublicSite } from './routes/public/PublicSite'
@@ -382,6 +387,57 @@ const router = createBrowserRouter([
           <RequireCapability capability="accounts.manage">{n}</RequireCapability>
         )),
       },
+
+      // ── Ramtha's seventeen forms ──────────────────────────────────────────
+      //
+      // One set of routes for all seventeen: `:form` is the form id and the
+      // screens read their structure from RMTH_FORMS. RequireRamtha refuses an
+      // id that is not one of the seventeen (a 404, not an empty screen) and
+      // refuses an account whose municipality is not Ramtha, saying why --
+      // RLS would answer an empty list, which looks like a bug.
+      //
+      // The municipality comes from the account, never from the URL (plan
+      // §3.4), so there is no slug here as there is on the public side.
+      //
+      // `/rmth/:form/new` is spelled out ahead of `/rmth/:form/:id`. React
+      // Router ranks a static segment above a dynamic one so the order in this
+      // array does not decide it -- but `/forms/:module/new` beat a splat once
+      // in this file already, so it was confirmed by following the URL rather
+      // than by trusting the ranking.
+      { path: '/rmth', element: <Navigate to={`/rmth/${RMTH_FORM_IDS[0]}`} replace /> },
+      {
+        path: '/rmth/:form',
+        element: guard(<RmthListScreen />, (n) => (
+          <RequireCapability capability="dashboard.view">
+            <RequireRamtha>{n}</RequireRamtha>
+          </RequireCapability>
+        )),
+      },
+      {
+        path: '/rmth/:form/new',
+        element: guard(<RmthFormScreen mode="new" />, (n) => (
+          <RequireCapability capability="record.create">
+            <RequireRamtha>{n}</RequireRamtha>
+          </RequireCapability>
+        )),
+      },
+      {
+        path: '/rmth/:form/:id',
+        element: guard(<RmthDetailScreen />, (n) => (
+          <RequireCapability capability="dashboard.view">
+            <RequireRamtha>{n}</RequireRamtha>
+          </RequireCapability>
+        )),
+      },
+      {
+        path: '/rmth/:form/:id/edit',
+        element: guard(<RmthFormScreen mode="edit" />, (n) => (
+          <RequireCapability capability="record.edit">
+            <RequireRamtha>{n}</RequireRamtha>
+          </RequireCapability>
+        )),
+      },
+
       { path: '/settings', element: <Settings /> },
       { path: '*', element: <NotFound /> },
     ],

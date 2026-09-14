@@ -31,3 +31,24 @@ export const CROSS = '×' // ×
 export const PERCENT = '%'
 /** Range separator between two period codes, e.g. 26/Q3 - 27/Q1. */
 export const RANGE = '–' // en dash
+
+// ── Added for the Ramtha screens ────────────────────────────────────────────
+// Same reasoning as everything above: punctuation, not content. A unit like
+// "KB" is NOT here -- that is a word and it lives in the locale files.
+
+/** Truncation / "still loading". Reads the same in both scripts. */
+export const ELLIPSIS = '…' // …
+/** The required-field marker beside a label. Not the letter x, not a bullet. */
+export const REQUIRED = '*'
+/** Label-to-value separator. U+003A is used in Arabic too; the Arabic comma
+    U+060C is a COMMA and is not a substitute for it. */
+export const COLON = ':'
+/** Ordinal prefix on a delivery number, e.g. #3. */
+export const HASH = '#'
+/** At most / at least, in a threshold summary. Mathematical, not linguistic. */
+export const LTE = '≤' // ≤
+export const GTE = '≥' // ≥
+/** Parentheses around a parenthetical. Listed so a call site does not reach
+    for a bare literal and re-open the hole the rule exists to close. */
+export const PAREN_OPEN = '('
+export const PAREN_CLOSE = ')'

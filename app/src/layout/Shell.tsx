@@ -11,6 +11,7 @@ import { DEMO_MODE } from '../demo/demoMode'
 import { EXTERNAL } from '../ui/glyphs'
 import { MunicipalitySwitcher } from '../components/MunicipalitySwitcher'
 import { useCurrentMunicipality, useMunicipalityName, useProgrammeLine } from '../data/municipalities'
+import { RMTH_FORMS, RMTH_FORM_IDS, type RmthFormId } from '../rmth/forms.generated'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -39,10 +40,35 @@ type Group = { labelKey: string | null; items: Dest[] }
  * heading with nothing under it. Convenience only -- the route guards refuse
  * the same paths and RLS refuses the same data.
  */
+/**
+ * Which nav group a Ramtha form belongs to, DERIVED from its indicator code
+ * rather than listed here.
+ *
+ * `RMTH-SO1-A1.2` -> `so1`, `RMTH-IMP-0` -> `impact`. A hand-written map of
+ * seventeen form ids to four groups is a second copy of something the
+ * definition already states, and CLAUDE.md's register is mostly second copies
+ * that drifted. Add an eighteenth form and it lands in the right group with no
+ * edit here; give one an indicator code in a shape this does not recognise and
+ * it returns undefined, which the caller turns into a visible group rather
+ * than dropping the form silently.
+ */
+function rmthGroupOf(fid: RmthFormId): 'impact' | 'so1' | 'so2' | 'so3' | undefined {
+  const code = (RMTH_FORMS[fid] as { indicator: string }).indicator
+  const part = code.split('-')[1]
+  if (part === 'IMP') return 'impact'
+  if (part === 'SO1') return 'so1'
+  if (part === 'SO2') return 'so2'
+  if (part === 'SO3') return 'so3'
+  return undefined
+}
+
+const RMTH_GROUP_ORDER = ['impact', 'so1', 'so2', 'so3'] as const
+
 function useNavGroups(): Group[] {
   const counts = useNavCounts()
   const { role } = useAuth()
   const allowed = modulesFor(role)
+  const municipality = useCurrentMunicipality()
 
   const mod = (m: ModuleId, num: string): Dest[] =>
     allowed.includes(m)
@@ -132,6 +158,54 @@ function useNavGroups(): Group[] {
     },
     { labelKey: null, items: [{ to: '/settings', labelKey: 'nav:settings', num: '09' }] },
   ]
+
+  // ── Ramtha ────────────────────────────────────────────────────────────────
+  //
+  // Ramtha's seventeen forms replace the Sahel Horan groups entirely when the
+  // acting municipality is Ramtha: they are a different programme, not extra
+  // modules, and the Sahel Horan screens would answer empty lists. The
+  // dashboard, accounts and settings entries above stay, because they are the
+  // platform's rather than either programme's.
+  //
+  // A super admin switching municipality switches this, because
+  // useCurrentMunicipality reads the acting municipality (0117).
+  if (municipality?.code === 'RMTH') {
+    const keep = new Set(['/dashboard', '/accounts', '/settings'])
+    const platform = groups
+      .map((g) => ({ ...g, items: g.items.filter((d) => keep.has(d.to)) }))
+      .filter((g) => g.items.length > 0)
+
+    const byGroup = new Map<string, Dest[]>()
+    let n = 0
+    for (const fid of RMTH_FORM_IDS) {
+      const g = rmthGroupOf(fid)
+      // An unrecognised indicator shape gets its own visible group rather than
+      // being dropped. A form missing from the sidebar is invisible; a form
+      // under a heading nobody expected is a question someone asks.
+      const key = g ?? 'other'
+      n += 1
+      const dest: Dest = {
+        to: `/rmth/${fid}`,
+        // `.short`, not `.title`: the English title is the sheet's full
+        // indicator statement, which belongs on the form page and not in a
+        // 238px rail. Arabic's short and title are the same string.
+        labelKey: `rmth:forms.${fid}.short`,
+        num: String(n).padStart(2, '0'),
+      }
+      byGroup.set(key, [...(byGroup.get(key) ?? []), dest])
+    }
+    const ordered: Group[] = [...RMTH_GROUP_ORDER, 'other']
+      .filter((k) => byGroup.has(k))
+      .map((k) => ({
+        labelKey: k === 'other' ? 'rmth:nav.group.other' : `rmth:nav.group.${k}`,
+        items: byGroup.get(k) ?? [],
+      }))
+
+    return [...platform.slice(0, 1), ...ordered, ...platform.slice(1)].filter(
+      (g) => g.items.length > 0,
+    )
+  }
+
   return groups.filter((g) => g.items.length > 0)
 }
 

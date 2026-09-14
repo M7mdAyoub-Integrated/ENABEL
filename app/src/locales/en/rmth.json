@@ -1,0 +1,1814 @@
+{
+  "forms": {
+    "imp0": {
+      "title": "Number of targeted population who achieve sustained employment/income as a result of Municipality-facilitated economic opportunities",
+      "short": "Sustained engagement",
+      "indicator": "RMTH-IMP-0",
+      "who": "Municipal M&E focal point, by telephone or site visit",
+      "when": "At each follow-up round once the beneficiary reaches the X-month point; reported at end of project",
+      "calc": "A COUNT, not a rate: unique beneficiaries (by National ID) whose engagement is confirmed as sustained for at least X consecutive months. Counted once only, whatever the number of trainings or support mechanisms accessed. Target: 65 persons over 3 years. OPEN ITEM: the Action Plan writes the calculation formula as a ratio; confirm with ENABEL that a count is what is reported.",
+      "disaggregation": "Gender; age; nationality; vulnerability category; type of pathway",
+      "sections": {
+        "s0": "IDENTIFICATION",
+        "s1": "PATHWAY AND ENTRY POINT",
+        "s2": "SUSTAINED ENGAGEMENT",
+        "s3": "VERIFICATION AND COUNTING"
+      },
+      "fields": {
+        "national_id": {
+          "label": "National ID",
+          "help": "The unique key for de-duplication across all forms."
+        },
+        "national_id_confirm": {
+          "label": "National ID (validation - re-enter)",
+          "help": "Must match the field above."
+        },
+        "full_name": {
+          "label": "Full name"
+        },
+        "phone": {
+          "label": "Phone number"
+        },
+        "sex": {
+          "label": "Gender",
+          "help": "Disaggregation.",
+          "opts": {
+            "male": "Male",
+            "female": "Female"
+          }
+        },
+        "age_years": {
+          "label": "Age",
+          "help": "Disaggregation. Record the number; the age bands are derived when reporting."
+        },
+        "nationality_id": {
+          "label": "Nationality",
+          "help": "Disaggregation."
+        },
+        "vulnerability": {
+          "label": "Vulnerability category",
+          "help": "Disaggregation. Select all that apply - a person can fall in more than one."
+        },
+        "pathway_id": {
+          "label": "Through which Municipality-facilitated opportunity did this person FIRST access economic support?",
+          "help": "Disaggregation by type of pathway, following the Action Plan's categories. Record the FIRST access only."
+        },
+        "pathway_refs": {
+          "label": "Reference of that opportunity",
+          "help": "Links this record back to the output form that first registered the person. Every pathway option above has an identifier here, including the internship or facilitated interview route, which is traced through the Event or Session ID.",
+          "parts": {
+            "pathway_event_id": "Event or Session ID (RMTH-EV- / RMTH-VG-...)",
+            "pathway_proposal_id": "Proposal / Project ID (RMTH-PP-...)",
+            "pathway_cycle_id": "Training cycle reference (RMTH-TC- / RMTH-EP-...)",
+            "pathway_incubator_id": "Incubator ID (RMTH-IN-...)",
+            "pathway_enterprise_id": "Enterprise ID (RMTH-EN-...)"
+          }
+        },
+        "first_access_month": {
+          "label": "Month and year of first access",
+          "help": "The clock for the X-month rule starts here."
+        },
+        "round_id": {
+          "label": "Which follow-up round is this?"
+        },
+        "contact_date": {
+          "label": "Date of this contact"
+        },
+        "engaged_id": {
+          "label": "Are you currently engaged in paid employment, self-employment or an income-generating activity?",
+          "help": "Do NOT skip the months question below when the answer is \"No, I stopped\". Someone who was engaged for 12 months and stopped last month still meets the definition."
+        },
+        "capacity_id": {
+          "label": "In what capacity are you engaged, or were you engaged?",
+          "help": "Daily or casual labour counts only where it has been continuous, per the Action Plan's exclusion of short-term, temporary and one-off engagements."
+        },
+        "consecutive_months": {
+          "label": "Number of CONSECUTIVE months engaged, with no break of a month or longer",
+          "help": "Record the number, not a band, so the criterion below can be applied whatever value of X is agreed. For someone who has stopped, record the months completed before stopping.",
+          "sub": "Number of whole months"
+        },
+        "stopped": {
+          "label": "If no longer engaged: month and year of stopping, and main reason",
+          "help": "Optional - for learning and programme management. Not part of the indicator count.",
+          "parts": {
+            "stopped_month": "Month and year",
+            "imp0_stop_reason_id": "Reason"
+          }
+        },
+        "imp0_criterion_id": {
+          "label": "Sustained engagement criterion met?",
+          "help": "THIS FIELD PRODUCES THE INDICATOR COUNT. It must follow arithmetically from the months field above. OPEN ITEM: agree the value of X with the Municipality before first use."
+        },
+        "imp0_verification": {
+          "label": "How was this verified, and what is on file?",
+          "help": "Self-report alone is the weakest source; seek at least one documentary item where possible."
+        },
+        "counted_under_id": {
+          "label": "Has this National ID already been counted for this indicator in a previous round?",
+          "help": "Prevents double counting. Each beneficiary is counted once only, per the Action Plan."
+        },
+        "enumerator_name": {
+          "label": "Enumerator name"
+        }
+      }
+    },
+    "so10": {
+      "title": "# of persons who demonstrate increased employability as a result of municipality facilitated networking opportunities",
+      "short": "Employability after networking",
+      "indicator": "RMTH-SO1-0",
+      "who": "Municipal M&E focal point, by telephone follow-up",
+      "when": "Three to six months after the event attended",
+      "calc": "Count of unique persons meeting the employability threshold: a confirmed placement, OR at least one VERIFIABLE action (interview attended, offer received, internship or placement started, enrolled in training) plus one further action from the checklist. Counted once per person. OPEN ITEM: confirm this threshold with the Municipality - the Action Plan's equivalent result indicator counts confirmed employment only.",
+      "disaggregation": "Gender; age; nationality; vulnerability category; type of event attended",
+      "sections": {
+        "s0": "IDENTIFICATION",
+        "s1": "NETWORKING OPPORTUNITY ATTENDED",
+        "s2": "EMPLOYABILITY CHANGE",
+        "s3": "SCORING AND EVIDENCE"
+      },
+      "fields": {
+        "national_id": {
+          "label": "National ID",
+          "help": "De-duplication key; must match the event attendance sheet."
+        },
+        "full_name": {
+          "label": "Full name"
+        },
+        "phone": {
+          "label": "Phone number"
+        },
+        "sex": {
+          "label": "Gender",
+          "help": "Disaggregation.",
+          "opts": {
+            "male": "Male",
+            "female": "Female"
+          }
+        },
+        "age_years": {
+          "label": "Age",
+          "help": "Disaggregation."
+        },
+        "nationality_id": {
+          "label": "Nationality",
+          "help": "Disaggregation."
+        },
+        "vulnerability": {
+          "label": "Vulnerability category",
+          "help": "Disaggregation."
+        },
+        "event_id": {
+          "label": "Which event is this follow-up attributed to?",
+          "help": "One event only. This is the key for the type-of-event disaggregation.",
+          "sub": "Single Event ID (RMTH-EV-...) or Session ID (RMTH-VG-...)"
+        },
+        "so10_event_type_id": {
+          "label": "Type of that event",
+          "help": "Disaggregation by type of event."
+        },
+        "event_date": {
+          "label": "Date of that event",
+          "help": "Follow-up should be at least three months after this date."
+        },
+        "other_events": {
+          "label": "Any other Municipality-facilitated events attended since?",
+          "help": "Optional - for learning and programme management. Not part of the indicator count.",
+          "sub": "Event or Session IDs"
+        },
+        "reached_id": {
+          "label": "Was the person reached?",
+          "help": "Those not reached are excluded from the count and from any rate. Record the attempts."
+        },
+        "so10_verifiable_step": {
+          "label": "Since attending, which VERIFIABLE steps have you taken?",
+          "help": "At least one item here is required to meet the threshold. These can be checked against an employer, host or training record."
+        },
+        "so10_other_step": {
+          "label": "Since attending, which other steps have you taken?",
+          "help": "Self-reported. One item here, alongside one verifiable step above, meets the threshold."
+        },
+        "current_status_id": {
+          "label": "What are you doing now?",
+          "help": "The first four options count as a confirmed placement, which meets the threshold on its own."
+        },
+        "so10_threshold_id": {
+          "label": "Employability threshold met?",
+          "help": "THIS FIELD PRODUCES THE INDICATOR COUNT. It must follow from the three questions above, not be judged separately."
+        },
+        "counted_under_id": {
+          "label": "Has this National ID already been counted for this indicator?",
+          "help": "Counted once per person."
+        },
+        "so10_evidence": {
+          "label": "Evidence on file"
+        },
+        "enumerator": {
+          "label": "Enumerator name and date of contact",
+          "parts": {
+            "enumerator_name": "Name",
+            "contact_date": "Date"
+          }
+        }
+      }
+    },
+    "a12": {
+      "title": "# of networking events including job fairs",
+      "short": "Networking events",
+      "indicator": "RMTH-SO1-A1.2",
+      "who": "Municipal officer who organised or co-organised the event",
+      "when": "Within one week of the event; reported quarterly",
+      "calc": "Count of documented networking events conducted. Each event is counted once. A combined event contributes 1 here AND 1 to RMTH-SO1-A1.3; the two indicators must never be added together, because the Action Plan treats them as one indicator with a single target of 4 per year.",
+      "disaggregation": "Type of event; gender and age of participants",
+      "sections": {
+        "s0": "EVENT IDENTIFICATION",
+        "s1": "PARTICIPATION",
+        "s2": "EVIDENCE"
+      },
+      "fields": {
+        "reference": {
+          "label": "Event ID",
+          "sub": "(RMTH-EV-YYYY-000)"
+        },
+        "title": {
+          "label": "Event title"
+        },
+        "event_type_id": {
+          "label": "Type of event",
+          "help": "Disaggregation by type of event."
+        },
+        "solely_guidance": {
+          "label": "Is this event solely a vocational guidance session?",
+          "help": "THIS FIELD DECIDES WHETHER A RECORD BELONGS HERE, AND SO PRODUCES THE INDICATOR COUNT: every record answering No counts as one event. A COMBINED event is recorded here and also as a session under RMTH-SO1-A1.3; the two indicators are then reported separately, never summed.",
+          "opts": {
+            "false": "No - it is a networking event, record it here",
+            "true": "Yes - record it under RMTH-SO1-A1.3 instead and do not create a record here"
+          }
+        },
+        "dates": {
+          "label": "Date of the event",
+          "parts": {
+            "start_date": "Start date",
+            "end_date": "End date"
+          }
+        },
+        "location": {
+          "label": "Location"
+        },
+        "organised_by_id": {
+          "label": "Organised by"
+        },
+        "partners": {
+          "label": "Partner organisation(s) and type",
+          "parts": {
+            "partner_names": "Name(s)",
+            "a12_partner_type": "Type"
+          }
+        },
+        "employers_count": {
+          "label": "Number of employers or companies taking part",
+          "help": "An event recorded as a networking event or job fair should have at least one employer present."
+        },
+        "attendees": {
+          "label": "Number of attendees",
+          "help": "Gender disaggregation of participants is required by the Action Plan.",
+          "parts": {
+            "attendees_total": "Total",
+            "attendees_women": "Of whom women",
+            "attendees_men": "Of whom men",
+            "attendees_non_jordanian": "Of whom non-Jordanian",
+            "attendees_disability": "Of whom persons with disability"
+          }
+        },
+        "age_bands": {
+          "label": "Age breakdown of attendees",
+          "help": "Same bands as the person-level forms, so event and person data can be reconciled.",
+          "parts": {
+            "age_under_18": "Under 18",
+            "age_18_24": "18-24",
+            "age_25_35": "25-35",
+            "age_36_45": "36-45",
+            "age_46_plus": "46 and above"
+          }
+        },
+        "a12_evidence": {
+          "label": "Evidence on file",
+          "help": "Attendance sheet and photographs are the minimum named by the Action Plan. The attendance sheet must carry National IDs so attendees can be followed up under RMTH-SO1-0."
+        },
+        "focal_point": {
+          "label": "Municipal focal point",
+          "parts": {
+            "focal_point_name": "Name",
+            "focal_point_phone": "Phone"
+          }
+        },
+        "completed_on": {
+          "label": "Date this record was completed"
+        }
+      }
+    },
+    "a13": {
+      "title": "# of vocational guidance sessions",
+      "short": "Vocational guidance sessions",
+      "indicator": "RMTH-SO1-A1.3",
+      "who": "Municipal careers officer or the facilitator who delivered the session",
+      "when": "Within one week of the session; reported quarterly",
+      "calc": "Count of documented vocational guidance sessions delivered. Each session is counted once. A session held inside a larger networking event still counts as 1 here, and that event counts as 1 under RMTH-SO1-A1.2; the two indicators must never be added together.",
+      "disaggregation": "Topic of the session; target group; gender and age of participants",
+      "sections": {
+        "s0": "SESSION IDENTIFICATION",
+        "s1": "CONTENT AND DELIVERY",
+        "s2": "PARTICIPATION AND EVIDENCE"
+      },
+      "fields": {
+        "reference": {
+          "label": "Session ID",
+          "help": "EVERY COMPLETED RECORD PRODUCES ONE UNIT OF THE INDICATOR COUNT: one session, one record, one ID. There is no further screening field, so do not open a record for a session that was cancelled or did not take place.",
+          "sub": "(RMTH-VG-YYYY-000)"
+        },
+        "title": {
+          "label": "Session title or topic"
+        },
+        "start_date": {
+          "label": "Date of the session"
+        },
+        "duration_hours": {
+          "label": "Duration",
+          "sub": "Number of hours"
+        },
+        "where": {
+          "label": "Location and modality",
+          "parts": {
+            "location": "Location",
+            "modality_id": "Modality"
+          }
+        },
+        "parent_event_id": {
+          "label": "Was the session standalone, or part of a larger event?",
+          "help": "Record the parent Event ID so the two records can be reconciled. Do NOT create a second RMTH-SO1-A1.2 record for this session.",
+          "sub": "Part of a larger networking event - parent Event ID",
+          "empty": "Standalone session"
+        },
+        "delivered_by_id": {
+          "label": "Delivered by"
+        },
+        "a13_topic": {
+          "label": "Topics covered",
+          "help": "Disaggregation by topic."
+        },
+        "target_group_id": {
+          "label": "Target group",
+          "help": "Disaggregation."
+        },
+        "attendees": {
+          "label": "Number of participants",
+          "help": "Gender disaggregation is required by the Action Plan.",
+          "parts": {
+            "attendees_total": "Total",
+            "attendees_women": "Of whom women",
+            "attendees_men": "Of whom men",
+            "attendees_non_jordanian": "Of whom non-Jordanian",
+            "attendees_disability": "Of whom persons with disability"
+          }
+        },
+        "age_bands": {
+          "label": "Age breakdown of participants",
+          "help": "Same bands as the person-level forms.",
+          "parts": {
+            "age_under_18": "Under 18",
+            "age_18_24": "18-24",
+            "age_25_35": "25-35",
+            "age_36_45": "36-45",
+            "age_46_plus": "46 and above"
+          }
+        },
+        "a13_evidence": {
+          "label": "Evidence on file",
+          "help": "The attendance sheet must carry National IDs so participants can be followed up under RMTH-SO1-0."
+        },
+        "facilitator_name": {
+          "label": "Facilitator name"
+        },
+        "completed_on": {
+          "label": "Date this record was completed"
+        }
+      }
+    },
+    "b1": {
+      "title": "% of supported project implementers reporting that at least one component of municipal support was essential to their ability to operate",
+      "short": "Project implementers",
+      "indicator": "RMTH-SO1-B1",
+      "who": "Municipal M&E focal point, by interview with the implementer",
+      "when": "Six to twelve months after the project began operating",
+      "calc": "Numerator: implementers rating at least one support component 'Essential'. Denominator: implementers who received at least one component of municipal support, were approached, and responded. Implementers not reached or refusing are excluded from both. An implementer running several approved projects is counted ONCE. Multiply by 100.",
+      "disaggregation": "Sector; project type; type of support component",
+      "sections": {
+        "s0": "IMPLEMENTER AND PROJECT",
+        "s1": "SUPPORT COMPONENTS AND HOW CRITICAL EACH WAS",
+        "s2": "STATUS AND EVIDENCE"
+      },
+      "fields": {
+        "entity": {
+          "label": "Implementing entity",
+          "parts": {
+            "entity_name": "Name",
+            "entity_type_id": "Type"
+          }
+        },
+        "first_record_of_id": {
+          "label": "Is this the first record for this implementer?",
+          "help": "The denominator counts implementers, not projects. An entity running three approved projects enters the denominator once.",
+          "sub": "No - already surveyed under record",
+          "empty": "Yes - include in the denominator"
+        },
+        "proposal_ids": {
+          "label": "Approved proposal / project ID(s) held by this implementer",
+          "help": "Links to the approval records under RMTH-SO1-B1.2.",
+          "sub": "(RMTH-PP-YYYY-000, list all)"
+        },
+        "project_titles": {
+          "label": "Project title(s)"
+        },
+        "project_type_id": {
+          "label": "Project type",
+          "help": "Disaggregation. Where the implementer holds several projects, record the main one."
+        },
+        "sector_id": {
+          "label": "Sector",
+          "help": "Disaggregation."
+        },
+        "respondent": {
+          "label": "Respondent name, role and phone",
+          "help": "The respondent must be someone who runs the project day to day.",
+          "parts": {
+            "respondent_name": "Name",
+            "respondent_role": "Role",
+            "respondent_phone": "Phone"
+          }
+        },
+        "reached_id": {
+          "label": "Was the implementer reached?",
+          "help": "Only completed interviews enter the denominator."
+        },
+        "interviewed_on": {
+          "label": "Date of this interview"
+        },
+        "enters_denominator": {
+          "label": "Enters the denominator?",
+          "help": "THIS FIELD PRODUCES THE DENOMINATOR. Derive it from the three fields above rather than leaving them to be combined at tabulation. Complete the support grid first, then return to this field."
+        },
+        "support": {
+          "label": "Support-criticality grid: for EACH component below, record whether it was received and, if so, how important it was to the implementer's ability to operate",
+          "help": "Lay this out as a grid, one row per component, before digitising. The per-component ratings are what give the type-of-support-component disaggregation; a single free-text cell will not hold them."
+        },
+        "received_any": {
+          "label": "Did this implementer receive at least one component of municipal support?",
+          "help": "An implementer who received nothing cannot be asked whether anything was essential."
+        },
+        "any_essential": {
+          "label": "Was at least one component rated 'Essential'?",
+          "help": "THIS FIELD PRODUCES THE NUMERATOR. It must follow from the grid above, not be asked separately."
+        },
+        "most_essential_component_id": {
+          "label": "Which single component was the most essential?",
+          "help": "Disaggregation by type of support component.",
+          "empty": "none was essential"
+        },
+        "would_have_helped": {
+          "label": "If no component was essential, what support would have made the difference?",
+          "help": "Ask only where the answer above is No. Optional - for learning and programme management. Not part of the indicator count."
+        },
+        "operating_status_id": {
+          "label": "Is the project currently operating?",
+          "help": "Ability to operate is the subject of the indicator, so this is the context for the rating."
+        },
+        "b1_evidence": {
+          "label": "Evidence on file"
+        },
+        "enumerator_name": {
+          "label": "Enumerator name"
+        }
+      }
+    },
+    "b11": {
+      "title": "# of specialized training programmes (industrial, agricultural, or administrative) tailored to the technical requirements of the approved projects",
+      "short": "Specialised training programmes",
+      "indicator": "RMTH-SO1-B1.1",
+      "who": "Municipal training focal point, with the partner that co-developed the content",
+      "when": "On completion of programme development; reported quarterly",
+      "calc": "Count of programmes meeting BOTH tests: (a) specialisation is industrial, agricultural or administrative, AND (b) the programme is documented as tailored to the technical requirements of at least one approved project. Each programme is counted once.",
+      "disaggregation": "Specialisation; sector of the linked project; partner type",
+      "sections": {
+        "s0": "PROGRAMME IDENTIFICATION",
+        "s1": "LINK TO AN APPROVED PROJECT",
+        "s2": "DEVELOPMENT PARTNER",
+        "s3": "EVIDENCE"
+      },
+      "fields": {
+        "reference": {
+          "label": "Programme reference",
+          "sub": "(RMTH-TP-YYYY-000)"
+        },
+        "title": {
+          "label": "Programme title"
+        },
+        "specialisation_id": {
+          "label": "Specialisation",
+          "help": "Only industrial, agricultural and administrative programmes count towards this indicator."
+        },
+        "occupation": {
+          "label": "Occupation or skill set targeted",
+          "sub": "(open text, for example CNC operator, greenhouse technician, warehouse clerk)"
+        },
+        "proposal_ids": {
+          "label": "Which approved project(s) does this programme serve?",
+          "help": "Required. A programme with no linked approved project does not count towards this indicator.",
+          "sub": "Proposal / Project ID(s) (RMTH-PP-...)"
+        },
+        "linked_sector_id": {
+          "label": "Sector of the linked project(s)",
+          "help": "Disaggregation. Use the same list as RMTH-SO1-B1.2 so the two can be cross-tabulated."
+        },
+        "b11_requirements_method": {
+          "label": "How were the project's technical requirements identified?",
+          "help": "At least one method must be documented for the programme to qualify as tailored."
+        },
+        "requirements_document": {
+          "label": "Reference of the requirements document",
+          "help": "This is the evidence that the programme is tailored rather than generic.",
+          "sub": "(document title and date)"
+        },
+        "tailoring_met": {
+          "label": "Tailoring criterion met?",
+          "help": "THIS FIELD PRODUCES THE INDICATOR COUNT.",
+          "opts": {
+            "true": "Yes - linked to an approved project and requirements documented",
+            "false": "No"
+          }
+        },
+        "developed_with_id": {
+          "label": "Developed with",
+          "help": "Disaggregation by partner type."
+        },
+        "partner_names": {
+          "label": "Partner name(s)"
+        },
+        "hours_modality": {
+          "label": "Total hours and modality",
+          "help": "Minimal programme identity, so the reference can be matched to delivery records.",
+          "parts": {
+            "total_hours": "Total hours",
+            "b11_modality_id": "Modality"
+          }
+        },
+        "b11_evidence": {
+          "label": "Evidence on file",
+          "help": "The Action Plan names training material as the evidence for programme-development indicators."
+        },
+        "completed_on": {
+          "label": "Date this record was completed"
+        }
+      }
+    },
+    "b12": {
+      "title": "# of proposals approved for implementation",
+      "short": "Proposals approved",
+      "indicator": "RMTH-SO1-B1.2",
+      "who": "Secretary of the municipal review or investment committee",
+      "when": "At each committee decision; reported quarterly",
+      "calc": "Count of proposals with a decision of 'Approved for implementation' or 'Approved with conditions'. Proposals deferred, rejected or still under review are recorded but not counted. Each proposal is counted once, on first approval.",
+      "disaggregation": "Sector; sub-sector; proposal type; type of submitting entity",
+      "sections": {
+        "s0": "PROPOSAL IDENTIFICATION",
+        "s1": "DECISION",
+        "s2": "EVIDENCE"
+      },
+      "fields": {
+        "reference": {
+          "label": "Proposal ID",
+          "help": "On approval this same ID becomes the Project ID used by RMTH-SO1-B1 and RMTH-SO1-B1.1.",
+          "sub": "(RMTH-PP-YYYY-000)"
+        },
+        "title": {
+          "label": "Proposal title"
+        },
+        "submitter": {
+          "label": "Submitted by",
+          "help": "Disaggregation by type of submitting entity.",
+          "parts": {
+            "submitted_by_name": "Name of entity or person",
+            "submitter_type_id": "Type"
+          }
+        },
+        "contact": {
+          "label": "Contact person and phone",
+          "parts": {
+            "contact_name": "Name",
+            "contact_phone": "Phone"
+          }
+        },
+        "submitted_on": {
+          "label": "Date submitted"
+        },
+        "proposal_type_id": {
+          "label": "Proposal type",
+          "help": "Disaggregation."
+        },
+        "sectors": {
+          "label": "Sector and sub-sector",
+          "help": "Disaggregation.",
+          "parts": {
+            "sector_id": "Sector",
+            "sub_sector": "Sub-sector"
+          }
+        },
+        "b12_support_requested": {
+          "label": "Municipal support requested",
+          "help": "Feeds the support-component grid in RMTH-SO1-B1."
+        },
+        "decision_id": {
+          "label": "Decision",
+          "help": "THIS FIELD PRODUCES THE INDICATOR COUNT. Only the first two options count."
+        },
+        "decided_on": {
+          "label": "Date of decision"
+        },
+        "approval": {
+          "label": "Approving body and decision reference",
+          "help": "The decision reference is the primary evidence for this indicator.",
+          "parts": {
+            "approving_body_id": "Body",
+            "decision_reference": "Decision reference number"
+          }
+        },
+        "conditions": {
+          "label": "If approved with conditions, what are the conditions?",
+          "help": "Optional - for learning and programme management. Not part of the indicator count."
+        },
+        "b12_evidence": {
+          "label": "Evidence on file",
+          "help": "The Action Plan names municipality reports, photographs and testimonials as evidence for the equivalent project indicator."
+        },
+        "completed_on": {
+          "label": "Date this record was completed"
+        }
+      }
+    },
+    "so20": {
+      "title": "% of training completers placed into employment or an internship within three months of completing the cycle",
+      "short": "Placement after training",
+      "indicator": "RMTH-SO2-0",
+      "who": "Municipal M&E focal point, by telephone follow-up",
+      "when": "Three months after each training cycle ends",
+      "calc": "Numerator: completers whose placement into EMPLOYMENT OR AN INTERNSHIP started within three months of the cycle end date. Denominator: completers on the RMTH-SO2-C1.2 roster for that cycle who have reached the three-month point and were reached for follow-up. Multiply by 100. OPEN ITEM: confirm with the Municipality whether self-employment counts as a placement; the indicator statement says employment or internship.",
+      "disaggregation": "Gender; age; nationality; vulnerability category; training cycle; type of placement",
+      "sections": {
+        "s0": "IDENTIFICATION",
+        "s1": "TRAINING CYCLE AND ELIGIBILITY",
+        "s2": "PLACEMENT",
+        "s3": "VERIFICATION"
+      },
+      "fields": {
+        "national_id": {
+          "label": "National ID",
+          "help": "Must match the completion record under RMTH-SO2-C1.2."
+        },
+        "national_id_confirm": {
+          "label": "National ID (validation - re-enter)"
+        },
+        "full_name": {
+          "label": "Full name"
+        },
+        "phone": {
+          "label": "Phone number"
+        },
+        "sex": {
+          "label": "Gender",
+          "help": "Disaggregation.",
+          "opts": {
+            "male": "Male",
+            "female": "Female"
+          }
+        },
+        "age_years": {
+          "label": "Age",
+          "help": "Disaggregation."
+        },
+        "nationality_id": {
+          "label": "Nationality",
+          "help": "Disaggregation."
+        },
+        "vulnerability": {
+          "label": "Vulnerability category",
+          "help": "Disaggregation."
+        },
+        "cycle_id": {
+          "label": "Training cycle reference and title",
+          "help": "Disaggregation by cycle.",
+          "sub": "Reference (RMTH-TC-...)"
+        },
+        "cycle_end": {
+          "label": "Date the cycle was completed",
+          "help": "The three-month window is counted from this date."
+        },
+        "three_month_reached": {
+          "label": "Has the three-month point been reached?",
+          "help": "Only completers past the three-month point enter the denominator."
+        },
+        "contact_date": {
+          "label": "Date of this follow-up contact"
+        },
+        "reached_id": {
+          "label": "Was the person reached?",
+          "help": "Those not reached are excluded from the denominator. Record the attempts so the response rate can be reported alongside the percentage."
+        },
+        "so20_placement_type": {
+          "label": "Since completing the cycle, have you been placed in any of the following?",
+          "help": "Employment, internship, on-the-job placement and apprenticeship count. Self-employment is recorded separately in the numerator field below pending the Municipality's decision."
+        },
+        "placement_start_month": {
+          "label": "Month and year the placement started",
+          "help": "Compare with the cycle end date to apply the three-month rule."
+        },
+        "so20_outcome_id": {
+          "label": "Placement outcome within three months of completing the cycle",
+          "help": "THIS FIELD PRODUCES THE NUMERATOR. Keeping self-employment on its own line means the numerator can be recomputed either way once the Municipality decides."
+        },
+        "employer": {
+          "label": "Employer or host organisation",
+          "parts": {
+            "employer_name": "Name",
+            "employer_sector": "Sector",
+            "placement_title": "Job or placement title"
+          }
+        },
+        "facilitated_by_id": {
+          "label": "Was the placement facilitated by the Municipality or its partners?"
+        },
+        "arrangement": {
+          "label": "Arrangement and working time",
+          "parts": {
+            "arrangement_id": "Arrangement",
+            "working_time_id": "Working time"
+          }
+        },
+        "obstacle_id": {
+          "label": "If not placed, what is the main obstacle?",
+          "help": "Optional - for learning and programme management. Not part of the indicator count."
+        },
+        "so20_verification": {
+          "label": "How was the placement verified, and what is on file?",
+          "help": "Self-report alone is the weakest source; seek one documentary item where possible."
+        },
+        "enumerator_name": {
+          "label": "Enumerator name"
+        }
+      }
+    },
+    "so2c1": {
+      "title": "% of trainees who report that training offered supported their employment journey",
+      "short": "Training that supported the journey",
+      "indicator": "RMTH-SO2-C1",
+      "who": "Municipal M&E focal point, by telephone or at a follow-up session",
+      "when": "Three to six months after the training cycle ends",
+      "calc": "Numerator: trainees answering 'Yes, significantly' or 'Yes, to some extent' to the headline question. Denominator: trainees on the RMTH-SO2-C1.2 completion roster for the cycle who were approached AND reached. Those not reached or refusing are excluded from both. Multiply by 100.",
+      "disaggregation": "Gender; age; training cycle; type of support reported",
+      "sections": {
+        "s0": "IDENTIFICATION",
+        "s1": "CONTACT OUTCOME",
+        "s2": "HEADLINE QUESTION",
+        "s3": "IN WHAT WAY",
+        "s4": "CLOSING"
+      },
+      "fields": {
+        "national_id": {
+          "label": "National ID",
+          "help": "Links to the completion record under RMTH-SO2-C1.2."
+        },
+        "full_name": {
+          "label": "Full name"
+        },
+        "phone": {
+          "label": "Phone number"
+        },
+        "sex": {
+          "label": "Gender",
+          "help": "Disaggregation.",
+          "opts": {
+            "male": "Male",
+            "female": "Female"
+          }
+        },
+        "age_years": {
+          "label": "Age",
+          "help": "Disaggregation."
+        },
+        "cycle_id": {
+          "label": "Training cycle reference, title and completion date",
+          "help": "Disaggregation by cycle.",
+          "sub": "Reference (RMTH-TC-...)"
+        },
+        "contact_date": {
+          "label": "Date of this feedback contact"
+        },
+        "reached_id": {
+          "label": "Was the trainee reached?",
+          "help": "Every trainee on the completion roster must have a record here, reached or not. Only those reached enter the denominator; report the response rate alongside the percentage."
+        },
+        "headline_id": {
+          "label": "Overall, did the training support your employment journey?",
+          "help": "THIS SINGLE QUESTION PRODUCES THE NUMERATOR: the first two options count. The denominator is set by the contact-outcome field above."
+        },
+        "so2c1_support_way": {
+          "label": "In what way did the training support you?",
+          "help": "Ask only where the headline answer is Yes. This gives the type-of-support disaggregation."
+        },
+        "why_not_id": {
+          "label": "If the training did NOT support your employment journey, why not?",
+          "help": "Ask only where the headline answer is No. This is what tells the Municipality what to change."
+        },
+        "so2c1_evidence": {
+          "label": "Evidence on file",
+          "help": "The completion roster is what fixes the denominator, so it must be filed with the feedback records for the cycle."
+        },
+        "enumerator_name": {
+          "label": "Enumerator name"
+        }
+      }
+    },
+    "c11": {
+      "title": "# of short-term intensive training cycles delivered whose content was jointly developed with private sector establishments and academic or vocational institutions",
+      "short": "Training cycles delivered",
+      "indicator": "RMTH-SO2-C1.1",
+      "who": "Municipal training focal point",
+      "when": "On completion of each cycle; reported quarterly",
+      "calc": "Count of cycles meeting BOTH tests: (a) short-term intensive per the agreed definition, and (b) content jointly developed with at least one private sector establishment AND at least one academic or vocational institution, with documentary evidence. OPEN ITEM: fix the short-term intensive thresholds with the Municipality before first use.",
+      "disaggregation": "Sector or occupation; partner type; delivery modality",
+      "sections": {
+        "s0": "CYCLE IDENTIFICATION",
+        "s1": "JOINT DEVELOPMENT OF THE CONTENT",
+        "s2": "DELIVERY AND EVIDENCE"
+      },
+      "fields": {
+        "reference": {
+          "label": "Cycle reference",
+          "help": "This reference is used by RMTH-SO2-C1.2, RMTH-SO2-C1 and RMTH-SO2-0.",
+          "sub": "(RMTH-TC-YYYY-000)"
+        },
+        "title": {
+          "label": "Cycle title"
+        },
+        "sector_id": {
+          "label": "Sector or occupation targeted",
+          "help": "Disaggregation."
+        },
+        "dates": {
+          "label": "Start and end dates",
+          "parts": {
+            "start_date": "Start",
+            "end_date": "End"
+          }
+        },
+        "intensity": {
+          "label": "Duration and intensity",
+          "help": "Record the raw numbers so the short-term intensive test below can be applied whatever thresholds are agreed.",
+          "parts": {
+            "contact_hours": "Total contact hours",
+            "weeks": "Number of weeks",
+            "hours_per_week": "Hours per week"
+          }
+        },
+        "short_term_intensive": {
+          "label": "Does the cycle meet the agreed definition of short-term intensive?",
+          "help": "Write the agreed thresholds here once fixed with the Municipality, for example \"no more than X weeks and at least Y contact hours per week\", and derive this answer from the numbers above."
+        },
+        "delivery": {
+          "label": "Delivery modality and location",
+          "help": "Disaggregation by modality.",
+          "parts": {
+            "modality_id": "Modality",
+            "location": "Location"
+          }
+        },
+        "private": {
+          "label": "Private sector establishment(s) that took part in developing the content",
+          "help": "At least one private sector establishment is required for the cycle to count.",
+          "parts": {
+            "private_partner_names": "Name(s)",
+            "c11_private_contribution": "How they contributed"
+          }
+        },
+        "academic": {
+          "label": "Academic or vocational institution(s) that took part in developing the content",
+          "help": "At least one academic or vocational institution is required for the cycle to count.",
+          "parts": {
+            "academic_partner_names": "Name(s)",
+            "academic_type_id": "Type",
+            "c11_academic_contribution": "How they contributed"
+          }
+        },
+        "c11_joint_evidence": {
+          "label": "Evidence of joint development",
+          "help": "At least one documentary item is required. Verbal involvement alone does not qualify."
+        },
+        "joint_development_met": {
+          "label": "Joint development criterion met?",
+          "help": "THIS FIELD, TOGETHER WITH THE SHORT-TERM INTENSIVE TEST, PRODUCES THE INDICATOR COUNT.",
+          "opts": {
+            "true": "Yes - at least one private sector establishment AND one academic or vocational institution, with documentary evidence",
+            "false": "No"
+          }
+        },
+        "trainees": {
+          "label": "Number of trainees",
+          "help": "Completers are recorded individually under RMTH-SO2-C1.2; these totals are the reconciliation check.",
+          "parts": {
+            "enrolled_count": "Enrolled",
+            "completed_count": "Completed",
+            "completed_women": "Of whom women"
+          }
+        },
+        "c11_evidence": {
+          "label": "Evidence on file"
+        },
+        "completed_on": {
+          "label": "Date this record was completed"
+        }
+      }
+    },
+    "c12": {
+      "title": "# of trainees completing training programs related to employability",
+      "short": "Training completions",
+      "indicator": "RMTH-SO2-C1.2",
+      "who": "Trainer or municipal training focal point, at the end of each cycle",
+      "when": "At the close of each cycle; reported quarterly",
+      "calc": "Count of records where 'Did this person meet the completion criteria?' is Yes. The Action Plan defines a completer as someone who completes the training AND is assessed as job-ready. Report BOTH figures: total completions, and unique completers by National ID (the de-duplication field below gives the second).",
+      "disaggregation": "Gender; age; nationality; vulnerability category; type of training",
+      "sections": {
+        "s0": "IDENTIFICATION",
+        "s1": "TRAINING",
+        "s2": "COMPLETION AND JOB-READINESS",
+        "s3": "EVIDENCE"
+      },
+      "fields": {
+        "national_id": {
+          "label": "National ID",
+          "help": "De-duplication key across all forms."
+        },
+        "national_id_confirm": {
+          "label": "National ID (validation - re-enter)",
+          "help": "Must match the field above."
+        },
+        "full_name": {
+          "label": "Full name"
+        },
+        "sex": {
+          "label": "Gender",
+          "help": "Disaggregation.",
+          "opts": {
+            "male": "Male",
+            "female": "Female"
+          }
+        },
+        "age_years": {
+          "label": "Age",
+          "help": "Disaggregation."
+        },
+        "nationality_id": {
+          "label": "Nationality",
+          "help": "Disaggregation."
+        },
+        "vulnerability": {
+          "label": "Vulnerability category",
+          "help": "Disaggregation."
+        },
+        "phone": {
+          "label": "Phone number",
+          "help": "Required for the three-month placement follow-up under RMTH-SO2-0 and the feedback survey under RMTH-SO2-C1."
+        },
+        "cycle_id": {
+          "label": "Training cycle reference and title",
+          "sub": "Reference (RMTH-TC-...)"
+        },
+        "c12_training_type_id": {
+          "label": "Type of training",
+          "help": "Disaggregation by type of training."
+        },
+        "cycle_dates": {
+          "label": "Training start and end dates"
+        },
+        "attendance_pct": {
+          "label": "Attendance rate",
+          "sub": "Percentage of sessions attended"
+        },
+        "tests": {
+          "label": "Pre-test and post-test scores",
+          "help": "The Action Plan names pre/post survey results as the evidence for this indicator.",
+          "parts": {
+            "pre_test": "Pre-test out of 100",
+            "post_test": "Post-test out of 100"
+          }
+        },
+        "assessment_result_id": {
+          "label": "Final assessment result"
+        },
+        "job_ready": {
+          "label": "Assessed as job-ready by the trainer?",
+          "help": "The Action Plan defines a completer as someone who completes AND is assessed as job-ready. There is deliberately no 'partially' option, because a middle answer cannot be counted.",
+          "opts": {
+            "true": "Yes",
+            "false": "No"
+          }
+        },
+        "employer_eval": {
+          "label": "For on-the-job trainees: employer evaluation received?",
+          "help": "The Action Plan names employer evaluations as a data collection method. A trainer cannot assess an on-the-job trainee; the host employer does.",
+          "parts": {
+            "employer_evaluation_id": "",
+            "employer_evaluation_note": "date and assessor"
+          }
+        },
+        "met_criteria": {
+          "label": "Did this person meet the completion criteria?",
+          "help": "THIS FIELD PRODUCES THE INDICATOR COUNT. Write the agreed rule here before first use, for example \"Yes only where attendance is at least 75%, the final assessment is Passed, and job-ready is Yes\". OPEN ITEM: confirm the rule with the Municipality.",
+          "opts": {
+            "true": "Yes",
+            "false": "No"
+          }
+        },
+        "certificate": {
+          "label": "Certificate issued?",
+          "parts": {
+            "certificate_issued": "",
+            "certificate_number": "certificate number"
+          },
+          "partOpts": {
+            "certificate_issued": {
+              "true": "Yes",
+              "false": "No"
+            }
+          }
+        },
+        "counted_under_id": {
+          "label": "Has this National ID already completed a cycle counted under this indicator?",
+          "help": "Lets the Municipality report unique completers as well as total completions, and feeds the de-duplicated impact count."
+        },
+        "c12_evidence": {
+          "label": "Evidence on file"
+        },
+        "trainer_name": {
+          "label": "Trainer name"
+        }
+      }
+    },
+    "so30": {
+      "title": "# of persons who secure regular income as a result of Municipality-supported/facilitated entrepreneurship programming",
+      "short": "Regular income",
+      "indicator": "RMTH-SO3-0",
+      "who": "Municipal M&E focal point, by telephone or site visit",
+      "when": "Annually, and at each follow-up round after support",
+      "calc": "Count of unique persons (by National ID) confirmed to be earning income from a supported enterprise in at least four of the last six months. Counted once per person. OPEN ITEM: confirm the four-of-six-months rule with the Municipality.",
+      "disaggregation": "Gender; age; nationality; vulnerability category; sector; type of support received",
+      "sections": {
+        "s0": "IDENTIFICATION",
+        "s1": "SUPPORT RECEIVED",
+        "s2": "REGULARITY OF INCOME",
+        "s3": "VERIFICATION"
+      },
+      "fields": {
+        "national_id": {
+          "label": "National ID",
+          "help": "De-duplication key."
+        },
+        "national_id_confirm": {
+          "label": "National ID (validation - re-enter)"
+        },
+        "full_name": {
+          "label": "Full name"
+        },
+        "phone": {
+          "label": "Phone number"
+        },
+        "sex": {
+          "label": "Gender",
+          "help": "Disaggregation.",
+          "opts": {
+            "male": "Male",
+            "female": "Female"
+          }
+        },
+        "age_years": {
+          "label": "Age",
+          "help": "Disaggregation."
+        },
+        "nationality_id": {
+          "label": "Nationality",
+          "help": "Disaggregation."
+        },
+        "vulnerability": {
+          "label": "Vulnerability category",
+          "help": "Disaggregation."
+        },
+        "so30_support": {
+          "label": "Which entrepreneurship support did this person receive?",
+          "help": "Disaggregation by type of support. Training on incubator design is NOT listed here: it equips staff to run incubators and does not make its participants entrepreneurs."
+        },
+        "support_refs": {
+          "label": "Reference of that support",
+          "help": "Incubated enterprises already carry an RMTH-EN number from RMTH-SO3-E0.2. For a household enterprise, supported micro or small business, or a trainee who never entered an incubator, issue the RMTH-EN number here, once per enterprise.",
+          "parts": {
+            "incubator_id": "Incubator ID (RMTH-IN-...)",
+            "enterprise_id": "Enterprise ID (RMTH-EN-...)",
+            "programme_id": "Entrepreneurship programme reference (RMTH-EP-...)"
+          }
+        },
+        "enterprise": {
+          "label": "Enterprise or activity name and sector",
+          "help": "Disaggregation by sector.",
+          "parts": {
+            "enterprise_name": "Name",
+            "so30_sector_id": "Sector"
+          }
+        },
+        "role_id": {
+          "label": "Role of this person in the activity"
+        },
+        "earning_since_month": {
+          "label": "Month and year the activity started earning"
+        },
+        "months_of_six": {
+          "label": "In how many of the last six months did you earn income from this activity?",
+          "help": "This is what makes the income 'regular'. Record the number, not a band.",
+          "sub": "Number of months out of six"
+        },
+        "so30_criterion_id": {
+          "label": "Regular income criterion met?",
+          "help": "THIS FIELD PRODUCES THE INDICATOR COUNT. It must follow from the number above."
+        },
+        "income_change_id": {
+          "label": "Compared with before the support, is your income from this activity higher or lower?",
+          "help": "Optional - for learning and programme management. Not part of the indicator count."
+        },
+        "stopped": {
+          "label": "If income has stopped, when and why?",
+          "help": "Optional - for learning and programme management. Not part of the indicator count.",
+          "parts": {
+            "income_stopped_month": "Month and year",
+            "so30_stop_reason_id": "Reason"
+          }
+        },
+        "so30_verification": {
+          "label": "How was the income verified, and what is on file?",
+          "help": "Seek at least one source beyond self-report where possible."
+        },
+        "counted_under_id": {
+          "label": "Has this National ID already been counted for this indicator?",
+          "help": "Counted once per person."
+        },
+        "enumerator": {
+          "label": "Enumerator name and date",
+          "parts": {
+            "enumerator_name": "Name",
+            "contact_date": "Date"
+          }
+        }
+      }
+    },
+    "e01": {
+      "title": "# of specialised business incubators in high-impact fields such as urban development, infrastructure, food manufacturing, and professional services established",
+      "short": "Specialised incubators",
+      "indicator": "RMTH-SO3-E0.1",
+      "who": "Municipal focal point for economic development",
+      "when": "At each stage of establishment; reported quarterly",
+      "calc": "Count of incubators that are (a) specialised in a high-impact field and (b) confirmed as established and operational against criteria 1 to 5 below. Following the Action Plan definition, admission of a first cohort is tracked but is NOT required for the incubator to count as established.",
+      "disaggregation": "Specialisation field; host arrangement; partner type",
+      "sections": {
+        "s0": "INCUBATOR IDENTIFICATION",
+        "s1": "ESTABLISHMENT CHECKLIST (CRITERIA 1 TO 5 DECIDE THE COUNT)",
+        "s2": "STATUS AND EVIDENCE"
+      },
+      "fields": {
+        "reference": {
+          "label": "Incubator ID",
+          "sub": "(RMTH-IN-YYYY-000)"
+        },
+        "name": {
+          "label": "Incubator name"
+        },
+        "field_id": {
+          "label": "Specialisation field",
+          "help": "A general-purpose incubator with no specialisation does not count towards this indicator."
+        },
+        "host_id": {
+          "label": "Host arrangement",
+          "help": "Disaggregation."
+        },
+        "partners": {
+          "label": "Partner institutions and their role",
+          "help": "The indicator specifies collaboration with universities and the private sector. Disaggregation by partner type.",
+          "parts": {
+            "partner_university": "University or academic institution",
+            "partner_private": "Private sector partner(s)",
+            "e01_partner_role": "Role"
+          }
+        },
+        "c1": {
+          "label": "1. Physical or virtual space identified and prepared",
+          "parts": {
+            "c1_id": "",
+            "c1_location": "Location",
+            "c1_date": "Date"
+          }
+        },
+        "c2": {
+          "label": "2. Governance arrangement approved",
+          "parts": {
+            "c2_id": "",
+            "c2_reference": "Decision reference",
+            "c2_date": "Date"
+          }
+        },
+        "c3": {
+          "label": "3. Operational plan and service catalogue in place",
+          "parts": {
+            "c3_id": "",
+            "c3_date": "Date"
+          }
+        },
+        "c4": {
+          "label": "4. Staff or focal point assigned",
+          "parts": {
+            "c4_id": "",
+            "c4_staff_count": "Number of staff"
+          }
+        },
+        "services_live": {
+          "label": "5. Core incubation services launched",
+          "help": "The Action Plan requires initiation of core incubation services. Two live services is the threshold, so criterion 5 can be read off rather than judged.",
+          "sub": "Services live (select all, with the date each began)",
+          "criterion": "Criterion 5: two or more services live - met; one service live - not met; no service live - not met"
+        },
+        "established_id": {
+          "label": "Is the incubator established and operational?",
+          "help": "THIS FIELD PRODUCES THE INDICATOR COUNT. Only 'Achieved' is counted."
+        },
+        "achieved_on": {
+          "label": "Date achieved"
+        },
+        "cohort": {
+          "label": "First cohort admitted",
+          "help": "Tracked for programme management and to link to RMTH-SO3-E0.2. Not a condition of the count.",
+          "parts": {
+            "first_cohort_admitted": "",
+            "first_cohort_count": "Number of enterprises",
+            "first_cohort_date": "Date"
+          },
+          "partOpts": {
+            "first_cohort_admitted": {
+              "true": "Yes",
+              "false": "Not yet"
+            }
+          }
+        },
+        "e01_evidence": {
+          "label": "Evidence on file",
+          "help": "The Action Plan names photographs and the project report as evidence for the incubator."
+        },
+        "completed_on": {
+          "label": "Date this record was completed"
+        }
+      }
+    },
+    "e02": {
+      "title": "# of participants receiving incubation services",
+      "short": "Incubation services",
+      "indicator": "RMTH-SO3-E0.2",
+      "who": "Incubator focal point, from the service log",
+      "when": "On admission and updated at each service; reported quarterly",
+      "calc": "Count of unique participants (by National ID) who have received at least one incubation service. Counted once per participant, however many services they receive.",
+      "disaggregation": "Gender; age; nationality; vulnerability category; sector; type of service; enterprise stage",
+      "sections": {
+        "s0": "IDENTIFICATION",
+        "s1": "ENTERPRISE AND ADMISSION",
+        "s2": "SERVICES RECEIVED",
+        "s3": "EVIDENCE"
+      },
+      "fields": {
+        "national_id": {
+          "label": "National ID",
+          "help": "De-duplication key."
+        },
+        "national_id_confirm": {
+          "label": "National ID (validation - re-enter)"
+        },
+        "full_name": {
+          "label": "Full name"
+        },
+        "sex": {
+          "label": "Gender",
+          "help": "Disaggregation.",
+          "opts": {
+            "male": "Male",
+            "female": "Female"
+          }
+        },
+        "age_years": {
+          "label": "Age",
+          "help": "Disaggregation."
+        },
+        "nationality_id": {
+          "label": "Nationality",
+          "help": "Disaggregation."
+        },
+        "vulnerability": {
+          "label": "Vulnerability category",
+          "help": "Disaggregation."
+        },
+        "phone": {
+          "label": "Phone number",
+          "help": "Required for the regular-income follow-up under RMTH-SO3-0."
+        },
+        "incubator_id": {
+          "label": "Incubator ID and name",
+          "help": "Links to the incubator record under RMTH-SO3-E0.1.",
+          "sub": "ID (RMTH-IN-...)"
+        },
+        "enterprise_id": {
+          "label": "Enterprise ID",
+          "help": "One ID per ENTERPRISE, not per person: where two co-founders are admitted, the first record issues the ID and the second reuses it. An enterprise that never enters an incubator is given its RMTH-EN number on the RMTH-SO3-0 form instead.",
+          "sub": "(RMTH-EN-YYYY-000)"
+        },
+        "enterprise_name": {
+          "label": "Enterprise or business idea name"
+        },
+        "admitted_on": {
+          "label": "Date of admission or first service",
+          "help": "This date places the participant in a reporting quarter."
+        },
+        "stage_id": {
+          "label": "Stage of the enterprise at admission",
+          "help": "Disaggregation."
+        },
+        "sector_id": {
+          "label": "Sector",
+          "help": "Disaggregation."
+        },
+        "e02_service": {
+          "label": "Which incubation services has this participant received?",
+          "help": "At least one service must be recorded for the participant to be counted. Disaggregation by type of service."
+        },
+        "counted_under_id": {
+          "label": "Is this the participant's first time receiving incubation services from the Municipality?",
+          "help": "THIS FIELD DE-DUPLICATES THE COUNT."
+        },
+        "status_id": {
+          "label": "Current status in the incubator",
+          "help": "Optional - for learning and programme management. Not part of the indicator count."
+        },
+        "e02_evidence": {
+          "label": "Evidence on file"
+        },
+        "focal": {
+          "label": "Incubator focal point and date",
+          "parts": {
+            "focal_point_name": "Name",
+            "completed_on": "Date"
+          }
+        }
+      }
+    },
+    "e03": {
+      "title": "# of participants trained on incubator design",
+      "short": "Incubator-design training",
+      "indicator": "RMTH-SO3-E0.3",
+      "who": "Trainer or municipal training focal point",
+      "when": "At the close of each cycle; reported quarterly",
+      "calc": "Count of records where 'Did this person meet the completion criteria?' is Yes. Report BOTH total completions and unique participants by National ID.",
+      "disaggregation": "Gender; age; type of organisation; role of the participant",
+      "sections": {
+        "s0": "IDENTIFICATION",
+        "s1": "TRAINING CYCLE",
+        "s2": "COMPLETION",
+        "s3": "EVIDENCE"
+      },
+      "fields": {
+        "national_id": {
+          "label": "National ID",
+          "help": "De-duplication key."
+        },
+        "full_name": {
+          "label": "Full name"
+        },
+        "sex": {
+          "label": "Gender",
+          "help": "Disaggregation.",
+          "opts": {
+            "male": "Male",
+            "female": "Female"
+          }
+        },
+        "age_years": {
+          "label": "Age",
+          "help": "Disaggregation."
+        },
+        "phone": {
+          "label": "Phone number"
+        },
+        "organisation": {
+          "label": "Organisation and role",
+          "help": "The key dimension for this indicator: who is being equipped to design and run incubators. Disaggregation by type of organisation and role.",
+          "parts": {
+            "organisation_name": "Organisation",
+            "org_type_id": "Type",
+            "org_role": "Role"
+          }
+        },
+        "cycle_id": {
+          "label": "Training cycle reference and title",
+          "help": "RMTH-ID is the prefix for incubator-design cycles, distinct from RMTH-TC employability cycles and RMTH-EP entrepreneurship programmes.",
+          "sub": "Reference (RMTH-ID-YYYY-000)"
+        },
+        "cycle_dates": {
+          "label": "Dates and total hours"
+        },
+        "delivered_by": {
+          "label": "Delivered by"
+        },
+        "modules": {
+          "label": "Modules covered",
+          "help": "This is the content check for the indicator, not an optional extra: at least one design module must be recorded, otherwise the cycle is not a training on incubator design and the participant is not counted."
+        },
+        "attendance_pct": {
+          "label": "Attendance rate",
+          "sub": "Percentage of sessions attended"
+        },
+        "tests": {
+          "label": "Pre-test and post-test knowledge scores",
+          "parts": {
+            "pre_test": "Pre-test out of 100",
+            "post_test": "Post-test out of 100"
+          }
+        },
+        "met_criteria": {
+          "label": "Did this person meet the completion criteria?",
+          "help": "THIS FIELD PRODUCES THE INDICATOR COUNT. The rule must include the content test: at least one incubator-design module recorded above. Write the full agreed rule here before first use, for example \"attendance at least 75%, post-test at least 60, and at least one design module covered\".",
+          "opts": {
+            "true": "Yes",
+            "false": "No"
+          }
+        },
+        "certificate": {
+          "label": "Certificate issued?",
+          "parts": {
+            "certificate_issued": "",
+            "certificate_number": "certificate number"
+          },
+          "partOpts": {
+            "certificate_issued": {
+              "true": "Yes",
+              "false": "No"
+            }
+          }
+        },
+        "counted_under_id": {
+          "label": "Has this National ID already been counted for this indicator?",
+          "help": "Lets the Municipality report unique participants as well as total completions."
+        },
+        "e03_evidence": {
+          "label": "Evidence on file"
+        },
+        "trainer": {
+          "label": "Trainer name and date",
+          "parts": {
+            "trainer_name": "Name",
+            "completed_on": "Date"
+          }
+        }
+      }
+    },
+    "f01": {
+      "title": "# of participants trained in entrepreneurship training",
+      "short": "Entrepreneurship training",
+      "indicator": "RMTH-SO3-F0.1",
+      "who": "Trainer or municipal training focal point, at the end of each programme",
+      "when": "At the close of each programme; reported quarterly",
+      "calc": "Count of records where 'Did this person successfully complete the training?' is Yes. The Action Plan defines these as participants who successfully complete training on production practices, quality standards and basic management skills relevant to their enterprise type. Report BOTH total completions and unique participants by National ID.",
+      "disaggregation": "Gender; age; nationality; vulnerability category; type of training; enterprise stage",
+      "sections": {
+        "s0": "IDENTIFICATION",
+        "s1": "PROGRAMME AND ENTERPRISE",
+        "s2": "MODULES AND COMPLETION",
+        "s3": "EVIDENCE"
+      },
+      "fields": {
+        "national_id": {
+          "label": "National ID",
+          "help": "De-duplication key."
+        },
+        "national_id_confirm": {
+          "label": "National ID (validation - re-enter)"
+        },
+        "full_name": {
+          "label": "Full name"
+        },
+        "sex": {
+          "label": "Gender",
+          "help": "Disaggregation.",
+          "opts": {
+            "male": "Male",
+            "female": "Female"
+          }
+        },
+        "age_years": {
+          "label": "Age",
+          "help": "Disaggregation."
+        },
+        "nationality_id": {
+          "label": "Nationality",
+          "help": "Disaggregation."
+        },
+        "vulnerability": {
+          "label": "Vulnerability category",
+          "help": "Disaggregation."
+        },
+        "phone": {
+          "label": "Phone number",
+          "help": "Required for the regular-income follow-up under RMTH-SO3-0."
+        },
+        "cycle_id": {
+          "label": "Programme reference and title",
+          "help": "Links to the programme record under RMTH-SO3-F0.2.",
+          "sub": "Reference (RMTH-EP-...)"
+        },
+        "f01_training_type_id": {
+          "label": "Type of training",
+          "help": "Disaggregation by type of training, as required by the Action Plan."
+        },
+        "cycle_dates": {
+          "label": "Training start and end dates"
+        },
+        "enterprise_status_id": {
+          "label": "Enterprise status at the start of the training",
+          "help": "Disaggregation."
+        },
+        "enterprise_sector_id": {
+          "label": "Enterprise type or sector",
+          "help": "The Action Plan requires the content to be relevant to the participant's enterprise type."
+        },
+        "f01_module": {
+          "label": "Modules completed",
+          "help": "Production practices, quality standards and basic management are the three the Action Plan names explicitly."
+        },
+        "attendance_pct": {
+          "label": "Attendance rate",
+          "sub": "Percentage of sessions attended"
+        },
+        "assessment_result_id": {
+          "label": "Final assessment result"
+        },
+        "met_criteria": {
+          "label": "Did this person successfully complete the training?",
+          "help": "THIS FIELD PRODUCES THE INDICATOR COUNT. The rule must include the content test from the Action Plan: at least one of production practices, quality standards or business management must appear in the modules completed above. Write the full agreed rule here before first use, for example \"attendance at least 75%, final assessment Passed, and at least one of the three named module areas completed\".",
+          "opts": {
+            "true": "Yes",
+            "false": "No"
+          }
+        },
+        "certificate": {
+          "label": "Certificate issued?",
+          "parts": {
+            "certificate_issued": "",
+            "certificate_number": "certificate number"
+          },
+          "partOpts": {
+            "certificate_issued": {
+              "true": "Yes",
+              "false": "No"
+            }
+          }
+        },
+        "counted_under_id": {
+          "label": "Has this National ID already been counted for this indicator?",
+          "help": "Lets the Municipality report unique participants as well as total completions."
+        },
+        "f01_evidence": {
+          "label": "Evidence on file",
+          "help": "The Action Plan names attendance sheets and completion certificates as the evidence."
+        },
+        "trainer_name": {
+          "label": "Trainer name"
+        }
+      }
+    },
+    "f02": {
+      "title": "# of training programs developed for entrepreneurship",
+      "short": "Entrepreneurship programmes",
+      "indicator": "RMTH-SO3-F0.2",
+      "who": "Municipal training focal point, with the partner that developed the content",
+      "when": "On completion of programme development, and updated at each delivery; reported quarterly",
+      "calc": "Count of programmes where 'Programme development complete?' is Yes. Each programme is counted once. OPEN ITEM: the Action Plan defines the equivalent indicator as the number of training SESSIONS delivered, each counted once regardless of participants. The delivery log below records every cycle so the number can be reported either way once ENABEL and the Municipality agree which reading governs.",
+      "disaggregation": "Sector; type of training (modality); target group and level; partner type",
+      "sections": {
+        "s0": "PROGRAMME IDENTIFICATION",
+        "s1": "DEVELOPMENT",
+        "s2": "CONTENT AND READINESS",
+        "s3": "DELIVERY LOG",
+        "s4": "EVIDENCE"
+      },
+      "fields": {
+        "reference": {
+          "label": "Programme reference",
+          "help": "This reference is used by RMTH-SO3-F0.1 and RMTH-SO3-0.",
+          "sub": "(RMTH-EP-YYYY-000)"
+        },
+        "title": {
+          "label": "Programme title"
+        },
+        "target": {
+          "label": "Target group and level",
+          "help": "Disaggregation.",
+          "parts": {
+            "level_id": "Level",
+            "group_id": "Group"
+          }
+        },
+        "sector_focus_id": {
+          "label": "Sector focus",
+          "help": "Disaggregation."
+        },
+        "developed_by_id": {
+          "label": "Developed by"
+        },
+        "partner": {
+          "label": "Partner name and type",
+          "help": "Disaggregation by partner type.",
+          "parts": {
+            "partner_names": "Name",
+            "partner_type_id": "Type"
+          }
+        },
+        "f02_content_basis": {
+          "label": "What was the content based on?"
+        },
+        "source_document": {
+          "label": "Reference of the needs assessment or source document",
+          "help": "The evidence that the programme was developed, not merely relabelled.",
+          "sub": "(document title and date)"
+        },
+        "f02_module": {
+          "label": "Modules included",
+          "help": "Should match the modules recorded as completed under RMTH-SO3-F0.1."
+        },
+        "hours": {
+          "label": "Total hours, sessions and modality",
+          "parts": {
+            "total_hours": "Total hours",
+            "sessions_count": "Number of sessions",
+            "f02_modality_id": "Modality"
+          }
+        },
+        "f02_material": {
+          "label": "Which materials have been produced?",
+          "help": "A programme counts as developed when the curriculum and at least the trainer guide exist."
+        },
+        "development_complete_id": {
+          "label": "Programme development complete?",
+          "help": "THIS FIELD PRODUCES THE INDICATOR COUNT under the programme reading."
+        },
+        "deliveries": {
+          "label": "Every delivery of this programme",
+          "help": "Add a row each time the programme is delivered. This log is what allows the indicator to be reported as sessions delivered, per the Action Plan definition, as well as programmes developed.",
+          "sub": "One row per cycle delivered"
+        },
+        "deliveries_total": {
+          "label": "Total deliveries to date",
+          "help": "The figure to report if the Action Plan's session-based reading governs."
+        },
+        "f02_evidence": {
+          "label": "Evidence on file",
+          "help": "The Action Plan names training material as the evidence for this indicator."
+        },
+        "completed_on": {
+          "label": "Date this record was completed"
+        }
+      }
+    }
+  },
+  "nav": {
+    "group": {
+      "so1": "Objective 1 · Job opportunities",
+      "so2": "Objective 2 · Training",
+      "so3": "Objective 3 · Entrepreneurship",
+      "impact": "Impact",
+      "other": "Other"
+    }
+  },
+  "list": {
+    "new": "New record",
+    "empty": "No records yet.",
+    "emptyBody": "Records entered through this form appear here, newest first.",
+    "loadFailed": "The list could not be loaded.",
+    "search": "Search",
+    "deleted": "Deleted",
+    "showDeleted": "Show deleted",
+    "count": "{count, plural, =0 {No records} one {# record} other {# records}}",
+    "columns": {
+      "reference": "Reference",
+      "title": "Title",
+      "person": "Person",
+      "date": "Date",
+      "counts": "Counts",
+      "status": "Status"
+    }
+  },
+  "form": {
+    "newTitle": "New: {title}",
+    "editTitle": "Edit: {title}",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "savedRef": "Saved as {reference}",
+    "cancel": "Cancel",
+    "back": "Back to the list",
+    "required": "This field is required.",
+    "assignedOnSave": "Assigned when the record is saved.",
+    "derivedOnSave": "Worked out from the answers when the record is saved.",
+    "notYet": "Not yet",
+    "specify": "Please specify",
+    "noneSelected": "Nothing selected",
+    "choose": "Choose…",
+    "calcTitle": "How the indicator is calculated from this form",
+    "who": "Who completes this form",
+    "when": "When",
+    "disaggregation": "Required disaggregation",
+    "countingField": "This field produces the indicator count",
+    "ruleTitle": "Agreed rule",
+    "ruleMissing": "The rule has not been agreed yet (open item). Records can be entered; the indicator is not computable until the M&E lead writes the rule in the thresholds table.",
+    "lookup": "Look up",
+    "lookingUp": "Looking up…",
+    "onFile": "On file — name is locked; empty details can be added.",
+    "newPerson": "Not on file — a new person will be created.",
+    "nidMismatch": "The two numbers are different.",
+    "nidInvalid": "A national ID is exactly nine digits.",
+    "personDeleted": "This national ID belongs to a person who was deleted. Restore them from the Sahel Horan person screen first.",
+    "invalid": "Not saved. {message}",
+    "notFound": "This record no longer exists or is not yours to edit.",
+    "unknownColumn": "Not saved: the form sent a field the database does not know ({column}). This is a defect in the form.",
+    "yes": "Yes",
+    "no": "No",
+    "undecided": "Not decided",
+    "decidedBy": "Decided {when}",
+    "gridComponent": "Component",
+    "gridRating": "Rating",
+    "serviceBegan": "Date it began",
+    "deliveryAdd": "Add a delivery",
+    "deliveryCycle": "Cycle number",
+    "deliveryStart": "Start date",
+    "deliveryEnd": "End date",
+    "deliveryLocation": "Location",
+    "deliveryEnrolled": "Participants enrolled",
+    "deliveryCompleting": "Participants completing",
+    "deliveryNone": "No deliveries recorded yet.",
+    "deliveriesSavedSeparately": "Deliveries are saved one at a time from the programme's page once the programme exists.",
+    "createEnterprise": "New enterprise",
+    "enterpriseName": "Enterprise name",
+    "mirrorEnd": "A session is one day: the end date is the same as the date.",
+    "recordPicker": {
+      "none": "None",
+      "loadFailed": "The list could not be loaded."
+    }
+  },
+  "detail": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "restore": "Restore",
+    "deleteConfirm": "Delete this record? It stops counting and can be restored later.",
+    "deletedNote": "This record is deleted and does not count. A coordinator can restore it.",
+    "created": "Created",
+    "updated": "Updated",
+    "notSet": "Not set",
+    "evidence": "Evidence files",
+    "upload": "Add a file",
+    "uploading": "Uploading…",
+    "noFiles": "No files attached yet.",
+    "remove": "Remove",
+    "download": "Open",
+    "uploadFailed": "The file could not be uploaded.",
+    "fileSizeKb": "{size} KB",
+    "fileSizeMb": "{size} MB",
+    "countedUnderNo": "No - count this person",
+    "countedUnderYes": "Yes - already counted under record {reference}",
+    "counts": "Counts towards the indicator",
+    "notCounts": "Does not count",
+    "thresholdUndecided": "Cannot be worked out until the open item is decided",
+    "deliveries": "Deliveries"
+  },
+  "kinds": {
+    "training": "Training cycle",
+    "event": "Event",
+    "enterprise": "Enterprise"
+  },
+  "gate": {
+    "title": "Ramtha screens",
+    "body": "These forms belong to Ramtha Municipality. Your account works in another municipality."
+  }
+}

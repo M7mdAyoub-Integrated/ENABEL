@@ -18648,6 +18648,10 @@ export type Database = {
         }
         Returns: Json
       }
+      rmth_ensure_person: {
+        Args: { p: Json }
+        Returns: string
+      }
       rmth_next_reference: {
         Args: { p_municipality_id: string; p_prefix: string; p_year: number }
         Returns: string
@@ -18747,6 +18751,10 @@ export type Database = {
           p_q43?: string
           p_survey_id: string
         }
+        Returns: Json
+      }
+      save_rmth_record: {
+        Args: { p: Json; p_table: string }
         Returns: Json
       }
       set_acting_municipality: {

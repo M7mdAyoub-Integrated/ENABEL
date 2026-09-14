@@ -80,3 +80,7 @@ supabase/.ledger_manifest
 # Netlify CLI local state: the site link and machine-specific absolute paths.
 # netlify.toml at the root IS committed; this directory is per-machine.
 .netlify/
+
+# Python bytecode from the Ramtha generators (supabase/ramtha/*.py)
+__pycache__/
+*.pyc
