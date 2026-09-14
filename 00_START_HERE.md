@@ -31,6 +31,7 @@ your-repo/
 | Writing RLS | 05 |
 | Stuck on a definition | 06 — it is probably a known conflict |
 | New to the programme | 01 |
+| Picking up the Ramtha work | RAMTHA_REPORT.md, then 09, then OQ-46 to OQ-49 in 06 |
 
 ## The one rule
 
