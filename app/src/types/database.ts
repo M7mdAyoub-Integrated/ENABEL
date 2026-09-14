@@ -4094,6 +4094,7 @@ export type Database = {
           disaggregation: string[] | null
           final_target: number | null
           formula: string | null
+          full_code: string
           id: string
           indicator_type: string
           municipality_id: string
@@ -4115,6 +4116,7 @@ export type Database = {
           disaggregation?: string[] | null
           final_target?: number | null
           formula?: string | null
+          full_code: string
           id?: string
           indicator_type: string
           municipality_id?: string
@@ -4136,6 +4138,7 @@ export type Database = {
           disaggregation?: string[] | null
           final_target?: number | null
           formula?: string | null
+          full_code?: string
           id?: string
           indicator_type?: string
           municipality_id?: string
@@ -18394,6 +18397,25 @@ export type Database = {
           person_id: string | null
           subject: string | null
           village: string | null
+        }
+        Relationships: []
+      }
+      v_rmth_indicator_status: {
+        Row: {
+          code: string | null
+          full_code: string | null
+          missing_keys: string[] | null
+          municipality_id: string | null
+          reason: string | null
+        }
+        Relationships: []
+      }
+      v_rmth_indicator_unique: {
+        Row: {
+          code: string | null
+          municipality_id: string | null
+          period_code: string | null
+          unique_actual: number | null
         }
         Relationships: []
       }

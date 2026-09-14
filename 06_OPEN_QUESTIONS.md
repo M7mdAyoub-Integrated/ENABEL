@@ -1530,8 +1530,11 @@ view that reads one returns **not computable** — null, with the missing
 definition named — until the value is set. Never zero. Answering is an
 UPDATE on the row (`value_numeric` / `value_text` / `value_bool`, with
 `decided_by` and `decided_on`), which a coordinator of Ramtha or a super
-admin may do from SQL today and from a screen when one is built; it is not a
-migration.
+admin does on the **Open items** screen (`/rmth/thresholds`, Part 6) — the
+row's question and note in their language, the current answer, which
+indicators wait on it, and a Decide control; it is not a migration. The
+dashboard reads the same status view the screen does, so the two cannot
+disagree about what is blocked.
 
 | # | question | key(s) | blocks |
 |---|---|---|---|
@@ -1549,6 +1552,87 @@ E0.1, E0.2), and SO1-A1 has no statement at all (OQ-48, Part 6).
 
 **Decides.** Ramtha's M&E lead with ENABEL, for the count-versus-ratio half of
 item 1 and for item 6, where the two source documents disagree.
+
+---
+
+## 🔴 OQ-48 · Ramtha has no targets, one indicator has no statement, and the two framework sheets do not list the same indicators
+
+**Added 14 September 2026**, with migration `0131`.
+
+### The targets
+
+`RAMTHA Framework.xlsx` has two English sheets. **`English_form`** is the
+list the forms workbook (`RMTH_indicator_forms.xlsx`) was built from and the
+list this platform implements: 18 codes, one form each (17 — SO1-A1 has no
+form). Its `Target (to be deleted)` column, its `Baseline` column and its
+eight quarterly target columns (`27/Q1` … `28/Q4`) are **empty for every
+row**. **`English Copy`** carries targets — but for a *different* list of 13
+statements, lettered per objective rather than coded, with a different
+type column and two milestones that `English_form` does not have.
+
+The plan (§6.2) says not to map one onto the other, and 0131 does not: it
+seeds all 234 `indicator_target` rows (18 indicators × 13 quarters) with
+`target_value` **null**, so the dashboard reads *target not set* and never
+0, and the four headline cards say so under each figure.
+
+What is in one and not the other, for whoever reconciles them:
+
+| English Copy (target) | nearest English_form code | why it was not carried across |
+|---|---|---|
+| IMPACT — sustained employment/income (**65 persons at the end of 3 years**) | RMTH-IMP-0 | the only statement identical in both sheets. Still not mapped: the Copy's formula writes a **ratio** and the form sheet says "a COUNT, not a rate" (OQ-47 item 1), and a three-year figure is not thirteen quarterly ones |
+| SO1 / SO1-C — persons employed in the Ramtha project(s) (**15 annually**, the row appears twice) | RMTH-SO1-0 | SO1-0 counts persons who *demonstrate increased employability*, a wider statement (OQ-47 item 7) |
+| SO1-A — networking events including job fairs, periodic meetings **and vocational guidance sessions** (**4 per year**) | RMTH-SO1-A1.2 + A1.3 | English_form splits this into two indicators that the index says must **never** be summed; a target for the union cannot be divided between them |
+| SO1-B — Municipality-facilitated projects developed for employment (**1 annually**) | RMTH-SO1-B1.2 | B1.2 counts *proposals approved for implementation*; a different unit of observation |
+| SO2-A — training programs developed for employment (**4**) | RMTH-SO2-C1.1 | C1.1 counts short-term intensive *cycles delivered* whose content was jointly developed; not programmes |
+| SO2-B — trainees completing training programs related to employability (**80**) | RMTH-SO2-C1.2 | same words bar "Number of" / "#"; the Copy's duration says *quarterly* and does not say whether 80 is per quarter, per year or in total |
+| SO3-A — entrepreneurship projects developed/established at household level (**10 by end of 3 years**) | — | **no counterpart** in English_form |
+| SO3-B — training programs developed for entrepreneurship (**2**) | RMTH-SO3-F0.2 | identical statement; the Copy's own definition counts *sessions* while its statement counts *programmes* (OQ-47 item 6) |
+| SO3-C — participants trained in entrepreneurship training (**40**) | RMTH-SO3-F0.1 | identical statement; the same "per what period" question as SO2-B |
+| SO3-D — a mechanism for in-kind support established and operational (milestone, **1**) | — | **no counterpart**; a milestone, not a count |
+| SO3-E — Ramtha entrepreneurship incubator established (milestone, **1**) | RMTH-SO3-E0.1 | E0.1 is a *count* of specialised incubators established and operational; the Copy has one milestone |
+| SO3-F — persons employed / with regular income from entrepreneurship (**20 by end of 3 years**) | RMTH-SO3-0 | near-identical statement (the Copy's has both "employed" and "regular income"); a three-year figure, not quarterly |
+
+In `English_form` and not in the Copy: SO1-A1 (see below), SO1-B1 (%),
+SO1-B1.1, SO2-0 (%), SO2-C1 (%), SO3-E0.2 and SO3-E0.3. E0.3's code is the
+**forms workbook's**: its row in `English_form` has the statement and an
+empty `No.` cell.
+
+**Reporting periods.** Neither sheet states Ramtha's programme dates; the
+target columns run 27/Q1–28/Q4, exactly as Sahel Horan's do. 0131 seeds the
+same thirteen quarters (26/Q3–29/Q3) as separate rows, so the two plans
+lock independently.
+
+### SO1-A1
+
+`English_form` has a row `RMTH-SO1-A1` with a code and nothing else — no
+statement, no type, no definition. Same shape as Sahel Horan's C1.3. 0131
+seeds it as an indicator whose name says so in both languages, with no
+formula, no source and no view; 0132's `v_rmth_indicator_status` gives it
+`reason = 'no_statement'`, and the dashboard lists it greyed with the gap
+named rather than leaving a hole between SO1-0 and A1.2.
+
+### Two things the workbook has that the platform corrects silently, and one it does not
+
+- The activity row for E is labelled **"Activity D"** in the workbook while
+  its own code and every code under it are `RMTH-SO3-E…`. The code E is
+  kept and the row's title ("Establishing Small Business Incubators …") is
+  stored as `activity.name_en`; the "Activity D" label is stored nowhere.
+- `indicator.full_code` (`SHM-SO1-A1.2`, `RMTH-SO1-A1.2`): 0113's header said
+  0116 would add it and 0116 did not. 0131 adds it, NOT NULL and unique,
+  backfilled for Sahel Horan from `03_INDICATORS.md`'s documented codes.
+- **Not corrected:** the plan (§7) says "E0.2 counts one record per
+  participant per incubator". The E0.2 sheet's calculation line counts
+  **unique participants** who received at least one service, once however
+  many services or incubators. The view follows the sheet, which is the
+  specification; the plan's line reads as a description of the unit of
+  observation (which *is* one record per participant per incubator). If
+  the M&E lead wants the record count, it is a one-line change to
+  `v_ind_rmth_e0_2`.
+
+**Decides.** Ramtha's M&E lead with ENABEL: which list is the framework,
+and then the targets per quarter for it. Until then every Ramtha target
+stays null. **Never** enter a target from the Copy against an
+`English_form` code because the words match.
 
 ---
 

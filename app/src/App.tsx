@@ -10,7 +10,6 @@ import { useDirection } from './hooks/useDirection'
 import { MunicipalityGate, RequireCapability, RequireModule, RequireSession } from './auth/guards'
 import { RETIRED_MODULE_IDS } from './modules'
 import Landing from './routes/Landing'
-import Dashboard from './routes/Dashboard'
 import ListScreen from './routes/ListScreen'
 import FormScreen from './routes/FormScreen'
 import DetailScreen from './routes/DetailScreen'
@@ -22,6 +21,8 @@ import { RequireRamtha } from './rmth/RequireRamtha'
 import { RmthListScreen } from './rmth/RmthListScreen'
 import { RmthFormScreen } from './rmth/RmthFormScreen'
 import { RmthDetailScreen } from './rmth/RmthDetailScreen'
+import { RmthThresholds } from './rmth/RmthThresholds'
+import { DashboardSwitch } from './rmth/DashboardSwitch'
 import NotFound from './routes/NotFound'
 import PublicHome from './routes/public/PublicHome'
 import { PublicChooser, PublicNotFound, PublicSite } from './routes/public/PublicSite'
@@ -165,9 +166,12 @@ const router = createBrowserRouter([
   {
     element: <ShellLayout />,
     children: [
+      // One URL, one dashboard per municipality: DashboardSwitch renders
+      // routes/Dashboard (Sahel Horan's) unchanged unless the acting
+      // municipality is Ramtha, in which case rmth/RmthDashboard (plan §6.4).
       {
         path: '/dashboard',
-        element: guard(<Dashboard />, (n) => (
+        element: guard(<DashboardSwitch />, (n) => (
           <RequireCapability capability="dashboard.view">{n}</RequireCapability>
         )),
       },
@@ -405,6 +409,18 @@ const router = createBrowserRouter([
       // in this file already, so it was confirmed by following the URL rather
       // than by trusting the ranking.
       { path: '/rmth', element: <Navigate to={`/rmth/${RMTH_FORM_IDS[0]}`} replace /> },
+      // The seven open items (plan §5.4), read by every Ramtha role and
+      // answered by a coordinator. A static segment, so it outranks
+      // `/rmth/:form` -- and RequireRamtha would 404 'thresholds' as a form id
+      // if it did not.
+      {
+        path: '/rmth/thresholds',
+        element: guard(<RmthThresholds />, (n) => (
+          <RequireCapability capability="dashboard.view">
+            <RequireRamtha>{n}</RequireRamtha>
+          </RequireCapability>
+        )),
+      },
       {
         path: '/rmth/:form',
         element: guard(<RmthListScreen />, (n) => (

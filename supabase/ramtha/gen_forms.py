@@ -193,7 +193,8 @@ if errors:
 # ── the screens' own strings ──────────────────────────────────────────────
 common_en = OrderedDict([
     ('nav', OrderedDict([
-        ('group', OrderedDict([('so1', 'Objective 1 · Job opportunities'), ('so2', 'Objective 2 · Training'), ('so3', 'Objective 3 · Entrepreneurship'), ('impact', 'Impact'), ('other', 'Other')])),
+        ('group', OrderedDict([('so1', 'Objective 1 · Job opportunities'), ('so2', 'Objective 2 · Training'), ('so3', 'Objective 3 · Entrepreneurship'), ('impact', 'Impact'), ('other', 'Other'), ('definitions', 'Definitions')])),
+        ('thresholds', 'Open items'),
     ])),
     ('list', OrderedDict([
         ('new', 'New record'), ('empty', 'No records yet.'), ('emptyBody', 'Records entered through this form appear here, newest first.'),
@@ -244,10 +245,54 @@ common_en = OrderedDict([
     ])),
     ('kinds', OrderedDict([('training', 'Training cycle'), ('event', 'Event'), ('enterprise', 'Enterprise')])),
     ('gate', OrderedDict([('title', 'Ramtha screens'), ('body', 'These forms belong to Ramtha Municipality. Your account works in another municipality.')])),
+    # The dashboard (Part 6). Names and objectives come from the database
+    # (0131 seeded them from the workbook and its Arabic Copy); these are only
+    # the words around the numbers.
+    ('dashboard', OrderedDict([
+        ('title', 'Ramtha dashboard'),
+        ('intro', 'Eighteen indicators from the Ramtha results framework, computed from the seventeen forms. Every figure is read from the database; nothing is typed or worked out here.'),
+        ('noValue', '—'),
+        ('percent', '{value}%'),
+        ('ofTarget', 'of {target}'),
+        ('targetNotSet', 'target not set'),
+        ('ofWhomUnique', '{count, plural, one {# unique person} other {# unique people}}'),
+        ('denominator', 'of {count}'),
+        ('notComputable', 'Not computable until decided: {definition}'),
+        ('noStatement', 'The framework workbook gives this code and no indicator statement (OQ-48).'),
+        ('noForm', 'No form'),
+        ('openItems', 'Open items'),
+        ('targetsNotSet', 'No Ramtha target is set for any quarter. The English_form workbook carries none, and the English Copy sheet\'s targets belong to a different indicator list (OQ-48). A missing target is shown as "not set", never as zero.'),
+        ('blockedNotice', '{count, plural, one {# indicator cannot be computed} other {# indicators cannot be computed}} until an open item is decided.'),
+        ('noStatementNotice', 'RMTH-SO1-A1 has a code and no indicator statement in the framework workbook. It is listed so the gap stays visible (OQ-48).'),
+    ])),
+    # The open items screen: the seven definitions of plan §5.4, in the
+    # plan's order, answered as data (0123) by a coordinator.
+    ('thresholds', OrderedDict([
+        ('title', 'Open items'),
+        ('intro', 'The seven definitions the Ramtha forms index leaves open. Each is a value the indicator views read; while it is empty the indicator that depends on it is not computable — never zero. A coordinator writes the decision here, with the date; nothing else changes.'),
+        ('notDecided', 'Not decided'), ('yes', 'Yes'), ('no', 'No'),
+        ('value', 'Value'), ('rule', 'Rule, as it will be applied'),
+        ('decide', 'Decide'), ('save', 'Save decision'), ('decidedOn', 'decided {date}'),
+        ('blocks', 'Waiting on this'),
+        ('item', OrderedDict([
+            ('sustained_engagement', 'Open item 1 · Sustained engagement (IMP-0)'),
+            ('short_term_intensive', 'Open item 2 · Short-term intensive (C1.1)'),
+            ('regular_income', 'Open item 3 · Regular income (SO3-0)'),
+            ('completion_criteria', 'Open item 4 · Completion criteria (C1.2, E0.3, F0.1)'),
+            ('self_employment_as_placement', 'Open item 5 · Self-employment as a placement (SO2-0)'),
+            ('programmes_or_sessions', 'Open item 6 · Programmes or sessions (F0.2)'),
+            ('employability_threshold', 'Open item 7 · Employability threshold (SO1-0)'),
+        ])),
+        ('choice', OrderedDict([
+            ('f02_counting_reading', OrderedDict([('programmes', 'Programmes developed'), ('sessions', 'Sessions delivered')])),
+            ('so10_employability_threshold', OrderedDict([('form_rule', 'The form\'s rule: a confirmed placement, or one verifiable step plus one other'), ('placement_only', 'Confirmed placement only')])),
+        ])),
+    ])),
 ])
 common_ar = OrderedDict([
     ('nav', OrderedDict([
-        ('group', OrderedDict([('so1', 'الهدف 1 · فرص العمل'), ('so2', 'الهدف 2 · التدريب'), ('so3', 'الهدف 3 · ريادة الأعمال'), ('impact', 'الأثر'), ('other', 'أخرى')])),
+        ('group', OrderedDict([('so1', 'الهدف 1 · فرص العمل'), ('so2', 'الهدف 2 · التدريب'), ('so3', 'الهدف 3 · ريادة الأعمال'), ('impact', 'الأثر'), ('other', 'أخرى'), ('definitions', 'التعريفات')])),
+        ('thresholds', 'البنود المفتوحة'),
     ])),
     ('list', OrderedDict([
         ('new', 'سجل جديد'), ('empty', 'لا توجد سجلات بعد.'), ('emptyBody', 'تظهر هنا السجلات المدخلة عبر هذا النموذج، الأحدث أولاً.'),
@@ -295,6 +340,44 @@ common_ar = OrderedDict([
     ])),
     ('kinds', OrderedDict([('training', 'دورة تدريب'), ('event', 'فعالية'), ('enterprise', 'مشروع')])),
     ('gate', OrderedDict([('title', 'شاشات الرمثا'), ('body', 'هذه النماذج تخص بلدية الرمثا. حسابك يعمل في بلدية أخرى.')])),
+    ('dashboard', OrderedDict([
+        ('title', 'لوحة الرمثا'),
+        ('intro', 'ثمانية عشر مؤشراً من إطار نتائج الرمثا، تُحتسب من النماذج السبعة عشر. كل رقم يُقرأ من قاعدة البيانات؛ لا يُكتب ولا يُحتسب شيء هنا.'),
+        ('noValue', '—'),
+        ('percent', '{value}٪'),
+        ('ofTarget', 'من {target}'),
+        ('targetNotSet', 'الهدف غير محدد'),
+        ('ofWhomUnique', '{count, plural, =0 {لا أشخاص فريدين} one {شخص فريد واحد} two {شخصان فريدان} few {# أشخاص فريدين} many {# شخصاً فريداً} other {# شخص فريد}}'),
+        ('denominator', 'من {count}'),
+        ('notComputable', 'لا يمكن احتسابه حتى يُقرَّر: {definition}'),
+        ('noStatement', 'يعطي مصنف الإطار لهذا الرمز صياغة مؤشر فارغة (OQ-48).'),
+        ('noForm', 'لا نموذج'),
+        ('openItems', 'البنود المفتوحة'),
+        ('targetsNotSet', 'لم يُحدَّد أي هدف للرمثا لأي ربع. لا يحمل مصنف English_form أي أهداف، وأهداف ورقة English Copy تعود إلى قائمة مؤشرات مختلفة (OQ-48). يُعرض الهدف الناقص على أنه "غير محدد"، وليس صفراً أبداً.'),
+        ('blockedNotice', '{count, plural, =0 {لا مؤشرات} one {مؤشر واحد لا يمكن احتسابه} two {مؤشران لا يمكن احتسابهما} few {# مؤشرات لا يمكن احتسابها} many {# مؤشراً لا يمكن احتسابها} other {# مؤشر لا يمكن احتسابه}} حتى يُقرَّر بند مفتوح.'),
+        ('noStatementNotice', 'يحمل RMTH-SO1-A1 رمزاً دون صياغة مؤشر في مصنف الإطار. يُدرج هنا لتبقى الفجوة ظاهرة (OQ-48).'),
+    ])),
+    ('thresholds', OrderedDict([
+        ('title', 'البنود المفتوحة'),
+        ('intro', 'التعريفات السبعة التي يتركها فهرس نماذج الرمثا مفتوحة. كل منها قيمة تقرأها عروض المؤشرات؛ وما دامت فارغة فالمؤشر المعتمد عليها غير قابل للاحتساب - وليس صفراً أبداً. يكتب المنسق القرار هنا مع تاريخه؛ ولا يتغير شيء آخر.'),
+        ('notDecided', 'لم يُقرَّر'), ('yes', 'نعم'), ('no', 'لا'),
+        ('value', 'القيمة'), ('rule', 'القاعدة كما ستُطبَّق'),
+        ('decide', 'قرِّر'), ('save', 'حفظ القرار'), ('decidedOn', 'قُرِّر في {date}'),
+        ('blocks', 'بانتظار هذا البند'),
+        ('item', OrderedDict([
+            ('sustained_engagement', 'البند المفتوح 1 · الانخراط المستدام (IMP-0)'),
+            ('short_term_intensive', 'البند المفتوح 2 · قصير الأمد ومكثف (C1.1)'),
+            ('regular_income', 'البند المفتوح 3 · الدخل المنتظم (SO3-0)'),
+            ('completion_criteria', 'البند المفتوح 4 · معايير الإتمام (C1.2، E0.3، F0.1)'),
+            ('self_employment_as_placement', 'البند المفتوح 5 · العمل الحر بوصفه إلحاقاً (SO2-0)'),
+            ('programmes_or_sessions', 'البند المفتوح 6 · البرامج أم الجلسات (F0.2)'),
+            ('employability_threshold', 'البند المفتوح 7 · حد قابلية التشغيل (SO1-0)'),
+        ])),
+        ('choice', OrderedDict([
+            ('f02_counting_reading', OrderedDict([('programmes', 'البرامج المطوّرة'), ('sessions', 'الجلسات المنفذة')])),
+            ('so10_employability_threshold', OrderedDict([('form_rule', 'قاعدة النموذج: إلحاق مؤكد، أو خطوة واحدة قابلة للتحقق مع خطوة أخرى'), ('placement_only', 'الإلحاق المؤكد فقط')])),
+        ])),
+    ])),
 ])
 en.update(common_en)
 ar.update(common_ar)

@@ -1727,8 +1727,10 @@
       "so2": "Objective 2 · Training",
       "so3": "Objective 3 · Entrepreneurship",
       "impact": "Impact",
-      "other": "Other"
-    }
+      "other": "Other",
+      "definitions": "Definitions"
+    },
+    "thresholds": "Open items"
   },
   "list": {
     "new": "New record",
@@ -1839,5 +1841,54 @@
   "gate": {
     "title": "Ramtha screens",
     "body": "These forms belong to Ramtha Municipality. Your account works in another municipality."
+  },
+  "dashboard": {
+    "title": "Ramtha dashboard",
+    "intro": "Eighteen indicators from the Ramtha results framework, computed from the seventeen forms. Every figure is read from the database; nothing is typed or worked out here.",
+    "noValue": "—",
+    "percent": "{value}%",
+    "ofTarget": "of {target}",
+    "targetNotSet": "target not set",
+    "ofWhomUnique": "{count, plural, one {# unique person} other {# unique people}}",
+    "denominator": "of {count}",
+    "notComputable": "Not computable until decided: {definition}",
+    "noStatement": "The framework workbook gives this code and no indicator statement (OQ-48).",
+    "noForm": "No form",
+    "openItems": "Open items",
+    "targetsNotSet": "No Ramtha target is set for any quarter. The English_form workbook carries none, and the English Copy sheet's targets belong to a different indicator list (OQ-48). A missing target is shown as \"not set\", never as zero.",
+    "blockedNotice": "{count, plural, one {# indicator cannot be computed} other {# indicators cannot be computed}} until an open item is decided.",
+    "noStatementNotice": "RMTH-SO1-A1 has a code and no indicator statement in the framework workbook. It is listed so the gap stays visible (OQ-48)."
+  },
+  "thresholds": {
+    "title": "Open items",
+    "intro": "The seven definitions the Ramtha forms index leaves open. Each is a value the indicator views read; while it is empty the indicator that depends on it is not computable — never zero. A coordinator writes the decision here, with the date; nothing else changes.",
+    "notDecided": "Not decided",
+    "yes": "Yes",
+    "no": "No",
+    "value": "Value",
+    "rule": "Rule, as it will be applied",
+    "decide": "Decide",
+    "save": "Save decision",
+    "decidedOn": "decided {date}",
+    "blocks": "Waiting on this",
+    "item": {
+      "sustained_engagement": "Open item 1 · Sustained engagement (IMP-0)",
+      "short_term_intensive": "Open item 2 · Short-term intensive (C1.1)",
+      "regular_income": "Open item 3 · Regular income (SO3-0)",
+      "completion_criteria": "Open item 4 · Completion criteria (C1.2, E0.3, F0.1)",
+      "self_employment_as_placement": "Open item 5 · Self-employment as a placement (SO2-0)",
+      "programmes_or_sessions": "Open item 6 · Programmes or sessions (F0.2)",
+      "employability_threshold": "Open item 7 · Employability threshold (SO1-0)"
+    },
+    "choice": {
+      "f02_counting_reading": {
+        "programmes": "Programmes developed",
+        "sessions": "Sessions delivered"
+      },
+      "so10_employability_threshold": {
+        "form_rule": "The form's rule: a confirmed placement, or one verifiable step plus one other",
+        "placement_only": "Confirmed placement only"
+      }
+    }
   }
 }

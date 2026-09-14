@@ -200,6 +200,13 @@ function useNavGroups(): Group[] {
         labelKey: k === 'other' ? 'rmth:nav.group.other' : `rmth:nav.group.${k}`,
         items: byGroup.get(k) ?? [],
       }))
+    // The seven open items, after the forms: the dashboard says "not
+    // computable until decided" and this is where it is decided. Every Ramtha
+    // role can read it; the screen shows the Decide control to coordinators.
+    ordered.push({
+      labelKey: 'rmth:nav.group.definitions',
+      items: [{ to: '/rmth/thresholds', labelKey: 'rmth:nav.thresholds', num: String(n + 1).padStart(2, '0') }],
+    })
 
     return [...platform.slice(0, 1), ...ordered, ...platform.slice(1)].filter(
       (g) => g.items.length > 0,
