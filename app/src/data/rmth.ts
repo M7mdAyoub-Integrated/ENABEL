@@ -191,6 +191,13 @@ const PICK_DATE: Partial<Record<RmthTable, string>> = {
   rmth_proposal: 'submitted_on',
   rmth_training_cycle: 'start_date',
 }
+// Only the tables 0124 issues a reference to. Selecting `reference` from one
+// that has no such column is a 400 from PostgREST and an empty picker with no
+// message -- which is how B1's "first record for this implementer" picker
+// was found empty on 14 September.
+const PICK_HAS_REFERENCE = new Set<RmthTable>([
+  'rmth_event', 'rmth_proposal', 'rmth_training_programme', 'rmth_training_cycle', 'rmth_incubator', 'rmth_enterprise',
+])
 
 export function useRmthPicker(table: RmthTable | undefined, kind: Readonly<Record<string, string>> | undefined) {
   return useQuery({
@@ -201,7 +208,7 @@ export function useRmthPicker(table: RmthTable | undefined, kind: Readonly<Recor
       const t = table!
       const titleCol = PICK_TITLE[t]
       const dateCol = PICK_DATE[t]
-      const cols = ['id', 'reference', titleCol, dateCol, t === 'rmth_training_cycle' ? 'programme_id' : null, t === 'rmth_training_cycle' ? 'cycle_no' : null]
+      const cols = ['id', PICK_HAS_REFERENCE.has(t) ? 'reference' : null, titleCol, dateCol, t === 'rmth_training_cycle' ? 'programme_id' : null, t === 'rmth_training_cycle' ? 'cycle_no' : null]
         .filter((c): c is string => !!c)
       let q = db.from(t).select(Array.from(new Set(cols)).join(', ')).is('deleted_at', null)
       for (const [k, v] of Object.entries(kind ?? {})) q = q.eq(k, v)
@@ -305,102 +312,5 @@ export function useCreateEnterprise() {
   return save
 }
 
-/* ── evidence ─────────────────────────────────────────────────────────────── */
-
-export type Attachment = {
-  id: string
-  entity_type: string
-  entity_id: string
-  storage_path: string
-  file_name: string
-  mime_type: string | null
-  size_bytes: number | null
-  uploaded_at: string
-  deleted_at: string | null
-}
-
-export function useAttachments(entityType: string, entityId: string | undefined) {
-  return useQuery({
-    queryKey: ['attachments', entityType, entityId ?? ''],
-    enabled: !!entityId,
-    queryFn: async (): Promise<Attachment[]> => {
-      const res = await (db
-        .from('attachment')
-        .select('id, entity_type, entity_id, storage_path, file_name, mime_type, size_bytes, uploaded_at, deleted_at')
-        .eq('entity_type', entityType)
-        .eq('entity_id', entityId!)
-        .is('deleted_at', null)
-        .order('uploaded_at', { ascending: false }) as unknown as Promise<{ data: Attachment[] | null; error: unknown }>)
-      return unwrapList(res)
-    },
-  })
-}
-
-/**
- * Upload: the object first, under <municipality>/<entity_type>/<entity_id>/,
- * then the row. If the row is refused the object is removed again, so the
- * bucket never holds a file no row points at.
- */
-export function useUploadAttachment(entityType: string, entityId: string, municipalityId: string) {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationKey: ['attachments', 'upload', entityType, entityId],
-    retry: false,
-    mutationFn: async (file: File) => {
-      const safe = file.name.replace(/[^\w.\-()؀-ۿ ]+/g, '_').slice(0, 120)
-      const path = `${municipalityId}/${entityType}/${entityId}/${crypto.randomUUID()}-${safe}`
-      const up = await supabase.storage.from('evidence').upload(path, file, { upsert: false, contentType: file.type || 'application/octet-stream' })
-      if (up.error) throw toAppError({ code: 'storage', message: up.error.message })
-      const ins = await (supabase
-        .from('attachment')
-        .insert({
-          entity_type: entityType,
-          entity_id: entityId,
-          storage_path: path,
-          file_name: file.name,
-          mime_type: file.type || null,
-          size_bytes: file.size,
-          municipality_id: municipalityId,
-        } as never)
-        .select('id') as unknown as Promise<{ data: { id: string }[] | null; error: { message: string; code?: string } | null }>)
-      if (ins.error || !ins.data?.length) {
-        await supabase.storage.from('evidence').remove([path])
-        throw toAppError(ins.error ?? { code: '42501', message: 'forbidden' })
-      }
-      return ins.data[0]!.id
-    },
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['attachments', entityType, entityId] })
-    },
-  })
-}
-
-/** A short-lived signed URL to open the file. */
-export async function attachmentUrl(path: string): Promise<string> {
-  const res = await supabase.storage.from('evidence').createSignedUrl(path, 60)
-  if (res.error || !res.data) throw toAppError({ code: 'storage', message: res.error?.message ?? 'no url' })
-  return res.data.signedUrl
-}
-
-/** Remove: soft-delete the row (coordinator, guard_soft_delete), then the object. */
-export function useRemoveAttachment(entityType: string, entityId: string) {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationKey: ['attachments', 'remove', entityType, entityId],
-    retry: false,
-    mutationFn: async (a: Attachment) => {
-      const res = await (supabase
-        .from('attachment')
-        .update({ deleted_at: new Date().toISOString() } as never)
-        .eq('id', a.id)
-        .select('id') as unknown as Promise<{ data: { id: string }[] | null; error: unknown }>)
-      if (res.error) throw toAppError(res.error)
-      if (!res.data || res.data.length !== 1) throw toAppError({ code: '42501', message: 'forbidden' })
-      const rm = await supabase.storage.from('evidence').remove([a.storage_path])
-      if (rm.error) throw toAppError({ code: 'storage', message: rm.error.message })
-    },
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['attachments', entityType, entityId] })
-    },
-  })
-}
+// Evidence files are in data/evidence.ts: since 0128 they live on Cloudflare
+// R2 through the `evidence` Edge Function, for every table, not only Ramtha's.

@@ -95,6 +95,55 @@ DISAGG_AR = {
 }
 
 
+# The Arabic INDICATOR STATEMENT for each form: the Arabic `title`, the
+# heading of the form page, and (Part 6) `indicator.name_ar`.
+#
+# `title_ar` above stays the SHORT name the sidebar uses. The two were one
+# string until 14 September 2026, which put a drafted short name where the
+# English side shows the sheet's full statement -- and the plan (§5.5) is
+# explicit that the framework workbook's "Arabic Copy" sheet already carries
+# the statements translated and is to be used.
+#
+# That sheet translates the "English Copy" list, which is NOT the form list
+# (the plan's §6.2: the two lists do not correspond). So each entry below says
+# where it came from:
+#
+#   workbook   the Arabic Copy's own statement, VERBATIM, where the form's
+#              English statement is the English Copy's statement (IMPACT,
+#              SO2-B, SO3-B, SO3-C, SO3-F)
+#   workbook*  built from the Arabic Copy's own words for a statement it
+#              splits or combines: SO1-A reads "networking events, including
+#              job fairs, periodic meetings and vocational guidance sessions",
+#              and the form list keeps events (A1.2) and guidance sessions
+#              (A1.3) apart -- the index says never to sum them -- so A1.2
+#              takes the clause before the guidance sessions and A1.3 takes
+#              the sheet's own phrase for them
+#   drafted    no Arabic Copy statement corresponds (SO1-C is "persons
+#              employed", not "increased employability"; SO3-E is a milestone,
+#              not a count of incubators); translated here from the form's
+#              English statement, under OQ-32's rule, for the Municipality's
+#              review alongside OQ-46
+STATEMENT_AR = {
+    'imp0':  ('workbook',  'عدد أفراد الفئة المستهدفة الذين يحققون عملاً أو دخلاً مستدامًا نتيجة للفرص الاقتصادية التي سهّلتها البلدية'),
+    'so10':  ('drafted',   'عدد الأشخاص الذين يُظهرون قابلية تشغيل متزايدة نتيجة فرص التشبيك التي سهّلتها البلدية'),
+    'a12':   ('workbook*', 'عدد فعاليات التشبيك، بما يشمل الأيام الوظيفية'),
+    'a13':   ('workbook*', 'عدد جلسات التوجيه المهني'),
+    'b1':    ('drafted',   'نسبة منفذي المشاريع المدعومة الذين يفيدون بأن مكوّناً واحداً على الأقل من الدعم البلدي كان أساسياً لقدرتهم على العمل'),
+    'b11':   ('drafted',   'عدد برامج التدريب المتخصصة (الصناعية أو الزراعية أو الإدارية) المصمَّمة وفق المتطلبات الفنية للمشاريع المعتمدة'),
+    'b12':   ('drafted',   'عدد المقترحات المعتمدة للتنفيذ'),
+    'so20':  ('drafted',   'نسبة متمّي التدريب الذين أُلحقوا بعمل أو تدريب داخلي خلال ثلاثة أشهر من إتمام الدورة'),
+    'so2c1': ('drafted',   'نسبة المتدربين الذين يفيدون بأن التدريب المقدَّم دعم مسارهم نحو التشغيل'),
+    'c11':   ('drafted',   'عدد دورات التدريب المكثفة قصيرة الأمد المنفَّذة التي طُوِّر محتواها بالاشتراك مع منشآت القطاع الخاص والمؤسسات الأكاديمية أو المهنية'),
+    'c12':   ('workbook',  'عدد المتدربين الذين أتمّوا برامج تدريب مرتبطة بالتشغيل'),
+    'so30':  ('workbook',  'عدد الأشخاص الذين حصلوا على دخل منتظم نتيجة برامج ريادة الأعمال المدعومة من البلدية'),
+    'e01':   ('drafted',   'عدد حاضنات الأعمال المتخصصة المُنشأة في مجالات عالية الأثر مثل التنمية الحضرية والبنية التحتية وتصنيع الأغذية والخدمات المهنية'),
+    'e02':   ('drafted',   'عدد المشاركين الذين يتلقون خدمات الاحتضان'),
+    'e03':   ('drafted',   'عدد المشاركين المدرَّبين على تصميم الحاضنات'),
+    'f01':   ('workbook',  'عدد المشاركين الذين أتمّوا تدريبات في ريادة الأعمال'),
+    'f02':   ('workbook',  'عدد برامج التدريب المطوّرة في مجال ريادة الأعمال'),
+}
+
+
 def form(fid, sheet, indicator, table, title_ar, calc_ar, who_ar, when_ar, fixed=None, filter_=None, sections=()):
     assert fid not in FORMS
     FORMS[fid] = dict(id=fid, sheet=sheet, indicator=indicator, table=table, title_ar=title_ar,
@@ -188,7 +237,7 @@ form('imp0', 'IMP-0_Sustained_engagement', 'RMTH-IMP-0', 'rmth_outcome_survey',
       fld('Has this National ID already been counted for this indicator in a previous round?', 'counted_under_id', 'readonly',
           'هل سبق احتساب هذا الرقم الوطني لهذا المؤشر في جولة سابقة؟',
           'يمنع العدّ المزدوج. يُحتسب كل مستفيد مرة واحدة فقط، وفق خطة العمل.',
-          derived='counted_under'),
+          options=[('first', 'No - count this person', 'لا - احتسب هذا الشخص'), ('counted', 'Yes - already counted under record: {reference}', 'نعم - سبق احتسابه تحت السجل: {reference}')], derived='counted_under'),
       ENUM),
 ])
 
@@ -235,7 +284,7 @@ form('so10', 'SO1-0_Employability', 'RMTH-SO1-0', 'rmth_outcome_survey',
           'هذا الحقل ينتج عدّ المؤشر. يجب أن يتبع من الأسئلة الثلاثة أعلاه، لا أن يُقدَّر بشكل منفصل.',
           derived='so10_threshold', counting=True),
       fld('Has this National ID already been counted for this indicator?', 'counted_under_id', 'readonly',
-          'هل سبق احتساب هذا الرقم الوطني لهذا المؤشر؟', 'يُحتسب مرة واحدة لكل شخص.', derived='counted_under'),
+          'هل سبق احتساب هذا الرقم الوطني لهذا المؤشر؟', 'يُحتسب مرة واحدة لكل شخص.', options=[('first', 'No - count this person', 'لا - احتسب هذا الشخص'), ('counted', 'Yes - already counted under record: {reference}', 'نعم - سبق احتسابه تحت السجل: {reference}')], derived='counted_under'),
       EVIDENCE('so10_evidence', 'الأدلة في الملف'),
       fld('Enumerator name and date of contact', 'enumerator', 'parts', 'اسم الباحث/ة وتاريخ التواصل',
           parts=[('enumerator_name', 'text', 'Name', 'الاسم', {}), ('contact_date', 'date', 'Date', 'التاريخ', {})])),
@@ -683,7 +732,7 @@ form('c12', 'SO2-C1.2_Completion', 'RMTH-SO2-C1.2', 'rmth_training_enrolment',
       fld('Has this National ID already completed a cycle counted under this indicator?', 'counted_under_id', 'readonly',
           'هل سبق لهذا الرقم الوطني إتمام دورة محتسبة تحت هذا المؤشر؟',
           'يتيح للبلدية الإبلاغ عن المتمّين الفريدين إلى جانب إجمالي الإتمامات، ويغذّي عدّ الأثر بعد إزالة التكرار.',
-          derived='counted_under')),
+          options=[('first', 'No - this is a first completion', 'لا - هذا أول إتمام'), ('counted', 'Yes - previously counted under record: {reference}', 'نعم - سبق احتسابه تحت السجل: {reference}')], derived='counted_under')),
   sec('EVIDENCE', 'الأدلة',
       EVIDENCE('c12_evidence', 'الأدلة في الملف'),
       fld('Trainer name', 'trainer_name', 'text', 'اسم المدرب/ة')),
@@ -734,7 +783,7 @@ form('so30', 'SO3-0_Regular_income', 'RMTH-SO3-0', 'rmth_outcome_survey',
           'كيف تم التحقق من الدخل، وما الموجود في الملف؟',
           'اسعَ إلى مصدر واحد على الأقل غير الإفادة الذاتية حيثما أمكن.', question='so30_verification'),
       fld('Has this National ID already been counted for this indicator?', 'counted_under_id', 'readonly',
-          'هل سبق احتساب هذا الرقم الوطني لهذا المؤشر؟', 'يُحتسب مرة واحدة لكل شخص.', derived='counted_under'),
+          'هل سبق احتساب هذا الرقم الوطني لهذا المؤشر؟', 'يُحتسب مرة واحدة لكل شخص.', options=[('first', 'No - count this person', 'لا - احتسب هذا الشخص'), ('counted', 'Yes - already counted under record: {reference}', 'نعم - سبق احتسابه تحت السجل: {reference}')], derived='counted_under'),
       fld('Enumerator name and date', 'enumerator', 'parts', 'اسم الباحث/ة والتاريخ',
           parts=[('enumerator_name', 'text', 'Name', 'الاسم', {}), ('contact_date', 'date', 'Date', 'التاريخ', {})])),
 ])
@@ -820,7 +869,7 @@ form('e02', 'SO3-E0.2_Incubation_service', 'RMTH-SO3-E0.2', 'rmth_incubation_ser
           question='e02_service', required=True, counting=True),
       fld("Is this the participant's first time receiving incubation services from the Municipality?", 'counted_under_id', 'readonly',
           'هل هذه المرة الأولى التي يتلقى فيها المشارك خدمات احتضان من البلدية؟',
-          'هذا الحقل يزيل التكرار من العدّ.', derived='counted_under'),
+          'هذا الحقل يزيل التكرار من العدّ.', options=[('first', 'Yes - count as a new unique participant', 'نعم - يُحتسب مشاركاً فريداً جديداً'), ('counted', 'No - already counted under record: {reference}', 'لا - سبق احتسابه تحت السجل: {reference}')], derived='counted_under'),
       fld('Current status in the incubator', 'status_id', 'select', 'الحالة الحالية في الحاضنة',
           'اختياري - للتعلّم وإدارة البرنامج. ليس جزءاً من عدّ المؤشر.', ref='e02_status')),
   sec('EVIDENCE', 'الأدلة',
@@ -847,7 +896,11 @@ form('e03', 'SO3-E0.3_Incub_design_train', 'RMTH-SO3-E0.3', 'rmth_training_enrol
   sec('TRAINING CYCLE', 'دورة التدريب',
       fld('Training cycle reference and title', 'cycle_id', 'record', 'مرجع دورة التدريب وعنوانها',
           'RMTH-ID هي البادئة لدورات تصميم الحاضنات، تمييزاً لها عن دورات التشغيل RMTH-TC وبرامج ريادة الأعمال RMTH-EP.',
-          table='rmth_training_cycle', kind={'cycle_kind': 'incubator_design'}, required=True,
+          # create=True: no other form makes an incubator-design cycle (C1.1
+          # makes employability cycles, F0.2's log makes entrepreneurship
+          # deliveries), and the sheet carries the cycle block on THIS form --
+          # so the picker offers to add one, with the sheet's own four rows.
+          table='rmth_training_cycle', kind={'cycle_kind': 'incubator_design'}, required=True, create=True,
           sub='Reference (RMTH-ID-YYYY-000)', sub_ar='المرجع (RMTH-ID-YYYY-000)'),
       fld('Dates and total hours', 'cycle_dates', 'readonly', 'التواريخ وإجمالي الساعات', derived='cycle_dates_hours'),
       fld('Delivered by', 'delivered_by', 'readonly', 'مقدَّمة من', derived='cycle_delivered_by'),
@@ -867,7 +920,7 @@ form('e03', 'SO3-E0.3_Incub_design_train', 'RMTH-SO3-E0.3', 'rmth_training_enrol
                  ('certificate_number', 'text', 'certificate number', 'رقم الشهادة', {})]),
       fld('Has this National ID already been counted for this indicator?', 'counted_under_id', 'readonly',
           'هل سبق احتساب هذا الرقم الوطني لهذا المؤشر؟',
-          'يتيح للبلدية الإبلاغ عن المشاركين الفريدين إلى جانب إجمالي الإتمامات.', derived='counted_under')),
+          'يتيح للبلدية الإبلاغ عن المشاركين الفريدين إلى جانب إجمالي الإتمامات.', options=[('first', 'No - this is a first completion', 'لا - هذا أول إتمام'), ('counted', 'Yes - previously counted under record: {reference}', 'نعم - سبق احتسابه تحت السجل: {reference}')], derived='counted_under')),
   sec('EVIDENCE', 'الأدلة',
       EVIDENCE('e03_evidence', 'الأدلة في الملف'),
       fld('Trainer name and date', 'trainer', 'parts', 'اسم المدرب/ة والتاريخ',
@@ -912,7 +965,7 @@ form('f01', 'SO3-F0.1_Entrep_completion', 'RMTH-SO3-F0.1', 'rmth_training_enrolm
                  ('certificate_number', 'text', 'certificate number', 'رقم الشهادة', {})]),
       fld('Has this National ID already been counted for this indicator?', 'counted_under_id', 'readonly',
           'هل سبق احتساب هذا الرقم الوطني لهذا المؤشر؟',
-          'يتيح للبلدية الإبلاغ عن المشاركين الفريدين إلى جانب إجمالي الإتمامات.', derived='counted_under')),
+          'يتيح للبلدية الإبلاغ عن المشاركين الفريدين إلى جانب إجمالي الإتمامات.', options=[('first', 'No - this is a first completion', 'لا - هذا أول إتمام'), ('counted', 'Yes - previously counted under record: {reference}', 'نعم - سبق احتسابه تحت السجل: {reference}')], derived='counted_under')),
   sec('EVIDENCE', 'الأدلة',
       EVIDENCE('f01_evidence', 'الأدلة في الملف', 'تسمّي خطة العمل كشوف الحضور وشهادات الإتمام أدلةً.'),
       fld('Trainer name', 'trainer_name', 'text', 'اسم المدرب/ة')),

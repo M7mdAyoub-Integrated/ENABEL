@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { AccentRule, Card, EmptyState, PageHead, SectionRule } from '../ui/primitives'
 import { LocaleSwitcher } from '../components/LocaleSwitcher'
 import { VerificationGaps } from '../components/VerificationGaps'
+import { EvidenceStorageCard } from '../components/EvidenceStorageCard'
 import { useAuth } from '../auth/AuthProvider'
 import { can } from '../auth/permissions'
 
@@ -39,6 +40,11 @@ export function Settings() {
           duplicating it: `person_read` is is_staff(), so partner_viewer and a
           participant get zero rows from RLS either way. */}
       {can(role, 'record.edit') ? <VerificationGaps /> : null}
+
+      {/* Evidence storage: the platform total against the 10 GB the store
+          includes, the 9 GB stop, and the largest consumers. Staff only, the
+          same gate as evidence_usage() itself (is_staff). */}
+      {can(role, 'record.edit') ? <EvidenceStorageCard /> : null}
 
       <div className="mt-[18px]">
         <EmptyState

@@ -20,7 +20,7 @@ import openpyxl
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
 sys.path.insert(0, HERE)
-from forms import FORMS, DISAGG_AR, SHORT_EN
+from forms import FORMS, DISAGG_AR, SHORT_EN, STATEMENT_AR
 from lists import L as LISTS
 
 WB = openpyxl.load_workbook(os.path.join(ROOT, 'RMTH_indicator_forms.xlsx'), read_only=True, data_only=True)
@@ -71,6 +71,9 @@ errors = []
 _missing_short = [k for k in FORMS if k not in SHORT_EN]
 if _missing_short:
     raise SystemExit('gen_forms: no SHORT_EN entry for: %s' % ', '.join(sorted(_missing_short)))
+_missing_stmt = [k for k in FORMS if k not in STATEMENT_AR]
+if _missing_stmt:
+    raise SystemExit('gen_forms: no STATEMENT_AR entry for: %s' % ', '.join(sorted(_missing_stmt)))
 _missing_disagg = [k for k in FORMS if k not in DISAGG_AR]
 if _missing_disagg:
     raise SystemExit('gen_forms: no DISAGG_AR entry for: %s' % ', '.join(sorted(_missing_disagg)))
@@ -91,9 +94,10 @@ for fid, f in FORMS.items():
     h = head(rows)
     fen = OrderedDict(title=h['title'], short=SHORT_EN[fid], indicator=f['indicator'], who=h.get('who', ''), when=h.get('when', ''),
                       calc=h.get('calc', ''), disaggregation=h.get('disagg', ''), sections=OrderedDict(), fields=OrderedDict())
-    # Arabic's `title` is already a short name, so `short` is the same string
-    # rather than a second, subtly different one for someone to keep in sync.
-    far = OrderedDict(title=f['title_ar'], short=f['title_ar'], indicator=f['indicator'], who=f['who_ar'], when=f['when_ar'],
+    # Arabic mirrors English: `title` is the indicator STATEMENT (the Arabic
+    # Copy's where it has one -- see STATEMENT_AR) and `short` is the name the
+    # sidebar shows. Until 14 September both were the short name.
+    far = OrderedDict(title=STATEMENT_AR[fid][1], short=f['title_ar'], indicator=f['indicator'], who=f['who_ar'], when=f['when_ar'],
                       calc=f['calc_ar'], disaggregation=DISAGG_AR[fid], sections=OrderedDict(), fields=OrderedDict())
     dsecs = []
     for si, s in enumerate(f['sections']):
@@ -141,7 +145,12 @@ for fid, f in FORMS.items():
                 e['opts'] = OrderedDict(); a['opts'] = OrderedDict()
                 d['options'] = [o[0] for o in fl['options']]
                 for val, en_txt, ar_txt in fl['options']:
-                    if not any(contains(l, en_txt) or contains(en_txt, l) for l in lines):
+                    # A `{reference}` placeholder stands where the sheet has a
+                    # blank to write the record reference into ("... under
+                    # record: _______"); option_lines() has already stripped
+                    # the blank, so strip the placeholder the same way.
+                    en_cmp = re.sub(r':\s*\{reference\}\s*$', '', en_txt)
+                    if not any(contains(l, en_cmp) or contains(en_cmp, l) for l in lines):
                         errors.append(f"{fid}.{key}: option '{en_txt}' not in the sheet")
                     e['opts'][val] = en_txt; a['opts'][val] = ar_txt
             if fl.get('parts'):
@@ -214,17 +223,21 @@ common_en = OrderedDict([
         ('deliveryCompleting', 'Participants completing'), ('deliveryNone', 'No deliveries recorded yet.'),
         ('deliveriesSavedSeparately', 'Deliveries are saved one at a time from the programme\'s page once the programme exists.'),
         ('createEnterprise', 'New enterprise'), ('enterpriseName', 'Enterprise name'), ('mirrorEnd', 'A session is one day: the end date is the same as the date.'),
+        # The inline cycle for E0.3 (the sheet's own four rows, verbatim)
+        ('cycleNew', OrderedDict([
+            ('open', 'Add an incubator-design cycle'), ('title', 'Title'), ('start', 'Start'), ('end', 'End'),
+            ('hours', 'Total hours'), ('deliveredBy', 'Delivered by'), ('modules', 'Modules covered'),
+            ('add', 'Add cycle'), ('cancel', 'Cancel'),
+            ('note', 'RMTH-ID is the prefix for incubator-design cycles. The reference is assigned when the cycle is added; at least one design module must be recorded or the participant will not count.'),
+        ])),
         ('recordPicker', OrderedDict([('none', 'None'), ('loadFailed', 'The list could not be loaded.')])),
     ])),
     ('detail', OrderedDict([
         ('edit', 'Edit'), ('delete', 'Delete'), ('restore', 'Restore'), ('deleteConfirm', 'Delete this record? It stops counting and can be restored later.'),
         ('deletedNote', 'This record is deleted and does not count. A coordinator can restore it.'),
-        ('created', 'Created'), ('updated', 'Updated'), ('notSet', 'Not set'), ('evidence', 'Evidence files'),
-        ('upload', 'Add a file'), ('uploading', 'Uploading…'), ('noFiles', 'No files attached yet.'),
-        ('remove', 'Remove'), ('download', 'Open'), ('uploadFailed', 'The file could not be uploaded.'),
-        # A unit is a word, not a glyph: it does not belong in ui/glyphs.ts.
-        ('fileSizeKb', '{size} KB'), ('fileSizeMb', '{size} MB'),
-        ('countedUnderNo', 'No - count this person'), ('countedUnderYes', 'Yes - already counted under record {reference}'),
+        ('created', 'Created'), ('updated', 'Updated'), ('notSet', 'Not set'),
+        # The evidence panel's strings are in common.json (`evidence.*`): since
+        # 0128 the panel is the platform's, not Ramtha's.
         ('counts', 'Counts towards the indicator'), ('notCounts', 'Does not count'),
         ('thresholdUndecided', 'Cannot be worked out until the open item is decided'),
         ('deliveries', 'Deliveries'),
@@ -264,16 +277,18 @@ common_ar = OrderedDict([
         ('deliveryCompleting', 'المشاركون المتمّون'), ('deliveryNone', 'لم تُسجَّل أي عمليات تنفيذ بعد.'),
         ('deliveriesSavedSeparately', 'تُحفظ عمليات التنفيذ واحدة تلو الأخرى من صفحة البرنامج بعد إنشائه.'),
         ('createEnterprise', 'مشروع جديد'), ('enterpriseName', 'اسم المشروع'), ('mirrorEnd', 'الجلسة يوم واحد: تاريخ الانتهاء هو التاريخ نفسه.'),
+        ('cycleNew', OrderedDict([
+            ('open', 'إضافة دورة تصميم حاضنات'), ('title', 'العنوان'), ('start', 'البداية'), ('end', 'النهاية'),
+            ('hours', 'إجمالي الساعات'), ('deliveredBy', 'مقدَّمة من'), ('modules', 'الوحدات المغطاة'),
+            ('add', 'إضافة الدورة'), ('cancel', 'إلغاء'),
+            ('note', 'RMTH-ID هي البادئة لدورات تصميم الحاضنات. يُعيَّن المرجع عند إضافة الدورة؛ ويجب تسجيل وحدة تصميم واحدة على الأقل وإلا فلن يُحتسب المشارك.'),
+        ])),
         ('recordPicker', OrderedDict([('none', 'لا شيء'), ('loadFailed', 'تعذّر تحميل القائمة.')])),
     ])),
     ('detail', OrderedDict([
         ('edit', 'تعديل'), ('delete', 'حذف'), ('restore', 'استعادة'), ('deleteConfirm', 'حذف هذا السجل؟ سيتوقف عن الاحتساب ويمكن استعادته لاحقاً.'),
         ('deletedNote', 'هذا السجل محذوف ولا يُحتسب. يمكن للمنسق استعادته.'),
-        ('created', 'أُنشئ'), ('updated', 'حُدِّث'), ('notSet', 'غير محدد'), ('evidence', 'ملفات الأدلة'),
-        ('upload', 'إضافة ملف'), ('uploading', 'جارٍ الرفع…'), ('noFiles', 'لا توجد ملفات مرفقة بعد.'),
-        ('remove', 'إزالة'), ('download', 'فتح'), ('uploadFailed', 'تعذّر رفع الملف.'),
-        ('fileSizeKb', '{size} كيلوبايت'), ('fileSizeMb', '{size} ميغابايت'),
-        ('countedUnderNo', 'لا - احتسب هذا الشخص'), ('countedUnderYes', 'نعم - سبق احتسابه تحت السجل {reference}'),
+        ('created', 'أُنشئ'), ('updated', 'حُدِّث'), ('notSet', 'غير محدد'),
         ('counts', 'يُحتسب في المؤشر'), ('notCounts', 'لا يُحتسب'),
         ('thresholdUndecided', 'لا يمكن استخلاصه حتى يُقرَّر البند المفتوح'),
         ('deliveries', 'عمليات التنفيذ'),

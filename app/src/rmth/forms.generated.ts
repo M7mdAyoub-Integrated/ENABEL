@@ -181,7 +181,11 @@ export const RMTH_FORMS = {
           {
             "key": "counted_under_id",
             "type": "readonly",
-            "derived": "counted_under"
+            "derived": "counted_under",
+            "options": [
+              "first",
+              "counted"
+            ]
           },
           {
             "key": "enumerator_name",
@@ -313,7 +317,11 @@ export const RMTH_FORMS = {
           {
             "key": "counted_under_id",
             "type": "readonly",
-            "derived": "counted_under"
+            "derived": "counted_under",
+            "options": [
+              "first",
+              "counted"
+            ]
           },
           {
             "key": "so10_evidence",
@@ -1703,7 +1711,11 @@ export const RMTH_FORMS = {
           {
             "key": "counted_under_id",
             "type": "readonly",
-            "derived": "counted_under"
+            "derived": "counted_under",
+            "options": [
+              "first",
+              "counted"
+            ]
           }
         ]
       },
@@ -1896,7 +1908,11 @@ export const RMTH_FORMS = {
           {
             "key": "counted_under_id",
             "type": "readonly",
-            "derived": "counted_under"
+            "derived": "counted_under",
+            "options": [
+              "first",
+              "counted"
+            ]
           },
           {
             "key": "enumerator",
@@ -2206,7 +2222,11 @@ export const RMTH_FORMS = {
           {
             "key": "counted_under_id",
             "type": "readonly",
-            "derived": "counted_under"
+            "derived": "counted_under",
+            "options": [
+              "first",
+              "counted"
+            ]
           },
           {
             "key": "status_id",
@@ -2313,7 +2333,8 @@ export const RMTH_FORMS = {
             "table": "rmth_training_cycle",
             "kind": {
               "cycle_kind": "incubator_design"
-            }
+            },
+            "create": true
           },
           {
             "key": "cycle_dates",
@@ -2385,7 +2406,11 @@ export const RMTH_FORMS = {
           {
             "key": "counted_under_id",
             "type": "readonly",
-            "derived": "counted_under"
+            "derived": "counted_under",
+            "options": [
+              "first",
+              "counted"
+            ]
           }
         ]
       },
@@ -2560,7 +2585,11 @@ export const RMTH_FORMS = {
           {
             "key": "counted_under_id",
             "type": "readonly",
-            "derived": "counted_under"
+            "derived": "counted_under",
+            "options": [
+              "first",
+              "counted"
+            ]
           }
         ]
       },

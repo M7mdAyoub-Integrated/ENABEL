@@ -11,7 +11,7 @@ import { usePersonByNationalId } from '../data/completions'
 import { isCompleteNationalId, normaliseNationalId } from '../data/apply'
 import { formatShortDate } from '../lib/format'
 import {
-  rmthRefQuery, useRmthPicker, useRmthRecord, useSaveRmth, useCreateEnterprise,
+  rmthRefQuery, useRmthPicker, useRmthRecord, useRmthRef, useSaveRmth, useCreateEnterprise,
   type RmthOption, type RmthRecord, type SavePayload, type SaveResult,
 } from '../data/rmth'
 import { useRmthThresholds } from '../data/rmthThresholds'
@@ -375,15 +375,32 @@ export function RmthFormScreen({ mode }: { mode: 'new' | 'edit' }) {
 }
 
 /** Loads every ref_rmth list the form reads, keyed by list name. */
+/**
+ * The lists a DERIVED (read-only) field renders through: the derived key
+ * names a column on another record, and the list its value is a row of. Kept
+ * here, next to the derivations DerivedField knows, so the form screen and
+ * the detail screen load the same lists -- the form screen did not, and E0.3
+ * showed "Not set" for a cycle's modules and deliverer the moment the cycle
+ * was chosen, while the detail screen (which had them by hand) showed both.
+ */
+export const DERIVED_LISTS: Readonly<Record<string, string>> = {
+  so10_threshold: 'so10_threshold',
+  cycle_delivered_by: 'e03_delivered_by',
+  cycle_modules: 'e03_module',
+}
+
+export function refListsOf(fields: RmthFieldDef[]): string[] {
+  const s = new Set<string>()
+  for (const f of fields) {
+    for (const k of [f.ref, f.question, f.components, f.ratings, f.services]) if (k) s.add(k)
+    for (const p of f.parts ?? []) for (const k of [p.ref, p.question]) if (k) s.add(k)
+    if (f.derived && DERIVED_LISTS[f.derived]) s.add(DERIVED_LISTS[f.derived]!)
+  }
+  return Array.from(s)
+}
+
 function useRefsFor(fields: RmthFieldDef[]): Record<string, RefRow[]> {
-  const names = useMemo(() => {
-    const s = new Set<string>()
-    for (const f of fields) {
-      for (const k of [f.ref, f.question, f.components, f.ratings, f.services]) if (k) s.add(k)
-      for (const p of f.parts ?? []) for (const k of [p.ref, p.question]) if (k) s.add(k)
-    }
-    return Array.from(s)
-  }, [fields])
+  const names = useMemo(() => refListsOf(fields), [fields])
   // useQueries, not a loop of hooks: the same component serves every form,
   // and moving from one form to another changes how many lists it reads.
   const results = useQueries({ queries: names.map((n) => rmthRefQuery(n)) })
@@ -392,7 +409,7 @@ function useRefsFor(fields: RmthFieldDef[]): Record<string, RefRow[]> {
   return out
 }
 
-function RefusalBand({ outcome }: { outcome: Exclude<SaveResult, { ok: true }> }) {
+export function RefusalBand({ outcome }: { outcome: Exclude<SaveResult, { ok: true }> }) {
   const { t } = useTranslation(['rmth', 'errors'])
   const text =
     outcome.result === 'not_found' ? t('rmth:form.notFound')
@@ -681,7 +698,7 @@ function FieldView(p: FieldViewProps) {
     )
   }
   if (f.type === 'readonly') {
-    return <DerivedField base={base} f={f} record={p.record} values={p.values} mode={p.mode} refs={p.refs} sub={sub} />
+    return <DerivedField base={base} f={f} fid={fid} record={p.record} values={p.values} mode={p.mode} refs={p.refs} sub={sub} />
   }
   return null
 }
@@ -769,7 +786,10 @@ function RecordPickerField({ base, f, value, onChange, sub, empty }: {
         value={value}
         onChange={onChange}
       />
-      {f.create && !value ? (
+      {f.create && !value && f.table === 'rmth_training_cycle' ? (
+        <NewIncubatorDesignCycle onCreated={onChange} />
+      ) : null}
+      {f.create && !value && f.table === 'rmth_enterprise' ? (
         <div className="col-span-12 flex flex-wrap items-end gap-2 sm:col-span-6">
           <div className="min-w-0 flex-1">
             <label className="mb-[7px] block font-narrow text-[12px] font-bold uppercase tracking-[0.12em] text-ink">{t('form.enterpriseName')}</label>
@@ -788,6 +808,84 @@ function RecordPickerField({ base, f, value, onChange, sub, empty }: {
         </div>
       ) : null}
     </>
+  )
+}
+
+/**
+ * An incubator-design cycle, added from the E0.3 form.
+ *
+ * No other form creates one: C1.1 makes employability cycles and F0.2's log
+ * makes entrepreneurship deliveries, so without this the E0.3 picker had
+ * nothing to pick and the form could never be saved -- CLAUDE.md's register,
+ * a control with nothing behind it. The E0.3 sheet carries the cycle block
+ * on the participant form itself (reference and title; dates and total
+ * hours; delivered by; modules covered), which is what this asks for. Saved
+ * through the same save function as every other record, so the RMTH-ID
+ * reference is issued by the database (0124), then selected.
+ */
+function NewIncubatorDesignCycle({ onCreated }: { onCreated: (id: string) => void }) {
+  const { t, i18n } = useTranslation('rmth')
+  const locale = i18n.resolvedLanguage ?? 'en'
+  const [open, setOpen] = useState(false)
+  const [d, setD] = useState({ title: '', start: '', end: '', hours: '', deliveredBy: '', modules: [] as string[] })
+  const [outcome, setOutcome] = useState<SaveResult | null>(null)
+  const deliveredBy = useRmthRef('e03_delivered_by')
+  const modules = useRmthRef('e03_module')
+  const save = useSaveRmth('rmth_training_cycle')
+  if (!open) {
+    return (
+      <div className="col-span-12 sm:col-span-6">
+        <SecondaryButton onClick={() => setOpen(true)}>{t('form.cycleNew.open')}</SecondaryButton>
+      </div>
+    )
+  }
+  const ready = d.title.trim() && d.start && d.end && d.modules.length > 0
+  return (
+    <div className="col-span-12 border-s-[3px] border-border-default ps-4">
+      <p className="mb-3 mt-0 text-[13.5px] text-muted" style={{ textWrap: 'pretty' }}>{t('form.cycleNew.note')}</p>
+      {outcome && !outcome.ok ? <RefusalBand outcome={outcome} /> : null}
+      {save.error ? <WriteError error={save.error} onDismiss={save.reset} /> : null}
+      <div className="grid grid-cols-12 gap-x-[18px] gap-y-[14px]">
+        <Field spec={{ key: 'new_cycle_title', label: t('form.cycleNew.title'), type: 'text', span: 6, required: true }} value={d.title} onChange={(x) => setD({ ...d, title: x })} />
+        <Field spec={{ key: 'new_cycle_start', label: t('form.cycleNew.start'), type: 'date', span: 4, required: true }} value={d.start} onChange={(x) => setD({ ...d, start: x })} />
+        <Field spec={{ key: 'new_cycle_end', label: t('form.cycleNew.end'), type: 'date', span: 4, required: true }} value={d.end} onChange={(x) => setD({ ...d, end: x })} />
+        <Field spec={{ key: 'new_cycle_hours', label: t('form.cycleNew.hours'), type: 'number', span: 4 }} value={d.hours} onChange={(x) => setD({ ...d, hours: x })} />
+        <Field
+          spec={{ key: 'new_cycle_delivered_by', label: t('form.cycleNew.deliveredBy'), type: 'select', span: 6, options: (deliveredBy.data ?? []).map((r) => ({ value: r.id, label: refLabel(r, locale) })) }}
+          value={d.deliveredBy}
+          onChange={(x) => setD({ ...d, deliveredBy: x })}
+        />
+        <Field
+          spec={{ key: 'new_cycle_modules', label: t('form.cycleNew.modules'), type: 'checks', twoCol: true, required: true, options: (modules.data ?? []).map((r) => ({ value: r.id, label: refLabel(r, locale) })) }}
+          value={d.modules}
+          onChange={() => {}}
+          onToggle={(id) => setD({ ...d, modules: d.modules.includes(id) ? d.modules.filter((x) => x !== id) : [...d.modules, id] })}
+        />
+      </div>
+      <div className="mt-3 flex gap-2">
+        <SecondaryButton onClick={() => setOpen(false)}>{t('form.cycleNew.cancel')}</SecondaryButton>
+        <PrimaryButton
+          disabled={!ready || save.isPending}
+          onClick={() => {
+            setOutcome(null)
+            void save.mutateAsync({
+              row: {
+                cycle_kind: 'incubator_design', title: d.title.trim(), start_date: d.start, end_date: d.end,
+                contact_hours: d.hours === '' ? null : Number(d.hours),
+                delivered_by_id: d.deliveredBy || null,
+              },
+              option_questions: ['e03_module'],
+              options: d.modules.map((id) => ({ question_code: 'e03_module', option_id: id, option_other: null })),
+            }).then((res) => {
+              setOutcome(res)
+              if (res.ok) { setOpen(false); onCreated(res.id) }
+            })
+          }}
+        >
+          {t('form.cycleNew.add')}
+        </PrimaryButton>
+      </div>
+    </div>
   )
 }
 
@@ -826,9 +924,10 @@ function RuleNote({ ruleKey }: { ruleKey: string }) {
 }
 
 /** A column the database assigns or works out: shown, never typed. */
-function DerivedField({ base, f, record, values, mode, refs, sub }: {
+function DerivedField({ base, f, fid, record, values, mode, refs, sub }: {
   base: Pick<FieldSpec, 'key' | 'label' | 'help' | 'required' | 'error' | 'tag' | 'tagAccent'>
   f: RmthFieldDef
+  fid: RmthFormId
   record?: RmthRecord | undefined
   values: Values
   mode: 'new' | 'edit'
@@ -836,6 +935,7 @@ function DerivedField({ base, f, record, values, mode, refs, sub }: {
   sub?: string | undefined
 }) {
   const { t, i18n } = useTranslation('rmth')
+  const L = useRmthLabels(fid)
   const locale = i18n.resolvedLanguage ?? 'en'
   const row = record?.row
   const cycleId = values['cycle_id'] || (typeof row?.['cycle_id'] === 'string' ? (row['cycle_id'] as string) : '')
@@ -858,11 +958,16 @@ function DerivedField({ base, f, record, values, mode, refs, sub }: {
     text = typeof row?.['reference'] === 'string' ? (row['reference'] as string) : undefined
     note = mode === 'new' ? t('form.assignedOnSave') : undefined
   } else if (d === 'counted_under') {
+    // The two answers are the SHEET's own for this form (three wordings
+    // across the seven forms: "No - count this person", "No - this is a
+    // first completion", and E0.2's inverted "Yes - count as a new unique
+    // participant"), carried as the field's options. One shared string here
+    // was wrong on E0.2, where null means "yes, first time".
     if (mode === 'new') note = t('form.derivedOnSave')
     else if (row?.['counted_under_id']) {
       const ref = countedUnder.data ? (typeof countedUnder.data.row['reference'] === 'string' ? (countedUnder.data.row['reference'] as string) : shortId(countedUnder.data.row.id)) : '…'
-      text = t('detail.countedUnderYes', { reference: ref })
-    } else text = t('detail.countedUnderNo')
+      text = L.opt(f, 'counted', { reference: ref })
+    } else text = L.opt(f, 'first')
   } else if (d === 'so10_threshold') {
     if (mode === 'new') note = t('form.derivedOnSave')
     else {

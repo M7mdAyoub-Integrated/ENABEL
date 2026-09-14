@@ -709,6 +709,12 @@ The missing delete policy is *stricter* than the spec and is fine. `evidence_sta
 
 **Decides.** Municipal Coordinator, with a technical check first — is `evidence_staff_update` needed for uploads to work at all, and if not, should overwriting be a coordinator action like deleting?
 
+
+**14 September 2026.** Moot for new evidence: since 0128 files live on R2,
+where every upload is signed for a new key and no update path exists; the
+Supabase bucket's three policies, the update one included, were dropped in
+0128 with zero objects in it. Left open only as the record of what section 8
+asked for.
 ---
 
 ## ✅ OQ-31 · Q25's options — RESOLVED 2026-08-30
@@ -1361,6 +1367,17 @@ delete would. Both should be settled together, because building the upload path
 on top of an unresolved overwrite hole is how the evidence trail ends up
 looking complete and not being.
 
+**14 September 2026 — the upload path exists.** `EvidencePanel`
+(`app/src/components/EvidencePanel.tsx`) uploads to Cloudflare R2 through the
+`evidence` Edge Function (0128, OQ-49) and is on every Ramtha detail screen.
+0128 also admits `milestone` and `case_study` as `entity_type`, so the four
+Sahel Horan screens can be given the same panel without another migration;
+they have not been yet, and the §8 constraint is still not built — this
+question's own recommendation is that the panel comes first, and for Sahel
+Horan it has not. The overwrite hole is closed on the R2 path: an object's
+key carries a fresh uuid, nothing signs a PUT to an existing key, and the
+Supabase bucket's update policy went with its other two in 0128.
+
 **Decides.** M&E lead — is evidence a hard precondition for marking a milestone
 achieved, or a record attached afterwards? The answer changes whether the
 constraint or the upload path is the blocking piece.
@@ -1532,3 +1549,48 @@ E0.1, E0.2), and SO1-A1 has no statement at all (OQ-48, Part 6).
 
 **Decides.** Ramtha's M&E lead with ENABEL, for the count-versus-ratio half of
 item 1 and for item 6, where the two source documents disagree.
+
+---
+
+## 🔴 OQ-49 · The evidence store is built and not configured, and the numbers behind the stop are a decision
+
+**Added 14 September 2026**, with migration `0128` and the `evidence` Edge
+Function.
+
+Evidence files are stored on Cloudflare R2. Everything on our side is in
+place — the compression, the presigned upload, the confirm-and-record, the
+9 GB stop in the database, the settings figure — and every upload today
+answers *"Evidence storage is not configured yet"*, naming the four Edge
+Function secrets, because they have not been set:
+
+| secret | what it is |
+|---|---|
+| `R2_ACCOUNT_ID` | the Cloudflare account id; the endpoint is `<account>.r2.cloudflarestorage.com` |
+| `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` | an R2 API token with Object Read & Write on this one bucket |
+| `R2_BUCKET` | the bucket name |
+
+plus a **CORS rule on the bucket** allowing `PUT` (and `Content-Type`) from
+the app's origins, because the browser PUTs to R2 directly. Set in the
+Supabase dashboard under the function's secrets, never in git.
+
+**Two numbers were decided here and should be confirmed:**
+
+1. **The stop is 9 GB against 10 GB included, in decimal gigabytes**
+   (10^9). Cloudflare's included storage is the smaller of the two readings
+   of "10 GB", so decimal trips first. If the account's plan changes, the
+   figure is `evidence_quota_bytes()` — one function, one migration.
+2. **The per-file limit is 1 MB after compression** (1 048 576 bytes,
+   `evidence_file_limit_bytes()`). At that size the store holds roughly
+   10 000 files at the stop; uncompressed photographs would have made it
+   a few hundred.
+
+**Who is told when the stop is reached.** The refusal names "the platform
+administrator (super admin)". There is no email or other alert: the stop is
+visible on the settings screen of every staff account and in the refusal
+itself, and nowhere else. If somebody wants to know *before* a coordinator
+hits it, that is a small addition to the settings screen (a warning band at,
+say, 80%), not a migration.
+
+**Decides.** Whoever holds the Cloudflare account, for the secrets; the M&E
+lead, for the two numbers.
+

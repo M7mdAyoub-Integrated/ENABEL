@@ -30,7 +30,8 @@ export function useRmthLabels(fid: RmthFormId) {
     sub: (f: RmthFieldDef) => (i18n.exists(`rmth:${base}.fields.${f.key}.sub`) ? t(`${base}.fields.${f.key}.sub`) : undefined),
     empty: (f: RmthFieldDef) => (i18n.exists(`rmth:${base}.fields.${f.key}.empty`) ? t(`${base}.fields.${f.key}.empty`) : undefined),
     criterion: (f: RmthFieldDef) => (i18n.exists(`rmth:${base}.fields.${f.key}.criterion`) ? t(`${base}.fields.${f.key}.criterion`) : undefined),
-    opt: (f: RmthFieldDef, value: string) => t(`${base}.fields.${f.key}.opts.${value}`),
+    opt: (f: RmthFieldDef, value: string, values?: Record<string, string>) =>
+      t(`${base}.fields.${f.key}.opts.${value}`, values ?? {}),
     // `i18n.exists` first, like help/sub/empty/criterion above, because
     // parseMissingKeyHandler returns the KEY when there is no defaultValue --
     // so a plain t() here is always truthy and `part(...) || label(f)` in
@@ -38,10 +39,22 @@ export function useRmthLabels(fid: RmthFormId) {
     // FIRST part of a `parts` field on purpose: that part carries the field's
     // own label. Without this, nine of those rendered the raw key instead.
     // CLAUDE.md's tenth register row, in a fresh place.
-    part: (f: RmthFieldDef, column: string) =>
-      i18n.exists(`rmth:${base}.fields.${f.key}.parts.${column}`)
-        ? t(`${base}.fields.${f.key}.parts.${column}`)
-        : undefined,
+    //
+    // And `exists` is not enough on its own. The generator writes the first
+    // part's heading as an EMPTY string (the part carries the field's own
+    // label), `exists` is true for an empty resource, and i18next is
+    // configured with `returnEmptyString: false` -- so t() answered the KEY
+    // for those nine parts, and `labelRaw || label(f)` never fell back. It
+    // reached the screen as the aria-label of E0.1's "first cohort admitted"
+    // radio group, and was missed by a sweep that searched innerText
+    // case-sensitively under a `text-transform: uppercase` label. Empty is
+    // absent, here, explicitly.
+    part: (f: RmthFieldDef, column: string) => {
+      const key = `${base}.fields.${f.key}.parts.${column}`
+      if (!i18n.exists(`rmth:${key}`)) return undefined
+      const v = t(key)
+      return v && v !== key ? v : undefined
+    },
     partOpt: (f: RmthFieldDef, column: string, value: string) => t(`${base}.fields.${f.key}.partOpts.${column}.${value}`),
   }
 }

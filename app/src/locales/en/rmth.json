@@ -105,7 +105,11 @@
         },
         "counted_under_id": {
           "label": "Has this National ID already been counted for this indicator in a previous round?",
-          "help": "Prevents double counting. Each beneficiary is counted once only, per the Action Plan."
+          "help": "Prevents double counting. Each beneficiary is counted once only, per the Action Plan.",
+          "opts": {
+            "first": "No - count this person",
+            "counted": "Yes - already counted under record: {reference}"
+          }
         },
         "enumerator_name": {
           "label": "Enumerator name"
@@ -197,7 +201,11 @@
         },
         "counted_under_id": {
           "label": "Has this National ID already been counted for this indicator?",
-          "help": "Counted once per person."
+          "help": "Counted once per person.",
+          "opts": {
+            "first": "No - count this person",
+            "counted": "Yes - already counted under record: {reference}"
+          }
         },
         "so10_evidence": {
           "label": "Evidence on file"
@@ -1050,7 +1058,11 @@
         },
         "counted_under_id": {
           "label": "Has this National ID already completed a cycle counted under this indicator?",
-          "help": "Lets the Municipality report unique completers as well as total completions, and feeds the de-duplicated impact count."
+          "help": "Lets the Municipality report unique completers as well as total completions, and feeds the de-duplicated impact count.",
+          "opts": {
+            "first": "No - this is a first completion",
+            "counted": "Yes - previously counted under record: {reference}"
+          }
         },
         "c12_evidence": {
           "label": "Evidence on file"
@@ -1162,7 +1174,11 @@
         },
         "counted_under_id": {
           "label": "Has this National ID already been counted for this indicator?",
-          "help": "Counted once per person."
+          "help": "Counted once per person.",
+          "opts": {
+            "first": "No - count this person",
+            "counted": "Yes - already counted under record: {reference}"
+          }
         },
         "enumerator": {
           "label": "Enumerator name and date",
@@ -1358,7 +1374,11 @@
         },
         "counted_under_id": {
           "label": "Is this the participant's first time receiving incubation services from the Municipality?",
-          "help": "THIS FIELD DE-DUPLICATES THE COUNT."
+          "help": "THIS FIELD DE-DUPLICATES THE COUNT.",
+          "opts": {
+            "first": "Yes - count as a new unique participant",
+            "counted": "No - already counted under record: {reference}"
+          }
         },
         "status_id": {
           "label": "Current status in the incubator",
@@ -1471,7 +1491,11 @@
         },
         "counted_under_id": {
           "label": "Has this National ID already been counted for this indicator?",
-          "help": "Lets the Municipality report unique participants as well as total completions."
+          "help": "Lets the Municipality report unique participants as well as total completions.",
+          "opts": {
+            "first": "No - this is a first completion",
+            "counted": "Yes - previously counted under record: {reference}"
+          }
         },
         "e03_evidence": {
           "label": "Evidence on file"
@@ -1588,7 +1612,11 @@
         },
         "counted_under_id": {
           "label": "Has this National ID already been counted for this indicator?",
-          "help": "Lets the Municipality report unique participants as well as total completions."
+          "help": "Lets the Municipality report unique participants as well as total completions.",
+          "opts": {
+            "first": "No - this is a first completion",
+            "counted": "Yes - previously counted under record: {reference}"
+          }
         },
         "f01_evidence": {
           "label": "Evidence on file",
@@ -1772,6 +1800,18 @@
     "createEnterprise": "New enterprise",
     "enterpriseName": "Enterprise name",
     "mirrorEnd": "A session is one day: the end date is the same as the date.",
+    "cycleNew": {
+      "open": "Add an incubator-design cycle",
+      "title": "Title",
+      "start": "Start",
+      "end": "End",
+      "hours": "Total hours",
+      "deliveredBy": "Delivered by",
+      "modules": "Modules covered",
+      "add": "Add cycle",
+      "cancel": "Cancel",
+      "note": "RMTH-ID is the prefix for incubator-design cycles. The reference is assigned when the cycle is added; at least one design module must be recorded or the participant will not count."
+    },
     "recordPicker": {
       "none": "None",
       "loadFailed": "The list could not be loaded."
@@ -1786,17 +1826,6 @@
     "created": "Created",
     "updated": "Updated",
     "notSet": "Not set",
-    "evidence": "Evidence files",
-    "upload": "Add a file",
-    "uploading": "Uploading…",
-    "noFiles": "No files attached yet.",
-    "remove": "Remove",
-    "download": "Open",
-    "uploadFailed": "The file could not be uploaded.",
-    "fileSizeKb": "{size} KB",
-    "fileSizeMb": "{size} MB",
-    "countedUnderNo": "No - count this person",
-    "countedUnderYes": "Yes - already counted under record {reference}",
     "counts": "Counts towards the indicator",
     "notCounts": "Does not count",
     "thresholdUndecided": "Cannot be worked out until the open item is decided",

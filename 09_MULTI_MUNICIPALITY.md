@@ -468,3 +468,97 @@ Ramtha row and cannot write one; the Ramtha admin sees the probe rows, the
 column default fills Ramtha, and the junction DELETE is permitted. Sahel
 Horan's baseline hashes are unchanged after 0122–0126; every Ramtha table has
 zero rows.
+
+---
+
+## Part 5 — the seventeen forms (migrations 0127–0130, `app/src/rmth`)
+
+### One screen, seventeen definitions
+
+`supabase/ramtha/forms.py` is the catalogue: every field of every sheet,
+typed, with its Arabic. `gen_forms.py` turns it into
+`app/src/rmth/forms.generated.ts` (structure only) and both `rmth.json`
+locales (every English label looked up in the sheet and the generator failing
+on any that is not there). `RmthFormScreen` renders whichever of the seventeen
+the URL names; `RmthListScreen` and `RmthDetailScreen` the same. Adding a
+field is an edit to the catalogue and a regeneration, never to a screen.
+
+`save_rmth_record` (0127) is the one write path for the ten tables: the
+person spine (lookup-and-lock on national ID, a new person created in the
+shared table, a soft-deleted one refused with *restore, do not recreate*),
+the header, every multi-select replaced by delete-then-insert with a
+read-back inside ONE exception block, the children (B1's support grid,
+E0.1's live services, the proposal links), and the derivations the sheets
+say "must follow" — B1's flags from the grid, SO1-0's threshold from its
+three questions, SO2-0's three-month point, and `counted_under_id` worked out
+from the records rather than asked blind. A column the payload names and the
+table lacks is refused as `unknown_column`, not dropped; that refusal found
+0130.
+
+### The Arabic statements
+
+The framework workbook's Arabic Copy sheet translates the *English Copy*
+list, not the form list (the two lists do not correspond — plan §6.2). Where
+a form's statement is the English Copy's, its Arabic is the workbook's
+verbatim (IMP-0, C1.2, F0.1, F0.2, SO3-0); A1.2 and A1.3 take the two halves
+of the sheet's own "networking events … and vocational guidance sessions",
+kept apart because the index says never to sum them; the other ten are
+drafted from the form's English under OQ-32's rule and listed for review with
+OQ-46. `STATEMENT_AR` in `forms.py` carries the source of each.
+
+### Found by opening the screens, and by saving through them
+
+Every form was created through its screen as the Ramtha admin, read back on
+its detail page, and checked in the database. Four things could not have
+been found any other way:
+
+- **E0.3 had a picker with nothing to pick.** Its enrolments hang off an
+  incubator-design cycle, and no form made one — C1.1 makes employability
+  cycles, F0.2's log makes entrepreneurship deliveries. The E0.3 sheet
+  carries the cycle block on the participant form, so the picker now offers
+  to add one there, with the sheet's own four rows.
+- **A delivery could not be saved, and the screen said nothing.** 0125's
+  `rmth_training_cycle_employability_only` reserved `enrolled_count` and
+  `completed_count` for C1.1, but F0.2's delivery log records both per
+  delivery. 0129 lets them through. The deliveries panel had checked only
+  `res.ok` to close itself, so the refusal never reached the screen — the
+  register's seventh shape from the other side; it renders the refusal now.
+- **E0.3's trainer date had no column.** The sheet closes with "Trainer name
+  and date"; C1.2 and F0.1 with "Trainer name". 0130 adds `completed_on` to
+  the enrolment table.
+- **Three sheets word the already-counted question three ways**, and E0.2's
+  is inverted (*"Yes — count as a new unique participant"*). One shared
+  string said "No — count this person" on all seven; each field now carries
+  its sheet's own two answers.
+
+And one thing the sweep for raw keys missed until it was repeated
+case-insensitively: a `text-transform: uppercase` label renders
+`FORMS.E01.FIELDS…`, so a search of `innerText` for `forms.` finds nothing.
+The key itself came from `i18n.exists()` answering true for an empty-string
+heading while `returnEmptyString: false` made `t()` answer the key.
+
+### Evidence on Cloudflare R2 (0128, `supabase/functions/evidence`)
+
+The brief moved evidence from Supabase Storage to R2 after 0126 and before
+any file existed; 0128 supersedes rather than edits. The row stores a
+`bucket` and an `object_key`, never a URL. The browser compresses first
+(`lib/evidence/compress.ts`: a photograph to 1600 px JPEG at quality 75, a
+scanned document to a grey 150 DPI PDF written by hand from JPEG pages, a
+PDF over the limit re-rasterised with pdf.js loaded on demand), refuses
+anything still over 1 MB with the sizes, asks the `evidence` Edge Function
+for a presigned PUT, uploads, and asks it to confirm — the function HEADs the
+object, checks the size R2 reports, and inserts the row **as the user**, so
+RLS, the audit actor and the column defaults are the database's. A refused
+row deletes the object again.
+
+The stop is ours, in two places: a check constraint (1 MB per file) and
+`guard_evidence_quota` (9 GB in total, security definer so it sums every
+municipality), both in the database, and both checked again in the function
+before any bytes move. Decimal gigabytes, so the stop trips on the safe side
+of Cloudflare's included 10 GB. The settings screen shows the total against
+10 GB as a figure and a percentage, the stop, what compression has saved, and
+the largest consumers by table and by record, from `evidence_usage()`.
+
+The SigV4 presigner is hand-written and tested against AWS's published
+vector (`sigv4.test.mjs`). Until the four R2 secrets are set on the function
+every upload answers `r2_not_configured` naming them, on screen — OQ-49.

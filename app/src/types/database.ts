@@ -1080,6 +1080,8 @@ export type Database = {
       }
       attachment: {
         Row: {
+          bucket: string
+          content_kind: string
           created_at: string
           deleted_at: string | null
           entity_id: string
@@ -1088,13 +1090,16 @@ export type Database = {
           id: string
           mime_type: string | null
           municipality_id: string
-          size_bytes: number | null
-          storage_path: string
+          object_key: string
+          original_size_bytes: number
+          size_bytes: number
           updated_at: string
           uploaded_at: string
           uploaded_by: string | null
         }
         Insert: {
+          bucket: string
+          content_kind: string
           created_at?: string
           deleted_at?: string | null
           entity_id: string
@@ -1103,13 +1108,16 @@ export type Database = {
           id?: string
           mime_type?: string | null
           municipality_id?: string
-          size_bytes?: number | null
-          storage_path: string
+          object_key: string
+          original_size_bytes: number
+          size_bytes: number
           updated_at?: string
           uploaded_at?: string
           uploaded_by?: string | null
         }
         Update: {
+          bucket?: string
+          content_kind?: string
           created_at?: string
           deleted_at?: string | null
           entity_id?: string
@@ -1118,8 +1126,9 @@ export type Database = {
           id?: string
           mime_type?: string | null
           municipality_id?: string
-          size_bytes?: number | null
-          storage_path?: string
+          object_key?: string
+          original_size_bytes?: number
+          size_bytes?: number
           updated_at?: string
           uploaded_at?: string
           uploaded_by?: string | null
@@ -16515,6 +16524,7 @@ export type Database = {
           certificate_issued: boolean | null
           certificate_number: string | null
           client_uuid: string | null
+          completed_on: string | null
           counted_under_id: string | null
           created_at: string
           created_by: string | null
@@ -16552,6 +16562,7 @@ export type Database = {
           certificate_issued?: boolean | null
           certificate_number?: string | null
           client_uuid?: string | null
+          completed_on?: string | null
           counted_under_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -16589,6 +16600,7 @@ export type Database = {
           certificate_issued?: boolean | null
           certificate_number?: string | null
           client_uuid?: string | null
+          completed_on?: string | null
           counted_under_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -18486,7 +18498,11 @@ export type Database = {
         Args: never
         Returns: Database["public"]["Enums"]["app_role_t"]
       }
+      evidence_file_limit_bytes: { Args: never; Returns: number }
+      evidence_included_bytes: { Args: never; Returns: number }
       evidence_municipality: { Args: { p_name: string }; Returns: string }
+      evidence_quota_bytes: { Args: never; Returns: number }
+      evidence_usage: { Args: never; Returns: Json }
       followup_indicator_reach: {
         Args: {
           p_status: Database["public"]["Enums"]["record_status_t"]

@@ -1,17 +1,17 @@
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import type { TFunction } from 'i18next'
 import { useQueries } from '@tanstack/react-query'
-import { BackLink, Card, DangerButton, PageHead, PrimaryButton, SecondaryButton, SectionRule, Chip } from '../ui/primitives'
+import { BackLink, Card, DangerButton, PageHead, PrimaryButton, SecondaryButton, SectionRule } from '../ui/primitives'
 import { DetailSkeleton, ErrorState, WriteError } from '../ui/states'
 import { Modal } from '../ui/Modal'
 import { useToast } from '../ui/Toast'
 import { refLabel, type RefRow } from '../data/refTables'
 import {
-  attachmentUrl, rmthRefQuery, useAttachments, useRemoveAttachment, useRmthList, useRmthRecord,
-  useSaveRmth, useSetRmthDeleted, useUploadAttachment, type RmthRecord,
+  rmthRefQuery, useRmthList, useRmthRecord, useSaveRmth, useSetRmthDeleted, type RmthRecord, type SaveResult,
 } from '../data/rmth'
+import { RefusalBand, refListsOf } from './RmthFormScreen'
+import { EvidencePanel } from '../components/EvidencePanel'
 import { useRmthThresholds } from '../data/rmthThresholds'
 import { formatShortDate } from '../lib/format'
 import { useAuth } from '../auth/AuthProvider'
@@ -90,7 +90,7 @@ export function RmthDetailScreen() {
         <DeliveriesPanel programmeId={id!} />
       ) : null}
 
-      <EvidencePanel entityType={def.table} entityId={id!} municipalityId={r.row.municipality_id} />
+      <EvidencePanel entityType={def.table} entityId={id!} />
 
       <p className="mt-8 font-narrow text-[11.5px] uppercase tracking-[0.1em] text-faint">
         {t('rmth:detail.created')} {formatShortDate(r.row.created_at, locale)} {SEP} {t('rmth:detail.updated')} {formatShortDate(r.row.updated_at, locale)}
@@ -112,15 +112,8 @@ export function RmthDetailScreen() {
 }
 
 function useRefsForDetail(fields: RmthFieldDef[]): Record<string, RefRow[]> {
-  const names = useMemo(() => {
-    const s = new Set<string>()
-    for (const f of fields) {
-      for (const k of [f.ref, f.question, f.components, f.ratings, f.services]) if (k) s.add(k)
-      for (const p of f.parts ?? []) for (const k of [p.ref, p.question]) if (k) s.add(k)
-    }
-    s.add('so10_threshold'); s.add('e03_module'); s.add('e03_delivered_by')
-    return Array.from(s)
-  }, [fields])
+  // The same lists as the form screen, derived ones included (refListsOf).
+  const names = useMemo(() => refListsOf(fields), [fields])
   const results = useQueries({ queries: names.map((n) => rmthRefQuery(n)) })
   const out: Record<string, RefRow[]> = {}
   names.forEach((n, i) => { out[n] = (results[i]?.data as RefRow[] | undefined) ?? [] })
@@ -240,6 +233,7 @@ function Row({ f, rec, fid, refs, locale }: { f: RmthFieldDef; rec: RmthRecord; 
 
 function Derived({ f, rec, refs, locale, fid }: { f: RmthFieldDef; rec: RmthRecord; refs: Record<string, RefRow[]>; locale: string; fid: RmthFormId }) {
   const { t } = useTranslation('rmth')
+  const L = useRmthLabels(fid)
   const row = rec.row
   const d = f.derived
   const table = formDef(fid).table
@@ -256,9 +250,10 @@ function Derived({ f, rec, refs, locale, fid }: { f: RmthFieldDef; rec: RmthReco
   switch (d) {
     case 'reference': return <>{typeof row['reference'] === 'string' ? (row['reference'] as string) : notSet}</>
     case 'counted_under': {
-      if (!row['counted_under_id']) return <>{t('detail.countedUnderNo')}</>
+      // The sheet's own two answers for this form (see DerivedField).
+      if (!row['counted_under_id']) return <>{L.opt(f, 'first')}</>
       const ref = under.data ? (typeof under.data.row['reference'] === 'string' ? (under.data.row['reference'] as string) : under.data.row.id.slice(0, 8)) : '…'
-      return <>{t('detail.countedUnderYes', { reference: ref })}</>
+      return <>{L.opt(f, 'counted', { reference: ref })}</>
     }
     case 'so10_threshold': { const r = (refs['so10_threshold'] ?? []).find((x) => x.id === row['so10_threshold_id']); return <>{r ? refLabel(r, locale) : notSet}</> }
     case 'three_month_reached': case 'enters_denominator': case 'received_any': case 'any_essential': return <>{yesNo(row[d])}</>
@@ -296,13 +291,25 @@ function RecordLink({ table, id, empty }: { table: RmthTable | undefined; id: un
   const { t } = useTranslation('rmth')
   const rid = typeof id === 'string' ? id : undefined
   const rec = useRmthRecord(table ?? 'rmth_event', table ? rid : undefined)
+  // An entrepreneurship delivery has no reference or title of its own: it is
+  // named by its programme and cycle number, the way the picker names it.
+  // Without this an F0.1 record showed the first eight characters of a uuid
+  // where the sheet says "programme reference and title".
+  const progId = typeof rec.data?.row['programme_id'] === 'string' ? (rec.data.row['programme_id'] as string) : undefined
+  const prog = useRmthRecord('rmth_training_programme', progId)
   if (!rid) return <span className="text-ghost">{empty ?? t('detail.notSet')}</span>
   if (!rec.data) return <>{ELLIPSIS}</>
   const row = rec.data.row
   const ref = typeof row['reference'] === 'string' ? (row['reference'] as string) : null
   const title = ['title', 'name', 'entity_name'].map((c) => row[c]).find((v) => typeof v === 'string') as string | undefined
   const fidOf = formIdFor(table, row)
-  const text = [ref, title].filter(Boolean).join(' · ') || rid.slice(0, 8)
+  let text = [ref, title].filter(Boolean).join(' · ') || rid.slice(0, 8)
+  if (progId) {
+    if (!prog.data) return <>{ELLIPSIS}</>
+    const p = prog.data.row
+    text = [typeof p['reference'] === 'string' ? p['reference'] : null, typeof p['title'] === 'string' ? p['title'] : null].filter(Boolean).join(' ') + ' ' + SEP + ' ' + HASH + String(row['cycle_no'] ?? '')
+    return <Link to={`/rmth/f02/${progId}`} className="text-ink underline">{text}</Link>
+  }
   return fidOf ? <Link to={`/rmth/${fidOf}/${rid}`} className="text-ink underline">{text}</Link> : <>{text}</>
 }
 
@@ -331,10 +338,18 @@ function DeliveriesPanel({ programmeId }: { programmeId: string }) {
   const save = useSaveRmth('rmth_training_cycle')
   const [draft, setDraft] = useState({ start: '', end: '', location: '', enrolled: '', completing: '' })
   const [open, setOpen] = useState(false)
+  // The save function answers {ok:false, ...} rather than throwing for a
+  // constraint refusal, so `save.error` never carries it. This panel used to
+  // check only `res.ok` to close itself and showed nothing otherwise: a
+  // delivery refused by 0125's constraint (fixed in 0129) left the form open,
+  // filled in, with no message -- the register's seventh shape from the
+  // screen side. The refusal is rendered now, like the form screen's.
+  const [outcome, setOutcome] = useState<SaveResult | null>(null)
   return (
     <section className="mt-[26px]">
       <SectionRule title={t('detail.deliveries')} right={can(role, 'record.create') ? <SecondaryButton onClick={() => setOpen((o) => !o)}>{t('form.deliveryAdd')}</SecondaryButton> : undefined} />
       {save.error ? <WriteError error={save.error} onDismiss={save.reset} /> : null}
+      {outcome && !outcome.ok ? <RefusalBand outcome={outcome} /> : null}
       {open ? (
         <Card>
           <div className="grid grid-cols-12 gap-3">
@@ -348,6 +363,7 @@ function DeliveriesPanel({ programmeId }: { programmeId: string }) {
             <PrimaryButton
               disabled={!draft.start || !draft.end || save.isPending}
               onClick={() => {
+                setOutcome(null)
                 void save.mutateAsync({
                   row: {
                     cycle_kind: 'entrepreneurship', programme_id: programmeId, start_date: draft.start, end_date: draft.end,
@@ -356,6 +372,7 @@ function DeliveriesPanel({ programmeId }: { programmeId: string }) {
                     completed_count: draft.completing === '' ? null : Number(draft.completing),
                   },
                 }).then((res) => {
+                  setOutcome(res)
                   if (res.ok) { setOpen(false); setDraft({ start: '', end: '', location: '', enrolled: '', completing: '' }) }
                 })
               }}
@@ -374,59 +391,6 @@ function DeliveriesPanel({ programmeId }: { programmeId: string }) {
               <span>{formatShortDate(String(c['start_date']), locale)} {RANGE} {formatShortDate(String(c['end_date']), locale)}</span>
               {c['location'] ? <span className="text-muted">{String(c['location'])}</span> : null}
               <span className="text-muted">{t('form.deliveryEnrolled')}{COLON} {c['enrolled_count'] == null ? EMPTY : String(c['enrolled_count'])} {SEP} {t('form.deliveryCompleting')}{COLON} {c['completed_count'] == null ? EMPTY : String(c['completed_count'])}</span>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-    </section>
-  )
-}
-
-/* ── evidence ───────────────────────────────────────────────────────────── */
-
-/**
- * A file size as a translated string. The unit is a WORD -- "KB" is not Arabic
- * -- so it comes from the locale file, not from ui/glyphs.ts. Rounds up to 1,
- * because a 300-byte file showing as "0 KB" reads as a failed upload.
- */
-function fileSize(bytes: number, t: TFunction<'rmth'>): string {
-  const kb = Math.max(1, Math.round(bytes / 1024))
-  return kb >= 1024
-    ? t('detail.fileSizeMb', { size: Math.round((kb / 1024) * 10) / 10 })
-    : t('detail.fileSizeKb', { size: kb })
-}
-
-export function EvidencePanel({ entityType, entityId, municipalityId }: { entityType: string; entityId: string; municipalityId: string }) {
-  const { t, i18n } = useTranslation('rmth')
-  const locale = i18n.resolvedLanguage ?? 'en'
-  const { role } = useAuth()
-  const files = useAttachments(entityType, entityId)
-  const upload = useUploadAttachment(entityType, entityId, municipalityId)
-  const remove = useRemoveAttachment(entityType, entityId)
-  const input = useRef<HTMLInputElement>(null)
-  return (
-    <section className="mt-[26px]">
-      <SectionRule
-        title={t('detail.evidence')}
-        right={can(role, 'record.edit') ? (
-          <>
-            <input ref={input} type="file" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) void upload.mutateAsync(f); e.target.value = '' }} />
-            <SecondaryButton disabled={upload.isPending} onClick={() => input.current?.click()}>{upload.isPending ? t('detail.uploading') : t('detail.upload')}</SecondaryButton>
-          </>
-        ) : undefined}
-      />
-      {upload.error ? <WriteError error={upload.error} onDismiss={upload.reset} /> : null}
-      {remove.error ? <WriteError error={remove.error} onDismiss={remove.reset} /> : null}
-      {files.data && files.data.length === 0 ? <p className="mt-3 text-[14px] text-muted">{t('detail.noFiles')}</p> : null}
-      {files.data && files.data.length > 0 ? (
-        <ul className="mt-3 divide-y divide-border-default border-[1.5px] border-ink">
-          {files.data.map((a) => (
-            <li key={a.id} className="flex flex-wrap items-center gap-3 px-3 py-2 text-[14px]">
-              <span className="min-w-0 flex-1 truncate"><BidiIsolate>{a.file_name}</BidiIsolate></span>
-              <span className="text-muted">{formatShortDate(a.uploaded_at, locale)}</span>
-              {a.size_bytes != null ? <Chip tone="mute">{fileSize(a.size_bytes, t)}</Chip> : null}
-              <button type="button" className="underline" onClick={() => void attachmentUrl(a.storage_path).then((u) => window.open(u, '_blank', 'noopener'))}>{t('detail.download')}</button>
-              {can(role, 'record.delete') ? <button type="button" className="text-error underline" onClick={() => void remove.mutateAsync(a)}>{t('detail.remove')}</button> : null}
             </li>
           ))}
         </ul>

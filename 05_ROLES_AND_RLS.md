@@ -511,6 +511,17 @@ rewritten view before the migration was applied.
 
 ## 8. Storage
 
+**Superseded on 14 September 2026 by migration `0128`.** Evidence lives on
+Cloudflare R2, reached only by the `evidence` Edge Function
+(`supabase/functions/evidence`), which holds the credentials and inserts the
+`attachment` row **as the user** so that the row's RLS (`op_read` staff of the
+municipality, `op_insert` writers of it, `op_update` — and so soft-delete —
+under `guard_soft_delete`, a coordinator's) is the permission model; the object
+is signed for one PUT to a fresh key and is never updated. The Supabase
+bucket's policies were dropped with zero objects in it. The path convention
+below survives as the object key, prefixed by the municipality id (0126). What
+follows is the original specification, kept for the record.
+
 Private bucket `evidence`. Path convention:
 
 ```

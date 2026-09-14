@@ -131,5 +131,57 @@
   "municipalityGate": {
     "title": "Choose a municipality",
     "body": "You are signed in as a super admin and are not working in either municipality yet. Choose one from the header to see its dashboard and enter its records. The accounts screen and settings are available without choosing."
+  },
+  "evidence": {
+    "title": "Evidence files",
+    "rule": "Files are compressed on this device before upload: a photograph to 1600 px JPEG, a scanned document to a grey 150 DPI PDF. Anything still over 1 MB after that is refused.",
+    "add": "Add a file",
+    "upload": "Upload",
+    "uploading": "Uploading…",
+    "none": "No files attached yet.",
+    "open": "Open",
+    "remove": "Remove",
+    "from": "from {size}",
+    "notAdded": "Not added",
+    "sizeKb": "{size} KB",
+    "sizeMb": "{size} MB",
+    "sizeGb": "{size} GB",
+    "kind": {
+      "label": "This file is a",
+      "photo": "Photograph",
+      "document": "Scanned document",
+      "other": "Other file"
+    },
+    "refusal": {
+      "too_large": "{name} is still {compressed} after compression (it was {original}), and the limit is {limit} per file. Take the photograph at a lower resolution, or split a long document into parts.",
+      "unsupported_type": "A file of this type ({type}) cannot be treated as that kind. Choose Photograph for an image, Scanned document for an image or PDF, or Other file.",
+      "unreadable": "{name} could not be read as an image or PDF on this device.",
+      "r2_not_configured": "Evidence storage is not configured yet. The platform administrator has to set these Edge Function secrets: {missing}.",
+      "not_signed_in": "Your session ended. Sign in again and try once more.",
+      "not_permitted": "Your role does not allow this. Ask the Coordinator.",
+      "coordinator_only": "Only a coordinator may remove evidence.",
+      "not_found": "That record is not visible to your role, or no longer exists.",
+      "file_too_large": "This file is over the {limit} per-file limit.",
+      "quota_exceeded": "Evidence storage has reached its limit: {used} used of the {quota} stop. This file was not added. Tell the platform administrator (super admin) before adding more evidence.",
+      "object_missing": "The upload did not arrive at the store. Try again.",
+      "size_mismatch": "The store received a different size from the one uploaded, so the file was discarded. Try again.",
+      "store_unreachable": "The evidence store did not answer. Try again in a moment.",
+      "upload_failed": "The upload to the evidence store failed ({code}). If this keeps happening, the store's CORS rule may not allow this site.",
+      "insert_refused": "The database refused the record: {message}",
+      "bucket_mismatch": "This file is in a different store from the one configured. Tell the platform administrator.",
+      "bad_request": "The request was not understood. This is a defect in the screen.",
+      "unknown": "The file could not be added."
+    },
+    "storage": {
+      "title": "Evidence storage",
+      "used": "{used} of {included}",
+      "files": "{count, plural, =0 {no files} one {# file} other {# files}}",
+      "barLabel": "Evidence storage used",
+      "stop": "The platform stops adding files at {stop}, before the included storage is exceeded and billed. Each file is at most {perFile} after compression.",
+      "saved": "Compression has saved {saved} so far.",
+      "byTable": "Largest by table",
+      "byRecord": "Largest by record",
+      "nothingVisible": "No evidence files in the municipalities you can see."
+    }
   }
 }
