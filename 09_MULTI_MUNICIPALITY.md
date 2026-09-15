@@ -602,21 +602,27 @@ soft-deleted record leaves the figure; a deferred proposal is not an
 approved one; C1.2 stays null until `c12_completion_rule` is written and
 counts the moment it is.
 
-### The dashboard (`RmthDashboard`, `DashboardSwitch`)
+### The dashboard
 
-`/dashboard` is one URL. `DashboardSwitch` renders `routes/Dashboard` —
-Sahel Horan's, unchanged — unless the acting municipality is Ramtha, in
-which case `rmth/RmthDashboard`. Nothing is computed in the front end: the
-eighteen rows come from `v_indicator_progress`, the reason a row has no
-figure from `v_rmth_indicator_status`, the names from the database (Sahel
-Horan's `indicators:name.*` keys are Sahel Horan's statements, and `A1.2` is
-a different indicator here). Three states, each in words: a figure against
-*target not set*; *not computable until decided*, naming the definition in
-the reader's language from the threshold row's own label, with a link to
-where it is decided; *no statement* for SO1-A1. The four headline cards are
-four of the rows below them — events, proposals approved, incubators,
-participants in incubation — chosen because each has a form and no open
-item.
+*Rewritten 15 September 2026.* Until then `/dashboard` chose between two
+screens: `routes/Dashboard` for Sahel Horan and a plainer `rmth/RmthDashboard`
+for Ramtha, picked by `DashboardSwitch` on the acting municipality. The
+audit (`PLATFORM_AUDIT.md` Part 4) asked for one screen, and Part 9 below
+records the rebuild: the same `routes/Dashboard.tsx` now renders both
+programmes, reading the acting municipality (0117) and never the URL, with
+everything that differs between them in `app/src/data/dashboardConfig.ts`.
+Nothing is computed in the front end: the rows come from
+`v_indicator_progress` for the municipality named in every query, the
+reason a row has no figure from `v_rmth_indicator_status`, the names from
+the municipality's own entry — Ramtha's from its form catalogue by full
+code, because Sahel Horan's `indicators:name.*` keys are Sahel Horan's
+statements and `A1.2` is a different indicator here. Three states, each in
+words: a figure against *not set*; *not computable until decided*, naming
+the definition in the reader's language from the threshold row's own
+label, with a link to where it is decided; *no statement* for SO1-A1. The
+four headline cards are four of the rows below them — events, proposals
+approved, incubators, participants in incubation — chosen because each has
+a form and no open item.
 
 ### The open items screen (`RmthThresholds`, `/rmth/thresholds`)
 
@@ -784,3 +790,101 @@ Sahel Horan table's live and soft-deleted counts equal the baseline's
 probes, OQ-21); Ramtha's 221 view rows are all zero or ∅/0, its status view
 reads 9 `threshold_unset` and 1 `no_statement` as seeded, and `person` is
 back at 7 rows, 3 deleted.
+
+---
+
+## Part 9 — the platform audit's response (migrations 0134–0135, one dashboard)
+
+**15 September 2026.** `PLATFORM_AUDIT.md` was received and committed as
+it arrived; this is what was done with it, in the audit's own order, and
+one thing the audit could not see.
+
+### Reconciled first
+
+`check_migration_files.sh` passed (132 exact, the two expected divergences),
+both municipalities' figures were captured to
+`supabase/baselines/2026-09-15_both_before_dashboard.md` — Sahel Horan's
+twenty lines identical to the 13 September baseline — and every function
+defined more than once across the 134 migrations was checked for a later
+version dropping a middle version's lines. Sixteen flags; the one real
+reversion is the documented one (`0082` losing `0080`'s read-back guard,
+restored by `0083`), and every other flag is a rewording whose substance is
+in the live body. No live function has lost an earlier change.
+
+### Part 4 — one dashboard
+
+`RmthDashboard.tsx`, `DashboardSwitch.tsx` and `rmthDashboard.ts` are gone.
+`routes/Dashboard.tsx` renders both programmes; `data/dashboardConfig.ts`
+holds what differs, keyed by municipality code — the four headline codes
+and tones, the short label for a card and a row, where a source chip points,
+and which breakdown dimensions the programme's forms never ask. A
+municipality with no entry gets the framework statement from the view.
+Every query in `data/indicators.ts` names its municipality in the WHERE and
+the query key, and the three other screens that read indicator rows (the
+contribution log, an initiative, the linkage match) pass it too.
+
+Sahel Horan renders byte-identically to the reference captured before the
+change — `main.outerHTML` compared at 1440 and 320, English and Arabic —
+apart from exactly three intended differences: the breakdown panel now
+sits below the indicator table; its OQ-12 warning names the municipality
+from its row instead of "this platform", which stopped being true when
+0122 gave Ramtha's forms a vulnerability list that includes refugee status
+and disability; and its intro derives "the 4 indicators" from the rows
+instead of spelling "four".
+
+Ramtha, at 1440 and 320 in both languages: no raw locale key (searched
+case-insensitively, the E0.1 lesson), no "of 0", no "/0", nine rows
+*not computable until decided* naming their definition, twenty-seven
+*not set*. A stored zero was written onto Ramtha A1.2 for 26/Q3 — the card
+and the row both read *not set* with a dashed bar — and reverted. The
+breakdown panel says, from `is_disaggregable` rather than from a sentence,
+that no breakdown view exists for Ramtha's indicators.
+
+### Part 2.1 — which of the four read rows
+
+None of the four reads a row of an indicator view. `followup_view_statuses`
+reads `pg_get_viewdef` only; `followup_indicator_reach` reads definitions
+and rows keyed by the survey, and its one municipality-sensitive test is
+the same unscoped test `v_ind_c1` makes (OQ-50). The defect was the 0114 bug
+class in three functions that join `reporting_period` with no municipality:
+`person_restore_impact`, `partner_restore_impact` (not on the audit's list;
+a sweep found it) and `submit_followup`. Measured before the fix,
+`person_restore_impact` answered every figure twice for the owner and for a
+super admin with no municipality chosen — C1.3 read 4 where two sessions
+exist. `0134` scopes all three and refuses a call with no municipality;
+role-tested as five account shapes.
+
+### Part 2.4 — `v_upcoming_exhibitions`
+
+`0135` puts the `can_see_municipality()` gate in the view's own WHERE,
+exposes `municipality_id`, and states the grants. `security_invoker` stays.
+
+### Part 5.3 — the account
+
+`superadmin@shm.test` is `superadmin@platform.test`, in `auth.users`, the
+email identity and `app_user`; signed in through GoTrue from a cleared
+session afterwards, and switched both ways through the header.
+
+### Found on the way: nine embeds refused since 0113
+
+`0113` gave every scoped child table a composite foreign key beside its
+single-column one. PostgREST then saw two relationships between each pair
+and refused every embed across them (PGRST201, HTTP 300). From 13 to 15
+September the partners list, the training completions, the contribution
+log, the exhibition registrations, the initiatives list and detail, the
+linkage match and the session qualification lookup answered *0 of 0 — no
+records yet* to a Sahel Horan coordinator whose records were in the
+database, beside a sidebar counter that still said 5. Part 7's verification
+of "the same components" saw them render and did not read what they said.
+The nine embeds now name the relationship they mean, and
+`check-constraint-names.mjs` verifies every hint against the constraint
+snapshot — confirmed to fail on a misspelt hint before it was trusted.
+The Ramtha screens read their children in separate queries and were never
+affected.
+
+### Both municipalities unchanged
+
+All seven per-municipality view hashes in the 15 September baseline are
+identical at the end; every table's live and soft-deleted counts equal the
+baseline's except `audit_log` (+5, insert-only: the stored-zero probe and
+its revert, the email, two acting-municipality switches).

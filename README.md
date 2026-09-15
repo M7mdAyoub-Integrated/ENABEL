@@ -26,9 +26,9 @@ Ramtha side stands — what computes, what waits on a decision — read
 
 | Layer | State |
 |---|---|
-| Database | **134 migrations** applied (`0001`–`0133`, plus `0015b`), every file byte-identical to the ledger; RLS on every table; two municipalities |
+| Database | **136 migrations** applied (`0001`–`0135`, plus `0015b`), every file byte-identical to the ledger; RLS on every table; two municipalities |
 | Indicators | Sahel Horan: 20 views, all live. Ramtha: 17 views; **8 compute today, 9 wait on a definition the M&E lead has to decide, 1 has no statement** |
-| Front end | Sahel Horan: every data-entry screen on live data. Ramtha: all 17 forms saving through the screen, a dashboard, an Open items screen |
+| Front end | One dashboard for both municipalities, reading the acting municipality. Sahel Horan: every data-entry screen on live data. Ramtha: all 17 forms saving through the screen, an Open items screen |
 | Auth | Sign-in, password reset, six roles, account management for super admins. **Demo mode** signs in silently in development only |
 | Evidence files | Built end to end on Cloudflare R2; **not configured** — four secrets and a CORS rule are still to be set (OQ-49) |
 | Public sites | `/sahel-horan` (training, markets, advisory, linkage requests, "my applications") and `/ramtha` (open list and "my applications") |
@@ -37,12 +37,14 @@ Ramtha side stands — what computes, what waits on a decision — read
 
 ## Database
 
-- **134 migrations**, numbered and append-only, in
+- **136 migrations**, numbered and append-only, in
   [`supabase/migrations`](supabase/migrations). `0001`–`0110` are Sahel
   Horan's; `0111`–`0133` add the second municipality, the sixth role, the
   public routing, Ramtha's tables, forms, framework, views and the evidence
-  path. `bash supabase/check_migration_files.sh` confirms every file equals
-  what the database applied.
+  path; `0134`–`0135` are the platform audit's response (a function that
+  reads periods names its municipality).
+  `bash supabase/check_migration_files.sh` confirms every file equals what
+  the database applied.
 - **Row-level security on every table**, including reference tables. Six
   app roles: `coordinator`, `data_entry`, `enumerator`, `partner_viewer`,
   `participant`, `super_admin`. `anon` holds no grants at all.
@@ -99,9 +101,11 @@ Seventeen forms generated from one catalogue
 ([`supabase/ramtha/forms.py`](supabase/ramtha/forms.py) →
 `app/src/rmth/forms.generated.ts` and both locale files), one save function
 (`save_rmth_record`), list / form / detail screens that read the catalogue,
-a dashboard that says in words why a figure is missing, and `/rmth/thresholds`
-where the seven open definitions are decided. A super admin switching
-municipality switches the sidebar, the dashboard and the public-site link.
+and `/rmth/thresholds` where the seven open definitions are decided. The
+dashboard is the same screen as Sahel Horan's (`routes/Dashboard.tsx`, with
+what differs in `data/dashboardConfig.ts`); for Ramtha it says in words why
+a figure is missing. A super admin switching municipality switches the
+sidebar, the dashboard and the public-site link.
 
 ### Demo mode
 
@@ -169,6 +173,7 @@ points at a route that exists.
 
 ```bash
 bash supabase/check_migration_files.sh       # every migration file equals the ledger
+python supabase/check_function_reversions.py # did a later migration rewrite a function from an older copy?
 node supabase/functions/evidence/sigv4.test.mjs   # the presigner against AWS's published vector
 PYTHONIOENCODING=utf-8 python supabase/ramtha/gen_forms.py   # regenerate the Ramtha forms
 ```
@@ -187,7 +192,7 @@ PYTHONIOENCODING=utf-8 python supabase/ramtha/gen_forms.py   # regenerate the Ra
 06_OPEN_QUESTIONS.md        decisions that must not be guessed (OQ-1 to OQ-49)
 07_BUILD_CHECKLIST.md       the migrations, in order, with verification
 08_FRONTEND_BUILD_PLAN.md   responsive and translation standards
-09_MULTI_MUNICIPALITY.md    the second municipality, part by part (0111–0133)
+09_MULTI_MUNICIPALITY.md    the second municipality, part by part (0111–0135)
 RAMTHA_IMPLEMENTATION_PLAN.md   the brief the Ramtha work followed
 RAMTHA_REPORT.md            where Ramtha stands, for the M&E lead
 CLAUDE.md                   the standing brief — hard rules and the register
@@ -195,7 +200,7 @@ RAMTHA Framework.xlsx       Ramtha's results framework (two lists; see OQ-48)
 RMTH_indicator_forms.xlsx   the seventeen Ramtha form sheets
 
 app/                        the React front end
-supabase/migrations/        134 numbered SQL migrations
+supabase/migrations/        136 numbered SQL migrations
 supabase/functions/         manage-account, evidence (Deno)
 supabase/ramtha/            the Ramtha form catalogue and generators
 supabase/baselines/         Sahel Horan's figures before the Ramtha work

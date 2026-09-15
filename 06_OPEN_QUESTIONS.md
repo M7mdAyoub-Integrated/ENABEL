@@ -1678,3 +1678,31 @@ say, 80%), not a migration.
 **Decides.** Whoever holds the Cloudflare account, for the secrets; the M&E
 lead, for the two numbers.
 
+---
+
+## 🟡 OQ-50 · `v_ind_c1` counts an initiative in any municipality as "reaching six months"
+
+**Added 15 September 2026**, with migration `0134`.
+
+**What the code does.** `v_ind_c1`'s denominator is surveys whose respondent
+has a `production_initiative` started at least six months before the
+contact date — and that `exists (...)` test is on `pi.person_id` alone, with
+no municipality. `followup_indicator_reach` and `person_restore_impact`
+repeat the same test, deliberately unscoped, so that the preview and the
+figure cannot disagree.
+
+**Why it is a question and not a fix.** `person` is shared between the two
+programmes (`09_MULTI_MUNICIPALITY.md` Part 3). A producer with an
+initiative recorded under one programme and a follow-up survey under the
+other would count in the second programme's C1 denominator on the strength
+of the first programme's initiative. Today that cannot happen — Ramtha has
+no initiative form, and every `production_initiative` row is Sahel Horan's
+— so no figure is wrong. Scoping the view to `pi.municipality_id =
+s.municipality_id` is one line, but it is a change to a reported figure's
+definition and 0134 did not make it in passing.
+
+**Interim behaviour.** Unchanged, in all three places, kept in step with
+each other.
+
+**Decides.** M&E lead — does "supported production activity" mean supported
+by *this* programme? If yes, the view and the two functions change together.

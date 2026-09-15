@@ -178,6 +178,14 @@ against `supabase/baselines/2026-09-13_shm_before_ramtha.md`:
   shared screen is the evidence storage card on Settings, which the brief
   asked for.
 
+  **Corrected 15 September 2026.** "Render the same components" was true
+  and not enough. Six of those Sahel Horan screens rendered *0 of 0 — no
+  records yet*: `0113`'s composite foreign keys had made every PostgREST
+  embed between a scoped child and its parent ambiguous, and the refusal
+  rendered as an empty list rather than an error. Found and fixed on
+  15 September (`09_MULTI_MUNICIPALITY.md` Part 9); the figures above were
+  never affected, because the views do not embed.
+
 Every Ramtha test row was removed as the owner under the one sanctioned
 hard-delete exception; Ramtha's 221 view rows read zero or null, its ten
 open items are undecided as seeded, and `person` is back at 7 rows, 3

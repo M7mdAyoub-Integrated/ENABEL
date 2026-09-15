@@ -173,6 +173,8 @@ fine.
 | The deliveries panel on `/rmth/f02/:id` | a save through the one save function, a success path that closed the form, a `WriteError` for thrown errors | anything for a refusal the function RETURNS. `save_rmth_record` answers `{ok:false}` rather than throwing, the panel checked `res.ok` only to close, and 0125's constraint refused every delivery — so the click did nothing and said nothing. The seventh shape from the screen side |
 | The raw-key sweep of the 34 Ramtha screens | a search of `innerText` for `forms.`/`rmth:` on every screen in both languages, reporting clean | the label under `text-transform: uppercase`. `innerText` returns `FORMS.E01.FIELDS…`; the regex was case-sensitive. The E0.1 radio group's aria-label was a raw key and the sweep said clean |
 | `L.part()` in `labels.ts` | an `i18n.exists()` guard, added after the tenth row, with a comment explaining why a bare `t()` could never fall back | an empty heading counting as absent. The generator writes `''` for a first part; `exists` is true for `''`; `returnEmptyString: false` makes `t()` answer the key. The guard the tenth row taught was there and passed the key through |
+| Nine PostgREST embeds after `0113` | a list screen that rendered, a sidebar counter reading 5, a Part 7 verification that saw "the same components" | the rows. `0113` added a composite `(parent_id, municipality_id)` foreign key beside every single-column one; PostgREST saw two relationships per pair and refused every embed across them with **HTTP 300** — which `unwrapList` had no branch for, so the refusal rendered as **"0 of 0 — no records yet"**. Partners, completions, the contribution log, registrations, initiatives, the linkage match: two days. Found by opening `/initiatives` while checking a dashboard's neighbours |
+| `person_restore_impact` (0107) after `0131` | the right five figures on the restore screen, as a coordinator, through RLS | any municipality in the function. `join reporting_period rp on <date> between …` matched both municipalities' `26/Q3` rows; the coordinator was right only because RLS hid the other thirteen periods from them. The owner and a super admin with no municipality chosen got every figure **twice** — C1.3 read 4 where two sessions exist. `partner_restore_impact`, same migration, same shape, not on the audit's list; a sweep of every function reading `reporting_period` found both |
 
 In each case the thing that would normally be checked *was there*. The file
 existed. The key existed. The comment existed. The translation key existed. Any
@@ -396,6 +398,41 @@ What that means in practice:
   opening every one of its screens in both languages and reading them. There is
   no automated answer to this one, and pretending otherwise is how four raw keys
   reached a screen that had passed every check in the build.
+
+### A refusal that renders as an empty state
+
+Found 15 September 2026, and it is the seventh shape from the read side.
+There a delete RLS filtered reported success and wrote nothing. Here a
+**read** PostgREST refused outright — `PGRST201`, HTTP 300, *more than one
+relationship was found* — and the screen said **"0 of 0 — no records yet"**,
+beside a sidebar counter, computed by a different query, that still said 5.
+
+`0113` had given every scoped child table a composite foreign key beside its
+single-column one, for the tenant guard. Correct, verified, and it made every
+embed between such a pair ambiguous to PostgREST. Nine embeds in `src/data`
+crossed one, and for two days the partners list, the training completions,
+the contribution log, the exhibition registrations, the initiatives and the
+linkage match were empty for a coordinator whose records were there. Part 7
+of the Ramtha work verified that those screens "render the same components
+they did" — and they did. Nobody read what the components said.
+
+Two things follow:
+
+- **A list that says "none yet" is a claim, and an empty result is not proof
+  of it.** Wherever a screen can show "no records", ask what a *refused* query
+  looks like on it. If the answer is "the same", the screen cannot tell a
+  coordinator that their data is missing from that it is invisible — which is
+  the seventh failure's cost again, arrived at from the other side.
+- **A schema change that adds a second path between two tables is a change to
+  every embed that walks the first one.** After a migration adds a foreign
+  key, probe one embed across it as the role, through REST, not through SQL:
+  the database join was fine; it was PostgREST that could no longer choose.
+
+Every embed now names its relationship (`market_linkage!market_linkage_
+initiative_id_fkey ( … )`), and `check-constraint-names.mjs` verifies every
+hint against the constraint snapshot — confirmed to fail on a misspelt hint,
+with and without a `_fkey` suffix, because its first version matched only
+correct-looking names and let the misspelling through.
 
 ### A placeholder is a claim about the state of the system
 
