@@ -232,7 +232,25 @@ The header of every municipal screen names the municipality and its programme
 line from the `municipality` row (0119 added `programme_en/ar`; the locale
 strings said "Sahel Horan" to everyone). A super admin gets the switcher there;
 a municipal account has no switcher, because its municipality comes from its
-account and never from the URL. `/accounts` lists every account (email is now
+account and never from the URL.
+
+Since 15 September 2026 the super admin's choice also has an address. It
+still lives in the database — `app_user.acting_municipality_id`, read by
+every policy and every column default — and `?m=<slug>` on every municipal
+route is kept equal to it in both directions (`ActingMunicipalityUrl`): the
+slug is written from the choice, an address naming another active
+municipality switches the choice, an unknown slug is dropped, and a
+municipal account's parameter is removed. A switch remounts the screen
+(the Outlet is keyed on the acting municipality), because a switch made by
+the URL happens on whatever screen is open and a mounted query answered
+under the old municipality would otherwise stay. The header carries a super
+admin's eyebrow — "super admin · acting on" — above the name, the account
+chip at the foot of the rail names the municipality too, and a super admin
+gets one public-site link per municipality, each in a new tab. `/admin` is
+the staff entrance: signed out it is the sign-in form, signed in it is the
+home the role implies; nothing on the public side links to it.
+
+`/accounts` lists every account (email is now
 on `app_user`, copied from `auth.users` where `authenticated` cannot read),
 creates one with a generated one-time password shown once, changes role or
 municipality, sets a password, deactivates and reactivates.
