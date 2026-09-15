@@ -84,7 +84,7 @@ type Select = {
 const SELECT = `
   id, person_id, session_id, attended, met_criteria, decided_on, created_at,
   person!inner ( national_id, full_name, sex, age_recorded, date_of_birth, phone ),
-  training_session!inner ( id, title, topic_id, start_date )
+  training_session!training_enrolment_session_id_fkey!inner ( id, title, topic_id, start_date )
 `
 
 function toRow(r: Select): CompletionRow {

@@ -358,7 +358,7 @@ export function useExhibitionRegistrations(exhibitionId: string | undefined, loc
           'id, person_id, status, is_first_time, submitted_by_participant, ' +
             'person:person_id (full_name, national_id, village), ' +
             'producer:producer_type_id (label_en, label_ar), ' +
-            'exhibition_registration_product (ref_product (label_en, label_ar))',
+            'exhibition_registration_product!exhibition_registration_product_registration_id_fkey (ref_product (label_en, label_ar))',
         )
         .eq('exhibition_id', exhibitionId!)
         .is('deleted_at', null)

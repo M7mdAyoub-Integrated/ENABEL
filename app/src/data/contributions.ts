@@ -135,7 +135,7 @@ export function useContributionsForPartner(partnerId: string | undefined, enable
     queryFn: async (): Promise<ContributionRow[]> => {
       const res = await supabase
         .from('partner_contribution')
-        .select(SELECT + ', partnership!inner ( partner_id, partnership_type )')
+        .select(SELECT + ', partnership!partner_contribution_partnership_id_fkey!inner ( partner_id, partnership_type )')
         .eq('partnership.partner_id', partnerId!)
         .is('deleted_at', null)
         .order('contributed_on', { ascending: false })

@@ -302,8 +302,8 @@ export function useInitiativesForPerson(personId: string | undefined) {
         .select(
           `id, title, main_product, started_on,
            ref_activity_type ( label_en, label_ar ),
-           market_linkage ( id, status, scope, linked_on, deleted_at,
-                            partnership ( partner ( name ) ) )`,
+           market_linkage!market_linkage_initiative_id_fkey ( id, status, scope, linked_on, deleted_at,
+                            partnership!market_linkage_partnership_id_fkey ( partner!partnership_partner_id_fkey ( name ) ) )`,
         )
         .eq('person_id', personId!)
         .is('deleted_at', null)
@@ -645,7 +645,7 @@ export function useAdvisoryQualification(personId: string | undefined) {
     queryFn: async (): Promise<AdvisoryQualification[]> => {
       const res = await supabase
         .from('advisory_enrolment')
-        .select('id, decided_on, advisory_session!inner ( title, track, end_date )')
+        .select('id, decided_on, advisory_session!advisory_enrolment_session_id_fkey!inner ( title, track, end_date )')
         .eq('person_id', personId!)
         .is('met_criteria', true)
         .is('deleted_at', null)

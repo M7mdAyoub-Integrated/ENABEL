@@ -613,7 +613,7 @@ export function useQualifications(personIds: string[]) {
       const res = await supabase
         .from('training_enrolment')
         .select(
-          'person_id, decided_on, registered_on, training_session!inner (title, end_date, deleted_at)',
+          'person_id, decided_on, registered_on, training_session!training_enrolment_session_id_fkey!inner (title, end_date, deleted_at)',
         )
         .in('person_id', personIds)
         .eq('met_criteria', true)

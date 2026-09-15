@@ -84,8 +84,8 @@ const LIST_SELECT = `
   id, title, person_id, main_product, started_on, status, is_women_led, is_youth_led,
   person!inner ( full_name, national_id ),
   ref_activity_type ( label_en, label_ar ),
-  market_linkage ( status, deleted_at ),
-  mentorship_session ( id, deleted_at )
+  market_linkage!market_linkage_initiative_id_fkey ( status, deleted_at ),
+  mentorship_session!mentorship_session_initiative_id_fkey ( id, deleted_at )
 `
 
 function toListRow(r: InitiativeSelect): InitiativeListRow {

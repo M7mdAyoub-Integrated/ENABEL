@@ -41,8 +41,29 @@
  * Re-run it after any migration that adds or renames a constraint. If this
  * check fails on a name you just created, the list is stale -- regenerate it
  * rather than deleting the key.
+ *
+ * ── THE SECOND THING IT CHECKS: EMBED HINTS ──
+ *
+ * Migration 0113 gave every scoped child table a composite foreign key
+ * `(parent_id, municipality_id)` beside its single-column one. PostgREST
+ * then sees TWO relationships between the two tables and refuses every
+ * embed across them with PGRST201 -- HTTP 300, "more than one relationship
+ * was found". Nine embeds in src/data crossed such a pair, and from 13 to
+ * 15 September 2026 the partners list, the training completions, the
+ * contribution log, the exhibition registrations, the initiatives and the
+ * linkage match all answered "no records yet" to a coordinator whose
+ * records were there. Nothing threw; the refusal rendered as an empty state.
+ *
+ * Each of those embeds now names the relationship it means, with the FK's
+ * constraint name: `market_linkage!market_linkage_initiative_id_fkey ( … )`.
+ * That ties the app to a constraint name, which is exactly the thing this
+ * script exists to verify -- so every `!word` hint anywhere in src/ that is
+ * not PostgREST's own `inner`/`left` is checked against the same snapshot.
+ * Rename a foreign key and the build fails here, rather than a screen going
+ * quietly empty. Confirmed to fail on a misspelt hint, with and without a
+ * `_fkey` suffix, not by reading it.
  */
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
@@ -100,4 +121,45 @@ if (missing.length > 0) {
   process.exit(1)
 }
 
-console.log(`check-constraint-names: ${claimed.length} names, all present in the schema.`)
+// ── embed hints ─────────────────────────────────────────────────────────────
+
+function walk(dir, out = []) {
+  for (const entry of readdirSync(dir)) {
+    const full = join(dir, entry)
+    if (statSync(full).isDirectory()) walk(full, out)
+    else if (/\.(ts|tsx)$/.test(entry) && entry !== 'database.ts') out.push(full)
+  }
+  return out
+}
+
+const hints = []
+for (const file of walk(join(here, '..', 'src'))) {
+  const text = readFileSync(file, 'utf8')
+  // Every `!word` inside a select string that is not PostgREST's own `inner`
+  // or `left`. Matching only names shaped like `_fkey` was tried first and
+  // let a misspelt hint through, because the misspelling did not end in
+  // `_fkey` either -- a check that only recognises correct-looking input
+  // cannot catch incorrect input.
+  for (const m of text.matchAll(/[a-z_]+!([a-z_][a-z0-9_]*)(?=[!\s(])/g)) {
+    if (m[1] === 'inner' || m[1] === 'left') continue
+    hints.push({ file: file.slice(join(here, '..').length + 1), name: m[1] })
+  }
+}
+
+const badHints = hints.filter((h) => !known.has(h.name))
+if (badHints.length > 0) {
+  console.error('\ncheck-constraint-names: FAIL\n')
+  console.error('these PostgREST embed hints name a foreign key the database does not have:\n')
+  for (const h of badHints) console.error(`  ${h.file}: !${h.name}`)
+  console.error(
+    '\nAn embed hint that matches nothing is refused by PostgREST (PGRST200), and\n' +
+      'a refused embed renders as an empty list. Read the real name from\n' +
+      'pg_constraint, or regenerate supabase/.constraint_names if it is stale.\n',
+  )
+  process.exit(1)
+}
+
+console.log(
+  `check-constraint-names: ${claimed.length} names, all present in the schema; ` +
+    `${hints.length} embed hint(s) name a real foreign key.`,
+)

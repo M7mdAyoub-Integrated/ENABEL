@@ -96,8 +96,8 @@ type PartnershipSelect = {
 const LIST_SELECT = `
   id, partner_id, partnership_type, partner_type_id, partner_type_other,
   established_on, agreement_ref, is_active, ended_on, created_at, created_by,
-  partner!inner ( id, name, unit, contact_person, phone, email ),
-  partnership_role ( role_id, role_other )
+  partner!partnership_partner_id_fkey!inner ( id, name, unit, contact_person, phone, email ),
+  partnership_role!partnership_role_partnership_id_fkey ( role_id, role_other )
 `
 
 function toRow(r: PartnershipSelect): PartnershipRow {
@@ -498,10 +498,10 @@ type PartnerSelect = {
 
 const PARTNER_SELECT = `
   id, name, unit, contact_person, phone, email, created_at,
-  partnership (
+  partnership!partnership_partner_id_fkey (
     id, partnership_type, partner_type_id, partner_type_other, established_on,
     agreement_ref, is_active, ended_on, deleted_at,
-    partnership_role ( role_id, role_other )
+    partnership_role!partnership_role_partnership_id_fkey ( role_id, role_other )
   )
 `
 
