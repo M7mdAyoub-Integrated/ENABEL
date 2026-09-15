@@ -22,7 +22,7 @@ import { RmthListScreen } from './rmth/RmthListScreen'
 import { RmthFormScreen } from './rmth/RmthFormScreen'
 import { RmthDetailScreen } from './rmth/RmthDetailScreen'
 import { RmthThresholds } from './rmth/RmthThresholds'
-import { DashboardSwitch } from './rmth/DashboardSwitch'
+import Dashboard from './routes/Dashboard'
 import NotFound from './routes/NotFound'
 import PublicHome from './routes/public/PublicHome'
 import { PublicChooser, PublicNotFound, PublicSite } from './routes/public/PublicSite'
@@ -166,12 +166,13 @@ const router = createBrowserRouter([
   {
     element: <ShellLayout />,
     children: [
-      // One URL, one dashboard per municipality: DashboardSwitch renders
-      // routes/Dashboard (Sahel Horan's) unchanged unless the acting
-      // municipality is Ramtha, in which case rmth/RmthDashboard (plan §6.4).
+      // One URL, one screen: Dashboard reads the acting municipality (0117)
+      // and renders that programme's framework -- Sahel Horan's twenty rows
+      // or Ramtha's eighteen -- from the same components. Which programme is
+      // never decided by the URL, the same rule as the sidebar.
       {
         path: '/dashboard',
-        element: guard(<DashboardSwitch />, (n) => (
+        element: guard(<Dashboard />, (n) => (
           <RequireCapability capability="dashboard.view">{n}</RequireCapability>
         )),
       },

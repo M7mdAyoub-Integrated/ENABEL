@@ -16,6 +16,7 @@ import {
   actualText,
   targetText,
 } from '../data/indicators'
+import { useCurrentMunicipality } from '../data/municipalities'
 import { useAuth } from '../auth/AuthProvider'
 import { can } from '../auth/permissions'
 import { WriteError } from '../ui/states'
@@ -77,9 +78,10 @@ export function ContributionLog({
   const update = useUpdateContribution()
   const remove = useDeleteContribution()
 
-  const periods = useReportingPeriods()
+  const municipalityId = useCurrentMunicipality()?.id ?? null
+  const periods = useReportingPeriods(municipalityId)
   const periodCode = currentPeriodCode(periods.data ?? [])
-  const indicators = useIndicatorRows(periodCode)
+  const indicators = useIndicatorRows(periodCode, municipalityId)
   const g04 = (indicators.data ?? []).find((r) => r.code === 'G0.4')
 
   const only = partnerships.length === 1 ? partnerships[0]!.id : ''

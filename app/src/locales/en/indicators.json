@@ -2,9 +2,9 @@
   "disagg": {
     "heading": "Breakdowns",
     "warnTag": "Read this before using these figures",
-    "warnBody": "No form in this platform collects refugee status or disability. Fields for both were built onto the completion and registration forms on 24 August 2026 and removed the same day; nothing has asked since. Every participant entered through a real form therefore appears as “not recorded” on those two breakdowns, and will keep doing so until the forms ask.",
+    "warnBody": "No {municipality} form collects refugee status or disability. Fields for both were built onto the completion and registration forms on 24 August 2026 and removed the same day; nothing has asked since. Every participant entered through a real form therefore appears as “not recorded” on those two breakdowns, and will keep doing so until the forms ask.",
     "warnSeed": "The refugee and disability values shown below come from seeded demonstration records only. They are not a finding about anyone. Refugee disaggregation is the reason this Action Plan exists, so this gap is open question OQ-12 and it is the Coordinator's to close — it is a form change and may need a data-protection review.",
-    "intro": "Only the four indicators that count distinct people can be broken down. “Not recorded” is always shown rather than dropped, so each breakdown adds up to the headline figure.",
+    "intro": "Only the {count, plural, one {# indicator that counts} other {# indicators that count}} distinct people can be broken down. “Not recorded” is always shown rather than dropped, so each breakdown adds up to the headline figure.",
     "loadFailed": "The breakdowns could not be loaded.",
     "noneInPeriod": "No one is counted towards {code} in {period}, so there is nothing to break down.",
     "totalLine": "{code} — {count, plural, one {# person} other {# people}} in this period",
@@ -32,7 +32,8 @@
       "25-34": "25–34",
       "35-44": "35–44",
       "45+": "45 and over"
-    }
+    },
+    "noneDisaggregable": "No breakdown view exists for any of {municipality}'s indicators, so there is nothing to break down here."
   },
   "quarterLine": "Quarter 3 · 2026 · plan period 2026—2029",
   "whereThePlanStands": "Where the plan stands",
@@ -197,5 +198,18 @@
     "goThere": "Go there",
     "notBuiltYet": "Not built yet"
   },
-  "noPathNotice": "{count, plural, one {# indicator still has nowhere to be entered. It counts distinct people, so it needs a per-person log rather than a typed total — until that exists it will stay at zero.} other {# indicators still have nowhere to be entered. They count distinct people, so they need a per-person log rather than a typed total — until those exist they will stay at zero.}}"
+  "noPathNotice": "{count, plural, one {# indicator has nowhere to be entered in this platform yet, so its figure cannot move.} other {# indicators have nowhere to be entered in this platform yet, so their figures cannot move.}}",
+  "notComputable": "Not computable until decided: {definition}",
+  "notComputableShort": "Not computable",
+  "noStatement": "The framework workbook gives this code and no indicator statement.",
+  "noStatementShort": "No statement",
+  "noStatementNotice": "{code} has a code and no indicator statement in the framework workbook. It is listed so the gap stays visible.",
+  "blockedNotice": "{count, plural, one {# indicator cannot be computed} other {# indicators cannot be computed}} until an open definition is decided.",
+  "openItems": "Open items",
+  "ofWhomUnique": "{count, plural, one {# unique person} other {# unique people}}",
+  "denominator": "of {count}",
+  "noTargetsAnywhere": "No target is set for {municipality} in any quarter. A missing target is shown as “not set”, never as zero. Actuals below are still counted from your records.",
+  "noTargetsNote": {
+    "RMTH": "The English_form workbook carries none, and the English Copy sheet's targets belong to a different indicator list (OQ-48)."
+  }
 }

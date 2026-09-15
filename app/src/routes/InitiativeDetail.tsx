@@ -16,6 +16,7 @@ import {
   actualText,
   targetText,
 } from '../data/indicators'
+import { useCurrentMunicipality } from '../data/municipalities'
 import { useAuth } from '../auth/AuthProvider'
 import { can } from '../auth/permissions'
 import { WriteError } from '../ui/states'
@@ -69,9 +70,10 @@ export function InitiativeDetail() {
   const update = useUpdateMentorshipSession()
   const remove = useDeleteMentorshipSession()
 
-  const periods = useReportingPeriods()
+  const municipalityId = useCurrentMunicipality()?.id ?? null
+  const periods = useReportingPeriods(municipalityId)
   const periodCode = currentPeriodCode(periods.data ?? [])
-  const indicators = useIndicatorRows(periodCode)
+  const indicators = useIndicatorRows(periodCode, municipalityId)
   const c13 = (indicators.data ?? []).find((r) => r.code === 'C1.3')
 
   const [form, setForm] = useState<FormState>(BLANK)

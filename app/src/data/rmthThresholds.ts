@@ -23,9 +23,10 @@ export type RmthThreshold = {
   decided_on: string | null
 }
 
-export function useRmthThresholds() {
+export function useRmthThresholds(enabled = true) {
   return useQuery({
     queryKey: ['rmth', 'thresholds'],
+    enabled,
     staleTime: 5 * 60_000,
     queryFn: async (): Promise<RmthThreshold[]> => {
       const res = await (supabase

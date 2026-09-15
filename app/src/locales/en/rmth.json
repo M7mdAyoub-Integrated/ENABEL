@@ -1842,23 +1842,6 @@
     "title": "Ramtha screens",
     "body": "These forms belong to Ramtha Municipality. Your account works in another municipality."
   },
-  "dashboard": {
-    "title": "Ramtha dashboard",
-    "intro": "Eighteen indicators from the Ramtha results framework, computed from the seventeen forms. Every figure is read from the database; nothing is typed or worked out here.",
-    "noValue": "—",
-    "percent": "{value}%",
-    "ofTarget": "of {target}",
-    "targetNotSet": "target not set",
-    "ofWhomUnique": "{count, plural, one {# unique person} other {# unique people}}",
-    "denominator": "of {count}",
-    "notComputable": "Not computable until decided: {definition}",
-    "noStatement": "The framework workbook gives this code and no indicator statement (OQ-48).",
-    "noForm": "No form",
-    "openItems": "Open items",
-    "targetsNotSet": "No Ramtha target is set for any quarter. The English_form workbook carries none, and the English Copy sheet's targets belong to a different indicator list (OQ-48). A missing target is shown as \"not set\", never as zero.",
-    "blockedNotice": "{count, plural, one {# indicator cannot be computed} other {# indicators cannot be computed}} until an open item is decided.",
-    "noStatementNotice": "RMTH-SO1-A1 has a code and no indicator statement in the framework workbook. It is listed so the gap stays visible (OQ-48)."
-  },
   "thresholds": {
     "title": "Open items",
     "intro": "The seven definitions the Ramtha forms index leaves open. Each is a value the indicator views read; while it is empty the indicator that depends on it is not computable — never zero. A coordinator writes the decision here, with the date; nothing else changes.",

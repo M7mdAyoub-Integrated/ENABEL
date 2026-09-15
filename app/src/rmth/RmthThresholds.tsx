@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRmthThresholds, useSetThreshold, type RmthThreshold } from '../data/rmthThresholds'
-import { useRmthStatus } from '../data/rmthDashboard'
+import { useIndicatorStatus } from '../data/indicators'
+import { useCurrentMunicipality } from '../data/municipalities'
 import { AccentRule, Card, PageHead, PrimaryButton, SecondaryButton, SectionRule } from '../ui/primitives'
 import { ErrorState, WriteError } from '../ui/states'
 import { useAuth } from '../auth/AuthProvider'
@@ -122,7 +123,7 @@ export function RmthThresholds() {
   const locale = i18n.resolvedLanguage ?? 'en'
   const { role } = useAuth()
   const rows = useRmthThresholds()
-  const status = useRmthStatus()
+  const status = useIndicatorStatus(useCurrentMunicipality()?.id ?? null)
   const [editing, setEditing] = useState<string | null>(null)
 
   if (rows.isError) return <ErrorState error={rows.error} onRetry={() => void rows.refetch()} />

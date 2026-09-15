@@ -7,12 +7,17 @@ import { unwrapList } from './errors'
  *  The breakdowns the results framework asks for, and the gap underneath them.
  *
  *  `v_indicator_disaggregated` is real and has been since 0014. It covers the
- *  four indicators that count distinct people — A1.3, B1.2, D0.1, E0.2 — and
- *  splits each by sex, age band, refugee status, disability status and village.
+ *  four Sahel Horan indicators that count distinct people — A1.3, B1.2, D0.1,
+ *  E0.2 — and splits each by sex, age band, refugee status, disability status
+ *  and village. Which indicators it covers is not written here: the view says
+ *  so itself through `v_indicator_progress.is_disaggregable`, and the panel
+ *  offers exactly those. For Ramtha that is none — no breakdown view exists
+ *  for its indicators yet — and the panel says that from the same flag rather
+ *  than from a sentence somebody wrote.
  *
  *  ── OQ-12, WHICH THIS MUST NOT HIDE ──
  *
- *  NO FORM IN THIS PLATFORM COLLECTS REFUGEE STATUS OR DISABILITY.
+ *  NO SAHEL HORAN FORM COLLECTS REFUGEE STATUS OR DISABILITY.
  *
  *  `person.is_refugee` and `person.has_disability` exist and are nullable.
  *  Fields for them were built onto the completion and registration forms on
@@ -21,10 +26,10 @@ import { unwrapList } from './errors'
  *
  *  So every value in those two columns today comes from SEEDED demo rows, and
  *  every person entered through a real form lands in `not_recorded`. That is
- *  already demonstrable: the person created through /forms/tc during this
- *  audit shows refugee_status = not_recorded, disability_status = not_recorded
- *  and village = not_recorded, sitting in the same table as four seeded people
- *  who have all three.
+ *  already demonstrable: the person created through /forms/tc during the
+ *  September audit shows refugee_status = not_recorded, disability_status =
+ *  not_recorded and village = not_recorded, sitting in the same table as four
+ *  seeded people who have all three.
  *
  *  This matters more than a normal missing field. The Action Plan exists
  *  because of an assessment on the inclusion of Syrian refugees in municipal
@@ -36,6 +41,12 @@ import { unwrapList } from './errors'
  *  those people, so the breakdown always reconciles with the headline. The
  *  panel's job is to say why that bucket will be everyone.
  *
+ *  This sentence used to say "no form in this PLATFORM". Since 0122 that is
+ *  false: nine Ramtha forms collect a vulnerability list that includes both.
+ *  Which dimensions a programme's forms never ask is therefore a fact about
+ *  the programme, and it lives in that programme's entry in
+ *  data/dashboardConfig.ts, next to the other things that differ between them.
+ *
  *  ── WHAT IS DELIBERATELY NOT DONE HERE ──
  *
  *  The fields are not being added back. OQ-12 is red and belongs to the
@@ -45,20 +56,9 @@ import { unwrapList } from './errors'
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-/** The four indicators v_indicator_disaggregated covers. */
-export const DISAGGREGABLE_CODES = ['A1.3', 'B1.2', 'D0.1', 'E0.2'] as const
-
 /** The five dimensions, in the order the framework lists them. */
 export const DIMENSIONS = ['sex', 'age_band', 'refugee_status', 'disability_status', 'village'] as const
 export type Dimension = (typeof DIMENSIONS)[number]
-
-/**
- * The two dimensions no form asks about. Named here rather than inferred from
- * the data: inferring would mean "everything is not_recorded, so probably
- * nobody collects it", which stops being true the moment one seeded row has a
- * value — which is exactly the state today.
- */
-export const UNCOLLECTED_DIMENSIONS: readonly Dimension[] = ['refugee_status', 'disability_status']
 
 export type DisaggregatedRow = {
   code: string
@@ -72,18 +72,19 @@ export type DisaggregatedRow = {
 }
 
 export const disaggKeys = {
-  period: (period: string) => ['disaggregated', period] as const,
+  period: (municipalityId: string, period: string) => ['disaggregated', municipalityId, period] as const,
 }
 
-export function useDisaggregation(periodCode: string | undefined) {
+export function useDisaggregation(periodCode: string | undefined, municipalityId: string | null) {
   return useQuery({
-    queryKey: disaggKeys.period(periodCode ?? ''),
-    enabled: !!periodCode,
+    queryKey: disaggKeys.period(municipalityId ?? '', periodCode ?? ''),
+    enabled: !!periodCode && !!municipalityId,
     queryFn: async (): Promise<DisaggregatedRow[]> => {
       const res = await supabase
         .from('v_indicator_disaggregated')
         .select('code, period_code, sex, age_band, refugee_status, disability_status, village, value')
-        .eq('period_code', periodCode as string)
+        .eq('municipality_id', municipalityId!)
+        .eq('period_code', periodCode!)
       return unwrapList(res as unknown as { data: DisaggregatedRow[] | null; error: unknown })
     },
   })

@@ -19,6 +19,7 @@ import {
   currentPeriodCode,
   actualText,
 } from '../data/indicators'
+import { useCurrentMunicipality } from '../data/municipalities'
 // The merged partner list, shared with the session form. `market_linkage`
 // points at a PARTNERSHIP, so one entry per agreement -- a body holding both
 // appears twice, correctly, because they are two different agreements and the
@@ -164,9 +165,10 @@ export function LinkageMatch() {
   // and look that up.
   const qualification = useAdvisoryQualification(req?.personId)
 
-  const periods = useReportingPeriods()
+  const municipalityId = useCurrentMunicipality()?.id ?? null
+  const periods = useReportingPeriods(municipalityId)
   const periodCode = currentPeriodCode(periods.data ?? [])
-  const indicators = useIndicatorRows(periodCode)
+  const indicators = useIndicatorRows(periodCode, municipalityId)
   const c12 = (indicators.data ?? []).find((r) => r.code === 'C1.2')
 
   const match = useMatchLinkageRequest()

@@ -4,7 +4,7 @@ import { unwrapList } from './errors'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
- *  The dashboard's numbers. All twenty of them, from the database.
+ *  The dashboard's numbers, for whichever municipality is asking.
  *
  *  ── WHAT THIS REPLACES ──
  *
@@ -33,6 +33,19 @@ import { unwrapList } from './errors'
  *  "not set" -- live in SQL and were tested there. Recomputing any of it in
  *  TypeScript would create a second implementation to drift from the donor
  *  return. The only arithmetic below is turning a percentage into a bar width.
+ *
+ *  ── EVERY QUERY NAMES ITS MUNICIPALITY ──
+ *
+ *  Since 0111 there are two programmes in one database, and every view here
+ *  carries `municipality_id`. The views gate rows on `can_see_municipality()`
+ *  whenever a JWT is present, so a signed-in coordinator could never see the
+ *  other programme's rows even without a filter -- but "could never" is a
+ *  property of the database's gate, and the audit that led here (PLATFORM_AUDIT
+ *  §1.1) is about queries that were correct with one municipality and became
+ *  silently wrong with two. `A1.2` exists in both programmes and means two
+ *  different things. So every hook takes the municipality it is asking about
+ *  and puts it in the WHERE clause and in the query key, and nothing here
+ *  finds a row by code alone in a result that could hold both.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
@@ -45,19 +58,28 @@ export type IndicatorStatus =
 
 export type IndicatorRow = {
   code: string
+  /** The framework's own statement, seeded from the workbook (0017, 0131). */
+  name_en: string
+  name_ar: string | null
   unit: string
   objective_code: string
+  objective_name_en: string
+  objective_name_ar: string | null
   objective_sort: number
   sort_order: number
   period_code: string
   /** null means the workbook sets no target for this quarter. NEVER read as 0. */
   target: number | null
   actual: number | null
+  /** The denominator of a percentage indicator; null for a count. */
+  denominator: number | null
   progress_pct: number | null
   status: IndicatorStatus
+  /** True when `v_indicator_disaggregated` covers this indicator. */
   is_disaggregable: boolean
   /** True when no data-collection form feeds this indicator. */
   is_manual: boolean
+  municipality_id: string
 }
 
 export type ReportingPeriod = {
@@ -67,83 +89,55 @@ export type ReportingPeriod = {
   is_locked: boolean
 }
 
-/* ── where a row's source-form chip points ────────────────────────────────── */
-
 /**
- * `indicator.data_source` names a table; the sidebar names a module. Two of
- * them need the indicator code as well, because `partnership` feeds both the
- * training partnerships form (A1.2) and the production one (C1.1).
+ * One row of `indicator` per code: where the figure comes from, and the full
+ * code that ties a Ramtha row to the form that feeds it (`RMTH_FORMS[fid]
+ * .indicator` is a full code). `disaggregation` is the framework's own list
+ * of required breakdowns, as the workbook wrote it.
  */
-const BY_CODE: Record<string, string[]> = {
-  // One module now. A1.2 and C1.1 still count different partnership TYPES --
-  // the type moved onto the form, it did not stop doing work.
-  'A1.2': ['pn'],
-  'C1.1': ['pn'],
-  'G0.4': ['pn'],
-}
-
-const BY_SOURCE: Record<string, string[]> = {
-  followup_survey: ['fu'],
-  training_enrolment: ['tc'],
-  market_linkage: ['ln'],
-  exhibition: ['ex'],
-  exhibition_registration: ['rg'],
-  // `office_service` was missing here for as long as /forms/os has existed, so
-  // B1.2 carried a "no entry path yet" tag beside an indicator that had one.
-  // The stale claim is the defect, not the missing screen.
-  office_service: ['os'],
-  guidance_record: ['gd'],
+export type IndicatorSource = {
+  code: string
+  full_code: string
+  data_source: string | null
+  disaggregation: string[] | null
 }
 
 /**
- * Entry paths that are not one of the seven form modules.
+ * Why a row has no figure, from `v_rmth_indicator_status` (0132), which reads
+ * the same rows the views do -- so the screen and the figure cannot disagree.
  *
- * D0.2 counts training_session rows with is_delivered and a food-processing
- * topic. The sessions screen sets exactly that flag, so this indicator HAS an
- * entry path -- it just is not a /forms/ module. Without this it would carry a
- * "no entry path yet" tag that stopped being true the moment /sessions landed.
+ *   threshold_unset   the view returns null because a definition in
+ *                     `rmth_threshold` is still null; `missing_keys` names it
+ *   no_statement      the framework gives the code and no indicator text
  *
- * The five on the manual-entries screen point there for the same reason.
+ * The view is Ramtha's, because only Ramtha has undecided definitions, and it
+ * is queried for every municipality anyway: the alternative is a branch on the
+ * municipality's code in the component, which is the shape that put Sahel
+ * Horan's copy on an advisory screen. For Sahel Horan it returns no rows, and
+ * no row is marked not computable -- which is the truth, not a special case.
  */
-const BY_CODE_PATH: Record<string, { to: string; labelKey: string }[]> = {
-  'D0.2': [{ to: '/sessions', labelKey: 'nav:sessions' }],
-  'B1.1': [{ to: '/manual-entries', labelKey: 'nav:manualEntries' }],
-  'G0.1': [{ to: '/manual-entries', labelKey: 'nav:manualEntries' }],
-  'F0.1': [{ to: '/manual-entries', labelKey: 'nav:manualEntries' }],
-  'G0.2': [{ to: '/manual-entries', labelKey: 'nav:manualEntries' }],
-  'G0.3': [{ to: '/manual-entries', labelKey: 'nav:manualEntries' }],
-  // C1.3 hangs off an initiative -- `mentorship_session.initiative_id` is NOT
-  // NULL -- so its entry path is the initiative list, not a form of its own.
-  'C1.3': [{ to: '/initiatives', labelKey: 'nav:initiatives' }],
+export type IndicatorStatusRow = {
+  code: string
+  full_code: string
+  reason: 'no_statement' | 'threshold_unset' | null
+  missing_keys: string[] | null
 }
 
-export type SourceLink = { to: string; labelKey: string }
-
-/**
- * Where the source chip on an indicator row points.
- *
- * Returns [] only when the indicator genuinely has NOWHERE to be entered.
- * That set is now empty: B1.2 goes to the coordination office, D0.1 to the
- * guidance log, C1.3 to the initiative it hangs off, and G0.4 to the
- * partnerships whose contributions feed it.
- */
-export function sourceLinks(code: string, dataSource: string): SourceLink[] {
-  const byPath = BY_CODE_PATH[code]
-  if (byPath) return byPath
-  const mods = BY_CODE[code] ?? BY_SOURCE[dataSource] ?? []
-  return mods.map((m) => ({ to: `/forms/${m}`, labelKey: `nav:module.${m}` }))
-}
+/** "Of whom unique" beside a completion count, from `v_rmth_indicator_unique` (0133). */
+export type IndicatorUniqueRow = { code: string; period_code: string; unique_actual: number }
 
 /* ── periods ──────────────────────────────────────────────────────────────── */
 
-export function useReportingPeriods() {
+export function useReportingPeriods(municipalityId: string | null) {
   return useQuery({
-    queryKey: ['indicators', 'periods'],
+    queryKey: ['indicators', 'periods', municipalityId],
+    enabled: !!municipalityId,
     staleTime: 60 * 60_000,
     queryFn: async (): Promise<ReportingPeriod[]> => {
       const res = await supabase
         .from('reporting_period')
         .select('code, start_date, end_date, is_locked')
+        .eq('municipality_id', municipalityId!)
         .order('code', { ascending: true })
       return unwrapList(res as unknown as { data: ReportingPeriod[] | null; error: unknown })
     },
@@ -157,19 +151,21 @@ export function currentPeriodCode(periods: ReportingPeriod[]): string | undefine
   return live?.code ?? periods[0]?.code
 }
 
-/* ── the twenty ───────────────────────────────────────────────────────────── */
+/* ── the rows ─────────────────────────────────────────────────────────────── */
 
-export function useIndicatorRows(periodCode: string | undefined) {
+export function useIndicatorRows(periodCode: string | undefined, municipalityId: string | null) {
   return useQuery({
-    queryKey: ['indicators', 'rows', periodCode],
-    enabled: !!periodCode,
+    queryKey: ['indicators', 'rows', municipalityId, periodCode],
+    enabled: !!periodCode && !!municipalityId,
     queryFn: async (): Promise<IndicatorRow[]> => {
       const res = await supabase
         .from('v_indicator_progress')
         .select(
-          'code, unit, objective_code, objective_sort, sort_order, period_code, ' +
-            'target, actual, progress_pct, status, is_disaggregable, is_manual',
+          'code, name_en, name_ar, unit, objective_code, objective_name_en, objective_name_ar, ' +
+            'objective_sort, sort_order, period_code, target, actual, denominator, progress_pct, ' +
+            'status, is_disaggregable, is_manual, municipality_id',
         )
+        .eq('municipality_id', municipalityId!)
         .eq('period_code', periodCode!)
         .order('objective_sort', { ascending: true })
         .order('sort_order', { ascending: true })
@@ -178,15 +174,81 @@ export function useIndicatorRows(periodCode: string | undefined) {
   })
 }
 
-/** `indicator.data_source`, needed only to point the source chips somewhere. */
-export function useIndicatorSources() {
+/** `indicator` itself: source table, full code, required breakdowns. */
+export function useIndicatorSources(municipalityId: string | null) {
   return useQuery({
-    queryKey: ['indicators', 'sources'],
+    queryKey: ['indicators', 'sources', municipalityId],
+    enabled: !!municipalityId,
     staleTime: 60 * 60_000,
-    queryFn: async (): Promise<{ code: string; data_source: string }[]> => {
-      const res = await supabase.from('indicator').select('code, data_source')
-      return unwrapList(
-        res as unknown as { data: { code: string; data_source: string }[] | null; error: unknown },
+    queryFn: async (): Promise<IndicatorSource[]> => {
+      const res = await supabase
+        .from('indicator')
+        .select('code, full_code, data_source, disaggregation')
+        .eq('municipality_id', municipalityId!)
+      return unwrapList(res as unknown as { data: IndicatorSource[] | null; error: unknown })
+    },
+  })
+}
+
+export function useIndicatorStatus(municipalityId: string | null) {
+  return useQuery({
+    queryKey: ['indicators', 'status', municipalityId],
+    enabled: !!municipalityId,
+    staleTime: 60_000,
+    queryFn: async (): Promise<IndicatorStatusRow[]> => {
+      const res = await supabase
+        .from('v_rmth_indicator_status')
+        .select('code, full_code, reason, missing_keys')
+        .eq('municipality_id', municipalityId!)
+      return unwrapList(res as unknown as { data: IndicatorStatusRow[] | null; error: unknown })
+    },
+  })
+}
+
+export function useIndicatorUnique(periodCode: string | undefined, municipalityId: string | null) {
+  return useQuery({
+    queryKey: ['indicators', 'unique', municipalityId, periodCode],
+    enabled: !!periodCode && !!municipalityId,
+    queryFn: async (): Promise<IndicatorUniqueRow[]> => {
+      const res = await supabase
+        .from('v_rmth_indicator_unique')
+        .select('code, period_code, unique_actual')
+        .eq('municipality_id', municipalityId!)
+        .eq('period_code', periodCode!)
+      return unwrapList(res as unknown as { data: IndicatorUniqueRow[] | null; error: unknown })
+    },
+  })
+}
+
+/**
+ * Does this municipality have a target in ANY quarter?
+ *
+ * The two reasons a quarter shows no target read very differently to a
+ * coordinator. Sahel Horan's matrix starts at 27/Q1, so its first quarter has
+ * none -- that is the framework's schedule, and the screen says so. Ramtha
+ * has none in any quarter at all (0131, OQ-48), and telling a Ramtha
+ * coordinator "this is the plan's first quarter, which the framework leaves
+ * without targets" would be false: every quarter is like that. So the screen
+ * asks the whole matrix, not just the quarter it is showing.
+ *
+ * A stored zero is not a target here either, for the reason `hasTarget` gives.
+ */
+export function useAnyTarget(municipalityId: string | null) {
+  return useQuery({
+    queryKey: ['indicators', 'anyTarget', municipalityId],
+    enabled: !!municipalityId,
+    staleTime: 60 * 60_000,
+    queryFn: async (): Promise<boolean> => {
+      const res = await supabase
+        .from('indicator_target')
+        .select('indicator_id')
+        .eq('municipality_id', municipalityId!)
+        .not('target_value', 'is', null)
+        .neq('target_value', 0)
+        .limit(1)
+      return (
+        unwrapList(res as unknown as { data: { indicator_id: string }[] | null; error: unknown })
+          .length > 0
       )
     },
   })
@@ -235,23 +297,6 @@ export function actualText(row: IndicatorRow, none: string): string {
 export function barWidth(row: IndicatorRow): number | null {
   if (!hasTarget(row) || row.progress_pct === null) return null
   return Math.max(0, Math.min(100, Number(row.progress_pct)))
-}
-
-/**
- * The four headline cards.
- *
- * Each card IS one of the rows below it, by code — not a separate query and not
- * a derived total. A card that summed A1.2 and C1.1 would be a second
- * calculation able to disagree with the table under it, and a headline figure
- * that contradicts the detail is worse than no headline at all.
- */
-export const KPI_CODES = ['A1.3', 'C1.2', 'E0.1', 'G0.4'] as const
-
-export const KPI_TONE: Record<(typeof KPI_CODES)[number], 'teal' | 'raised' | 'amber' | 'green'> = {
-  'A1.3': 'teal',
-  'C1.2': 'green',
-  'E0.1': 'amber',
-  'G0.4': 'raised',
 }
 
 /** Objective groups, in plan order, with the prototype's accents. */
