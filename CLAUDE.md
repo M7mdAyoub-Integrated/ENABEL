@@ -624,6 +624,7 @@ Before you say a migration is complete, all of these must be true:
 - [ ] Every new table has the standard column block and both triggers
 - [ ] Every foreign key has an index
 - [ ] If it added or renamed a constraint, `supabase/.constraint_names` and `supabase/.foreign_keys` are regenerated in the same commit (queries in `app/scripts/check-constraint-names.mjs`)
+- [ ] If it created or replaced a function or view that reads `reporting_period`, `indicator`, `objective`, `activity` or `indicator_target`, `supabase/check_municipality_scope.sql` passes as the owner — both municipalities share their codes, and a join on code or date alone doubles every figure for anyone unscoped (the register's `person_restore_impact` row)
 - [ ] The step's verification query in `07_BUILD_CHECKLIST.md` returns the expected result
 - [ ] Any assumption you had to make is written into `06_OPEN_QUESTIONS.md`, not left in a code comment
 
