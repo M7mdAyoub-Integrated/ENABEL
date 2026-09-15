@@ -153,7 +153,7 @@ So both are fine. The six record-level forms that omit vulnerability are about e
 
 Every Ramtha form except `SO2-0_3month_placement` names required evidence: attendance sheets, photographs, pre/post results, certificates, employer evaluations, signed decisions, licences.
 
-`attachment` has **no live rows** (two soft-deleted probes from 15 September 2026, with their audit trails). The R2 path is built and verified through the store; the four secrets are set and a bucket CORS rule is outstanding (**OQ-49**).
+`attachment` is **empty** (the probes of 15 September 2026 were removed from the table and the store; their audit rows remain). The R2 path is built and verified from the browser; the bucket's CORS rule names the 5173 dev origin only and the production origin is outstanding (**OQ-49**).
 
 Two forms verify their indicator **entirely** through evidence:
 
@@ -288,7 +288,7 @@ Number 9 is the one that keeps recurring. It has hidden three real defects and p
 1. **Rebuild the Ramtha dashboard to match Sahel Horan** — Part 4. Parameterise the existing one; do not write a second.
 2. Scope the four functions in 2.1 explicitly rather than relying on the callers JWT
 3. Add an explicit municipality filter to `v_upcoming_exhibitions`
-4. Set the bucket CORS rule — the secrets are set (OQ-49)
+4. Add the production origin to the bucket's CORS rule (OQ-49)
 5. Rename `superadmin@shm.test` — it is not scoped to Sahel Horan
 
 ## Not code — these need people

@@ -142,7 +142,7 @@ from the Copy against an English_form code because the words match.
 
 | what | state | needs |
 |---|---|---|
-| **Evidence files** | Built end to end: compression in the browser (photo → 1600 px JPEG q75; scanned document → grey 150 DPI PDF; refused over 1 MB with the sizes), a presigned PUT to Cloudflare R2, confirm-and-record as the user, the 9 GB stop in the database, the settings figure against 10 GB with the largest consumers by table and by record. Every upload today answers *"Evidence storage is not configured yet"*, naming what is missing. | The four secrets on the `evidence` Edge Function — `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET` — and a CORS rule on the bucket allowing PUT from the app's origins. Two numbers to confirm: the stop at 9 GB of 10 GB in decimal gigabytes, and 1 MB per file. (OQ-49.) |
+| **Evidence files** | Built end to end: compression in the browser (photo → 1600 px JPEG q75; scanned document → grey 150 DPI PDF; refused over 1 MB with the sizes), a presigned PUT to Cloudflare R2, confirm-and-record as the user, the 9 GB stop in the database, the settings figure against 10 GB with the largest consumers by table and by record. Verified from the browser on 15 September 2026: a 4.5 MB photograph on a Ramtha cycle landed as 186 KB, rendered back, and was seen by the Ramtha admin and not by Sahel Horan. | The bucket's CORS rule names `http://localhost:5173` only: add the production origin (and 5174, this repository's dev port) — OQ-49 has the one-line probe. Two numbers to confirm: the stop at 9 GB of 10 GB in decimal gigabytes, and 1 MB per file. |
 | **Targets** | Seeded null | Section 3 |
 | **SO1-A1** | Seeded as a code with no statement | A statement from the framework's authors, then a form, a formula and a view |
 | **Arabic that is not the Municipality's** | The 613 response options of the 106 Ramtha lists carry drafted Arabic; ten of the eighteen indicator statements are drafted (the workbook's Arabic Copy translates the *other* list, so only IMP-0, C1.2, F0.1, F0.2, SO3-0 and the two halves of A1.2/A1.3 are its words). Every screen reads correctly in Arabic today; the words are the platform's, not Ramtha's. | Ramtha's focal point reads the lists and statements in Arabic and corrects any row — `label_ar` / `name_ar` are data, no migration. (OQ-46.) |
@@ -195,10 +195,10 @@ soft-deleted.
 
 ## What to do next, in order
 
-1. Set the bucket's CORS rule (the four secrets are set, and the path was
-   verified through the store on 15 September 2026 with the one blocked
-   step done from outside a browser); then upload one photograph from any
-   Ramtha record and watch the settings figure move (OQ-49).
+1. Add the production origin to the bucket's CORS rule (it names
+   `http://localhost:5173` only; the path was driven from that origin on
+   15 September 2026 and works end to end) and confirm it with the probe in
+   OQ-49.
 2. Decide the seven open items on `/rmth/thresholds` (section 2).
 3. Reconcile the two framework sheets and enter targets (section 3).
 4. Have Ramtha's focal point read the Arabic of the 106 lists and the ten

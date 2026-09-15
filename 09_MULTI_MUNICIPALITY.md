@@ -693,7 +693,18 @@ catalogue rather than a sample:
 | `superadmin@platform.test`, acting nowhere | all | all | all |
 
 `rmth_reference_counter` answers `NOSELECT` to every client role: it has no
-grant at all, and only the reference trigger reads it. The views: a Sahel
+grant at all, and only the reference trigger reads it.
+
+**The TC/2026 counter stands at 1, and stays there.** The only training
+cycle Ramtha has ever had was a probe, `RMTH-TC-2026-001`, saved on 15
+September 2026 to prove a super admin's write lands in Ramtha, and
+soft-deleted the same day. Its number is spent. A counter that has advanced
+is honest history: resetting it so the first real cycle reads `-001` would
+let a reference that once named the probe name something else, and a gap in
+the sequence costs nothing. **Do not reset it.** Ramtha's first real cycle
+will be `RMTH-TC-2026-002`, and that is correct.
+
+The views: a Sahel
 Horan coordinator reads 260 rows of `v_indicator_progress`, 260 of
 `v_indicator_actual` (20 codes), 7 of `v_indicator_disaggregated`, and
 **zero** of `v_rmth_indicator_status` and `v_rmth_indicator_unique`; the

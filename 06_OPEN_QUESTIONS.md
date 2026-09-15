@@ -1671,11 +1671,34 @@ the Ramtha admin sees neither the Sahel Horan file nor its bytes in the
 per-municipality breakdown; the platform total is what everyone sees, by
 design.
 
-**The one outstanding step is the bucket's CORS rule.** The browser's PUT to
-the presigned URL is refused by the bucket today (*no
-Access-Control-Allow-Origin header*), so the verification above did its PUT
-from outside a browser. Whoever holds the Cloudflare account sets it, on the
-bucket (R2 → the bucket → Settings → CORS policy):
+**The CORS rule is set, for one origin.** Later on 15 September the bucket
+answered a preflight from `http://localhost:5173` with the right headers
+(PUT, GET, HEAD; `content-type`; one hour), and from that origin the whole
+path ran **from the browser**: a 6.5 MB photograph on a Sahel Horan milestone
+landed as 232 KB (`original_size_bytes` 6 481 309, `size_bytes` 231 748), a
+4.5 MB one on a Ramtha cycle as 186 KB, both rendered back at 1600 px from
+the signed URL, both scoped -- the Ramtha admin saw one and the Sahel Horan
+coordinator the other two, in a rolled-back transaction as those roles. A
+2.1 MB "other" file and a 12-page scanned PDF that rasterised to 11.6 MB
+were refused with both sizes and the limit, before any request was made.
+All test files were removed through the panel and the store confirmed each
+object gone (`object_missing`).
+
+Two origins are still missing from the rule, and a browser on either sees
+the failure below:
+
+- **`http://localhost:5174`** -- the port this repository's dev server is
+  pinned to (`.claude/launch.json`). The rule names Vite's default, 5173.
+  Either add 5174 or run on 5173 (`npm run dev -- --port 5173` in `app/`).
+- **The production origin** -- the Netlify site. Nothing in the repository
+  names it, so it could not be probed. Check it the same way:
+
+```bash
+curl -s -o /dev/null -D - -X OPTIONS -H "Origin: https://<the site>" -H "Access-Control-Request-Method: PUT" -H "Access-Control-Request-Headers: content-type" "https://<account>.r2.cloudflarestorage.com/evidence/probe" | grep -i "^HTTP\|access-control"
+```
+
+`204` with `Access-Control-Allow-Origin` echoing the origin is a pass; `403`
+with no such header is the failure. The rule, for reference:
 
 ```json
 [
@@ -1690,6 +1713,25 @@ bucket (R2 → the bucket → Settings → CORS policy):
 
 `GET` is not needed: a download is a signed URL opened in a new tab, which
 is a navigation, not a cross-origin fetch.
+
+**What a CORS failure looks like, so it can be recognised.** The app cannot
+see the cause: a fetch refused by CORS rejects with a bare `TypeError`,
+indistinguishable from being offline, so the panel says *"The upload to the
+evidence store failed (network)"* and mentions CORS as a possibility. The
+browser console (F12 → Console) is the only place the cause is named, as an
+error in this shape:
+
+> Access to fetch at 'https://…r2.cloudflarestorage.com/evidence/…' from
+> origin 'http://localhost:5174' has been blocked by CORS policy: Response to
+> preflight request doesn't pass access control check: No
+> 'Access-Control-Allow-Origin' header is present on the requested resource.
+
+followed by `net::ERR_FAILED` on the same URL. In the Network tab the
+request shows as an `OPTIONS` to the bucket answering **403** and no `PUT`
+after it. The function is not involved: presign succeeded (the URL in the
+message is the signed one) and the bucket refused the browser, not the
+upload. The fix is always the rule on the bucket; nothing in this
+repository can change the outcome.
 
 **Two defects the first real confirm found, both fixed in the function
 (deployed as version 4):**
