@@ -15,9 +15,17 @@ your-repo/
 │   ├── 04_DATA_DICTIONARY.md
 │   ├── 05_ROLES_AND_RLS.md
 │   ├── 06_OPEN_QUESTIONS.md
-│   └── 07_BUILD_CHECKLIST.md
+│   ├── 07_BUILD_CHECKLIST.md
+│   ├── 08_FRONTEND_BUILD_PLAN.md
+│   └── 09_MULTI_MUNICIPALITY.md  ← the second municipality (Ramtha), 0111–0133
+├── RAMTHA_IMPLEMENTATION_PLAN.md ← the brief the Ramtha work followed
+├── RAMTHA_REPORT.md              ← where Ramtha stands, for the M&E lead
+├── README.md                     ← what is built, what is not, how to run it
 └── supabase/migrations/          ← Claude Code writes here
 ```
+
+In this repository the documents sit at the root rather than under `docs/`;
+the names are the same.
 
 `CLAUDE.md` must sit at the repo root. Claude Code loads it automatically at the start of every session. The rest are read on demand.
 

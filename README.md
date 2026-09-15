@@ -1,20 +1,24 @@
 # SHM M&E Platform
 
-Monitoring and evaluation platform for **Sahel Horan Municipality, Jordan**.
+Monitoring and evaluation platform for two Jordanian municipalities, built
+for EU-funded programmes implemented with **Enabel**:
 
-It backs the *Action Plan for Enhancing Local Economic Participation Through
-Agriculture and Food Production* — EU-funded, implemented with **Enabel**,
-running **1 August 2026 to 1 September 2029**.
+- **Sahel Horan Municipality** — the *Action Plan for Enhancing Local
+  Economic Participation Through Agriculture and Food Production*, running
+  **1 August 2026 to 1 September 2029**. Seven forms, **20 indicators**,
+  broken down by sex, age, refugee status and disability.
+- **Ramtha Municipality** — its employment and entrepreneurship programme.
+  Seventeen forms, **18 indicators**. Added 13–14 September 2026.
 
-The platform does three jobs:
+One database, one application, one public site per municipality. Each
+municipality sees only its own records; a super admin can switch between
+them. The platform does three jobs for each: collect records through forms,
+compute the indicators from those records in SQL, and produce the quarterly
+return for the donor.
 
-1. Collects records through seven forms.
-2. Computes **20 indicators** from those records, broken down by sex, age,
-   refugee status and disability.
-3. Produces a quarterly return for the donor.
-
-New here? Start with [`00_START_HERE.md`](00_START_HERE.md), then
-[`01_PROJECT_CONTEXT.md`](01_PROJECT_CONTEXT.md).
+New here? Start with [`00_START_HERE.md`](00_START_HERE.md). For where the
+Ramtha side stands — what computes, what waits on a decision — read
+[`RAMTHA_REPORT.md`](RAMTHA_REPORT.md).
 
 ---
 
@@ -22,91 +26,96 @@ New here? Start with [`00_START_HERE.md`](00_START_HERE.md), then
 
 | Layer | State |
 |---|---|
-| Database | **Complete.** 42 migrations applied, RLS on every table |
-| Indicators | 20 indicator views + a filterable `indicator_figures()` function |
-| Front end | Built; **2 of 7 forms on live data**, the rest still on mock |
-| Auth | Built and working, but **switched off** by demo mode |
+| Database | **134 migrations** applied (`0001`–`0133`, plus `0015b`), every file byte-identical to the ledger; RLS on every table; two municipalities |
+| Indicators | Sahel Horan: 20 views, all live. Ramtha: 17 views; **8 compute today, 9 wait on a definition the M&E lead has to decide, 1 has no statement** |
+| Front end | Sahel Horan: every data-entry screen on live data. Ramtha: all 17 forms saving through the screen, a dashboard, an Open items screen |
+| Auth | Sign-in, password reset, six roles, account management for super admins. **Demo mode** signs in silently in development only |
+| Evidence files | Built end to end on Cloudflare R2; **not configured** — four secrets and a CORS rule are still to be set (OQ-49) |
+| Public sites | `/sahel-horan` (training, markets, advisory, linkage requests, "my applications") and `/ramtha` (open list and "my applications") |
 
 ---
 
 ## Database
 
-- **42 migrations**, numbered and append-only, in [`supabase/migrations`](supabase/migrations).
-- **Row-level security on every table**, including reference tables. Five app
-  roles: `coordinator`, `data_entry`, `enumerator`, `partner_viewer`,
-  `participant`. `anon` holds no grants at all.
+- **134 migrations**, numbered and append-only, in
+  [`supabase/migrations`](supabase/migrations). `0001`–`0110` are Sahel
+  Horan's; `0111`–`0133` add the second municipality, the sixth role, the
+  public routing, Ramtha's tables, forms, framework, views and the evidence
+  path. `bash supabase/check_migration_files.sh` confirms every file equals
+  what the database applied.
+- **Row-level security on every table**, including reference tables. Six
+  app roles: `coordinator`, `data_entry`, `enumerator`, `partner_viewer`,
+  `participant`, `super_admin`. `anon` holds no grants at all.
+- **Every scoped table carries `municipality_id`**, and every policy on it
+  checks `can_see_municipality()`. `person` is shared — one national ID is
+  one row for both programmes — but what that person did in one programme
+  is never shown on the other's pages.
 - **Soft delete everywhere.** Every table has `deleted_at`; nothing is ever
   hard-deleted. `audit_log` is insert-only and cannot be modified by anyone.
-- **20 indicator views** (`v_ind_*`) plus `v_indicator_actual`,
-  `v_indicator_disaggregated` and `v_indicator_progress`.
+- **Indicator views**: 20 `v_ind_*` for Sahel Horan, 17 `v_ind_rmth_*` for
+  Ramtha, all revoked from client roles; the application reads
+  `v_indicator_actual`, `v_indicator_progress`, `v_indicator_disaggregated`,
+  and for Ramtha `v_rmth_indicator_status` (why a figure is missing) and
+  `v_rmth_indicator_unique` (unique completers beside a completion count).
+- **Two Edge Functions** in [`supabase/functions`](supabase/functions):
+  `manage-account` (super admins create, deactivate and re-assign staff
+  accounts) and `evidence` (presigned uploads to R2, confirm-and-record,
+  download, remove).
 
 The counting rules live in SQL and nowhere else. Nothing in the front end
-computes an indicator — see [`03_INDICATORS.md`](03_INDICATORS.md) for why the
-distinction between "distinct people" and "rows" matters.
+computes an indicator — see [`03_INDICATORS.md`](03_INDICATORS.md) for why
+the distinction between "distinct people" and "rows" matters, and
+[`CLAUDE.md`](CLAUDE.md) for the register of the ways a check can pass while
+the thing it checks is wrong.
 
 ### Migrations are append-only
 
 Never edit a migration that has been applied. Write a new one. A revert is a
-forward migration, not a rewrite.
+forward migration, not a rewrite. The procedure — file first, apply the exact
+text, rename to the ledger version, run the check — is in `CLAUDE.md`, rule 5.
 
 ---
 
 ## Front end
 
 React + TypeScript + Vite + Tailwind v4, in [`app/`](app). Bilingual
-English/Arabic with full RTL.
+English/Arabic with full RTL. Deployed with Netlify from
+[`netlify.toml`](netlify.toml).
 
-### Which forms are on live data
+### Sahel Horan
 
-Phase 4 wires the seven modules to the database one at a time. **A module on
-mock data looks like it saves and does not.**
+Every screen reads and writes the database. The forms modules
+(`/forms/pn`, `/forms/ex`, `/forms/tc`, `/forms/os`, `/forms/gd`) plus the
+dedicated screens for sessions, exhibitions and their registrations,
+advisory sessions, production initiatives and mentorship, linkage requests,
+and the follow-up survey (five sections, built for a phone in a field).
+Five indicators (`B1.1`, `F0.1`, `G0.1`, `G0.2`, `G0.3`) have no
+data-collection form and are entered on `/manual-entries`, greyed and tagged
+on the dashboard so the gap is visible.
 
-| # | Module | Status |
-|---|---|---|
-| 1 | Partnerships (training + support) | **live** |
-| 2 | Exhibitions | **live** |
-| 3 | Training completion | mock — in progress |
-| 4 | Exhibition registration | mock |
-| 5 | Market linkage | mock |
-| 6 | Manual entries | mock |
-| 7 | Follow-up survey | mock |
+### Ramtha
 
-The authoritative version of this table is the comment at the top of
-[`app/src/data/moduleRows.ts`](app/src/data/moduleRows.ts) — it sits next to the
-code that decides, so it cannot drift.
+Seventeen forms generated from one catalogue
+([`supabase/ramtha/forms.py`](supabase/ramtha/forms.py) →
+`app/src/rmth/forms.generated.ts` and both locale files), one save function
+(`save_rmth_record`), list / form / detail screens that read the catalogue,
+a dashboard that says in words why a figure is missing, and `/rmth/thresholds`
+where the seven open definitions are decided. A super admin switching
+municipality switches the sidebar, the dashboard and the public-site link.
 
-The dashboard is also still on mock numbers.
+### Demo mode
 
----
+In development the app signs itself in as a test account so it can be used
+without a login. It is bound to `import.meta.env.DEV`, so a production build
+cannot run it, and `npm run build` fails if a real password reaches a
+bundle. Everything it changes is a conditional on one flag in
+[`app/src/demo/demoMode.ts`](app/src/demo/demoMode.ts) (`DEMO_MODE_REQUESTED`);
+set it to `false` to restore sign-in and role gating in development too.
 
-## Demo mode
-
-**The app currently has no sign-in.** It opens straight into the municipality
-view and a single button switches to the participant view, matching the
-standalone prototype.
-
-Everything is behind one constant in
-[`app/src/demo/demoMode.ts`](app/src/demo/demoMode.ts):
-
-```ts
-export const DEMO_MODE = true   // set to false to restore sign-in and roles
-```
-
-**To turn it off, set that to `false`.** That is the entire reversal. No
-component was deleted and no route removed — sign-in, the route guards,
-role-filtered navigation and the account chip are all conditionals on that flag.
-
-### It still signs in
-
-The database is untouched: RLS gates every table and `anon` has no grants, so
-without a session every read returns empty and every write is refused. Demo mode
-therefore signs in silently as a coordinator test account. That is a **real**
-session — `app_user.role` is real and RLS behaves exactly as in production. The
-demo simply never shows it.
-
-The producer portal is pointed at one demo person by national ID
-(`DEMO_PORTAL_NATIONAL_ID`), because the coordinator account is not itself a
-participant.
+The password comes from `VITE_DEMO_PASSWORD` in `.env.local`, which is
+gitignored. `node scripts/demo-as.mjs admin@ramtha.test` switches which test
+account demo mode uses. That is a **real** session — `app_user.role` is real
+and RLS behaves exactly as in production.
 
 ---
 
@@ -121,8 +130,8 @@ npm run dev
 
 ### Environment
 
-`app/.env.local`, which is gitignored. Only `VITE_`-prefixed variables reach the
-browser bundle — that is deliberate, and it is what makes it structurally
+`app/.env.local`, which is gitignored. Only `VITE_`-prefixed variables reach
+the browser bundle — that is deliberate, and it is what makes it structurally
 impossible to leak a server secret through Vite.
 
 ```
@@ -138,13 +147,30 @@ what protects the data. It is fine in `.env.local`.
 > not anywhere under `app/`. This project holds national ID numbers for real
 > people.
 
+The Edge Functions take their secrets from the Supabase dashboard, never from
+a file here: `SUPABASE_SERVICE_ROLE_KEY` for `manage-account`; `R2_ACCOUNT_ID`,
+`R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` and `R2_BUCKET` for `evidence`.
+
 ### Commands
 
 ```bash
 npm run dev        # dev server
-npm run build      # typecheck + lint + build; fails on any lint warning
+npm run build      # seven checks, then tsc, eslint (zero warnings) and vite build
 npm run lint       # eslint, zero warnings tolerated
 npm run typecheck  # tsc, no emit
+```
+
+The build's checks each verify a piece of substance rather than shape: that
+every constraint the UI maps a message for exists in the schema, that every
+soft-deletable table has its guard, that no locale value is silently
+English, that no module is missing a locale group, that every Ramtha form
+field has a label in both languages, and that no "not built yet" label
+points at a route that exists.
+
+```bash
+bash supabase/check_migration_files.sh       # every migration file equals the ledger
+node supabase/functions/evidence/sigv4.test.mjs   # the presigner against AWS's published vector
+PYTHONIOENCODING=utf-8 python supabase/ramtha/gen_forms.py   # regenerate the Ramtha forms
 ```
 
 ---
@@ -155,22 +181,31 @@ npm run typecheck  # tsc, no emit
 00_START_HERE.md            read this first
 01_PROJECT_CONTEXT.md       the Action Plan, the four pillars
 02_DATABASE_PLAN.md         schema spec, table by table
-03_INDICATORS.md            all 20 indicators: definition, formula, targets
-04_DATA_DICTIONARY.md       every field of every form
-05_ROLES_AND_RLS.md         the five roles and the policy for every table
-06_OPEN_QUESTIONS.md        decisions that must not be guessed
+03_INDICATORS.md            all 20 Sahel Horan indicators: definition, formula, targets
+04_DATA_DICTIONARY.md       every field of every Sahel Horan form
+05_ROLES_AND_RLS.md         the roles and the policy for every table
+06_OPEN_QUESTIONS.md        decisions that must not be guessed (OQ-1 to OQ-49)
 07_BUILD_CHECKLIST.md       the migrations, in order, with verification
 08_FRONTEND_BUILD_PLAN.md   responsive and translation standards
-CLAUDE.md                   the standing brief — hard rules
+09_MULTI_MUNICIPALITY.md    the second municipality, part by part (0111–0133)
+RAMTHA_IMPLEMENTATION_PLAN.md   the brief the Ramtha work followed
+RAMTHA_REPORT.md            where Ramtha stands, for the M&E lead
+CLAUDE.md                   the standing brief — hard rules and the register
+RAMTHA Framework.xlsx       Ramtha's results framework (two lists; see OQ-48)
+RMTH_indicator_forms.xlsx   the seventeen Ramtha form sheets
 
 app/                        the React front end
-supabase/migrations/        42 numbered SQL migrations
+supabase/migrations/        134 numbered SQL migrations
+supabase/functions/         manage-account, evidence (Deno)
+supabase/ramtha/            the Ramtha form catalogue and generators
+supabase/baselines/         Sahel Horan's figures before the Ramtha work
+supabase/verification/      the Part 7 probe statements
 shm-install/                the design source of record (prototype)
 ```
 
-`shm-install/` and the standalone HTML are the **design source of record**. The
-front end is a copy of that prototype; if the two disagree, the prototype is
-right.
+`shm-install/` and the standalone HTML are the **design source of record**
+for the Sahel Horan screens. The front end is a copy of that prototype; if
+the two disagree, the prototype is right.
 
 ---
 
@@ -178,15 +213,25 @@ right.
 
 These are deliberate and documented, not oversights:
 
-- **Eight indicators have no data-collection form.** They are typed in by hand
-  each quarter and cannot be traced to a record. The dashboard shows them greyed
-  and tagged rather than hiding the gap.
-- **Refugee status and disability are not collected by any form**, so those
-  breakdowns are almost entirely "not recorded". The bucket is shown rather than
-  dropped, so the totals still reconcile.
-- **`label_ar` is empty across every `ref_*` table**, and `indicator.name_ar` is
-  null for all 20. The app falls back to English and logs a warning — it never
-  renders blank. Those translations must come from the approved questionnaire
-  and the source workbook, not be invented.
+- **Ramtha has no targets.** The framework workbook's `English_form` list —
+  the one implemented — carries none; its `English Copy` list carries
+  targets for a different set of indicators. Nothing was mapped across; the
+  dashboard shows *target not set*, never 0. The reconciliation is OQ-48.
+- **Nine Ramtha indicators are not computable** until the M&E lead decides
+  the seven open definitions (OQ-47), on `/rmth/thresholds`. A null there
+  reads as *not computable*, never as zero.
+- **`RMTH-SO1-A1` has a code and no statement** in the framework workbook.
+  It is seeded visibly incomplete rather than invented.
+- **Evidence storage is not configured.** Every upload answers
+  *"Evidence storage is not configured yet"* naming the four secrets (OQ-49).
+- **Arabic that is not the Municipalities' own.** 138 of Sahel Horan's 204
+  reference labels and all 20 of its indicator names in the database still
+  lack Arabic (OQ-26, OQ-32); the application falls back to English and never
+  renders blank. Ramtha's 613 option labels and ten of its indicator
+  statements carry Arabic drafted for this platform, listed for review
+  (OQ-46).
+- **Refugee status and disability are not collected by any Sahel Horan
+  form**, so those breakdowns are almost entirely "not recorded". The bucket
+  is shown rather than dropped, so the totals still reconcile.
 
 Open decisions are tracked in [`06_OPEN_QUESTIONS.md`](06_OPEN_QUESTIONS.md).
