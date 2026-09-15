@@ -62,6 +62,18 @@
  * Rename a foreign key and the build fails here, rather than a screen going
  * quietly empty. Confirmed to fail on a misspelt hint, with and without a
  * `_fkey` suffix, not by reading it.
+ *
+ * ── THE THIRD: THE AMBIGUITY ITSELF ──
+ *
+ * A hint check only sees hints. The trap is the embed with NO hint across a
+ * pair the schema joins twice -- the next composite key would recreate it.
+ * The last section reads supabase/.foreign_keys (every foreign key, child,
+ * parent, name, columns), resolves the base table of every `.select(...)`
+ * in src/, walks each embed and its nested embeds, and fails on any that
+ * crosses a two-key pair without naming a key. Confirmed to fail four ways
+ * before it was trusted: a top-level hint removed, a nested hint removed, a
+ * composite key added to the snapshot on a pair embedded by column, and one
+ * added on a pair embedded by name from a dynamic base.
  */
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -159,7 +171,222 @@ if (badHints.length > 0) {
   process.exit(1)
 }
 
+// ── embed ambiguity ─────────────────────────────────────────────────────────
+//
+// The hint check above catches a hint that names nothing. This catches the
+// trap itself: an embed with NO hint across a pair of tables the schema joins
+// by two foreign keys. supabase/.foreign_keys is the schema's own list
+// (child, parent, constraint, columns), regenerated with:
+//
+//   select string_agg(line, E'\n' order by line) from (
+//     select c.conrelid::regclass::text || ' ' || c.confrelid::regclass::text
+//            || ' ' || c.conname || ' ' ||
+//            (select string_agg(a.attname, ',' order by k.ord)
+//               from unnest(c.conkey) with ordinality as k(attnum, ord)
+//               join pg_attribute a on a.attrelid = c.conrelid and a.attnum = k.attnum)
+//       from pg_constraint c join pg_namespace n on n.oid = c.connamespace
+//      where c.contype = 'f' and n.nspname = 'public') x;
+//
+// Regenerate it after any migration that adds a foreign key. The check is
+// static and reads the snapshot; a composite key added tomorrow is caught the
+// day the snapshot is regenerated, not before -- the same limit as
+// .constraint_names, and the reason the migration definition-of-done says to.
+//
+// How an embed is judged, following PostgREST's own rules:
+//
+//   relation(...)              the table name; ambiguous when the pair
+//                              (base, relation) or (relation, base) has more
+//                              than one foreign key
+//   relation!fk_name(...)      resolved, if fk_name is one of that pair's keys
+//   relation!column(...)       resolved, if exactly one of the pair's keys
+//                              uses that column
+//   column_name(...)           embedding by the FK column; resolved the same
+//                              way as a column hint
+//   alias:...                  an alias changes the JSON key, not the rule
+//
+// The base of a nested embed is the relation that encloses it.
+
+const fks = readFileSync(join(root, 'supabase', '.foreign_keys'), 'utf8')
+  .split('\n')
+  .map((l) => l.trim())
+  .filter(Boolean)
+  .map((l) => {
+    const [child, parent, name, cols] = l.split(' ')
+    return { child, parent, name, cols: cols.split(',') }
+  })
+
+/** Every key between two tables, in either direction. */
+function keysBetween(a, b) {
+  return fks.filter((k) => (k.child === a && k.parent === b) || (k.child === b && k.parent === a))
+}
+const tables = new Set(fks.flatMap((k) => [k.child, k.parent]))
+
+/** Split a select body on top-level commas. */
+function splitTop(s) {
+  const out = []
+  let depth = 0
+  let cur = ''
+  for (const ch of s) {
+    if (ch === '(') depth++
+    if (ch === ')') depth--
+    if (ch === ',' && depth === 0) {
+      out.push(cur)
+      cur = ''
+    } else cur += ch
+  }
+  if (cur.trim()) out.push(cur)
+  return out.map((x) => x.trim())
+}
+
+/** One entry of a select: { relation, hints, alias, inner } or null for a plain column. */
+function parseEmbed(entry) {
+  const m = entry.match(/^(?:([a-z_][a-z0-9_]*)\s*:\s*)?([a-z_][a-z0-9_]*)((?:!\s*[a-z_][a-z0-9_]*)*)\s*\(([\s\S]*)\)\s*$/)
+  if (!m) return null
+  const hints = (m[3].match(/[a-z_][a-z0-9_]*/g) ?? []).filter((h) => h !== 'inner' && h !== 'left')
+  return { alias: m[1] ?? null, relation: m[2], hints, inner: m[4] }
+}
+
+const problems = []
+
+function checkSelect(base, body, where) {
+  for (const entry of splitTop(body)) {
+    const e = parseEmbed(entry)
+    if (!e) continue
+    // A relation position holding an FK column of the base names one key --
+    // provided only one key of the base uses that column. A composite key
+    // that includes the same column makes the column name ambiguous too;
+    // the first version of this test counted single-column keys only and let
+    // exactly that case through.
+    const byColumn = fks.filter((k) => k.child === base && k.cols.includes(e.relation))
+    let target = null
+    if (byColumn.length === 1 && byColumn[0].cols.length === 1) {
+      target = byColumn[0].parent
+    } else if (byColumn.length > 1) {
+      target = byColumn[0].parent
+      problems.push(
+        `${where}: ${base} -> ${e.relation}(...) embeds by column, and ${byColumn.length} foreign keys use ` +
+          `that column (${byColumn.map((k) => k.name).join(', ')})`,
+      )
+    } else if (tables.has(e.relation)) {
+      target = e.relation
+      const keys = keysBetween(base, target)
+      if (keys.length > 1) {
+        const resolved = e.hints.some(
+          (h) => keys.some((k) => k.name === h) || keys.filter((k) => k.cols.includes(h)).length === 1,
+        )
+        if (!resolved) {
+          problems.push(
+            `${where}: ${base} -> ${e.relation}(...) has ${keys.length} foreign keys ` +
+              `(${keys.map((k) => k.name).join(', ')}) and no hint saying which`,
+          )
+        }
+      }
+    }
+    // Recurse with the embedded relation as the base, when it is known.
+    if (target && tables.has(target)) checkSelect(target, e.inner, where)
+  }
+}
+
+/**
+ * The select strings in a file, each with the table it is read from.
+ *
+ * `.from('x').select(<arg>)` where the argument is a string literal, a
+ * file-level constant, a `+` of those, or something else -- in which case
+ * every string literal inside the argument is checked on its own, and a
+ * function called in it contributes the string literals of its body. A
+ * `.from(<expression>)` has no static base; its embeds are checked against
+ * every table the relation could be joined to, which is stricter, not looser.
+ */
+function selectsIn(text) {
+  const consts = new Map()
+  for (const m of text.matchAll(/const\s+([A-Z_][A-Z0-9_]*)\s*=\s*(`[^`]*`|'(?:[^'\\]|\\.)*')/g)) {
+    consts.set(m[1], m[2].slice(1, -1))
+  }
+  const fnBodies = new Map()
+  for (const m of text.matchAll(/function\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\([^)]*\)[^{]*\{/g)) {
+    let depth = 1
+    let i = m.index + m[0].length
+    while (i < text.length && depth > 0) {
+      if (text[i] === '{') depth++
+      if (text[i] === '}') depth--
+      i++
+    }
+    fnBodies.set(m[1], text.slice(m.index + m[0].length, i))
+  }
+  const literalsOf = (expr) =>
+    [...expr.matchAll(/`([^`]*)`|'((?:[^'\\]|\\.)*)'/g)].map((m) => m[1] ?? m[2])
+
+  const out = []
+  for (const m of text.matchAll(/\.from\(\s*('([a-z_][a-z0-9_]*)'|[^)]*)\s*\)/g)) {
+    const base = m[2] ?? null
+    const after = text.slice(m.index, m.index + 2500)
+    const sel = after.match(/\.select\(\s*/)
+    if (!sel) continue
+    let depth = 1
+    let i = sel.index + sel[0].length
+    const argStart = i
+    while (i < after.length && depth > 0) {
+      if (after[i] === '(') depth++
+      if (after[i] === ')') depth--
+      i++
+    }
+    const arg = after.slice(argStart, i - 1)
+    const parts = arg.split('+').map((p) => p.trim())
+    let resolved = ''
+    let ok = true
+    for (const p of parts) {
+      if (/^`[^`]*`$/.test(p) || /^'(?:[^'\\]|\\.)*'$/.test(p)) resolved += p.slice(1, -1)
+      else if (consts.has(p)) resolved += consts.get(p)
+      else ok = false
+    }
+    const strings = ok ? [resolved] : literalsOf(arg)
+    if (!ok) {
+      for (const call of arg.matchAll(/([a-zA-Z_][a-zA-Z0-9_]*)\s*\(/g)) {
+        if (fnBodies.has(call[1])) strings.push(...literalsOf(fnBodies.get(call[1])))
+      }
+    }
+    for (const s of strings) out.push({ base, select: s, line: text.slice(0, m.index).split('\n').length })
+  }
+  return out
+}
+
+let embedsSeen = 0
+for (const file of walk(join(here, '..', 'src'))) {
+  const text = readFileSync(file, 'utf8')
+  const rel = file.slice(join(here, '..').length + 1)
+  for (const { base, select, line } of selectsIn(text)) {
+    const where = `${rel}:${line}`
+    embedsSeen += splitTop(select).filter((x) => parseEmbed(x)).length
+    if (base) checkSelect(base, select, where)
+    else {
+      // No static base: judge each embed against every table it could hang
+      // off. An embed that is ambiguous from any of them must carry a hint.
+      for (const entry of splitTop(select)) {
+        const e = parseEmbed(entry)
+        if (!e || !tables.has(e.relation)) continue
+        const bases = [...new Set(fks.filter((k) => k.child === e.relation || k.parent === e.relation).flatMap((k) => [k.child, k.parent]))]
+        for (const b of bases) if (b !== e.relation) checkSelect(b, entry, `${where} (base unknown, as ${b})`)
+      }
+    }
+  }
+}
+
+if (problems.length > 0) {
+  console.error('\ncheck-constraint-names: FAIL\n')
+  console.error('these embeds cross a pair of tables joined by more than one foreign key, and do not say which:\n')
+  for (const p of problems) console.error(`  ${p}`)
+  console.error(
+    '\nPostgREST refuses such an embed with PGRST201 (HTTP 300), and the refusal\n' +
+      'renders as an empty list -- nine screens read "no records yet" for two days\n' +
+      'after 0113 added composite keys. Name the key: relation!<constraint>( ... ).\n' +
+      'If the snapshot is stale, regenerate supabase/.foreign_keys with the query\n' +
+      'in this script.\n',
+  )
+  process.exit(1)
+}
+
 console.log(
   `check-constraint-names: ${claimed.length} names, all present in the schema; ` +
-    `${hints.length} embed hint(s) name a real foreign key.`,
+    `${hints.length} embed hint(s) name a real foreign key; ${embedsSeen} embed(s) checked, ` +
+    `none crosses a two-key pair unhinted (${fks.length} foreign keys in the snapshot).`,
 )

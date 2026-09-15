@@ -399,40 +399,53 @@ What that means in practice:
   no automated answer to this one, and pretending otherwise is how four raw keys
   reached a screen that had passed every check in the build.
 
-### A refusal that renders as an empty state
+### A schema change that is correct in SQL can make the client ambiguous
 
-Found 15 September 2026, and it is the seventh shape from the read side.
-There a delete RLS filtered reported success and wrote nothing. Here a
-**read** PostgREST refused outright — `PGRST201`, HTTP 300, *more than one
-relationship was found* — and the screen said **"0 of 0 — no records yet"**,
+Found 15 September 2026. The shape: **a migration that is right in the
+database changes what a client library can infer from the database, and the
+symptom is an empty list rather than a failure. Nothing in the database
+tests the client.**
+
+`0113` gave every scoped child table a composite foreign key
+`(parent_id, municipality_id)` beside its single-column one. Correct — it is
+the tenant guard, it was verified, and nothing about it could be faulted by
+reading it. PostgREST, which infers relationships from foreign keys, now saw
+two between each such pair and refused every embed across them: `PGRST201`,
+HTTP 300, *more than one relationship was found*. `unwrapList` had no branch
+for a refusal, so nine screens read **"0 of 0 — no records yet"** to a
+coordinator whose records were in the database and visible through RLS —
 beside a sidebar counter, computed by a different query, that still said 5.
+For two days: the partners list, the training completions, the contribution
+log, the exhibition registrations, the initiatives and the linkage match.
+Part 7 of the Ramtha work verified that those screens "render the same
+components they did", and they did. Nobody read what the components said.
 
-`0113` had given every scoped child table a composite foreign key beside its
-single-column one, for the tenant guard. Correct, verified, and it made every
-embed between such a pair ambiguous to PostgREST. Nine embeds in `src/data`
-crossed one, and for two days the partners list, the training completions,
-the contribution log, the exhibition registrations, the initiatives and the
-linkage match were empty for a coordinator whose records were there. Part 7
-of the Ramtha work verified that those screens "render the same components
-they did" — and they did. Nobody read what the components said.
-
-Two things follow:
+It could not have been predicted from the migration, because the migration
+was not wrong. It could only have been found by asking the client. Three
+things follow:
 
 - **A list that says "none yet" is a claim, and an empty result is not proof
   of it.** Wherever a screen can show "no records", ask what a *refused* query
   looks like on it. If the answer is "the same", the screen cannot tell a
-  coordinator that their data is missing from that it is invisible — which is
-  the seventh failure's cost again, arrived at from the other side.
-- **A schema change that adds a second path between two tables is a change to
-  every embed that walks the first one.** After a migration adds a foreign
-  key, probe one embed across it as the role, through REST, not through SQL:
-  the database join was fine; it was PostgREST that could no longer choose.
+  coordinator that their data is missing from that it is invisible — the
+  seventh failure's cost, arrived at from the read side.
+- **After a migration touches a foreign key, probe one embed across it as the
+  role, through REST.** The SQL join was fine; PostgREST was what could no
+  longer choose. `set local role` proves what the database permits; only a
+  request through the API proves what the client can express.
+- **Regenerate `supabase/.foreign_keys` and `supabase/.constraint_names` in
+  the same commit as any migration that adds or renames a constraint.**
+  `check-constraint-names.mjs` reads both: it fails on a hint that names
+  nothing, and on any embed — nested ones included — that crosses a pair
+  joined by two keys without naming one. It is static, so a stale snapshot
+  is a check that has already passed.
 
 Every embed now names its relationship (`market_linkage!market_linkage_
-initiative_id_fkey ( … )`), and `check-constraint-names.mjs` verifies every
-hint against the constraint snapshot — confirmed to fail on a misspelt hint,
-with and without a `_fkey` suffix, because its first version matched only
-correct-looking names and let the misspelling through.
+initiative_id_fkey ( … )`). The check was confirmed to fail four ways before
+it was trusted — a top-level hint removed, a nested one removed, a composite
+key added to the snapshot on a pair embedded by column, and one added on a
+pair embedded from a dynamic base — and the first version of it passed the
+third, because it resolved a column-named embed by single-column keys alone.
 
 ### A placeholder is a claim about the state of the system
 
@@ -590,7 +603,8 @@ Every `ref_*` table has `label_en` and `label_ar`. Free-text fields store whatev
 supabase migration new <name>      # create a numbered migration
 supabase db push                   # apply to the linked project
 supabase db reset                  # rebuild locally from all migrations + seed
-supabase gen types typescript --linked > types/database.ts
+supabase gen types typescript --linked > app/src/types/database.ts
+node app/scripts/strip-view-relationships.mjs   # then this, or tsc stops with TS2589 (see the script)
 ```
 
 When using the Supabase MCP, apply one migration at a time and run that step's verification query before moving on.
@@ -607,6 +621,7 @@ Before you say a migration is complete, all of these must be true:
 - [ ] Every new table has RLS enabled and at least one policy
 - [ ] Every new table has the standard column block and both triggers
 - [ ] Every foreign key has an index
+- [ ] If it added or renamed a constraint, `supabase/.constraint_names` and `supabase/.foreign_keys` are regenerated in the same commit (queries in `app/scripts/check-constraint-names.mjs`)
 - [ ] The step's verification query in `07_BUILD_CHECKLIST.md` returns the expected result
 - [ ] Any assumption you had to make is written into `06_OPEN_QUESTIONS.md`, not left in a code comment
 
