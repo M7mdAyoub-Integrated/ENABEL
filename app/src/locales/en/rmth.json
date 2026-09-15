@@ -1732,6 +1732,12 @@
     },
     "thresholds": "Open items"
   },
+  "objective": {
+    "impact": "Impact",
+    "so1": "SO1 · Job opportunities",
+    "so2": "SO2 · Training",
+    "so3": "SO3 · Entrepreneurship"
+  },
   "list": {
     "new": "New record",
     "empty": "No records yet.",

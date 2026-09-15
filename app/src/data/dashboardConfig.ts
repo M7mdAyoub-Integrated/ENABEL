@@ -185,11 +185,14 @@ const RMTH: DashboardConfig = {
     const key = fid ? `rmth:forms.${fid}.short` : ''
     return fid && exists(key) ? t(key) : statement(row, ar)
   },
-  // The sidebar's group heading for the same objective, so the two screens
-  // agree; the workbook's own objective name from the view if a code arrives
-  // that the sidebar has no group for.
+  // `CODE · name`, the same form as Sahel Horan's `indicators:objective.*`,
+  // so the two dashboards head their groups alike -- SO1 is the code in
+  // RMTH-SO1-A1.2 and in the rows beneath. (It used to borrow the sidebar's
+  // "Objective 1 · Job opportunities", which named the same group a second
+  // way.) The workbook's own objective name from the view if a code arrives
+  // that has no key.
   objectiveTitle: (code, row, { t, exists, ar }) => {
-    const key = `rmth:nav.group.${code.toLowerCase()}`
+    const key = `rmth:objective.${code.toLowerCase()}`
     return exists(key) ? t(key) : objectiveStatement(row, ar)
   },
   // The form IS the source. `RMTH_FORMS[fid].indicator` is the plan's "which
