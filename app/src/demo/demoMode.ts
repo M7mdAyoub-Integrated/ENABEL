@@ -9,7 +9,6 @@
  *  component was deleted, no route was removed from the codebase, no guard was
  *  unpicked. Turning it off restores:
  *
- *    • the /signin, /forgot and /reset routes                (App.tsx)
  *    • RequireAuth / RequireCapability / RequireModule /
  *      RequirePortal around every route                      (App.tsx, guards.tsx)
  *    • role-based navigation filtering                       (Shell.tsx)
@@ -25,6 +24,18 @@
  *
  *  Grep for DEMO_MODE to find all of them. Every site carries a comment
  *  pointing back here.
+ *
+ *  THE SIGN-IN SCREENS ARE NEVER TAKEN OVER BY THIS MODE. /signin, /admin,
+ *  /forgot and /reset are routed in every mode, and a tab opened on one of
+ *  them does not sign in silently (AuthProvider, openedOnAuthRoute). The
+ *  silent sign-in runs only when there is NO session at all; a session that
+ *  exists is kept whoever it belongs to, so an account chosen on /signin
+ *  survives a reload. Until 15 September 2026 the routes were redirects to
+ *  `/` and the bootstrap signed in on every cold load, which sent a
+ *  signed-out developer typing /admin straight to the Ramtha dashboard.
+ *  Consequence: TO CHANGE THE DEMO ACCOUNT, sign out (the chip in the
+ *  sidebar), then reload -- editing VITE_DEMO_EMAIL alone no longer replaces
+ *  a session that is already there.
  *
  *  The account chip and sign-out in the sidebar used to be on this list and
  *  are not any more. Hiding them meant no development session had a way out

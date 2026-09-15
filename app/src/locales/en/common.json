@@ -10,7 +10,7 @@
     "phoneOnlyBody": "No date of birth, but a phone number is on file, so the site can still find them. Adding a date of birth is better: a phone number changes."
   },
   "appName": "SHM M&E Platform",
-  "subtitle": "Sahel Horan Municipality",
+  "subtitle": "Municipal programmes",
   "yes": "Yes",
   "no": "No",
   "optional": "Optional.",
@@ -130,7 +130,9 @@
   },
   "municipalityGate": {
     "title": "Choose a municipality",
-    "body": "You are signed in as a super admin and are not working in either municipality yet. Choose one from the header to see its dashboard and enter its records. The accounts screen and settings are available without choosing."
+    "body": "You are signed in as a super admin and are not working in either municipality yet. Choose one to see its dashboard and enter its records; the switcher in the header changes it later. The accounts screen and settings are available without choosing.",
+    "failed": "The choice could not be saved. Try again.",
+    "loadFailed": "The list of municipalities could not be loaded."
   },
   "evidence": {
     "title": "Evidence files",

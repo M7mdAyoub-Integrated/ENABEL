@@ -58,6 +58,20 @@ export type AuthState = {
 
 const AuthContext = createContext<AuthState | null>(null)
 
+/**
+ * The routes where nobody is signed in on purpose. A cold load of one of
+ * these never runs the silent demo sign-in: /signin exists to choose an
+ * account, and demo mode choosing one first is exactly how a signed-out
+ * developer typing /signin or /admin arrived at the Ramtha dashboard with
+ * no form in between (15 September 2026). Read once, at bootstrap, from
+ * the address the tab was opened at -- the provider sits above the router.
+ */
+const AUTH_ROUTES = new Set(['/signin', '/admin', '/forgot', '/reset'])
+function openedOnAuthRoute(): boolean {
+  const path = window.location.pathname.replace(/\/+$/, '') || '/'
+  return AUTH_ROUTES.has(path)
+}
+
 export function useAuth(): AuthState {
   const ctx = useContext(AuthContext)
   if (!ctx) throw new Error('useAuth must be used inside <AuthProvider>')
@@ -193,16 +207,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let cancelled = false
 
     /**
-     * Demo mode signs in silently as the coordinator. See src/demo/demoMode.ts
-     * -- set DEMO_MODE to false there to restore normal sign-in.
+     * Demo mode signs in silently as the demo account. See
+     * src/demo/demoMode.ts -- set DEMO_MODE to false there to restore normal
+     * sign-in.
      *
      * A REAL sign-in, not a stub: RLS gates every table, so without a session
-     * every read is empty and every write refused. The session is never shown
-     * or offered as a choice.
+     * every read is empty and every write refused. It runs only when there is
+     * NO session and the tab was not opened on a sign-in screen. An existing
+     * session is kept whoever it belongs to: an account chosen on /signin has
+     * to survive a reload, or the choice was never real. (It used to replace
+     * any other account's session with the demo account's; to change the
+     * demo account now, sign out and reload.)
      */
-    const demoSignIn = async (existing: Session | null): Promise<Session | null> => {
-      if (existing?.user.email === DEMO_ACCOUNT.email) return existing
-      if (existing) await supabase.auth.signOut()
+    const demoSignIn = async (): Promise<Session | null> => {
       const { data, error } = await supabase.auth.signInWithPassword(DEMO_ACCOUNT)
       if (error) {
         console.error(
@@ -217,9 +234,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     void supabase.auth.getSession().then(async ({ data }) => {
       if (cancelled) return
 
-      if (DEMO_MODE) {
-        warnIfDemo()
-        const s = await demoSignIn(data.session)
+      if (DEMO_MODE) warnIfDemo()
+      if (DEMO_MODE && !data.session && !openedOnAuthRoute()) {
+        const s = await demoSignIn()
         if (cancelled) return
         clearCacheIfIdentityChanged(s)
         setSession(s)
@@ -229,6 +246,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return
       }
 
+      // Either not demo mode, or a session already exists, or the tab was
+      // opened on a sign-in screen. The listener takes over from here.
+      demoBootstrapping.current = false
       clearCacheIfIdentityChanged(data.session)
       setSession(data.session)
       setStatus(data.session ? 'signedIn' : 'signedOut')
@@ -238,6 +258,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
       if (cancelled) return
       if (demoBootstrapping.current) return
+      // Read before clearCacheIfIdentityChanged moves the marker.
+      const identityChanged = lastIdentity.current !== (s?.user.id ?? null)
       // Before setSession, so anything this render reads is fetched fresh.
       // TOKEN_REFRESHED keeps the same user id, so it does not clear.
       clearCacheIfIdentityChanged(s)
@@ -254,7 +276,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setRoleResolved(true)
         return
       }
-      setRoleResolved(false)
+      // The same identity again -- INITIAL_SESSION or SIGNED_IN landing after
+      // the bootstrap has already settled, or a token refresh -- re-reads the
+      // role without putting the screen back to "checking". That reset showed
+      // the dashboard skeleton under the municipality chooser, and "Checking
+      // your access" over the sign-in screen, for a moment on every cold load.
+      if (identityChanged) setRoleResolved(false)
       void loadRoleFor(s)
     })
 

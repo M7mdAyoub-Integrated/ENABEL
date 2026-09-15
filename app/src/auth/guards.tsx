@@ -1,7 +1,8 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Navigate, useLocation, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from './AuthProvider'
+import { useMunicipalities, useMunicipalityName } from '../data/municipalities'
 import {
   can,
   canAccessModule,
@@ -138,13 +139,57 @@ export function RequireCapability({
  */
 export function MunicipalityGate({ children }: { children: ReactNode }) {
   const { isSuperAdmin, municipalityId, roleResolved } = useAuth()
-  const { t } = useTranslation('common')
   const location = useLocation()
   const exempt = location.pathname === '/accounts' || location.pathname === '/settings'
-  if (roleResolved && isSuperAdmin && !municipalityId && !exempt) {
-    return <Denied title={t('municipalityGate.title')} body={t('municipalityGate.body')} />
-  }
+  if (roleResolved && isSuperAdmin && !municipalityId && !exempt) return <MunicipalityChooser />
   return <>{children}</>
+}
+
+/**
+ * A super admin with no municipality chosen, on a screen that needs one.
+ * One button per active municipality; the choice is written to the database
+ * (`set_acting_municipality`, the same call the header switcher makes), and
+ * the gate above lets the screen through as soon as it lands. Used to be a
+ * notice pointing at the header, which is a chooser only if you know where
+ * to look.
+ */
+function MunicipalityChooser() {
+  const { t } = useTranslation('common')
+  const { setActingMunicipality } = useAuth()
+  const { data, isLoading, isError } = useMunicipalities()
+  const name = useMunicipalityName()
+  const [busy, setBusy] = useState<string | null>(null)
+  const [failed, setFailed] = useState(false)
+  const options = (data ?? []).filter((m) => m.is_active)
+
+  const choose = async (id: string) => {
+    setBusy(id)
+    setFailed(false)
+    const { error } = await setActingMunicipality(id)
+    setBusy(null)
+    if (error) setFailed(true)
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-3 rounded-[var(--radius-card)] border border-dashed border-border-strong bg-sunken px-6 py-12 text-center">
+      <h1 className="text-lg font-bold tracking-tight text-ink">{t('municipalityGate.title')}</h1>
+      <p className="max-w-prose text-sm leading-relaxed text-muted">{t('municipalityGate.body')}</p>
+      {isLoading ? <div aria-hidden="true" className="h-11 w-48 animate-pulse bg-track" /> : null}
+      {isError ? (
+        <p role="alert" className="text-sm font-semibold text-error">{t('municipalityGate.loadFailed')}</p>
+      ) : null}
+      <div className="mt-2 flex flex-wrap justify-center gap-3">
+        {options.map((m) => (
+          <PrimaryButton key={m.id} disabled={busy !== null} onClick={() => void choose(m.id)}>
+            {name(m)}
+          </PrimaryButton>
+        ))}
+      </div>
+      {failed ? (
+        <p role="alert" className="text-sm font-semibold text-error">{t('municipalityGate.failed')}</p>
+      ) : null}
+    </div>
+  )
 }
 
 /** Guards `/forms/:module`, matching the role's module list. */

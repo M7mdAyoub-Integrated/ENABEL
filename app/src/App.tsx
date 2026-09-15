@@ -103,23 +103,19 @@ function guard(node: React.ReactElement, wrap: (n: React.ReactElement) => React.
  * municipal navigation would be misleading as well as useless.
  */
 /**
- * The unauthenticated routes.
+ * The unauthenticated routes, in every mode.
  *
- * Demo mode removes them from routing entirely -- they redirect to the root --
- * but the components stay imported and the paths stay declared, so restoring
- * them is a one-line change. See src/demo/demoMode.ts.
+ * Demo mode used to replace them with redirects to `/`, which together with
+ * the silent sign-in meant a signed-out developer had no way to choose an
+ * account: /signin bounced to the public home and /admin to whichever
+ * dashboard the demo account implied. The screens are routed regardless of
+ * the mode now, and the provider never signs in silently on them.
  */
-const authRoutes = DEMO_MODE
-  ? [
-      { path: '/signin', element: <Navigate to="/" replace /> },
-      { path: '/forgot', element: <Navigate to="/" replace /> },
-      { path: '/reset', element: <Navigate to="/" replace /> },
-    ]
-  : [
-      { path: '/signin', element: <SignIn /> },
-      { path: '/forgot', element: <ForgotPassword /> },
-      { path: '/reset', element: <ResetPassword /> },
-    ]
+const authRoutes = [
+  { path: '/signin', element: <SignIn /> },
+  { path: '/forgot', element: <ForgotPassword /> },
+  { path: '/reset', element: <ResetPassword /> },
+]
 
 const router = createBrowserRouter([
   ...authRoutes,
@@ -169,9 +165,11 @@ const router = createBrowserRouter([
   // Where staff used to land. Kept so an existing bookmark still works.
   { path: '/home', element: <Landing /> },
   // The staff entrance. `/` is the public home page and says nothing about
-  // accounts, so this is the address a coordinator types: signed out it is
-  // the sign-in form, signed in it is the home the role implies.
-  { path: '/admin', element: <Landing /> },
+  // accounts, so this is the address a coordinator types. It is the sign-in
+  // screen itself: signed out, the form; signed in, who that is, with
+  // "continue" and "someone else" -- never a silent redirect, which is what
+  // hid the demo sign-in firing here.
+  { path: '/admin', element: <SignIn /> },
 
   // THE PARTICIPANT PORTAL IS RETIRED. `/` is a global home page now, so there
   // is no tailored personal page and no account to sign in to. PortalDashboard,
