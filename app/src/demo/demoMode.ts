@@ -13,7 +13,6 @@
  *    • RequireAuth / RequireCapability / RequireModule /
  *      RequirePortal around every route                      (App.tsx, guards.tsx)
  *    • role-based navigation filtering                       (Shell.tsx)
- *    • the account chip and sign-out in the sidebar          (Shell.tsx)
  *    • the sign-out button in the producer portal            (PortalShell.tsx)
  *    • capability gating on create / edit / delete / approve (permissions.ts)
  *
@@ -26,6 +25,13 @@
  *
  *  Grep for DEMO_MODE to find all of them. Every site carries a comment
  *  pointing back here.
+ *
+ *  The account chip and sign-out in the sidebar used to be on this list and
+ *  are not any more. Hiding them meant no development session had a way out
+ *  or any statement of who it was, and a super admin switching municipalities
+ *  needs exactly that statement. The chip shows the demo account like any
+ *  other; signing out lands on the public home page and a reload signs in
+ *  again (RequireSession sends a signed-out demo session to `/`).
  *
  * ─────────────────────────────────────────────────────────────────────────────
  *  WHAT THIS MODE IS

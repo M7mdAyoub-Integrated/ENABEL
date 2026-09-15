@@ -95,6 +95,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Guards against a slow role query landing after the user has signed out or
   // switched account, which would otherwise grant the previous role.
   const requestSeq = useRef(0)
+  // Demo mode: true until the silent sign-in has settled. While it is, the
+  // auth listener stays quiet -- it fires INITIAL_SESSION with no session
+  // before the sign-in, and SIGNED_OUT when the stored session belongs to a
+  // different demo account, and either would read as "signed out" for a
+  // moment. RequireSession sends a signed-out demo session to the public
+  // home page (sign-out is real in demo mode), so a moment is enough to
+  // bounce a cold load of /dashboard to /.
+  const demoBootstrapping = useRef(DEMO_MODE)
 
   /**
    * ── THE CACHE MUST NOT OUTLIVE THE IDENTITY THAT FILLED IT ──
@@ -216,6 +224,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         clearCacheIfIdentityChanged(s)
         setSession(s)
         setStatus(s ? 'signedIn' : 'signedOut')
+        demoBootstrapping.current = false
         void loadRoleFor(s)
         return
       }
@@ -228,6 +237,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
       if (cancelled) return
+      if (demoBootstrapping.current) return
       // Before setSession, so anything this render reads is fetched fresh.
       // TOKEN_REFRESHED keeps the same user id, so it does not clear.
       clearCacheIfIdentityChanged(s)

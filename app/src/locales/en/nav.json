@@ -54,5 +54,10 @@
   "allMunicipalities": "All municipalities",
   "allMunicipalitiesLine": "Both programmes — choose a municipality to enter records",
   "switchMunicipality": "Working in",
-  "switchFailed": "Could not switch"
+  "switchFailed": "Could not switch",
+  "actingOn": "Acting on",
+  "workingIn": "Municipality",
+  "superAdminActingOn": "Super admin · acting on",
+  "superAdminNotActing": "Super admin · no municipality chosen",
+  "publicSiteOf": "Public site · {name}"
 }

@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { type ModuleId } from '../modules'
 import { useNavCounts } from '../data/moduleCounts'
@@ -7,10 +7,9 @@ import { LocaleSwitcher } from '../components/LocaleSwitcher'
 import { OfflineBar } from '../components/OfflineBar'
 import { useAuth } from '../auth/AuthProvider'
 import { can, modulesFor } from '../auth/permissions'
-import { DEMO_MODE } from '../demo/demoMode'
 import { EXTERNAL } from '../ui/glyphs'
 import { MunicipalitySwitcher } from '../components/MunicipalitySwitcher'
-import { useCurrentMunicipality, useMunicipalityName, useProgrammeLine } from '../data/municipalities'
+import { useCurrentMunicipality, useMunicipalities, useMunicipalityName, useProgrammeLine } from '../data/municipalities'
 import { RMTH_FORMS, RMTH_FORM_IDS, type RmthFormId } from '../rmth/forms.generated'
 
 /**
@@ -286,15 +285,36 @@ function NavGroups({
   )
 }
 
-/** Foot of the rail: who is signed in, and the way out. */
+/**
+ * Who is signed in, and the way out.
+ *
+ * Foot of the rail on a desktop, foot of the drawer on a tablet, foot of the
+ * "More" sheet on a phone -- reachable from every screen at every width. It
+ * names the account, the role and the municipality the account is working
+ * in: fixed for a municipal account, chosen for a super admin, and a super
+ * admin who has lost track of which one they chose enters data against the
+ * wrong municipality.
+ *
+ * Demo mode used to hide this ("shows nothing about accounts"), which is how
+ * sign-out came to be missing from every development session while the
+ * production build still had it. A demo session is a real session and is
+ * shown as one. Signing out lands on the public home page, never on the
+ * sign-in form: a coordinator leaving the app should see what a resident
+ * sees, and nothing on that page mentions an account. In demo mode a reload
+ * signs in again (src/demo/demoMode.ts).
+ */
 function SignedInAs({ compact = false }: { compact?: boolean }) {
   const { t } = useTranslation(['auth', 'nav'])
-  const { email, role, signOut } = useAuth()
-  // Demo mode shows nothing about accounts, roles or sessions. The component is
-  // untouched and returns in full when DEMO_MODE is false.
-  // See src/demo/demoMode.ts.
-  if (DEMO_MODE) return null
+  const { email, role, signOut, isSuperAdmin, municipalityId } = useAuth()
+  const municipality = useCurrentMunicipality()
+  const name = useMunicipalityName()
+  const navigate = useNavigate()
   if (!email) return null
+  const where = municipality
+    ? name(municipality)
+    : isSuperAdmin && !municipalityId
+      ? t('nav:allMunicipalities')
+      : null
   return (
     <div className={`border-t-2 border-ink px-[18px] py-[14px] ${compact ? '' : 'mt-auto'}`}>
       <div className="font-narrow text-[10px] font-bold uppercase tracking-[0.16em] text-dim">
@@ -310,10 +330,47 @@ function SignedInAs({ compact = false }: { compact?: boolean }) {
       >
         {email}
       </div>
+      {where ? (
+        <div className="mt-[6px] font-narrow text-[10.5px] font-bold uppercase tracking-[0.12em] text-ink">
+          <span className="text-dim">{isSuperAdmin ? t('nav:actingOn') : t('nav:workingIn')}</span>{' '}
+          {where}
+        </div>
+      ) : null}
       <button
         type="button"
-        onClick={() => void signOut()}
+        onClick={() => {
+          void signOut().then(() => navigate('/', { replace: true }))
+        }}
         className="mt-[10px] w-full cursor-pointer border-[1.5px] border-ink bg-bg px-4 py-[7px] font-narrow text-[11.5px] font-bold uppercase tracking-[0.12em] text-ink hover:bg-sunken"
+      >
+        {t('auth:signOut')}
+      </button>
+    </div>
+  )
+}
+
+/**
+ * The header's copy of the account, for the tablet widths where the rail is
+ * a drawer and the foot of it is out of sight: role and sign out. Hidden on
+ * a desktop (the rail's foot shows it) and on a phone (the More sheet does,
+ * and the header has no room).
+ */
+function HeaderAccount() {
+  const { t } = useTranslation(['auth', 'nav'])
+  const { email, role, signOut } = useAuth()
+  const navigate = useNavigate()
+  if (!email) return null
+  return (
+    <div className="hidden items-center gap-2 md:flex lg:hidden">
+      <span className="font-narrow text-[11px] font-bold uppercase tracking-[0.1em] text-muted">
+        {role ? t(`auth:role.${role}`) : t('auth:role.none')}
+      </span>
+      <button
+        type="button"
+        onClick={() => {
+          void signOut().then(() => navigate('/', { replace: true }))
+        }}
+        className="cursor-pointer border-[1.5px] border-ink bg-bg px-[11px] py-[5px] font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-ink hover:bg-sunken"
       >
         {t('auth:signOut')}
       </button>
@@ -394,18 +451,78 @@ function usePublicSitePath(): string {
   return municipality ? `/${municipality.slug}` : '/'
 }
 
+/**
+ * The public sites a super admin can open: one per active municipality, each
+ * in a new tab, labelled with the municipality's own name. A municipal
+ * account has one public site and the preview control below; the list is
+ * for the account that has more than one and needs to see both.
+ */
+function usePublicSites(): { to: string; label: string }[] {
+  const { isSuperAdmin } = useAuth()
+  const { data } = useMunicipalities()
+  const name = useMunicipalityName()
+  if (!isSuperAdmin) return []
+  return (data ?? []).filter((m) => m.is_active).map((m) => ({ to: `/${m.slug}`, label: name(m) }))
+}
+
+const PUBLIC_LINK_CLASS =
+  'flex min-h-11 flex-none items-center gap-2 whitespace-nowrap border-[1.5px] border-ink bg-bg px-[11px] py-[5px] font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-ink no-underline hover:bg-ink hover:text-bg sm:min-h-0'
+
+/**
+ * The header control. A municipal account's single preview link from `sm`
+ * up; a super admin's two labelled links only from `lg` up, because at a
+ * tablet width the switcher and two labelled links do not fit beside the
+ * municipality name -- there they live in the drawer (PublicSiteList).
+ */
 function ViewPublicSite() {
   const { t } = useTranslation('nav')
   const publicPath = usePublicSitePath()
+  const sites = usePublicSites()
+
+  if (sites.length > 0) {
+    return (
+      <div className="hidden gap-[10px] lg:flex">
+        {sites.map((site) => (
+          <a key={site.to} href={site.to} target="_blank" rel="noopener" className={PUBLIC_LINK_CLASS}>
+            <span aria-hidden="true" className="inline-block mirror-rtl">{EXTERNAL}</span>
+            {t('publicSiteOf', { name: site.label })}
+          </a>
+        ))}
+      </div>
+    )
+  }
 
   return (
-    <NavLink
-      to={publicPath}
-      className="flex min-h-11 flex-none items-center gap-2 whitespace-nowrap border-[1.5px] border-ink bg-bg px-[11px] py-[5px] font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-ink no-underline hover:bg-ink hover:text-bg sm:min-h-0"
-    >
-      <span aria-hidden="true" className="inline-block mirror-rtl">{EXTERNAL}</span>
-      {t('viewPublicSite')}
-    </NavLink>
+    <div className="hidden sm:flex">
+      <NavLink to={publicPath} className={PUBLIC_LINK_CLASS}>
+        <span aria-hidden="true" className="inline-block mirror-rtl">{EXTERNAL}</span>
+        {t('viewPublicSite')}
+      </NavLink>
+    </div>
+  )
+}
+
+/** The super admin's public sites as a stacked list, for the drawer and the phone sheet. */
+function PublicSiteList({ sites }: { sites: { to: string; label: string }[] }) {
+  const { t } = useTranslation('nav')
+  if (sites.length === 0) return null
+  return (
+    <div className="flex flex-col gap-2 border-t border-border-default px-[18px] py-3">
+      {sites.map((site) => (
+        <a
+          key={site.to}
+          href={site.to}
+          target="_blank"
+          rel="noopener"
+          className="flex min-h-11 items-center gap-2 border-[1.5px] border-ink px-3 font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-ink no-underline"
+        >
+          <span aria-hidden="true" className="inline-block mirror-rtl">
+            {EXTERNAL}
+          </span>
+          {t('publicSiteOf', { name: site.label })}
+        </a>
+      ))}
+    </div>
   )
 }
 
@@ -432,6 +549,7 @@ export function Shell({ children }: { children: ReactNode }) {
       ? t('nav:allMunicipalitiesLine')
       : t('common:programmeLine')
   const all = useFlatDests(groups)
+  const sites = usePublicSites()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [moreOpen, setMoreOpen] = useState(false)
   const primary = all.slice(0, 4)
@@ -465,6 +583,14 @@ export function Shell({ children }: { children: ReactNode }) {
               </svg>
             </button>
             <div className="min-w-0">
+              {/* A super admin is told, on every screen and at every width,
+                  that the name below is the municipality they CHOSE. The
+                  switcher is a control, not a statement. */}
+              {isSuperAdmin ? (
+                <div className="truncate font-narrow text-[10px] font-bold uppercase tracking-[0.16em] text-amber">
+                  {municipality ? t('nav:superAdminActingOn') : t('nav:superAdminNotActing')}
+                </div>
+              ) : null}
               <div className="truncate text-[15px] font-extrabold uppercase tracking-[-0.015em]">
                 {headerName}
               </div>
@@ -473,11 +599,10 @@ export function Shell({ children }: { children: ReactNode }) {
               </div>
             </div>
           </div>
-          <div className="flex flex-none items-stretch gap-[10px]">
+          <div className="flex flex-initial flex-wrap items-stretch justify-end gap-[10px]">
             <MunicipalitySwitcher />
-            <div className="hidden sm:flex">
-              <ViewPublicSite />
-            </div>
+            <ViewPublicSite />
+            <HeaderAccount />
             <LocaleSwitcher />
           </div>
         </header>
@@ -499,6 +624,11 @@ export function Shell({ children }: { children: ReactNode }) {
               <Brand />
               <div className="flex-1 overflow-auto pb-2">
                 <NavGroups groups={groups} onNavigate={() => setDrawerOpen(false)} />
+              </div>
+              {/* The header hides a super admin's two public-site links
+                  below lg; this is where they are at a tablet width. */}
+              <div className="hidden lg:hidden md:block">
+                <PublicSiteList sites={sites} />
               </div>
               <SignedInAs />
             </nav>
@@ -564,18 +694,24 @@ export function Shell({ children }: { children: ReactNode }) {
                 toggle it replaced; it is not for this one, because checking how
                 the public site looks on a phone is the single most likely
                 reason to press it. */}
-            <div className="border-t border-border-default px-[18px] py-3 md:hidden">
-              <NavLink
-                to={publicPath}
-                onClick={() => setMoreOpen(false)}
-                className="flex min-h-11 items-center gap-2 border-[1.5px] border-ink px-3 font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-ink no-underline"
-              >
-                <span aria-hidden="true" className="inline-block mirror-rtl">
-                  {EXTERNAL}
-                </span>
-                {t('nav:viewPublicSite')}
-              </NavLink>
-            </div>
+            {sites.length > 0 ? (
+              <div className="md:hidden">
+                <PublicSiteList sites={sites} />
+              </div>
+            ) : (
+              <div className="border-t border-border-default px-[18px] py-3 md:hidden">
+                <NavLink
+                  to={publicPath}
+                  onClick={() => setMoreOpen(false)}
+                  className="flex min-h-11 items-center gap-2 border-[1.5px] border-ink px-3 font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-ink no-underline"
+                >
+                  <span aria-hidden="true" className="inline-block mirror-rtl">
+                    {EXTERNAL}
+                  </span>
+                  {t('nav:viewPublicSite')}
+                </NavLink>
+              </div>
+            )}
             <SignedInAs compact />
           </nav>
         </div>

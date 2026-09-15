@@ -54,5 +54,10 @@
   "allMunicipalities": "كل البلديات",
   "allMunicipalitiesLine": "البرنامجان معًا — اختر بلدية لإدخال السجلات",
   "switchMunicipality": "العمل في",
-  "switchFailed": "تعذّر التبديل"
+  "switchFailed": "تعذّر التبديل",
+  "actingOn": "يعمل باسم",
+  "workingIn": "البلدية",
+  "superAdminActingOn": "مدير عام · يعمل باسم",
+  "superAdminNotActing": "مدير عام · لم تُختر بلدية",
+  "publicSiteOf": "الموقع العام · {name}"
 }

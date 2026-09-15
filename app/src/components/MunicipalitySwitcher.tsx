@@ -50,8 +50,11 @@ export function MunicipalitySwitcher() {
             return
           }
           // A record open on screen belongs to the municipality just left.
-          // Land on the dashboard, which reads the new one.
-          navigate('/dashboard', { replace: true })
+          // Land on the dashboard, which reads the new one -- with the choice
+          // in the URL, so the address can be shared. ActingMunicipalityUrl
+          // keeps the two in step from here.
+          const chosen = options.find((m) => m.id === next)
+          navigate(chosen ? `/dashboard?m=${chosen.slug}` : '/dashboard', { replace: true })
         }}
         className="bg-bg font-narrow text-[12px] font-bold uppercase tracking-[0.08em] text-ink outline-none"
       >

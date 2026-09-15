@@ -39,6 +39,10 @@ export function Resolving() {
  */
 export function RequireSession({ children }: { children: ReactNode }) {
   const { status } = useAuth()
+  // Signing out is real in demo mode too (the chip in Shell.tsx). Without
+  // this branch a signed-out demo session would sit on "checking" forever,
+  // because the silent sign-in runs once, on load.
+  if (status === 'signedOut') return <Navigate to="/" replace />
   if (status !== 'signedIn') return <Resolving />
   return <>{children}</>
 }

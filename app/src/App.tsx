@@ -10,6 +10,7 @@ import { useDirection } from './hooks/useDirection'
 import { MunicipalityGate, RequireCapability, RequireModule, RequireSession } from './auth/guards'
 import { RETIRED_MODULE_IDS } from './modules'
 import Landing from './routes/Landing'
+import { ActingMunicipalityUrl } from './components/ActingMunicipalityUrl'
 import ListScreen from './routes/ListScreen'
 import FormScreen from './routes/FormScreen'
 import DetailScreen from './routes/DetailScreen'
@@ -62,6 +63,7 @@ import ResetPassword from './routes/auth/ResetPassword'
 function ShellLayout() {
   const inner = (
     <Shell>
+      <ActingMunicipalityUrl />
       <MunicipalityGate>
         <Outlet />
       </MunicipalityGate>
@@ -156,6 +158,10 @@ const router = createBrowserRouter([
 
   // Where staff used to land. Kept so an existing bookmark still works.
   { path: '/home', element: <Landing /> },
+  // The staff entrance. `/` is the public home page and says nothing about
+  // accounts, so this is the address a coordinator types: signed out it is
+  // the sign-in form, signed in it is the home the role implies.
+  { path: '/admin', element: <Landing /> },
 
   // THE PARTICIPANT PORTAL IS RETIRED. `/` is a global home page now, so there
   // is no tailored personal page and no account to sign in to. PortalDashboard,

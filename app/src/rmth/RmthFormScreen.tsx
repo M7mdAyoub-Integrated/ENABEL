@@ -186,8 +186,18 @@ export function RmthFormScreen({ mode }: { mode: 'new' | 'edit' }) {
     })
 
   /* ── validation ───────────────────────────────────────────────────────── */
+  //
+  // Computed on every render, whether or not the form has been touched, and
+  // `touched` only decides whether the messages are SHOWN. It used to be the
+  // other way round -- nothing computed until touched -- and `submit()` set
+  // touched and then read `invalid` from the same render, which had been
+  // computed while touched was still false. So the first click on any
+  // incomplete form went to the database with the blanks in it: the
+  // not-null refusal came back as raw SQL, and "this field is required"
+  // appeared beside it a render later. The second click stopped correctly,
+  // which is why it looked like it worked.
   const errors: Record<string, string> = {}
-  if (touched) {
+  {
     for (const f of fields) {
       if (f.type === 'nid' && !personLocked) {
         if (!isCompleteNationalId(nidNorm)) errors[f.key] = t('rmth:form.nidInvalid')
@@ -208,6 +218,7 @@ export function RmthFormScreen({ mode }: { mode: 'new' | 'edit' }) {
     }
   }
   const invalid = Object.keys(errors).length > 0
+  const shown = touched ? errors : {}
 
   /* ── the payload ──────────────────────────────────────────────────────── */
   function buildPayload(): SavePayload {
@@ -350,7 +361,7 @@ export function RmthFormScreen({ mode }: { mode: 'new' | 'edit' }) {
                 personLocked={personLocked}
                 onFile={onFile}
                 lookingUp={lookup.isFetching}
-                error={errors[f.key]}
+                error={shown[f.key]}
                 refs={refs}
                 record={rec.data}
               />
