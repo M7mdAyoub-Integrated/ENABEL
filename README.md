@@ -30,7 +30,7 @@ Ramtha side stands — what computes, what waits on a decision — read
 | Indicators | Sahel Horan: 20 views, all live. Ramtha: 17 views; **8 compute today, 9 wait on a definition the M&E lead has to decide, 1 has no statement** |
 | Front end | One dashboard for both municipalities, reading the acting municipality. Sahel Horan: every data-entry screen on live data. Ramtha: all 17 forms saving through the screen, an Open items screen |
 | Auth | Sign-in, password reset, six roles, account management for super admins. **Demo mode** signs in silently in development only |
-| Evidence files | Built end to end on Cloudflare R2; **not configured** — four secrets and a CORS rule are still to be set (OQ-49) |
+| Evidence files | Built end to end on Cloudflare R2 and verified through the store on 15 September 2026; the four secrets are set, and **one CORS rule on the bucket** is still to be set before a browser can upload (OQ-49) |
 | Public sites | `/sahel-horan` (training, markets, advisory, linkage requests, "my applications") and `/ramtha` (open list and "my applications") |
 
 ---

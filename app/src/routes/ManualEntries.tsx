@@ -13,6 +13,7 @@ import {
 } from '../data/manualEntries'
 import { formatShortDate } from '../lib/format'
 import { AccentRule, PageHead, SectionRule } from '../ui/primitives'
+import { EvidencePanel } from '../components/EvidencePanel'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -145,6 +146,11 @@ function Milestones() {
               </button>
             </div>
           )}
+          {/* OQ-43: evidence on the Sahel Horan side starts here, on the one
+              record type whose figure is a single dated claim. `milestone` has
+              been an admitted entity_type since 0128; this is the first
+              screen to use it. */}
+          <EvidencePanel entityType="milestone" entityId={m.id} compact />
         </div>
       ))}
     </div>

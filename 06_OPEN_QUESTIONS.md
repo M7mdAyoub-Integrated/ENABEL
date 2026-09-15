@@ -1657,6 +1657,53 @@ plus a **CORS rule on the bucket** allowing `PUT` (and `Content-Type`) from
 the app's origins, because the browser PUTs to R2 directly. Set in the
 Supabase dashboard under the function's secrets, never in git.
 
+**Where it stands, 15 September 2026.** The four secrets are set: the
+function signs upload URLs, and the whole path was driven through the real
+store as the super admin — presign, PUT, confirm-as-the-user (the row landed
+with the municipality, the uploader and an `insert:super_admin` audit row),
+the signed download (byte-identical, with the file's own name and type), the
+list on the screen, the settings figure ("1 KB of 10 GB · 1 file", largest
+by table and by record), remove (soft delete plus the object), and the two
+limits in a rolled-back transaction: a file landing exactly on 9 GB is
+accepted, one more byte is refused with `53100` and the message naming the
+administrator, and 1 048 577 bytes is refused by the check constraint. RLS:
+the Ramtha admin sees neither the Sahel Horan file nor its bytes in the
+per-municipality breakdown; the platform total is what everyone sees, by
+design.
+
+**The one outstanding step is the bucket's CORS rule.** The browser's PUT to
+the presigned URL is refused by the bucket today (*no
+Access-Control-Allow-Origin header*), so the verification above did its PUT
+from outside a browser. Whoever holds the Cloudflare account sets it, on the
+bucket (R2 → the bucket → Settings → CORS policy):
+
+```json
+[
+  {
+    "AllowedOrigins": ["https://<the app's production origin>", "http://localhost:5174"],
+    "AllowedMethods": ["PUT"],
+    "AllowedHeaders": ["Content-Type"],
+    "MaxAgeSeconds": 3600
+  }
+]
+```
+
+`GET` is not needed: a download is a signed URL opened in a new tab, which
+is a navigation, not a cross-origin fetch.
+
+**Two defects the first real confirm found, both fixed in the function
+(deployed as version 4):**
+
+- `confirm` read the object's size from `Content-Length` on a HEAD, Deno's
+  fetch handed the response back without that header, `Number(null)` is 0,
+  and the function treated a correctly stored 186-byte file as a size
+  mismatch and **deleted it**. It asks the store with a one-byte ranged GET
+  now, whose `Content-Range` names the total.
+- `presign_upload` signed an upload for a **soft-deleted** record (its
+  screen shows it, with Restore, so RLS lets the function see it). It
+  answers `record_deleted` now, and the panel offers no Add on a deleted
+  record.
+
 **Two numbers were decided here and should be confirmed:**
 
 1. **The stop is 9 GB against 10 GB included, in decimal gigabytes**

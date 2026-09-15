@@ -58,6 +58,11 @@ function RefusalNote({ error, onDismiss, t, locale }: { error: unknown; onDismis
     quota: num('quota_bytes'),
     missing: String(v['missing'] ?? ''),
     message: String(v['message'] ?? ''),
+    // upload_failed carries the HTTP status as `code`, or `message: 'network'`
+    // when the PUT never got an answer -- which is what a missing CORS rule
+    // on the bucket looks like from here. The wording names {code}; it read
+    // "({code})" literally on the first upload ever attempted.
+    code: String(v['code'] ?? v['message'] ?? ''),
   }
   return (
     <div role="alert" className="mt-[14px] flex flex-wrap items-baseline gap-x-[14px] gap-y-2 bg-error px-[18px] py-[14px] text-bg">
@@ -70,7 +75,24 @@ function RefusalNote({ error, onDismiss, t, locale }: { error: unknown; onDismis
   )
 }
 
-export function EvidencePanel({ entityType, entityId }: { entityType: string; entityId: string }) {
+/**
+ * `compact` is for a panel inside a card that sits in a list -- the
+ * milestones on /manual-entries -- where four copies of the explanatory
+ * paragraph would drown four short cards. The list, the add button and the
+ * refusals are the same; only the margin and the paragraph go.
+ */
+export function EvidencePanel({
+  entityType,
+  entityId,
+  compact = false,
+  deleted = false,
+}: {
+  entityType: string
+  entityId: string
+  compact?: boolean
+  /** The record is soft-deleted: its files stay listed, nothing can be added. */
+  deleted?: boolean
+}) {
   const { t, i18n } = useTranslation(['common'])
   const locale = i18n.resolvedLanguage ?? 'en'
   const { role } = useAuth()
@@ -80,6 +102,10 @@ export function EvidencePanel({ entityType, entityId }: { entityType: string; en
   const input = useRef<HTMLInputElement>(null)
   const [pending, setPending] = useState<{ file: File; kind: EvidenceKind } | null>(null)
   const [openError, setOpenError] = useState<unknown>(null)
+  // The function answers a remove with whether the OBJECT went too. The row
+  // is gone either way; a file left in the store costs storage and appears
+  // in no figure, so a "no" is shown rather than swallowed.
+  const [objectKept, setObjectKept] = useState(false)
 
   const start = () => {
     if (!pending) return
@@ -98,10 +124,10 @@ export function EvidencePanel({ entityType, entityId }: { entityType: string; en
   }
 
   return (
-    <section className="mt-[26px]">
+    <section className={compact ? 'mt-4' : 'mt-[26px]'}>
       <SectionRule
         title={t('common:evidence.title')}
-        right={can(role, 'record.edit') ? (
+        right={can(role, 'record.edit') && !deleted ? (
           <>
             <input
               ref={input}
@@ -119,7 +145,9 @@ export function EvidencePanel({ entityType, entityId }: { entityType: string; en
           </>
         ) : undefined}
       />
-      <p className="mt-2 text-[13.5px] text-muted" style={{ textWrap: 'pretty' }}>{t('common:evidence.rule')}</p>
+      {compact ? null : (
+        <p className="mt-2 text-[13.5px] text-muted" style={{ textWrap: 'pretty' }}>{t('common:evidence.rule')}</p>
+      )}
 
       {pending ? (
         <div className="mt-3 flex flex-wrap items-end gap-3 border-[1.5px] border-ink bg-sunken p-3">
@@ -147,6 +175,11 @@ export function EvidencePanel({ entityType, entityId }: { entityType: string; en
       <RefusalNote error={upload.error} onDismiss={upload.reset} t={t} locale={locale} />
       <RefusalNote error={remove.error} onDismiss={remove.reset} t={t} locale={locale} />
       <RefusalNote error={openError} onDismiss={() => setOpenError(null)} t={t} locale={locale} />
+      {objectKept ? (
+        <p role="status" className="mt-3 border-[1.5px] border-attention-border bg-attention-bg px-3 py-2 text-[14px] text-attention-ink">
+          {t('common:evidence.objectKept')}
+        </p>
+      ) : null}
 
       {files.data && files.data.length === 0 ? <p className="mt-3 text-[14px] text-muted">{t('common:evidence.none')}</p> : null}
       {files.data && files.data.length > 0 ? (
@@ -167,7 +200,12 @@ export function EvidencePanel({ entityType, entityId }: { entityType: string; en
                 <span className="text-[13px] text-muted">{sizeText}</span>
                 <button type="button" className="underline" onClick={() => open(a)}>{t('common:evidence.open')}</button>
                 {can(role, 'record.delete') ? (
-                  <button type="button" className="text-error underline" disabled={remove.isPending} onClick={() => void remove.mutateAsync(a.id).catch(() => {})}>
+                  <button
+                    type="button"
+                    className="text-error underline"
+                    disabled={remove.isPending}
+                    onClick={() => void remove.mutateAsync(a.id).then((r) => setObjectKept(!r.objectDeleted)).catch(() => {})}
+                  >
                     {t('common:evidence.remove')}
                   </button>
                 ) : null}

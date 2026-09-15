@@ -2,7 +2,7 @@ import { createBrowserRouter, RouterProvider, Outlet, Navigate } from 'react-rou
 import { Shell } from './layout/Shell'
 import { ToastProvider } from './ui/Toast'
 import { QueryClientProvider } from '@tanstack/react-query'
-import { AuthProvider } from './auth/AuthProvider'
+import { AuthProvider, useAuth } from './auth/AuthProvider'
 import { queryClient } from './data/queryClient'
 import { DEMO_MODE } from './demo/demoMode'
 import { useQueueSync } from './data/useOffline'
@@ -61,11 +61,21 @@ import ResetPassword from './routes/auth/ResetPassword'
  * and comes straight back when DEMO_MODE is false. See src/demo/demoMode.ts.
  */
 function ShellLayout() {
+  const { municipalityId } = useAuth()
   const inner = (
     <Shell>
       <ActingMunicipalityUrl />
       <MunicipalityGate>
-        <Outlet />
+        {/* Keyed on the acting municipality, so a switch REMOUNTS the screen
+            and every query it holds is asked again under the new one.
+            setActingMunicipality clears the query cache, but a mounted
+            screen that reads no auth context never re-renders, and its
+            observer keeps the answer it already had -- /manual-entries
+            opened with ?m=sahel-horan while the database still said Ramtha
+            showed no milestones at all, from a query RLS had answered for
+            Ramtha. The old switcher hid this by always navigating to
+            /dashboard; a switch made by the URL happens in place. */}
+        <Outlet key={municipalityId ?? 'none'} />
       </MunicipalityGate>
     </Shell>
   )

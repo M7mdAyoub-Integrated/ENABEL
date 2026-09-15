@@ -9,8 +9,8 @@
 // not trusted.
 //
 // Only `host` is signed. The browser sets Content-Type on its PUT and R2
-// accepts it unsigned; the size is verified afterwards with a HEAD, which is
-// the check that matters (see index.ts, "confirm").
+// accepts it unsigned; the size is verified afterwards from the store (see
+// index.ts, storedSize), which is the check that matters.
 
 const enc = new TextEncoder();
 

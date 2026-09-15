@@ -90,7 +90,7 @@ export function RmthDetailScreen() {
         <DeliveriesPanel programmeId={id!} />
       ) : null}
 
-      <EvidencePanel entityType={def.table} entityId={id!} />
+      <EvidencePanel entityType={def.table} entityId={id!} deleted={deleted} />
 
       <p className="mt-8 font-narrow text-[11.5px] uppercase tracking-[0.1em] text-faint">
         {t('rmth:detail.created')} {formatShortDate(r.row.created_at, locale)} {SEP} {t('rmth:detail.updated')} {formatShortDate(r.row.updated_at, locale)}

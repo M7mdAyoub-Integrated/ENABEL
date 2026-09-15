@@ -195,8 +195,10 @@ soft-deleted.
 
 ## What to do next, in order
 
-1. Set the four R2 secrets and the bucket CORS rule; upload one photograph
-   from any Ramtha record and watch the settings figure move (OQ-49).
+1. Set the bucket's CORS rule (the four secrets are set, and the path was
+   verified through the store on 15 September 2026 with the one blocked
+   step done from outside a browser); then upload one photograph from any
+   Ramtha record and watch the settings figure move (OQ-49).
 2. Decide the seven open items on `/rmth/thresholds` (section 2).
 3. Reconcile the two framework sheets and enter targets (section 3).
 4. Have Ramtha's focal point read the Arabic of the 106 lists and the ten

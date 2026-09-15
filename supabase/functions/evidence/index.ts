@@ -15,9 +15,10 @@
 //   presign_upload  can the caller see the record and write? is the file
 //                   within the per-file limit? would it take the total past
 //                   the quota? then a PUT URL, ten minutes
-//   confirm         HEAD the object (exists? the declared size?), insert the
-//                   row as the user; if the row is refused, DELETE the object
-//                   so the bucket never holds a file no row points at
+//   confirm         ask the store for the object's size (exists? the declared
+//                   size?), insert the row as the user; if the row is
+//                   refused, DELETE the object so the bucket never holds a
+//                   file no row points at
 //   download        the row as the user (RLS), then a GET URL, sixty seconds,
 //                   with the file's own name and type
 //   remove          soft-delete the row as the user (RLS + guard_soft_delete,
@@ -116,6 +117,46 @@ function safeName(name: string): string {
   return s || "file";
 }
 
+/**
+ * The stored size of an object, from the store itself.
+ *
+ * Not Content-Length from a HEAD. The first confirm ever attempted (15
+ * September 2026, a 186-byte file the store had answered 200 and an ETag
+ * for) read `stored: 0`: Deno's fetch handed the HEAD response back without
+ * a content-length header, Number(null) is 0, and the function took that as
+ * a size mismatch and DELETED the object it had been asked to confirm. So a
+ * one-byte ranged GET is asked instead. Its Content-Range names the total
+ * ("bytes 0-0/186"), a header nothing strips; a 416 is what an empty object
+ * answers to a range; and a store that ignores the range and sends the whole
+ * body is measured by reading it, which the per-file limit keeps small.
+ */
+async function storedSize(r2: R2, key: string): Promise<number | "missing" | "unreachable"> {
+  let res: Response;
+  try {
+    res = await fetch(await objectUrl(r2, "GET", key, 60), { headers: { Range: "bytes=0-0" } });
+  } catch {
+    return "unreachable";
+  }
+  if (res.status === 404) {
+    await res.body?.cancel();
+    return "missing";
+  }
+  if (res.status === 416) {
+    await res.body?.cancel();
+    return 0;
+  }
+  if (!res.ok) {
+    await res.body?.cancel();
+    return "unreachable";
+  }
+  const total = res.headers.get("content-range")?.match(/\/(\d+)$/);
+  if (total) {
+    await res.body?.cancel();
+    return Number(total[1]);
+  }
+  return (await res.arrayBuffer()).byteLength;
+}
+
 async function deleteObject(r2: R2, key: string): Promise<boolean> {
   try {
     const res = await fetch(await objectUrl(r2, "DELETE", key, 60), { method: "DELETE" });
@@ -162,11 +203,16 @@ Deno.serve(async (req: Request) => {
     if (!Number.isInteger(sizeBytes) || sizeBytes <= 0) return json({ ok: false, result: "bad_request" }, 400);
 
     // The record, as the user. Invisible means either not there or not
-    // theirs; both are `not_found` to them, and neither gets a URL.
-    const { data: rec, error: recErr } = await asUser.from(entityType).select("municipality_id").eq("id", entityId).maybeSingle();
+    // theirs; both are `not_found` to them, and neither gets a URL. A
+    // deleted record is visible (its screen offers Restore) and gets no URL
+    // either: a file on a record that does not count would still count
+    // against the store. Found by asking for one.
+    const { data: rec, error: recErr } = await asUser.from(entityType).select("municipality_id, deleted_at").eq("id", entityId).maybeSingle();
     if (recErr) return json({ ok: false, result: "not_permitted", detail: recErr.message }, 403);
     if (!rec) return json({ ok: false, result: "not_found" }, 404);
-    const municipalityId = String((rec as { municipality_id: string }).municipality_id);
+    const found = rec as { municipality_id: string; deleted_at: string | null };
+    if (found.deleted_at) return json({ ok: false, result: "record_deleted" }, 409);
+    const municipalityId = String(found.municipality_id);
 
     const { data: canWrite } = await asUser.rpc("can_write");
     if (canWrite !== true) return json({ ok: false, result: "not_permitted" }, 403);
@@ -205,12 +251,11 @@ Deno.serve(async (req: Request) => {
     if (!keyPrefixRe.test(key) || key.includes("..")) return json({ ok: false, result: "bad_request" }, 400);
 
     // Is the object there, and is it the size that was declared? The
-    // browser's word for the size is not taken: Content-Length from R2 is.
-    const head = await fetch(await objectUrl(r2, "HEAD", key, 60), { method: "HEAD" });
-    if (head.status === 404) return json({ ok: false, result: "object_missing" }, 409);
-    if (!head.ok) return json({ ok: false, result: "store_unreachable", status: head.status }, 502);
-    const actual = Number(head.headers.get("content-length"));
-    if (!Number.isInteger(actual) || actual !== sizeBytes) {
+    // browser's word for the size is not taken: the store's is (storedSize).
+    const actual = await storedSize(r2, key);
+    if (actual === "missing") return json({ ok: false, result: "object_missing" }, 409);
+    if (actual === "unreachable") return json({ ok: false, result: "store_unreachable" }, 502);
+    if (actual !== sizeBytes) {
       await deleteObject(r2, key);
       return json({ ok: false, result: "size_mismatch", declared: sizeBytes, stored: actual }, 409);
     }

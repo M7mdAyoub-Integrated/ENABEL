@@ -55,7 +55,7 @@ export type EvidenceUsage = {
 }
 
 export type FunctionRefusalResult =
-  | 'r2_not_configured' | 'not_signed_in' | 'not_permitted' | 'not_found' | 'file_too_large'
+  | 'r2_not_configured' | 'not_signed_in' | 'not_permitted' | 'not_found' | 'record_deleted' | 'file_too_large'
   | 'quota_exceeded' | 'object_missing' | 'size_mismatch' | 'store_unreachable' | 'insert_refused'
   | 'coordinator_only' | 'bucket_mismatch' | 'upload_failed' | 'bad_request' | 'unknown'
 
