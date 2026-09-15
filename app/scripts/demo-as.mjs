@@ -2,7 +2,7 @@
 /**
  * Switch which test account demo mode signs in as, in development only.
  *
- *   node scripts/demo-as.mjs superadmin@shm.test
+ *   node scripts/demo-as.mjs superadmin@platform.test
  *   node scripts/demo-as.mjs admin@ramtha.test
  *   node scripts/demo-as.mjs coordinator@shm.test      (the default)
  *
@@ -27,7 +27,9 @@ const ACCOUNTS = {
   'viewer@shm.test': 'SHM_TEST_PW_VIEWER',
   'producer@shm.test': 'SHM_TEST_PW_PRODUCER',
   'unlinked@shm.test': 'SHM_TEST_PW_UNLINKED',
-  'superadmin@shm.test': 'SHM_TEST_PW_SUPERADMIN',
+  // Not a Sahel Horan account: its municipality is null and it switches
+  // between both. Renamed from superadmin@shm.test on 15 September 2026.
+  'superadmin@platform.test': 'SHM_TEST_PW_SUPERADMIN',
   'admin@ramtha.test': 'SHM_TEST_PW_RAMTHA_ADMIN',
 }
 

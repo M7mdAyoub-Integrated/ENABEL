@@ -127,7 +127,7 @@ moment, as the plan says. Three accounts are assigned today:
 |---|---|---|
 | `coordinator@shm.test` | `coordinator` | Sahel Horan |
 | `admin@ramtha.test` | `coordinator` | Ramtha |
-| `superadmin@shm.test` | `super_admin` | none — switches |
+| `superadmin@platform.test` (was `superadmin@shm.test` until 15 September 2026 — it was never Sahel Horan's) | `super_admin` | none — switches |
 
 The five other build-phase test accounts keep their roles and are Sahel Horan's.
 
@@ -665,8 +665,8 @@ catalogue rather than a sample:
 | owner | 20 indicators, 260 targets, 13 periods, every operational count as the baseline | 18, 234, 13, and the probe rows then live | — |
 | `coordinator@shm.test` | **every table equal to its Sahel Horan count** | **0 in all 26** | `person` all rows; `audit_log` Sahel Horan rows plus the 904 rows about shared tables (`person`, `app_user`, `ref_*`, `municipality`), none of Ramtha's |
 | `admin@ramtha.test` | **0 in all** | **every table equal to its Ramtha count** | `person` all rows; `audit_log` Ramtha's 377 plus the same 904 shared |
-| `superadmin@shm.test`, acting Ramtha | 0 | Ramtha's | `app_user` all 8 |
-| `superadmin@shm.test`, acting nowhere | all | all | all |
+| `superadmin@platform.test`, acting Ramtha | 0 | Ramtha's | `app_user` all 8 |
+| `superadmin@platform.test`, acting nowhere | all | all | all |
 
 `rmth_reference_counter` answers `NOSELECT` to every client role: it has no
 grant at all, and only the reference trigger reads it. The views: a Sahel

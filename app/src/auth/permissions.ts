@@ -141,7 +141,7 @@ export function can(role: Role | null, capability: Capability): boolean {
   // Except account management. The demo coordinator really cannot do that
   // -- manage-account refuses anyone but a super admin -- so showing the
   // link would be the placeholder shape from CLAUDE.md: a control that
-  // exists and cannot work. `node scripts/demo-as.mjs superadmin@shm.test`
+  // exists and cannot work. `node scripts/demo-as.mjs superadmin@platform.test`
   // is how to see it in development.
   if (DEMO_MODE && capability !== 'accounts.manage') return true
   if (!role) return false
