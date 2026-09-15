@@ -29,6 +29,22 @@
  * migrations stale (the state from 0132 to 0135, when regenerating "did not
  * work") and one that matches the schema.
  *
+ * ── WHERE THE DEPTH COMES FROM (read in postgrest-js 2.112.4, unchanged in
+ *    2.116.0, the latest on 15 September 2026) ──
+ *
+ * It is not a type recursing on itself and not the total amount of work:
+ * the raw file costs 1.24 M instantiations against 0.96 M stripped, both far
+ * under the 5 M cap. It is DEPTH. `DeduplicateRelationships<T>` walks a
+ * table's Relationships tuple one conditional-type frame per entry --
+ * `[First, ...DeduplicateRelationships<Rest>]`, not tail-recursive -- and
+ * `ResolveJoinTableRelationship` maps it over EVERY table's list. TypeScript
+ * stops a conditional type at 100 nested frames. With the view entries the
+ * scoped tables carry 42-78 entries (app_user 78, exhibition_registration
+ * 48, training_enrolment 44); a one-level embed fits under 100 and a
+ * two-level one, with its outer frames, does not. Stripped, no list is
+ * longer than 5. Upgrading the client does not change this, and the
+ * generator has no switch for it, so this script stays.
+ *
  * Idempotent; safe to run on an already-stripped file.
  */
 import { readFileSync, writeFileSync } from 'node:fs'
