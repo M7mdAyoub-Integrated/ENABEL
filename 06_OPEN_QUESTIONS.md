@@ -378,14 +378,19 @@ than no summary — a reader counts nine reds and stops looking.
 
 | Priority | Count | Codes |
 |---|---|---|
-| 🔴 Blocks a reported number | 10 | OQ-1, OQ-2, OQ-3, OQ-4, OQ-5, OQ-12, OQ-25, OQ-30, OQ-32, OQ-40 |
-| 🟠 Affects the schema, the forms or a permission | 17 | OQ-6, OQ-7, OQ-8, OQ-9, OQ-10, OQ-11, OQ-13, OQ-14, OQ-21, OQ-26, OQ-27, OQ-28, OQ-29, OQ-35, OQ-36, OQ-37, OQ-39 |
-| 🟡 Wording and presentation | 9 | OQ-15, OQ-16, OQ-17, OQ-18, OQ-19, OQ-20, OQ-33, OQ-34, OQ-38 |
-| 🟢 Resolved or fixed | 4 | OQ-22, OQ-23, OQ-24, OQ-31 |
+| 🔴 Blocks a reported number | 12 | OQ-1, OQ-2, OQ-3, OQ-4, OQ-5, OQ-12, OQ-25, OQ-32, OQ-40, OQ-44, OQ-47, OQ-48 |
+| 🟠 Affects the schema, the forms or a permission | 21 | OQ-6, OQ-7, OQ-8, OQ-9, OQ-10, OQ-11, OQ-13, OQ-14, OQ-21, OQ-26, OQ-27, OQ-28, OQ-29, OQ-35, OQ-36, OQ-37, OQ-39, OQ-41, OQ-43, OQ-45, OQ-49 |
+| 🟡 Wording and presentation | 11 | OQ-15, OQ-16, OQ-17, OQ-18, OQ-19, OQ-20, OQ-33, OQ-34, OQ-38, OQ-46, OQ-50 |
+| 🟢 Resolved, fixed or moot | 6 | OQ-22, OQ-23, OQ-24, OQ-30, OQ-31, OQ-42 |
 
-**36 open, 4 closed, 40 in total.**
+**44 open, 6 closed, 50 in total.**
 
-Updated 2026-09-01, second pass: the partner merge, the advisory track and the
+Updated 16 September 2026: the table is regenerated from the headings, so it
+cannot drift from them again. OQ-30 is moot since 0128, OQ-43 is half answered
+and OQ-49 mostly, all three re-marked; OQ-41 to OQ-50 are counted for the first
+time.
+
+Earlier note, 2026-09-01, second pass: the partner merge, the advisory track and the
 linkage gate. **OQ-40 is new and it is the one to read** — it is the KPI half of
 the advisory-track work, deliberately not built, and answering it settles OQ-1
 and OQ-4 as a side effect. OQ-29 is unchanged and now visible on three screens
@@ -704,7 +709,7 @@ unfiltered by type, still deliberately.
 
 ---
 
-## 🔴 OQ-30 · Staff can overwrite evidence in place, which section 8 was written to prevent
+## 🟢 OQ-30 · Staff can overwrite evidence in place, which section 8 was written to prevent — MOOT since 0128
 
 **What section 8 grants.** Read and insert to staff; delete to a coordinator only. The intent is clear: uploading evidence is routine, removing it is not.
 
@@ -1330,7 +1335,7 @@ usually an unfinished migration, which is the thing the check was written for.
 
 ---
 
-## 🔴 OQ-43 · Four indicators require evidence and nothing in the platform can upload a file
+## 🟠 OQ-43 · Four indicators require evidence; two of them can attach one since 15 September 2026
 
 **Found 3 September 2026**, during the table audit.
 
@@ -1349,7 +1354,16 @@ staff read and staff insert. The `attachment` table, with `entity_type`,
 `entity_id`, `storage_path`, its audit trigger, its soft-delete guard, and a
 generated row type in `app/src/types/database.ts`.
 
-**What does not exist.** Any code that uses it. `supabase.storage` appears
+**15 September 2026.** The evidence panel (0128, R2) sits on each milestone
+card of `/manual-entries`, so **B1.1 and G0.1** can carry their decisions,
+schedules and minutes today, verified with a real photograph from the
+browser. **G0.2 and G0.3** cannot yet: coordination meetings and case
+studies are rows in a record log on the same screen with no detail view to
+hang a panel on. `coordination_meeting` and `case_study` have been admitted
+`entity_type`s since 0128, so what is missing is a place on the screen --
+an expandable row, or a detail route -- not a migration.
+
+**What did not exist before 0128.** Any code that used the bucket. `supabase.storage` appeared
 **nowhere** in `app/src`. `attachment` holds 0 rows, is written by nothing, and
 is read by nothing — no view, no function, no screen.
 
@@ -1645,7 +1659,7 @@ stays null. **Never** enter a target from the Copy against an
 
 ---
 
-## 🔴 OQ-49 · The evidence store is built and not configured, and the numbers behind the stop are a decision
+## 🟠 OQ-49 · The evidence store works from the browser; the production origin and the two numbers behind the stop remain
 
 **Added 14 September 2026**, with migration `0128` and the `evidence` Edge
 Function.

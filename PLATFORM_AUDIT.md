@@ -294,18 +294,29 @@ nothing to scope; `v_upcoming_exhibitions` names its municipality (`0135`);
 `superadmin@shm.test` is `superadmin@platform.test`. The sweep behind 2.1 is
 now a check, `supabase/check_municipality_scope.sql`.
 
-What is left in code:
+What is left, 16 September 2026 -- the whole project, one list, by who acts.
 
-1. **The bucket's CORS rule**: `http://localhost:5174` and the production origin (OQ-49 has the JSON and the probe). Two minutes in the Cloudflare dashboard, once the Netlify domain exists.
-2. **The sign-in form itself has not been submitted by anyone since the `/signin` fix** -- everything around it was driven from a cleared browser; the one keystroke that types a password is a person's.
+## Code
 
-## Not code — these need people
+1. **Evidence on G0.2 and G0.3.** Coordination meetings and case studies are rows in a record log on `/manual-entries` with nowhere to hang the panel; B1.1 and G0.1 have it. An expandable row or a detail route, no migration (OQ-43).
+2. **A coordinator can snapshot a period.** `snapshot_period` is correct and `authenticated` cannot execute it, so no period has ever been snapshotted and nothing protects a reported figure. A grant and a button (OQ-44, OQ-25).
+3. **The completion form writes its two agricultural fields.** Both are on screen; neither reaches `person` (OQ-45).
+4. **The rate limiter answers as itself**, not as `cannot_verify` (OQ-41), and `v_ind_c1` counts an initiative of the survey's own municipality (OQ-50).
 
-4. **Refugee status and disability on two Sahel Horan forms.** Seven indicators, and it is the purpose of the programme. Coordinator.
-5. **The seven Ramtha thresholds.** Nine indicators cannot compute. M&E lead.
-6. **The Ramtha target reconciliation.** Two sheets, two indicator lists. M&E lead.
-7. **`SO1-A1`'s indicator statement.** M&E lead.
-8. **Arabic** — 138 of 204 Sahel Horan reference labels, and the Municipality's own wording. Native speaker.
+## Configuration -- the account holder
+
+5. **The bucket's CORS rule**: `http://localhost:5174` now, the Netlify origin when the domain exists. OQ-49 has the JSON and the probe.
+6. **Submit the sign-in form once**, as each kind of account. Everything around it was driven from a cleared browser; the keystroke that types a password is a person's.
+
+## Decisions -- these need people, and no code moves them
+
+7. **Ramtha's seven definitions** (OQ-47): nine indicators say "not computable until decided". M&E lead.
+8. **Ramtha's targets, `SO1-A1`'s statement, and the two framework sheets** (OQ-48). M&E lead.
+9. **Refugee status and disability on two Sahel Horan forms** (OQ-12): seven indicators, and the purpose of the programme. Coordinator.
+10. **Arabic**: the twenty Sahel Horan indicator names (OQ-26, now visible beside a fully Arabic Ramtha dashboard), 138 reference labels (OQ-32), and Ramtha's 613 drafted labels read by its focal point (OQ-46). Native speaker.
+11. **The Sahel Horan framework's own conflicts** (OQ-1 to OQ-5, OQ-40): C1.3's definition and target, G0.2's arithmetic, three targets against their deadline, D0.1's form, E0.1's twelve events against six, and an indicator for the advisory tracks. M&E lead, with the donor where a target moves.
+
+Six code items became four; the people's list is the same length it was, because nothing in a repository answers it.
 9. **Snapshot and lock a period.** No reported figure is protected today. M&E lead.
 
 ## Before real data
