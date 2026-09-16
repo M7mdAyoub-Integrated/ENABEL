@@ -302,6 +302,13 @@ unchanged. One wording for the native speaker's pass under item 10: two
 Arabic renderings of "super admin" sit on one screen (`auth:role.super_admin`
 and `nav:superAdminActingOn`).
 
+Later the same day (`09` Part 11) the panel became a centred dialog with
+one entrance and the accounts list gained URL-addressed filters. **Nothing
+was added to the four code items below.** One decision was added to the
+people's list -- item 12, OQ-51: the `app_user` policies admit a municipal
+coordinator to their own municipality's accounts while the screen is super
+admin only, found by probing as the real role.
+
 ## Code
 
 1. **Evidence on G0.2 and G0.3.** Coordination meetings and case studies are rows in a record log on `/manual-entries` with nowhere to hang the panel; B1.1 and G0.1 have it. An expandable row or a detail route, no migration (OQ-43).
@@ -321,8 +328,9 @@ and `nav:superAdminActingOn`).
 9. **Refugee status and disability on two Sahel Horan forms** (OQ-12): seven indicators, and the purpose of the programme. Coordinator.
 10. **Arabic**: the twenty Sahel Horan indicator names (OQ-26, now visible beside a fully Arabic Ramtha dashboard), 138 reference labels (OQ-32), and Ramtha's 613 drafted labels read by its focal point (OQ-46). Native speaker.
 11. **The Sahel Horan framework's own conflicts** (OQ-1 to OQ-5, OQ-40): C1.3's definition and target, G0.2's arithmetic, three targets against their deadline, D0.1's form, E0.1's twelve events against six, and an indicator for the advisory tracks. M&E lead, with the donor where a target moves.
+12. **May a municipal coordinator manage their own municipality's accounts?** (OQ-51) The database says yes short of a super admin's row; the plan and the screen say super admin only. Whichever is meant, the other moves to match. Project owner, with the Municipal Coordinator.
 
-Six code items became four; the people's list is the same length it was, because nothing in a repository answers it.
+Six code items became four; the people's list grew by one, because nothing in a repository answers it.
 9. **Snapshot and lock a period.** No reported figure is protected today. M&E lead.
 
 ## Before real data

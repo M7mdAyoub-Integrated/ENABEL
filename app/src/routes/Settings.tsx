@@ -10,10 +10,10 @@ import { can } from '../auth/permissions'
  * The settings every signed-in role has: the language, and for staff the
  * two platform-wide worklists that belong to no form.
  *
- * Rendered inside the platform panel (layout/PlatformPanel.tsx), never as a
+ * Rendered inside the platform dialog (layout/PlatformDialog.tsx), never as a
  * page of its own: settings are the platform's, not a municipality's, and a
  * municipality's sidebar is only its own product. `/settings` still exists
- * as an address and opens the panel here.
+ * as an address and opens the dialog here.
  *
  * This used to end with an empty state saying "user roles … are seeded and
  * changed in the database". Roles have been changed on the accounts screen

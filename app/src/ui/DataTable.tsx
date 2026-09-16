@@ -43,10 +43,11 @@ function CellView({ cell }: { cell: Cell }) {
  *
  * `layout="stacked"` is the card list at every width. The two renderings
  * switch on the VIEWPORT, which is right on a page and wrong inside the
- * platform panel: there the container is 760px on a wide screen, the
- * viewport says "table", and the accounts table -- five columns and three
- * actions in a row -- is a thousand pixels of sideways scrolling. The
- * caller that knows it is in a narrow container says so.
+ * platform dialog: there the container is at most 900px on a wide screen
+ * (it was a 760px panel until 16 September 2026), the viewport says
+ * "table", and the accounts table -- five columns and three actions in a
+ * row -- is a thousand pixels of sideways scrolling. The caller that knows
+ * it is in a narrow container says so.
  */
 export function DataTable({
   columns,

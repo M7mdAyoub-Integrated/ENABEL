@@ -38,8 +38,7 @@
     "followup": "Follow-up",
     "noForm": "No form yet",
     "office": "Coordination office",
-    "guidance": "Guidance",
-    "platform": "Platform"
+    "guidance": "Guidance"
   },
   "signedIn": "Signed in",
   "sessions": "Sessions",
@@ -64,5 +63,6 @@
   },
   "platform": {
     "title": "Platform administration"
-  }
+  },
+  "noMunicipalityNav": "No municipality chosen. Its dashboard and forms appear here once one is."
 }

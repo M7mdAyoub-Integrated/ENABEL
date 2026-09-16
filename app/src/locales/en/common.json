@@ -128,7 +128,7 @@
   },
   "municipalityGate": {
     "title": "Choose a municipality",
-    "body": "You are signed in as a super admin and are not working in either municipality yet. Choose one to see its dashboard and enter its records; the switcher in the header changes it later. Accounts and settings need no municipality: they are in the sidebar here, and in the account menu once you have chosen.",
+    "body": "You are signed in as a super admin and are not working in either municipality yet. Choose one to see its dashboard and enter its records; the switcher in the header changes it later. Accounts and settings need no municipality: they are in the account menu, under your name.",
     "failed": "The choice could not be saved. Try again.",
     "loadFailed": "The list of municipalities could not be loaded."
   },

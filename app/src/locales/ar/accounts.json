@@ -88,5 +88,30 @@
     "bad_action": "إجراء غير معروف.",
     "method_not_allowed": "إجراء غير معروف.",
     "misconfigured": "خدمة الحسابات غير مهيّأة."
+  },
+  "filters": {
+    "toggle": "التصفية",
+    "show": "عرض",
+    "hide": "إخفاء",
+    "searchLabel": "البحث في الحسابات بالاسم أو البريد الإلكتروني",
+    "searchPlaceholder": "ابحث بالاسم أو البريد الإلكتروني",
+    "municipality": "التصفية حسب البلدية",
+    "role": "التصفية حسب الدور",
+    "status": "التصفية حسب الحالة",
+    "anyMunicipality": "أي بلدية",
+    "noMunicipality": "بلا بلدية · المشرفون العامون",
+    "anyRole": "أي دور",
+    "anyStatus": "النشطة والمعطّلة",
+    "showing": "{shown} من {total} حسابات",
+    "chip": {
+      "q": "البحث: {value}",
+      "muni": "البلدية: {value}",
+      "role": "الدور: {value}",
+      "status": "الحالة: {value}"
+    },
+    "remove": "إزالة التصفية: {label}",
+    "clearAll": "مسح كل التصفيات",
+    "emptyTitle": "لا حساب مطابق",
+    "emptyDesc": "لا يطابق أي حساب هذه التصفيات. امسحها لعرض جميع الحسابات البالغ عددها {total}."
   }
 }

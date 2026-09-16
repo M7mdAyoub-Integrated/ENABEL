@@ -88,5 +88,30 @@
     "bad_action": "Unknown action.",
     "method_not_allowed": "Unknown action.",
     "misconfigured": "The account service is not configured."
+  },
+  "filters": {
+    "toggle": "Filters",
+    "show": "Show",
+    "hide": "Hide",
+    "searchLabel": "Search accounts by name or email",
+    "searchPlaceholder": "Search by name or email",
+    "municipality": "Filter by municipality",
+    "role": "Filter by role",
+    "status": "Filter by status",
+    "anyMunicipality": "Any municipality",
+    "noMunicipality": "No municipality · super admins",
+    "anyRole": "Any role",
+    "anyStatus": "Active and deactivated",
+    "showing": "{shown} of {total} accounts",
+    "chip": {
+      "q": "Search: {value}",
+      "muni": "Municipality: {value}",
+      "role": "Role: {value}",
+      "status": "Status: {value}"
+    },
+    "remove": "Remove filter: {label}",
+    "clearAll": "Clear all filters",
+    "emptyTitle": "No account matches",
+    "emptyDesc": "No account matches these filters. Clear them to see all {total}."
   }
 }

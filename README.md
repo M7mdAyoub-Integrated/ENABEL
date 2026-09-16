@@ -107,9 +107,12 @@ what differs in `data/dashboardConfig.ts`); for Ramtha it says in words why
 a figure is missing. A super admin switching municipality switches the
 sidebar, the dashboard and the public-site link — to exactly what that
 municipality's own admin sees. The platform's own administration (accounts,
-settings) is not in the sidebar: it opens in a panel from the account menu
-at the foot of the rail, for every role, and is the only sidebar a super
-admin has before choosing a municipality (`09_MULTI_MUNICIPALITY.md` Part 10).
+settings) is not in the sidebar for anyone: it opens in a centred dialog
+from the account menu — the chip under your name, at the foot of the rail —
+which is the one way in; `/accounts` and `/settings` redirect into it, its
+state and the accounts filters live in the URL, and a super admin who has not
+chosen a municipality has an empty sidebar that says so
+(`09_MULTI_MUNICIPALITY.md` Parts 10–11).
 
 ### Demo mode
 

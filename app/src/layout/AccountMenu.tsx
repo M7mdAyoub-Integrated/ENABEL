@@ -2,8 +2,9 @@ import { useEffect, useId, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../auth/AuthProvider'
+import { can } from '../auth/permissions'
 import { useCurrentMunicipality, useMunicipalityName } from '../data/municipalities'
-import { usePlatformPanel } from './platformPanelContext'
+import { usePlatformDialog } from './platformDialogContext'
 
 /**
  * Who is signed in, and the two things they can do about it.
@@ -15,13 +16,18 @@ import { usePlatformPanel } from './platformPanelContext'
  * the foot of the rail on a desktop, the header on a tablet, the foot of the
  * "More" sheet on a phone.
  *
- * The chip is a button. It opens a menu carrying the same identity, then
- * Settings — the platform's administration, in a panel over the screen — and
- * Sign out. One control for every role: a super admin's panel has an
- * Accounts tab and a municipal admin's does not, but the menu is the same
- * menu, so the two roles do not feel like two products. Nothing here is a
- * permission boundary; the panel decides what to show by capability and the
- * database refuses what the role cannot do.
+ * The chip is a button. It opens a menu carrying the same identity, then the
+ * platform's administration — a dialog over the screen — and Sign out. The
+ * administration item is the ONE way into that dialog (the addresses
+ * /accounts and /settings redirect into it): it belongs to the person, not
+ * to the municipality being looked at, so it lives in the control that
+ * already carries the identity and nowhere in the municipality's sidebar.
+ * One control for every role: for an account that manages accounts the item
+ * reads "Platform administration" and opens on the Accounts tab; for anyone
+ * else it reads "Settings" and opens a dialog with no tabs. The same
+ * capability test titles the dialog, so the item and what it opens cannot
+ * disagree. Nothing here is a permission boundary; the dialog decides what
+ * to show by capability and the database refuses what the role cannot do.
  *
  * Signing out lands on the public home page, never on the sign-in form: a
  * coordinator leaving the app should see what a resident sees, and nothing
@@ -48,7 +54,8 @@ export function AccountMenu({
   const municipality = useCurrentMunicipality()
   const name = useMunicipalityName()
   const navigate = useNavigate()
-  const { openPanel } = usePlatformPanel()
+  const { openDialog } = usePlatformDialog()
+  const manages = can(role, 'accounts.manage')
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
   const chipRef = useRef<HTMLButtonElement>(null)
@@ -163,16 +170,16 @@ export function AccountMenu({
             role="menuitem"
             onClick={() => {
               setOpen(false)
-              // The panel returns focus to whatever had it when it opened;
+              // The dialog returns focus to whatever had it when it opened;
               // this item is about to unmount, so hand focus to the chip
-              // first or the panel would return it to nothing.
+              // first or the dialog would return it to nothing.
               chipRef.current?.focus()
               onAction?.()
-              openPanel('settings')
+              openDialog(manages ? 'accounts' : 'settings')
             }}
             className="flex min-h-11 w-full cursor-pointer items-center px-[18px] text-start text-sm font-medium text-ink hover:bg-ink hover:text-bg"
           >
-            {t('nav:settings')}
+            {manages ? t('nav:platform.title') : t('nav:settings')}
           </button>
           <button
             type="button"

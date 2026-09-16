@@ -379,13 +379,15 @@ than no summary — a reader counts nine reds and stops looking.
 | Priority | Count | Codes |
 |---|---|---|
 | 🔴 Blocks a reported number | 12 | OQ-1, OQ-2, OQ-3, OQ-4, OQ-5, OQ-12, OQ-25, OQ-32, OQ-40, OQ-44, OQ-47, OQ-48 |
-| 🟠 Affects the schema, the forms or a permission | 21 | OQ-6, OQ-7, OQ-8, OQ-9, OQ-10, OQ-11, OQ-13, OQ-14, OQ-21, OQ-26, OQ-27, OQ-28, OQ-29, OQ-35, OQ-36, OQ-37, OQ-39, OQ-41, OQ-43, OQ-45, OQ-49 |
+| 🟠 Affects the schema, the forms or a permission | 22 | OQ-6, OQ-7, OQ-8, OQ-9, OQ-10, OQ-11, OQ-13, OQ-14, OQ-21, OQ-26, OQ-27, OQ-28, OQ-29, OQ-35, OQ-36, OQ-37, OQ-39, OQ-41, OQ-43, OQ-45, OQ-49, OQ-51 |
 | 🟡 Wording and presentation | 11 | OQ-15, OQ-16, OQ-17, OQ-18, OQ-19, OQ-20, OQ-33, OQ-34, OQ-38, OQ-46, OQ-50 |
 | 🟢 Resolved, fixed or moot | 6 | OQ-22, OQ-23, OQ-24, OQ-30, OQ-31, OQ-42 |
 
-**44 open, 6 closed, 50 in total.**
+**45 open, 6 closed, 51 in total.**
 
-Updated 16 September 2026: the table is regenerated from the headings, so it
+Updated 16 September 2026 (later): OQ-51 is added — the `app_user` policies
+admit a municipal coordinator to their own municipality's accounts while the
+screen is super admin only. Earlier that day: the table is regenerated from the headings, so it
 cannot drift from them again. OQ-30 is moot since 0128, OQ-43 is half answered
 and OQ-49 mostly, all three re-marked; OQ-41 to OQ-50 are counted for the first
 time.
@@ -1849,3 +1851,74 @@ each other.
 
 **Decides.** M&E lead — does "supported production activity" mean supported
 by *this* programme? If yes, the view and the two functions change together.
+
+---
+
+## 🟠 OQ-51 · The database lets a municipal coordinator manage their municipality's accounts, and the screen is super admin only
+
+**Found 16 September 2026**, verifying that the platform dialog is not a
+permission boundary (`09_MULTI_MUNICIPALITY.md` Part 11).
+
+**What the plan and the screen say.** `RAMTHA_IMPLEMENTATION_PLAN.md` §2.5:
+*"Super admin can manage accounts … Super admin only."* The accounts tab is
+shown to `accounts.manage`, which `permissions.ts` gives to `super_admin`
+alone; `/accounts` is behind `RequireCapability('accounts.manage')`; and
+`manage-account` — the only way to create a login or set a password —
+refuses anyone who is not an active super admin.
+
+**What the database does.** `au_read` and `au_update` (0118) admit
+`is_coordinator() and municipality_id = my_municipality()`, and 0118's
+header says so on purpose: *"a coordinator reads and edits the accounts of
+their own municipality."* `guard_app_user` (0117) then refuses a
+non-super-admin only three things: minting a super admin, moving an account
+between municipalities, and touching a super admin's row.
+
+Measured as `coordinator@shm.test`, through RLS with `set local role
+authenticated` and the claims set, in a transaction that rolled back:
+
+| statement | rows |
+|---|---|
+| `select` from `app_user` | 6 — the Sahel Horan accounts, not the Ramtha admin, not the super admin |
+| deactivate `dataentry@shm.test` | **1** |
+| change `viewer@shm.test`'s role to `data_entry` | **1** |
+| deactivate `superadmin@platform.test` | 0 — filtered |
+| deactivate `admin@ramtha.test` | 0 — filtered |
+
+So a coordinator driving PostgREST directly can deactivate, reactivate and
+re-role every staff account of their own municipality (short of a super
+admin's), and the only thing stopping them on the platform is that the
+screen is not offered to them. **That is the front end as the permission
+boundary**, which the standing rule for the chrome forbids — from the
+opposite direction to the usual: the database is wider than the screen, not
+narrower.
+
+**Why it is not fixed here.** Both fixes are one line and both are a
+decision:
+
+- narrow the policy to `is_super_admin()` — the plan's reading, and it
+  turns 0118's deliberate sentence into a mistake; or
+- widen `accounts.manage` to a coordinator for their own municipality — the
+  database's reading, and then a municipal admin gets an Accounts tab whose
+  *create* and *set password* actions the Edge Function refuses, so the
+  function's gate would have to move too.
+
+A municipal coordinator being able to deactivate a colleague who has left is
+a plausible intent; a municipal coordinator being able to demote the other
+coordinator is a plausible accident. Nothing in the source documents says
+which.
+
+**Interim behaviour.** Unchanged. The screen stays super admin only; the
+policy stays as 0118 wrote it. Nothing today depends on the gap — every
+coordinator account is a test fixture.
+
+**Decides.** Project owner, with the Municipal Coordinator: may a municipal
+coordinator manage their own municipality's accounts (which ones, and which
+actions), or is that the super admin's alone? Then the policy or the
+capability moves to match, and the other is left as the record of the
+decision — not both edited to agree with whichever was easier.
+
+**Grep for it:**
+
+    select policyname, pg_get_expr(polqual, polrelid) from pg_policies pol
+      join pg_policy p on p.polname = pol.policyname
+     where schemaname = 'public' and tablename = 'app_user';

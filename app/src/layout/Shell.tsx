@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState, type ReactNode } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { type ModuleId } from '../modules'
 import { useNavCounts } from '../data/moduleCounts'
@@ -12,8 +12,14 @@ import { MunicipalitySwitcher } from '../components/MunicipalitySwitcher'
 import { useCurrentMunicipality, useMunicipalityName, useProgrammeLine } from '../data/municipalities'
 import { RMTH_FORMS, RMTH_FORM_IDS, type RmthFormId } from '../rmth/forms.generated'
 import { AccountMenu } from './AccountMenu'
-import { PlatformPanel } from './PlatformPanel'
-import { PlatformPanelContext, usePlatformPanel, type PanelSection } from './platformPanelContext'
+import { PlatformDialog } from './PlatformDialog'
+import {
+  PlatformDialogContext,
+  sectionFromParams,
+  withDialogSection,
+  withoutDialog,
+  type DialogSection,
+} from './platformDialogContext'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -32,16 +38,13 @@ import { PlatformPanelContext, usePlatformPanel, type PanelSection } from './pla
  */
 
 /**
- * A navigation entry: a route, or — for the two platform entries a super
- * admin with no municipality sees — a section of the platform panel, which
- * opens over the screen rather than replacing it.
+ * A navigation entry: a route. Nothing else — the platform's two sections
+ * (accounts, settings) used to be entries here too, for a super admin with no
+ * municipality chosen, and are reached from the account menu only now; see
+ * useNavGroups.
  */
-type Dest = { labelKey: string; num: string; count?: number | string } & (
-  | { to: string; panel?: never }
-  | { to?: never; panel: PanelSection }
-)
+type Dest = { to: string; labelKey: string; num: string; count?: number | string }
 type Group = { labelKey: string | null; items: Dest[] }
-const destKey = (d: Dest) => d.to ?? `panel:${d.panel}`
 
 /**
  * Navigation, grouped and numbered exactly as the prototype's NAV table.
@@ -79,18 +82,23 @@ const RMTH_GROUP_ORDER = ['impact', 'so1', 'so2', 'so3'] as const
  * Two scopes, never mixed.
  *
  * Administering the platform and looking at a municipality are different
- * activities. A super admin who has not chosen a municipality is doing the
- * first, and the sidebar is the platform's administration and nothing else:
- * no forms, no dashboard, no municipal navigation, because a form belongs to
- * a municipality and listing one municipality's forms under "choose a
- * municipality" implies a choice that has not been made.
+ * activities. The sidebar is for the second: a municipality's product, built
+ * by the same code path its own admin's is, so a super admin acting on Ramtha
+ * sees the sidebar the Ramtha admin sees, entry for entry. A super admin who
+ * has not chosen a municipality has nothing to navigate — a form belongs to a
+ * municipality, and listing one municipality's forms under "choose a
+ * municipality" implies a choice that has not been made — so the sidebar is
+ * EMPTY for them, and says so (ShellFrame), while the chooser in the main
+ * area does the choosing.
  *
- * Once a municipality is chosen — or for a municipal account, always — the
- * sidebar is that municipality's product, built by the same code path its
- * own admin's is. Accounts and settings are not in it: they are the
- * platform's, and they live in the account menu (AccountMenu) and the panel
- * it opens (PlatformPanel), so a super admin acting on Ramtha sees the
- * sidebar the Ramtha admin sees, entry for entry.
+ * The platform's administration — accounts and settings — is not in the
+ * sidebar for anyone. It belongs to the person, not to the municipality
+ * being looked at, so it lives in the one control that already carries the
+ * identity: the account menu (AccountMenu), which opens the platform dialog
+ * (PlatformDialog). Until 16 September 2026 a super admin with no
+ * municipality ALSO had the two as sidebar entries, which put the same
+ * destination in two places, one of them inside the thing the other opened.
+ * There is exactly one way in now.
  */
 function useNavGroups(): Group[] {
   const counts = useNavCounts()
@@ -98,17 +106,7 @@ function useNavGroups(): Group[] {
   const allowed = modulesFor(role)
   const municipality = useCurrentMunicipality()
 
-  if (isSuperAdmin && !municipalityId) {
-    return [
-      {
-        labelKey: 'nav:group.platform',
-        items: [
-          { panel: 'accounts', labelKey: 'nav:accounts', num: '01' },
-          { panel: 'settings', labelKey: 'nav:settings', num: '02' },
-        ],
-      },
-    ]
-  }
+  if (isSuperAdmin && !municipalityId) return []
 
   const mod = (m: ModuleId, num: string): Dest[] =>
     allowed.includes(m)
@@ -191,7 +189,7 @@ function useNavGroups(): Group[] {
     // Accounts and settings used to end this list — an "Administration"
     // group for a super admin, and Settings for everyone. Both are the
     // platform's, not the programme's, and are reached from the account
-    // menu now; see the note above.
+    // menu only; see the note above.
   ]
 
   // ── Ramtha ────────────────────────────────────────────────────────────────
@@ -285,24 +283,6 @@ function NavItemBody({ dest, isActive }: { dest: Dest; isActive: boolean }) {
 }
 
 function NavItem({ dest, onNavigate }: { dest: Dest; onNavigate?: (() => void) | undefined }) {
-  const { open, openPanel } = usePlatformPanel()
-  if (dest.panel) {
-    // A platform entry: opens the panel in place. Drawn exactly like a route
-    // entry, and "active" while its section is the one open.
-    const isActive = open === dest.panel
-    return (
-      <button
-        type="button"
-        onClick={() => {
-          onNavigate?.()
-          openPanel(dest.panel)
-        }}
-        className={`${NAV_ITEM} cursor-pointer ${isActive ? NAV_ITEM_ON : NAV_ITEM_OFF}`}
-      >
-        <NavItemBody dest={dest} isActive={isActive} />
-      </button>
-    )
-  }
   return (
     <NavLink
       to={dest.to}
@@ -322,6 +302,19 @@ function NavGroups({
   onNavigate?: (() => void) | undefined
 }) {
   const { t } = useTranslation()
+  const { isSuperAdmin, municipalityId } = useAuth()
+  // The one state with nothing to navigate (useNavGroups): a super admin
+  // before choosing. An empty rail with no word about why reads as broken;
+  // this names the state. Derived from the same condition that empties the
+  // list, not from the list being empty, so it cannot say this for some
+  // other reason.
+  if (isSuperAdmin && !municipalityId) {
+    return (
+      <p className="m-0 px-[18px] pb-[5px] pt-[15px] text-[13px] leading-[1.45] text-muted">
+        {t('nav:noMunicipalityNav')}
+      </p>
+    )
+  }
   return (
     <>
       {groups.map((g, i) => (
@@ -332,7 +325,7 @@ function NavGroups({
             </div>
           ) : null}
           {g.items.map((d) => (
-            <NavItem key={destKey(d)} dest={d} onNavigate={onNavigate} />
+            <NavItem key={d.to} dest={d} onNavigate={onNavigate} />
           ))}
         </div>
       ))}
@@ -459,18 +452,26 @@ function PublicSiteLink({ stacked = false, onNavigate }: { stacked?: boolean; on
 }
 
 export function Shell({ children }: { children: ReactNode }) {
-  // The platform panel's state lives here, above the routed screen, so a
-  // switch of municipality — which remounts the Outlet — does not close it,
-  // and so /accounts and /settings can open it from a route.
-  const [panel, setPanel] = useState<PanelSection | null>(null)
-  const openPanel = useCallback((section: PanelSection) => setPanel(section), [])
-  const closePanel = useCallback(() => setPanel(null), [])
-  const panelState = useMemo(() => ({ open: panel, openPanel, closePanel }), [panel, openPanel, closePanel])
+  // The platform dialog's state is the URL — `?platform=<section>` on
+  // whatever route is underneath (platformDialogContext.ts) — read here,
+  // above the routed screen, so a switch of municipality that remounts the
+  // Outlet does not close it, a refresh does not lose it, and /accounts and
+  // /settings can open it by redirecting to an address that names it.
+  // Every write replaces the history entry: opening, closing and typing in
+  // a filter are one screen's state, not places to go Back to.
+  const [params, setParams] = useSearchParams()
+  const open = sectionFromParams(params)
+  const openDialog = useCallback(
+    (section: DialogSection) => setParams((prev) => withDialogSection(prev, section), { replace: true }),
+    [setParams],
+  )
+  const closeDialog = useCallback(() => setParams((prev) => withoutDialog(prev), { replace: true }), [setParams])
+  const dialogState = useMemo(() => ({ open, openDialog, closeDialog }), [open, openDialog, closeDialog])
   return (
-    <PlatformPanelContext.Provider value={panelState}>
+    <PlatformDialogContext.Provider value={dialogState}>
       <ShellFrame>{children}</ShellFrame>
-      <PlatformPanel />
-    </PlatformPanelContext.Provider>
+      <PlatformDialog />
+    </PlatformDialogContext.Provider>
   )
 }
 
@@ -534,7 +535,7 @@ function ShellFrame({ children }: { children: ReactNode }) {
               {/* A super admin is told, on every screen and at every width,
                   that the name below is the municipality they CHOSE. The
                   switcher is a control, not a statement. These two, and the
-                  Accounts tab in the panel, are the only marks of a super
+                  Accounts tab in the platform dialog, are the only marks of a super
                   admin on a municipal screen. */}
               {isSuperAdmin ? (
                 <div className="truncate font-narrow text-[10px] font-bold uppercase tracking-[0.16em] text-amber">
@@ -607,7 +608,7 @@ function ShellFrame({ children }: { children: ReactNode }) {
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
         {primary.map((d) => (
-          <TabBarItem key={destKey(d)} dest={d} onNavigate={() => setMoreOpen(false)} />
+          <TabBarItem key={d.to} dest={d} onNavigate={() => setMoreOpen(false)} />
         ))}
         <button
           type="button"
@@ -648,28 +649,13 @@ function ShellFrame({ children }: { children: ReactNode }) {
   )
 }
 
-/** A phone tab: a route, or a platform entry that opens the panel. */
+/** A phone tab. */
 function TabBarItem({ dest, onNavigate }: { dest: Dest; onNavigate: () => void }) {
   const { t } = useTranslation()
-  const { open, openPanel } = usePlatformPanel()
   const cls = (active: boolean) =>
     `flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 border-e border-border-default px-1 py-2 text-center font-narrow text-[10.5px] font-bold uppercase tracking-[0.08em] ${
       active ? 'bg-ink text-bg' : 'text-muted'
     }`
-  if (dest.panel) {
-    return (
-      <button
-        type="button"
-        onClick={() => {
-          onNavigate()
-          openPanel(dest.panel)
-        }}
-        className={cls(open === dest.panel)}
-      >
-        <span className="line-clamp-2 leading-tight">{t(dest.labelKey)}</span>
-      </button>
-    )
-  }
   return (
     <NavLink to={dest.to} onClick={onNavigate} className={({ isActive }) => cls(isActive)}>
       <span className="line-clamp-2 leading-tight">{t(dest.labelKey)}</span>

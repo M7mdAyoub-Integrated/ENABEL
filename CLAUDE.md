@@ -43,7 +43,7 @@ docs/04_DATA_DICTIONARY.md     ← every field of every form, with option lists
 docs/05_ROLES_AND_RLS.md       ← the five roles and the policy for every table
 docs/06_OPEN_QUESTIONS.md      ← decisions that must NOT be guessed
 docs/07_BUILD_CHECKLIST.md     ← the 17 migrations, in order, with verification
-09_MULTI_MUNICIPALITY.md       ← the second municipality (Ramtha), part by part, 0111–0135; Part 10 is the super admin's chrome
+09_MULTI_MUNICIPALITY.md       ← the second municipality (Ramtha), part by part, 0111–0135; Parts 10–11 are the super admin's chrome and the platform dialog
 RAMTHA_IMPLEMENTATION_PLAN.md  ← the brief that work followed
 RAMTHA_REPORT.md               ← where Ramtha stands: what computes, what waits on a decision
 supabase/migrations/           ← the SQL you write

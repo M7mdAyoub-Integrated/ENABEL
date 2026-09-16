@@ -253,7 +253,7 @@ the staff entrance: signed out it is the sign-in form, signed in it is the
 home the role implies; nothing on the public side links to it.
 
 The accounts screen (`/accounts`; since Part 10 the Accounts tab of the
-platform panel, which that address opens) lists every account (email is now
+platform panel — a dialog since Part 11 — which that address opens) lists every account (email is now
 on `app_user`, copied from `auth.users` where `authenticated` cannot read),
 creates one with a generated one-time password shown once, changes role or
 municipality, sets a password, deactivates and reactivates.
@@ -948,7 +948,7 @@ because it is built by the same code path.
 
 | | sidebar |
 |---|---|
-| super admin, no municipality | one group, *Platform*: Accounts, Settings. No forms, no dashboard, no municipal navigation — a form belongs to a municipality, and listing one municipality's forms under "choose a municipality" implies a choice that has not been made |
+| super admin, no municipality | one group, *Platform*: Accounts, Settings. No forms, no dashboard, no municipal navigation — a form belongs to a municipality, and listing one municipality's forms under "choose a municipality" implies a choice that has not been made. *Superseded the same day by Part 11: the two platform entries left the sidebar too, and it is empty, with a line saying why* |
 | super admin acting on X | **entry for entry what X's own admin sees** |
 | a municipal account | its own product |
 
@@ -979,6 +979,11 @@ products. Escape and a click elsewhere close it; a choice in the sheet or
 drawer closes the sheet or drawer too.
 
 ### The platform panel (`PlatformPanel.tsx`, `platformPanelContext.ts`)
+
+*Superseded later on 16 September 2026 by Part 11: the panel is a centred
+dialog (`PlatformDialog.tsx`, `platformDialogContext.ts`), its state is in
+the URL, and the account menu is its only entrance. The paragraphs below
+describe the panel as it was built that morning.*
 
 *Settings* opens the platform's administration in a panel over whatever is
 on screen — the municipality's product stays where it is. Decided by
@@ -1077,3 +1082,188 @@ One thing surfaced by putting the chip and the header eyebrow side by side:
 `auth:role.super_admin` reads *مشرف عام* and `nav:superAdminActingOn`
 *مدير عام*, two Arabic renderings of one role on one screen. Not decided
 here — it belongs with the native speaker's pass (OQ-26's list).
+
+---
+
+## Part 11 — the platform dialog: one door, a modal, and filters with an address (16 September 2026, later the same day, `app/src/layout`, `app/src/ui/Dialog.tsx`)
+
+No migration. Part 10 was reviewed the same day and two things about it
+were wrong: the platform panel was a drawer, and Settings could be reached
+two ways. A third thing was asked for — filtering the accounts list — and a
+fourth was found on the way.
+
+### A dialog, not a drawer
+
+A drawer attached to the inline-end edge reads as another region of the
+same page. Administering the platform is a different scope entirely, and a
+centred dialog over a dimmed screen says so: you have stepped out of the
+municipality and you will step back.
+
+The mechanics — overlay, centred panel, focus trap, Escape, scroll lock,
+focus return, the bottom sheet below 768px — lived inline in `Modal`, the
+delete confirmation, and the panel had copied them by hand with its own
+Escape rule. There was no shared primitive, so the primitive is what was
+built: `ui/Dialog.tsx`. `Modal` is now content only (title bar, sentence,
+red note, cancel/confirm) on top of it, the same look, and `PlatformDialog`
+is header, tabs and a scrolling body on top of the same thing. Two things
+in it are worth knowing:
+
+- **Dialogs nest through a module-level stack.** Escape and Tab act on the
+  top dialog only, so the one-time-password and deactivation confirmations
+  own the keyboard while they are up, and one key never closes both. The
+  panel used to decide this with a DOM query for an inner `[role="dialog"]`;
+  the stack is the same fact kept where both sides read it. Verified: with
+  the deactivation open inside the dialog, the first Escape closed the
+  confirmation and returned focus to its Deactivate button with the page
+  still locked; the second closed the dialog.
+- **`onClose` is read through a ref.** The dialog's close handler now
+  writes the URL and so changes identity on every render; an effect keyed
+  on it would re-lock scroll and move focus to the close control while
+  somebody was typing in the search box. Typing kept focus, checked.
+
+Sized to its content and capped at the viewport (`max-h-full` inside a
+padded `inset-0` box, so the empty filtered state is a short centred box
+and the full list a tall one), 900px at most, scrolling inside its body.
+Below 768px `size="wide"` is a full-screen sheet — full height, not
+content-sized, so its header does not jump when the Settings tab gives way
+to the longer Accounts tab. The confirmation keeps its content-sized sheet.
+
+### One door
+
+Settings was in the account menu **and**, for a super admin with no
+municipality, in the sidebar beside Accounts — the same destination in two
+places, one of them inside the thing the other opened. The account menu is
+the home, for the reason the review gave: it is the control that already
+carries the identity, and platform administration belongs to the person,
+not to the municipality being looked at. Part 10 had already decided the
+sidebar must be entry-for-entry the municipality's own admin's when acting
+on one; an entry that appears in the sidebar only until a municipality is
+chosen and lives in the menu at all other times is the worse of the two.
+
+So the *Platform* group is gone from `useNavGroups`, `Dest` lost its
+`panel` variant, and the super admin's sidebar before choosing is **empty**
+with one line — *"No municipality chosen. Its dashboard and forms appear
+here once one is."* — derived from the same condition that empties it, not
+from the list being empty. The chooser in the main area does the choosing.
+The phone tab bar for that state is a single *More*, which is where the
+menu is.
+
+The menu item is labelled by the same capability test that titles the
+dialog: `accounts.manage` → *Platform administration*, opening on the
+Accounts tab; anyone else → *Settings*, a dialog with no tab bar. A menu
+item named "Settings" that opened "Platform administration" on an Accounts
+tab would have been the register's placeholder shape in a menu.
+
+    grep -rn "openDialog(" app/src   →  AccountMenu.tsx (the door),
+                                        PlatformDialog.tsx (its own tabs, and
+                                        the capability redirect below)
+
+`/accounts` and `/settings` remain addresses and redirect into the dialog
+(`PlatformRoute`); they are not a second door, they are how a bookmark
+arrives.
+
+### The dialog's state is the URL
+
+`?platform=accounts|settings` on whatever route is underneath, read in
+`Shell` above the routed screen and written with `replace` — opening,
+closing and a keystroke in a filter are one screen's state, not places to
+go Back to. It had to be the URL rather than React state because the
+filters below are in the URL, and a filter that survives a refresh while
+the dialog holding it does not would leave `?role=coordinator` orphaned on
+a dashboard. Consequences, each checked:
+
+- a refresh on `/dashboard?platform=accounts&muni=ramtha&role=coordinator`
+  comes back with the dialog open, the Accounts tab selected, both selects
+  showing their values and the list at 1 of 8;
+- `/accounts?role=super_admin` lands on `/dashboard?role=super_admin&platform=accounts`,
+  filtered; `/settings` on `/dashboard?platform=settings`;
+- a super admin acting on Ramtha opens it over `/rmth/a12?m=ramtha` and the
+  address reads `/rmth/a12?m=ramtha&platform=accounts` — `ActingMunicipalityUrl`
+  copies the other parameters when it writes `m`, so a switch of
+  municipality by address while the dialog is open (Ramtha → Sahel Horan)
+  remounted the screen beneath it, changed the sidebar and header, and left
+  the dialog open with its filter;
+- closing strips `platform` and the four filter keys; leaving the accounts
+  tab for settings strips the filter keys. The URL describes what is on
+  screen and nothing else;
+- `PlatformRoute` is one `<Navigate>` carrying the section and any filter
+  parameters, not an effect plus a redirect — two navigations in one commit
+  race, and the last to run wins.
+
+**Found while verifying, in my own change.** The capability redirect (a
+role without `accounts.manage` asking for the accounts tab gets settings,
+and the address is corrected to say so) fired on a cold load *before the
+role had resolved*: `can(null, …)` is false, so a super admin's
+`?platform=accounts&role=coordinator` was rewritten to `settings` and the
+filter thrown away, with the account signing in a moment later to a
+Settings tab it had not asked for. The old panel had the same test but only
+chose what to render, so the race cost nothing; giving it a write made it
+destructive. Gated on `roleResolved`, and the dialog renders nothing until
+then rather than a "Settings" title that turns into "Platform
+administration". Found by loading the address cold, which is the one thing
+a client-side navigation cannot test.
+
+### The accounts filter
+
+Municipality (each municipality by slug, and `none` for the super admins,
+who belong to none), role (all six), active or deactivated, and a text
+search on name and email — `?muni=`, `?role=`, `?status=`, `?q=`. A value
+the URL carries that nothing recognises is read as unset and left alone.
+Active filters are removable chips under the strip with a *Clear all
+filters*, beside an always-present *n of N accounts*; an empty result under
+a filter is an empty state with the same clear-all, not a blank list.
+
+The brief said to do this "the same way the dashboard filters work". **The
+dashboard has no filters**, and nothing in the app kept filter state in the
+URL before this; the only filter UI is the list screens' search-and-select
+strip, in React state. The strip's language was reused — one 1.5px frame,
+hairlines between cells — with the search on its own row from 768px and the
+three selects sharing the second: four cells in one row truncated every
+select's label inside a 900px dialog. Below 768px the frame holds one
+*Filters* control with a count badge that opens the four stacked; the chips
+beneath still show what is active without opening it.
+
+**The list stays stacked.** The five-column table with three actions per
+row needs 1041px; the dialog's body is at most ~850px, so the table
+rendering would be sideways scroll here as it was in the 760px panel.
+
+Verified as the super admin, in English and Arabic, at 1440, 800 and 320:
+each filter alone (Ramtha → 1 of 8; coordinator → 2; deactivated → 0;
+`SHM.test` → the six `@shm.test` accounts, case-insensitively), two and
+three combined, one chip removed by its ×, clear all, and the refresh
+above. Nothing wider than the viewport at 320 in either language (every
+element's bounding box checked, and the dialog's `scrollWidth`); no raw
+locale key, searched case-insensitively (the E0.1 lesson). A municipal
+admin (`admin@ramtha.test`): *Settings* in the menu, a dialog titled
+Settings with no tab bar and no accounts list, and `/accounts?role=…` typed
+lands on `?platform=settings` with the filter stripped. Focus lands on the
+close control, returns to the chip on close (overlay click and Escape
+both), and the page behind is locked.
+
+### Found: the database admits a coordinator to accounts, and the screen does not
+
+The rule for this work was that the chrome is not a permission boundary,
+and checking that as the real role found the boundary in the wrong place.
+`au_read` and `au_update` (0118, deliberate — its header says "a coordinator
+reads and edits the accounts of their own municipality") admit a municipal
+coordinator to every `app_user` row of their municipality; `guard_app_user`
+stops them minting a super admin, moving an account between municipalities
+and touching a super admin's row, and nothing else. Measured as
+`coordinator@shm.test`, through RLS, in a transaction that rolled back:
+six accounts visible, **deactivating `dataentry@shm.test` — 1 row;
+changing `viewer@shm.test`'s role — 1 row**; the super admin and the
+Ramtha admin — 0 rows each. The accounts screen is shown to
+`accounts.manage`, which is `super_admin` only, as plan §2.5 says.
+
+So for a coordinator the only thing between them and managing their
+municipality's accounts is the front end — which is exactly the shape the
+rule forbids, and it is not this work's to settle: either the policy is
+wider than the plan meant or the screen is narrower than the policy
+intends. Recorded as **OQ-51**, and not worked around in either direction.
+
+### Both municipalities unchanged
+
+The matrix, all seven view hashes and every table's counts read the same at
+the end as in `supabase/baselines/2026-09-16_both_before_platform_modal.md`;
+`audit_log` +5, all of them the super admin's acting-municipality switches
+made by the verification. The super admin is back to acting nowhere.

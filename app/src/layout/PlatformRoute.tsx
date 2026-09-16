@@ -1,27 +1,26 @@
-import { useEffect } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../auth/AuthProvider'
 import { homeRouteFor } from '../auth/permissions'
-import { usePlatformPanel, type PanelSection } from './platformPanelContext'
+import { withDialogSection, type DialogSection } from './platformDialogContext'
 
 /**
  * `/accounts` and `/settings` as addresses.
  *
- * Neither is a page any more — the platform's administration opens in a
- * panel over the municipality's product (layout/PlatformPanel.tsx) — but a
- * bookmark or a typed address still has to arrive somewhere. This opens the
- * panel at the section the address names and lands on the role's home
- * underneath it: the dashboard for a municipal account or a super admin
- * acting on a municipality, the chooser for a super admin who has not.
+ * Neither is a page — the platform's administration opens in a dialog over
+ * the municipality's product (layout/PlatformDialog.tsx) — but a bookmark or
+ * a typed address still has to arrive somewhere. This lands on the role's
+ * home — the dashboard for a municipal account or a super admin acting on a
+ * municipality, the chooser for a super admin who has not — with
+ * `?platform=<section>` set, which is what opens the dialog, and carries
+ * any filter parameters the address brought with it, so
+ * `/accounts?role=coordinator` opens the accounts tab already filtered.
  *
- * The panel's state lives in Shell, above the routed screen, so it survives
- * the redirect.
+ * One navigation, not an effect plus a redirect: two navigations in one
+ * commit race, and the one that ran last would win.
  */
-export function PlatformRoute({ section }: { section: PanelSection }) {
-  const { openPanel } = usePlatformPanel()
+export function PlatformRoute({ section }: { section: DialogSection }) {
   const { role } = useAuth()
-  useEffect(() => {
-    openPanel(section)
-  }, [openPanel, section])
-  return <Navigate to={homeRouteFor(role)} replace />
+  const location = useLocation()
+  const search = withDialogSection(new URLSearchParams(location.search), section).toString()
+  return <Navigate to={{ pathname: homeRouteFor(role), search: `?${search}` }} replace />
 }
