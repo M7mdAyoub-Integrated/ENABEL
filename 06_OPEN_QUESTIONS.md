@@ -636,6 +636,15 @@ This surfaced while working out whether *restoring a person* should warn about c
 
 **Why this is worse than a missing translation.** A missing key falls back visibly and shows up in the missing-key console warning the i18n setup already emits. A key present with English text passes every check — completeness tooling, the missing-key handler, a reviewer counting keys — while being untranslated. It is the same failure shape as the dead constraint names and the comments that claimed behaviour living elsewhere: it looks handled.
 
+**It is user-visible since 15 September 2026, not latent.** Ramtha's
+eighteen indicators arrived with Arabic statements from its own workbook, so
+its dashboard is fully Arabic; Sahel Horan's, on the same screen, has Arabic
+headings, chips and notices around **English row names**. A super admin who
+switches between them sees one finished and one half done, and a Sahel Horan
+coordinator working in Arabic sees the half. That does not change the
+answer -- a native speaker supplies the twenty, and nothing here should
+guess them -- but it changes how long the answer can wait.
+
 **Why it has not been fixed here.** D-3 in `08_FRONTEND_BUILD_PLAN.md` is explicit: a native speaker must review the Arabic, *especially* M&E terms — indicator, disaggregation, baseline, milestone. Machine-translating "Unique participants completing a training" would produce something that reads wrong to a Jordanian civil servant and, worse, would look finished. **Inventing M&E terminology is exactly what CLAUDE.md rule 7 forbids.**
 
 **Where the translation should live.** `indicator.name_ar` already exists on the table and is the better home than a locale file: these are the framework's own wording, they must match the workbook, and they change only when the framework does. The locale file would then be redundant for names.
@@ -1684,21 +1693,48 @@ were refused with both sizes and the limit, before any request was made.
 All test files were removed through the panel and the store confirmed each
 object gone (`object_missing`).
 
-Two origins are still missing from the rule, and a browser on either sees
-the failure below:
+The mismatch was not the rule's fault. The repository pinned no port, so
+`npm run dev` took 5173 when free and **5174 silently when not** -- a second
+server beside a running one came up on an origin the bucket had never heard
+of. `app/vite.config.ts` pins 5173 with `strictPort` since 16 September, so
+a second server refuses to start rather than drifting. The dev origin is
+`http://localhost:5173`, and 5174 is listed below only so a stray server on
+it fails for some other reason than CORS.
 
-- **`http://localhost:5174`** -- the port this repository's dev server is
-  pinned to (`.claude/launch.json`). The rule names Vite's default, 5173.
-  Either add 5174 or run on 5173 (`npm run dev -- --port 5173` in `app/`).
-- **The production origin** -- the Netlify site. Nothing in the repository
-  names it, so it could not be probed. Check it the same way:
+**The rule to paste** (R2 → the bucket → Settings → CORS policy → edit as
+JSON). Replace the placeholder line with the Netlify site's origin when the
+domain is set; until then leave it out entirely, because a wrong origin in
+the list is silently ignored rather than reported:
 
-```bash
-curl -s -o /dev/null -D - -X OPTIONS -H "Origin: https://<the site>" -H "Access-Control-Request-Method: PUT" -H "Access-Control-Request-Headers: content-type" "https://<account>.r2.cloudflarestorage.com/evidence/probe" | grep -i "^HTTP\|access-control"
+```json
+[
+  {
+    "AllowedOrigins": [
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "https://REPLACE-WITH-THE-NETLIFY-ORIGIN"
+    ],
+    "AllowedMethods": ["PUT", "GET", "HEAD"],
+    "AllowedHeaders": ["Content-Type"],
+    "MaxAgeSeconds": 3600
+  }
+]
 ```
 
-`204` with `Access-Control-Allow-Origin` echoing the origin is a pass; `403`
-with no such header is the failure. The rule, for reference:
+**The probe**, one origin per run, no app needed. The account id is the
+host of every signed URL the function returns; the bucket is `evidence`:
+
+```bash
+curl -s -o /dev/null -D - -X OPTIONS -H "Origin: http://localhost:5174" -H "Access-Control-Request-Method: PUT" -H "Access-Control-Request-Headers: content-type" "https://3d29f16de77022031f4f442e9cbb9f3c.r2.cloudflarestorage.com/evidence/probe" | grep -i "^HTTP\|access-control"
+```
+
+A pass is `HTTP/1.1 204 No Content` followed by
+`Access-Control-Allow-Origin: http://localhost:5174` and the methods and
+headers echoed back. The failure is `HTTP/1.1 403 Forbidden` and nothing
+else -- no `Access-Control-*` line at all. Run it once per origin in the
+list, and once with an origin that is NOT in it to see that the bucket says
+no to strangers. Verified this way on 15 September: 5173 passed, 5174 and
+`https://example.org` were refused.
 
 ```json
 [

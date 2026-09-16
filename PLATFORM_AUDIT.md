@@ -285,11 +285,19 @@ Number 9 is the one that keeps recurring. It has hidden three real defects and p
 
 ## Code
 
-1. **Rebuild the Ramtha dashboard to match Sahel Horan** — Part 4. Parameterise the existing one; do not write a second.
-2. Scope the four functions in 2.1 explicitly rather than relying on the callers JWT
-3. Add an explicit municipality filter to `v_upcoming_exhibitions`
-4. Add the production origin to the bucket's CORS rule (OQ-49)
-5. Rename `superadmin@shm.test` — it is not scoped to Sahel Horan
+Done, 15 September 2026: the dashboards are one screen (`routes/Dashboard.tsx`
+with the differences in `data/dashboardConfig.ts`); the four functions in
+2.1 are settled -- `person_restore_impact` and `submit_followup` were scoped
+in `0134` along with `partner_restore_impact`, and `followup_indicator_reach`
+and `followup_view_statuses` read view **definitions**, not rows, so there is
+nothing to scope; `v_upcoming_exhibitions` names its municipality (`0135`);
+`superadmin@shm.test` is `superadmin@platform.test`. The sweep behind 2.1 is
+now a check, `supabase/check_municipality_scope.sql`.
+
+What is left in code:
+
+1. **The bucket's CORS rule**: `http://localhost:5174` and the production origin (OQ-49 has the JSON and the probe). Two minutes in the Cloudflare dashboard, once the Netlify domain exists.
+2. **The sign-in form itself has not been submitted by anyone since the `/signin` fix** -- everything around it was driven from a cleared browser; the one keystroke that types a password is a person's.
 
 ## Not code — these need people
 

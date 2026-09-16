@@ -129,8 +129,14 @@ and RLS behaves exactly as in production.
 cd app
 npm install
 cp .env.example .env.local     # then fill in the two values
-npm run dev
+npm run dev                    # http://localhost:5173 -- that port, strictly
 ```
+
+**The dev server is `http://localhost:5173`, pinned with `strictPort`** in
+`app/vite.config.ts`. Not a preference: the evidence bucket's CORS rule
+names the dev server by origin, and Vite's default when 5173 is busy is to
+take 5174 silently, from which every upload is refused. With `strictPort` a
+second server refuses to start instead. One server, one origin.
 
 ### Environment
 
