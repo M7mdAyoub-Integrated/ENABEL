@@ -15,8 +15,7 @@ import ListScreen from './routes/ListScreen'
 import FormScreen from './routes/FormScreen'
 import DetailScreen from './routes/DetailScreen'
 import ManualEntries from './routes/ManualEntries'
-import Settings from './routes/Settings'
-import Accounts from './routes/Accounts'
+import { PlatformRoute } from './layout/PlatformRoute'
 import { RMTH_FORM_IDS } from './rmth/forms.generated'
 import { RequireRamtha } from './rmth/RequireRamtha'
 import { RmthListScreen } from './rmth/RmthListScreen'
@@ -399,10 +398,12 @@ const router = createBrowserRouter([
         )),
       },
       // Staff accounts. Super admin only; the guard renders the refusal for
-      // everyone else, and the database refuses the writes regardless.
+      // everyone else, and the database refuses the writes regardless. Not a
+      // page: the address opens the platform panel at its Accounts tab over
+      // the role's home (layout/PlatformRoute.tsx).
       {
         path: '/accounts',
-        element: guard(<Accounts />, (n) => (
+        element: guard(<PlatformRoute section="accounts" />, (n) => (
           <RequireCapability capability="accounts.manage">{n}</RequireCapability>
         )),
       },
@@ -469,7 +470,8 @@ const router = createBrowserRouter([
         )),
       },
 
-      { path: '/settings', element: <Settings /> },
+      // Settings, likewise an address that opens the panel.
+      { path: '/settings', element: <PlatformRoute section="settings" /> },
       { path: '*', element: <NotFound /> },
     ],
   },

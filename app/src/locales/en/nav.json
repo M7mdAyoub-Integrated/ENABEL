@@ -39,13 +39,12 @@
     "noForm": "No form yet",
     "office": "Coordination office",
     "guidance": "Guidance",
-    "admin": "Administration"
+    "platform": "Platform"
   },
   "signedIn": "Signed in",
   "sessions": "Sessions",
   "advisory": "Advisory sessions",
   "linkageRequests": "Linkage requests",
-  "viewPublicSite": "View public site",
   "municipality": "Municipality",
   "participant": "Participant",
   "followups": "Follow-up surveys",
@@ -59,5 +58,11 @@
   "workingIn": "Municipality",
   "superAdminActingOn": "Super admin · acting on",
   "superAdminNotActing": "Super admin · no municipality chosen",
-  "publicSiteOf": "Public site · {name}"
+  "publicSiteOf": "Visit the public site · {name}",
+  "accountMenu": {
+    "label": "Account menu"
+  },
+  "platform": {
+    "title": "Platform administration"
+  }
 }

@@ -39,13 +39,12 @@
     "noForm": "بلا نموذج بعد",
     "office": "مكتب التنسيق",
     "guidance": "الإرشاد",
-    "admin": "الإدارة"
+    "platform": "المنصة"
   },
   "signedIn": "مسجّل الدخول",
   "sessions": "الدورات",
   "advisory": "الجلسات الاستشارية",
   "linkageRequests": "طلبات الربط",
-  "viewPublicSite": "عرض الموقع العام",
   "municipality": "البلدية",
   "participant": "مشارك",
   "followups": "استبيانات المتابعة",
@@ -59,5 +58,11 @@
   "workingIn": "البلدية",
   "superAdminActingOn": "مدير عام · يعمل باسم",
   "superAdminNotActing": "مدير عام · لم تُختر بلدية",
-  "publicSiteOf": "الموقع العام · {name}"
+  "publicSiteOf": "زيارة الموقع العام · {name}",
+  "accountMenu": {
+    "label": "قائمة الحساب"
+  },
+  "platform": {
+    "title": "إدارة المنصة"
+  }
 }

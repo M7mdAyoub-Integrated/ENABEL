@@ -156,7 +156,7 @@ the acting municipality on the account, the column default from 0112 fills it
 into every insert and `can_see_municipality` narrows every read to it. A super
 admin who has not switched in sees both programmes and can insert nothing
 (NOT NULL refuses); the `MunicipalityGate` in `App.tsx` holds them at a chooser
-until they pick one. The accounts screen and settings need no municipality.
+until they pick one. Accounts and settings need no municipality (Part 10).
 
 ### The account shape
 
@@ -244,13 +244,16 @@ municipal account's parameter is removed. A switch remounts the screen
 (the Outlet is keyed on the acting municipality), because a switch made by
 the URL happens on whatever screen is open and a mounted query answered
 under the old municipality would otherwise stay. The header carries a super
-admin's eyebrow — "super admin · acting on" — above the name, the account
-chip at the foot of the rail names the municipality too, and a super admin
-gets one public-site link per municipality, each in a new tab. `/admin` is
+admin's eyebrow — "super admin · acting on" — above the name, and the account
+chip at the foot of the rail names the municipality too. *Until 16 September
+2026 a super admin also got one public-site link per municipality, listed
+together, and the sidebar mixed the platform's administration into the
+programme's forms; Part 10 has what replaced both.* `/admin` is
 the staff entrance: signed out it is the sign-in form, signed in it is the
 home the role implies; nothing on the public side links to it.
 
-`/accounts` lists every account (email is now
+The accounts screen (`/accounts`; since Part 10 the Accounts tab of the
+platform panel, which that address opens) lists every account (email is now
 on `app_user`, copied from `auth.users` where `authenticated` cannot read),
 creates one with a generated one-time password shown once, changes role or
 municipality, sets a password, deactivates and reactivates.
@@ -917,3 +920,160 @@ All seven per-municipality view hashes in the 15 September baseline are
 identical at the end; every table's live and soft-deleted counts equal the
 baseline's except `audit_log` (+5, insert-only: the stored-zero probe and
 its revert, the email, two acting-municipality switches).
+
+---
+
+## Part 10 — the super admin's chrome: two scopes, never mixed (16 September 2026, `app/src/layout`)
+
+No migration. Three defects in the shell, one cause: the chrome did not
+distinguish *administering the platform* from *looking at a municipality*.
+Signed in as the super admin with no municipality chosen, the sidebar
+listed Sahel Horan's nine forms under "choose a municipality", with
+"Administration → Accounts" and "Settings" in the same list; acting on
+Ramtha, that list still carried the platform's entries beside Ramtha's
+forms; and the header offered a public-site link per municipality, listed
+together, so acting on Ramtha the one place Sahel Horan still appeared was
+the chrome.
+
+### The principle, and what marks a super admin now
+
+**A super admin acting on a municipality sees that municipality's product,
+not a super admin product with a municipality filter applied.** The marks of
+a super admin on a municipal screen are exactly three: the switcher, the
+"super admin · acting on" eyebrow, and the Accounts tab inside the panel
+below. Everything else is the same screen the municipality's own admin has,
+because it is built by the same code path.
+
+### The sidebar (`useNavGroups`, `Shell.tsx`)
+
+| | sidebar |
+|---|---|
+| super admin, no municipality | one group, *Platform*: Accounts, Settings. No forms, no dashboard, no municipal navigation — a form belongs to a municipality, and listing one municipality's forms under "choose a municipality" implies a choice that has not been made |
+| super admin acting on X | **entry for entry what X's own admin sees** |
+| a municipal account | its own product |
+
+Accounts and Settings left the municipal list for everyone. They are the
+platform's, and they live in the account menu and the panel it opens.
+
+Verified by capture and `diff`, not by reading: the Ramtha admin's sidebar
+and the Sahel Horan coordinator's were captured before the change
+(`innerText` of every entry and group heading, in order), the super admin's
+was captured acting on each, and each pair is identical apart from the
+`Settings` entry that moved to the menu for both roles. The Ramtha admin's
+sidebar was captured again after the change and equals the super admin's
+acting-on-Ramtha capture exactly. The counts beside the entries follow the
+switch (Sahel Horan's 3 / 5 / 2 / 1 / 2 after switching from Ramtha),
+because `setActingMunicipality` clears the query cache and the Outlet is
+keyed on the acting municipality.
+
+### The account menu (`AccountMenu.tsx`)
+
+The account chip is a button now, in all three places it appears — the foot
+of the rail, the tablet header (compact: the role and a chevron), the foot
+of the phone's More sheet (expands in place) — and the bare Sign out button
+is gone. The menu carries the account, the role and the municipality (under
+the compact chip; the full chip already says all of it directly above),
+**Settings**, and **Sign out**. The same control for every role: a
+municipal admin's menu is the same menu, so the two roles are not two
+products. Escape and a click elsewhere close it; a choice in the sheet or
+drawer closes the sheet or drawer too.
+
+### The platform panel (`PlatformPanel.tsx`, `platformPanelContext.ts`)
+
+*Settings* opens the platform's administration in a panel over whatever is
+on screen — the municipality's product stays where it is. Decided by
+capability, never by role name:
+
+| `accounts.manage` | title | tabs | content |
+|---|---|---|---|
+| yes (a super admin) | Platform administration | Accounts · Settings | the accounts management (`AccountsSection`, what `/accounts` rendered); language, the verification worklist, evidence storage (`SettingsSections`) |
+| no | Settings | none | language, and the two staff worklists the role reaches |
+
+The eyebrow above the title is the platform's name, in the position where
+the rail's masthead names the municipality: it says whose settings these
+are. A dialog: focus lands on the close control, the page behind stops
+scrolling, Escape closes it — unless one of the accounts tab's own modals
+(the one-time password, the deactivation) is open, which owns Escape until
+it closes, so one key never closes both. Full width at 320px, 760px from
+`md`. The accounts list renders as the card list at every width inside it
+(`DataTable layout="stacked"`): the two renderings switch on the viewport,
+which is right on a page and wrong in a 760px panel — the five-column table
+with three actions per row was a thousand pixels of sideways scrolling.
+
+`/accounts` and `/settings` are addresses still: each opens the panel at
+its section and lands on the role's home under it (`PlatformRoute.tsx`) —
+the dashboard, or the chooser for a super admin who has not chosen. A role
+without `accounts.manage` asking for `/accounts` gets the Settings panel
+(behind `RequireCapability` outside demo mode, which refuses first).
+
+### The public-site link (`PublicSiteLink`, `Shell.tsx`)
+
+One component, one behaviour. Acting on Ramtha: one link, *Visit the public
+site · Ramtha Municipality*, and nothing about Sahel Horan; acting on Sahel
+Horan, the reverse; no municipality chosen, **no link** — there is no site to
+visit until one is. The chooser screen deliberately does not offer both:
+its one job is the choice, and a super admin who wants a public site
+chooses the municipality first, which is how they reach everything else
+about it. A municipal account gets the same component for its own
+municipality. It opens `/:slug` in a new tab for everyone; the municipal
+preview used to navigate the same tab, and the two behaviours were the two
+components. Consequence worth knowing: the public page's "Back to the
+Municipality" bar now runs in that second tab and opens the dashboard
+there rather than returning to the first.
+
+### Copy that had gone stale
+
+`common:settings.emptyBody` said user roles "are seeded and changed in the
+database" — false since 0117 gave roles a screen. The register's
+placeholder shape; the sentence is gone and the intro names only what is
+true (targets and periods). `municipalityGate.body` said "the accounts
+screen and settings are available without choosing" and now says where
+they are.
+
+### Verified
+
+- Super admin, no municipality: Platform → Accounts, Settings; no form, no
+  dashboard entry, no public-site link; the chooser under the panel when
+  `/accounts` is typed.
+- Super admin acting on Ramtha: sidebar `diff`-identical to
+  `admin@ramtha.test`'s; one link, `/ramtha`.
+- Switched to Sahel Horan from the header: sidebar `diff`-identical to
+  `coordinator@shm.test`'s, counts 3 / 5 / 2 / 1 / 2, the dashboard's four
+  cards 3 / 1 / 1 / 2, link `/sahel-horan`, and the only "Ramtha" left on
+  the page is the switcher's option.
+- Both municipal admins: no switcher, the same menu (Settings, Sign out), a
+  Settings panel with no tabs and no accounts list, `/accounts` answering
+  the same.
+- 320px, English and Arabic: the tab bar, the sheet, the inline menu, the
+  panel with its two tabs; nothing wider than the viewport
+  (`scrollWidth` checked on the sheet and the panel); no raw locale key,
+  searched case-insensitively (the E0.1 lesson); the email isolated LTR
+  under RTL. Tablet band (800px): compact chip, menu below it aligned to
+  its inline end, drawer with twelve links and no public-site list.
+- **The write.** A networking event saved through `/rmth/a12/new` as the
+  super admin acting on Ramtha landed with Ramtha's `municipality_id`,
+  `created_by = superadmin@platform.test`, an `insert` audit row with the
+  same actor and Ramtha's municipality, and moved Ramtha A1.2 26/Q3 from 0
+  to **1** with A1.3 unmoved. Then, in a rolled-back transaction as
+  `authenticated` with the claims set: the Ramtha admin sees the row and
+  A1.2 = 1; the Sahel Horan coordinator 0 rows and no Ramtha A1.2 row; the
+  super admin acting on Sahel Horan 0 rows; the same super admin with the
+  switch cleared, 1. **The chrome is not the boundary and nothing here
+  depends on it for access**; the acting municipality on `app_user` is.
+- The probe row was removed as the owner (`app.allow_hard_delete`, the one
+  sanctioned exception, as Part 7), the super admin put back to acting
+  nowhere through `set_acting_municipality(null)` as themself, and every
+  figure and hash in `supabase/baselines/2026-09-16_both_before_super_admin_chrome.md`
+  reads the same at the end. `audit_log` +5. **The EV/2026 counter stands
+  at 1 and stays there**, for the reason Part 7 gives for TC/2026:
+  `RMTH-EV-2026-001` named the probe, and Ramtha's first real networking
+  event will be `-002`, which is correct.
+
+### Not changed, and one wording to settle
+
+`RequireRamtha`'s refusal, the dashboard, and every municipal screen were
+already free of super admin chrome; the three above were the whole of it.
+One thing surfaced by putting the chip and the header eyebrow side by side:
+`auth:role.super_admin` reads *مشرف عام* and `nav:superAdminActingOn`
+*مدير عام*, two Arabic renderings of one role on one screen. Not decided
+here — it belongs with the native speaker's pass (OQ-26's list).

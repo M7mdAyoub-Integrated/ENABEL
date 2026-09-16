@@ -105,7 +105,11 @@ and `/rmth/thresholds` where the seven open definitions are decided. The
 dashboard is the same screen as Sahel Horan's (`routes/Dashboard.tsx`, with
 what differs in `data/dashboardConfig.ts`); for Ramtha it says in words why
 a figure is missing. A super admin switching municipality switches the
-sidebar, the dashboard and the public-site link.
+sidebar, the dashboard and the public-site link — to exactly what that
+municipality's own admin sees. The platform's own administration (accounts,
+settings) is not in the sidebar: it opens in a panel from the account menu
+at the foot of the rail, for every role, and is the only sidebar a super
+admin has before choosing a municipality (`09_MULTI_MUNICIPALITY.md` Part 10).
 
 ### Demo mode
 

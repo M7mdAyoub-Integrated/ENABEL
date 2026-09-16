@@ -132,8 +132,9 @@ export function RequireCapability({
  * A super admin who has not switched into a municipality has nowhere to put
  * a record: every scoped column default is null and NOT NULL refuses (0112,
  * 0117). Rather than let every form fail on submit, the municipal screens
- * are held behind this until one is chosen from the header. The accounts
- * screen and settings need no municipality and are let through.
+ * are held behind this until one is chosen from the header. `/accounts` and
+ * `/settings` need no municipality and are let through: each opens the
+ * platform panel and lands back here, so the chooser sits under the panel.
  *
  * A municipal account always has one, so this never fires for them.
  */

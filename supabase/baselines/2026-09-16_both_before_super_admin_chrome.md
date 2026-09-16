@@ -41,3 +41,16 @@ of this work (it was RMTH at the start of the 15 September session).
 
 - `check_migration_files.sh`: 134 exact, 2 expected-divergent (0030, 0031), PASS
 - `check_municipality_scope.sql`: all three groups passed as the owner
+
+## At the end of the work (same day)
+
+All seven view hashes above identical; both matrices identical to 15 September
+(one md5 over every line of both: `586257485961af14853f3493d26932e2`). Row counts
+identical except two documented movements:
+
+```
+audit_log               2856 → 2861   the probe event's insert, its removal, two acting-municipality switches
+rmth_reference_counter     1 → 2      EV/2026 now stands at 1 — spent by RMTH-EV-2026-001, the probe; kept, as TC/2026 is
+```
+
+The super admin is back to `acting_municipality_id` null. 09 Part 10 has the probe.

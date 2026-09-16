@@ -40,25 +40,35 @@ function CellView({ cell }: { cell: Cell }) {
  *
  * Column order mirrors under RTL for free, because this is a real table and the
  * browser reverses cell order when `dir="rtl"` sits on <html>.
+ *
+ * `layout="stacked"` is the card list at every width. The two renderings
+ * switch on the VIEWPORT, which is right on a page and wrong inside the
+ * platform panel: there the container is 760px on a wide screen, the
+ * viewport says "table", and the accounts table -- five columns and three
+ * actions in a row -- is a thousand pixels of sideways scrolling. The
+ * caller that knows it is in a narrow container says so.
  */
 export function DataTable({
   columns,
   rows,
   actions,
   recordLabel,
+  layout = 'responsive',
 }: {
   columns: string[]
   rows: ListRow[]
   actions: (row: ListRow) => RowAction[]
   recordLabel: string
+  layout?: 'responsive' | 'stacked'
 }) {
   const { t } = useTranslation('common')
   const [expanded, setExpanded] = useState<string | null>(null)
+  const stacked = layout === 'stacked'
 
   return (
     <>
       {/* Phone: card list */}
-      <ul className="mt-[18px] flex flex-col gap-3 md:hidden">
+      <ul className={`mt-[18px] flex flex-col gap-3 ${stacked ? '' : 'md:hidden'}`}>
         {rows.map((row) => {
           const isOpen = expanded === row.id
           const head = row.cells.slice(0, 3)
@@ -133,62 +143,64 @@ export function DataTable({
       </ul>
 
       {/* Tablet and up: the prototype's table */}
-      <div className="mt-[18px] hidden overflow-x-auto md:block">
-        <table className="w-full min-w-[680px] border-collapse">
-          <thead>
-            <tr>
-              {columns.map((c, i) => (
-                <th
-                  key={i}
-                  scope="col"
-                  className="whitespace-nowrap border-b-[3px] border-ink pb-[7px] pe-[14px] text-start font-narrow text-[11px] font-bold uppercase tracking-[0.14em] text-muted"
-                >
-                  {c}
-                </th>
-              ))}
-              <th
-                scope="col"
-                className="w-[172px] border-b-[3px] border-ink pb-[7px] ps-[14px] text-end font-narrow text-[11px] font-bold uppercase tracking-[0.14em] text-muted"
-              >
-                {recordLabel}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.id}>
-                {row.cells.map((cell, i) => (
-                  <td
+      {stacked ? null : (
+        <div className="mt-[18px] hidden overflow-x-auto md:block">
+          <table className="w-full min-w-[680px] border-collapse">
+            <thead>
+              <tr>
+                {columns.map((c, i) => (
+                  <th
                     key={i}
-                    className={`border-b border-border-default py-3 pe-[14px] align-top text-ink ${
-                      i === 0
-                        ? 'text-[16px] font-bold tracking-[-0.015em]'
-                        : 'text-[14.5px] font-normal'
-                    }`}
-                    style={{ textWrap: 'pretty' }}
+                    scope="col"
+                    className="whitespace-nowrap border-b-[3px] border-ink pb-[7px] pe-[14px] text-start font-narrow text-[11px] font-bold uppercase tracking-[0.14em] text-muted"
                   >
-                    <CellView cell={cell} />
-                  </td>
+                    {c}
+                  </th>
                 ))}
-                <td className="whitespace-nowrap border-b border-border-default py-3 ps-[14px] text-end align-top">
-                  <ActionGroup>
-                    {actions(row).map((a, i) => (
-                      <ActionButton
-                        key={a.id}
-                        tone={a.tone ?? 'ink'}
-                        first={i === 0}
-                        onClick={() => a.onSelect(row.id)}
-                      >
-                        {a.label}
-                      </ActionButton>
-                    ))}
-                  </ActionGroup>
-                </td>
+                <th
+                  scope="col"
+                  className="w-[172px] border-b-[3px] border-ink pb-[7px] ps-[14px] text-end font-narrow text-[11px] font-bold uppercase tracking-[0.14em] text-muted"
+                >
+                  {recordLabel}
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr key={row.id}>
+                  {row.cells.map((cell, i) => (
+                    <td
+                      key={i}
+                      className={`border-b border-border-default py-3 pe-[14px] align-top text-ink ${
+                        i === 0
+                          ? 'text-[16px] font-bold tracking-[-0.015em]'
+                          : 'text-[14.5px] font-normal'
+                      }`}
+                      style={{ textWrap: 'pretty' }}
+                    >
+                      <CellView cell={cell} />
+                    </td>
+                  ))}
+                  <td className="whitespace-nowrap border-b border-border-default py-3 ps-[14px] text-end align-top">
+                    <ActionGroup>
+                      {actions(row).map((a, i) => (
+                        <ActionButton
+                          key={a.id}
+                          tone={a.tone ?? 'ink'}
+                          first={i === 0}
+                          onClick={() => a.onSelect(row.id)}
+                        >
+                          {a.label}
+                        </ActionButton>
+                      ))}
+                    </ActionGroup>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </>
   )
 }

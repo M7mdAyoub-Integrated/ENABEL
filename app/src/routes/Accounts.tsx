@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { AccentRule, Card, PageHead, PrimaryButton, SecondaryButton, SectionRule } from '../ui/primitives'
+import { Card, PrimaryButton, SecondaryButton, SectionRule } from '../ui/primitives'
 import { DataTable, type RowAction } from '../ui/DataTable'
 import { Field } from '../ui/Field'
 import { Modal } from '../ui/Modal'
@@ -24,6 +24,12 @@ import type { ListRow } from '../hooks/useData'
  * ─────────────────────────────────────────────────────────────────────────────
  *  Staff accounts. Super admin only (RAMTHA_IMPLEMENTATION_PLAN.md §2.5).
  *
+ *  Rendered inside the platform panel (layout/PlatformPanel.tsx), never as a
+ *  page inside a municipality's shell: an account belongs to the platform,
+ *  and a super admin acting on a municipality sees that municipality's
+ *  product with the platform's administration in a panel over it. `/accounts`
+ *  is still an address and opens the panel here.
+ *
  *  Create an admin, assign a municipality, create another super admin,
  *  deactivate an account, set a password. Nothing here is a permission check:
  *  every refusal on this screen is the database's, rendered — RLS on
@@ -46,7 +52,7 @@ function roleTone(role: Role): 'ok' | 'warn' | 'err' | 'mute' | 'pending' {
   return 'mute'
 }
 
-export function Accounts() {
+export function AccountsSection() {
   const { t } = useTranslation(['accounts', 'auth', 'common', 'nav'])
   const toast = useToast()
   const { userId } = useAuth()
@@ -142,16 +148,14 @@ export function Accounts() {
 
   return (
     <>
-      <PageHead
-        title={t('nav:accounts')}
-        description={t('accounts:intro')}
-        action={
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+        <p className="text-[15px] leading-relaxed text-body">{t('accounts:intro')}</p>
+        <div className="flex-none">
           <PrimaryButton onClick={() => setShowCreate((v) => !v)}>
             {showCreate ? t('common:actions.cancel') : t('accounts:create.open')}
           </PrimaryButton>
-        }
-      />
-      <AccentRule className="bg-slate" />
+        </div>
+      </div>
 
       {writeError ? <WriteError error={writeError} onDismiss={() => setWriteError(null)} /> : null}
 
@@ -221,6 +225,7 @@ export function Accounts() {
             rows={rows}
             actions={actions}
             recordLabel={t('accounts:record')}
+            layout="stacked"
           />
         )}
       </Card>
@@ -481,4 +486,4 @@ function EditAccountForm({
   )
 }
 
-export default Accounts
+export default AccountsSection

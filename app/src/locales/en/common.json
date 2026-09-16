@@ -108,10 +108,8 @@
     "boothsFree": "{count, plural, one {# booth free} other {# booths free}}"
   },
   "settings": {
-    "intro": "Language is set here. Targets, roles and reporting periods are still set in the database, not on this screen.",
-    "languageHelp": "Switching language also flips the text direction.",
-    "emptyTitle": "Nothing to configure yet",
-    "emptyBody": "Indicator targets, user roles and reporting periods are seeded and changed in the database. Nothing else on this screen is configurable yet."
+    "intro": "Language is set here. Indicator targets and reporting periods are set in the database, not on this screen.",
+    "languageHelp": "Switching language also flips the text direction."
   },
   "appNameShort": "M&E Platform",
   "orgShort": "Sahel Horan",
@@ -130,7 +128,7 @@
   },
   "municipalityGate": {
     "title": "Choose a municipality",
-    "body": "You are signed in as a super admin and are not working in either municipality yet. Choose one to see its dashboard and enter its records; the switcher in the header changes it later. The accounts screen and settings are available without choosing.",
+    "body": "You are signed in as a super admin and are not working in either municipality yet. Choose one to see its dashboard and enter its records; the switcher in the header changes it later. Accounts and settings need no municipality: they are in the sidebar here, and in the account menu once you have chosen.",
     "failed": "The choice could not be saved. Try again.",
     "loadFailed": "The list of municipalities could not be loaded."
   },

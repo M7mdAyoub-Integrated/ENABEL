@@ -1,5 +1,5 @@
-import { useState, type ReactNode } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { useCallback, useMemo, useState, type ReactNode } from 'react'
+import { NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { type ModuleId } from '../modules'
 import { useNavCounts } from '../data/moduleCounts'
@@ -9,8 +9,11 @@ import { useAuth } from '../auth/AuthProvider'
 import { can, modulesFor } from '../auth/permissions'
 import { EXTERNAL } from '../ui/glyphs'
 import { MunicipalitySwitcher } from '../components/MunicipalitySwitcher'
-import { useCurrentMunicipality, useMunicipalities, useMunicipalityName, useProgrammeLine } from '../data/municipalities'
+import { useCurrentMunicipality, useMunicipalityName, useProgrammeLine } from '../data/municipalities'
 import { RMTH_FORMS, RMTH_FORM_IDS, type RmthFormId } from '../rmth/forms.generated'
+import { AccountMenu } from './AccountMenu'
+import { PlatformPanel } from './PlatformPanel'
+import { PlatformPanelContext, usePlatformPanel, type PanelSection } from './platformPanelContext'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -28,8 +31,17 @@ import { RMTH_FORMS, RMTH_FORM_IDS, type RmthFormId } from '../rmth/forms.genera
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-type Dest = { to: string; labelKey: string; num: string; count?: number | string }
+/**
+ * A navigation entry: a route, or — for the two platform entries a super
+ * admin with no municipality sees — a section of the platform panel, which
+ * opens over the screen rather than replacing it.
+ */
+type Dest = { labelKey: string; num: string; count?: number | string } & (
+  | { to: string; panel?: never }
+  | { to?: never; panel: PanelSection }
+)
 type Group = { labelKey: string | null; items: Dest[] }
+const destKey = (d: Dest) => d.to ?? `panel:${d.panel}`
 
 /**
  * Navigation, grouped and numbered exactly as the prototype's NAV table.
@@ -63,11 +75,40 @@ function rmthGroupOf(fid: RmthFormId): 'impact' | 'so1' | 'so2' | 'so3' | undefi
 
 const RMTH_GROUP_ORDER = ['impact', 'so1', 'so2', 'so3'] as const
 
+/**
+ * Two scopes, never mixed.
+ *
+ * Administering the platform and looking at a municipality are different
+ * activities. A super admin who has not chosen a municipality is doing the
+ * first, and the sidebar is the platform's administration and nothing else:
+ * no forms, no dashboard, no municipal navigation, because a form belongs to
+ * a municipality and listing one municipality's forms under "choose a
+ * municipality" implies a choice that has not been made.
+ *
+ * Once a municipality is chosen — or for a municipal account, always — the
+ * sidebar is that municipality's product, built by the same code path its
+ * own admin's is. Accounts and settings are not in it: they are the
+ * platform's, and they live in the account menu (AccountMenu) and the panel
+ * it opens (PlatformPanel), so a super admin acting on Ramtha sees the
+ * sidebar the Ramtha admin sees, entry for entry.
+ */
 function useNavGroups(): Group[] {
   const counts = useNavCounts()
-  const { role } = useAuth()
+  const { role, isSuperAdmin, municipalityId } = useAuth()
   const allowed = modulesFor(role)
   const municipality = useCurrentMunicipality()
+
+  if (isSuperAdmin && !municipalityId) {
+    return [
+      {
+        labelKey: 'nav:group.platform',
+        items: [
+          { panel: 'accounts', labelKey: 'nav:accounts', num: '01' },
+          { panel: 'settings', labelKey: 'nav:settings', num: '02' },
+        ],
+      },
+    ]
+  }
 
   const mod = (m: ModuleId, num: string): Dest[] =>
     allowed.includes(m)
@@ -147,15 +188,10 @@ function useNavGroups(): Group[] {
         ? [{ to: '/manual-entries', labelKey: 'nav:manualEntries', num: '08' }]
         : [],
     },
-    {
-      labelKey: 'nav:group.admin',
-      // Super admin only. The database is the boundary (au_* policies, 0118;
-      // guard_app_user, 0117); this is where the screen is reachable from.
-      items: can(role, 'accounts.manage')
-        ? [{ to: '/accounts', labelKey: 'nav:accounts', num: '10' } as Dest]
-        : [],
-    },
-    { labelKey: null, items: [{ to: '/settings', labelKey: 'nav:settings', num: '09' }] },
+    // Accounts and settings used to end this list — an "Administration"
+    // group for a super admin, and Settings for everyone. Both are the
+    // platform's, not the programme's, and are reached from the account
+    // menu now; see the note above.
   ]
 
   // ── Ramtha ────────────────────────────────────────────────────────────────
@@ -163,15 +199,14 @@ function useNavGroups(): Group[] {
   // Ramtha's seventeen forms replace the Sahel Horan groups entirely when the
   // acting municipality is Ramtha: they are a different programme, not extra
   // modules, and the Sahel Horan screens would answer empty lists. The
-  // dashboard, accounts and settings entries above stay, because they are the
-  // platform's rather than either programme's.
+  // dashboard entry above stays, because it is the same screen for both.
   //
   // A super admin switching municipality switches this, because
   // useCurrentMunicipality reads the acting municipality (0117).
   if (municipality?.code === 'RMTH') {
-    const keep = new Set(['/dashboard', '/accounts', '/settings'])
+    const keep = new Set(['/dashboard'])
     const platform = groups
-      .map((g) => ({ ...g, items: g.items.filter((d) => keep.has(d.to)) }))
+      .map((g) => ({ ...g, items: g.items.filter((d) => d.to !== undefined && keep.has(d.to)) }))
       .filter((g) => g.items.length > 0)
 
     const byGroup = new Map<string, Dest[]>()
@@ -207,9 +242,7 @@ function useNavGroups(): Group[] {
       items: [{ to: '/rmth/thresholds', labelKey: 'rmth:nav.thresholds', num: String(n + 1).padStart(2, '0') }],
     })
 
-    return [...platform.slice(0, 1), ...ordered, ...platform.slice(1)].filter(
-      (g) => g.items.length > 0,
-    )
+    return [...platform, ...ordered].filter((g) => g.items.length > 0)
   }
 
   return groups.filter((g) => g.items.length > 0)
@@ -220,41 +253,63 @@ function useFlatDests(groups: Group[]): Dest[] {
   return groups.flatMap((g) => g.items)
 }
 
-function NavItem({ dest, onNavigate }: { dest: Dest; onNavigate?: (() => void) | undefined }) {
+const NAV_ITEM = 'flex w-full items-center gap-[11px] px-[18px] py-2 text-start'
+const NAV_ITEM_ON = 'bg-ink text-bg'
+const NAV_ITEM_OFF = 'text-ink hover:bg-sunken'
+
+function NavItemBody({ dest, isActive }: { dest: Dest; isActive: boolean }) {
   const { t } = useTranslation()
+  return (
+    <>
+      <span
+        className={`w-4 flex-none font-narrow text-[11px] font-bold tracking-[0.08em] tabular-nums ${
+          isActive ? 'text-dim' : 'text-ghost'
+        }`}
+      >
+        {dest.num}
+      </span>
+      <span className={`text-sm tracking-[-0.005em] ${isActive ? 'font-extrabold' : 'font-medium'}`}>
+        {t(dest.labelKey)}
+      </span>
+      {dest.count != null ? (
+        <span
+          className={`ms-auto font-narrow text-[11.5px] font-semibold tabular-nums ${
+            isActive ? 'text-dim' : 'text-ghost'
+          }`}
+        >
+          {dest.count}
+        </span>
+      ) : null}
+    </>
+  )
+}
+
+function NavItem({ dest, onNavigate }: { dest: Dest; onNavigate?: (() => void) | undefined }) {
+  const { open, openPanel } = usePlatformPanel()
+  if (dest.panel) {
+    // A platform entry: opens the panel in place. Drawn exactly like a route
+    // entry, and "active" while its section is the one open.
+    const isActive = open === dest.panel
+    return (
+      <button
+        type="button"
+        onClick={() => {
+          onNavigate?.()
+          openPanel(dest.panel)
+        }}
+        className={`${NAV_ITEM} cursor-pointer ${isActive ? NAV_ITEM_ON : NAV_ITEM_OFF}`}
+      >
+        <NavItemBody dest={dest} isActive={isActive} />
+      </button>
+    )
+  }
   return (
     <NavLink
       to={dest.to}
       onClick={onNavigate}
-      className={({ isActive }) =>
-        `flex w-full items-center gap-[11px] px-[18px] py-2 text-start ${
-          isActive ? 'bg-ink text-bg' : 'text-ink hover:bg-sunken'
-        }`
-      }
+      className={({ isActive }) => `${NAV_ITEM} ${isActive ? NAV_ITEM_ON : NAV_ITEM_OFF}`}
     >
-      {({ isActive }) => (
-        <>
-          <span
-            className={`w-4 flex-none font-narrow text-[11px] font-bold tracking-[0.08em] tabular-nums ${
-              isActive ? 'text-dim' : 'text-ghost'
-            }`}
-          >
-            {dest.num}
-          </span>
-          <span className={`text-sm tracking-[-0.005em] ${isActive ? 'font-extrabold' : 'font-medium'}`}>
-            {t(dest.labelKey)}
-          </span>
-          {dest.count != null ? (
-            <span
-              className={`ms-auto font-narrow text-[11.5px] font-semibold tabular-nums ${
-                isActive ? 'text-dim' : 'text-ghost'
-              }`}
-            >
-              {dest.count}
-            </span>
-          ) : null}
-        </>
-      )}
+      {({ isActive }) => <NavItemBody dest={dest} isActive={isActive} />}
     </NavLink>
   )
 }
@@ -277,104 +332,11 @@ function NavGroups({
             </div>
           ) : null}
           {g.items.map((d) => (
-            <NavItem key={d.to} dest={d} onNavigate={onNavigate} />
+            <NavItem key={destKey(d)} dest={d} onNavigate={onNavigate} />
           ))}
         </div>
       ))}
     </>
-  )
-}
-
-/**
- * Who is signed in, and the way out.
- *
- * Foot of the rail on a desktop, foot of the drawer on a tablet, foot of the
- * "More" sheet on a phone -- reachable from every screen at every width. It
- * names the account, the role and the municipality the account is working
- * in: fixed for a municipal account, chosen for a super admin, and a super
- * admin who has lost track of which one they chose enters data against the
- * wrong municipality.
- *
- * Demo mode used to hide this ("shows nothing about accounts"), which is how
- * sign-out came to be missing from every development session while the
- * production build still had it. A demo session is a real session and is
- * shown as one. Signing out lands on the public home page, never on the
- * sign-in form: a coordinator leaving the app should see what a resident
- * sees, and nothing on that page mentions an account. In demo mode a reload
- * signs in again (src/demo/demoMode.ts).
- */
-function SignedInAs({ compact = false }: { compact?: boolean }) {
-  const { t } = useTranslation(['auth', 'nav'])
-  const { email, role, signOut, isSuperAdmin, municipalityId } = useAuth()
-  const municipality = useCurrentMunicipality()
-  const name = useMunicipalityName()
-  const navigate = useNavigate()
-  if (!email) return null
-  const where = municipality
-    ? name(municipality)
-    : isSuperAdmin && !municipalityId
-      ? t('nav:allMunicipalities')
-      : null
-  return (
-    <div className={`border-t-2 border-ink px-[18px] py-[14px] ${compact ? '' : 'mt-auto'}`}>
-      <div className="font-narrow text-[10px] font-bold uppercase tracking-[0.16em] text-dim">
-        {t('nav:signedIn')}
-      </div>
-      <div className="mt-[3px] text-[13.5px] font-bold leading-[1.25] tracking-[-0.01em]">
-        {role ? t(`auth:role.${role}`) : t('auth:role.none')}
-      </div>
-      <div
-        className="mt-[3px] truncate text-[12px] text-muted"
-        dir="ltr"
-        style={{ unicodeBidi: 'isolate' }}
-      >
-        {email}
-      </div>
-      {where ? (
-        <div className="mt-[6px] font-narrow text-[10.5px] font-bold uppercase tracking-[0.12em] text-ink">
-          <span className="text-dim">{isSuperAdmin ? t('nav:actingOn') : t('nav:workingIn')}</span>{' '}
-          {where}
-        </div>
-      ) : null}
-      <button
-        type="button"
-        onClick={() => {
-          void signOut().then(() => navigate('/', { replace: true }))
-        }}
-        className="mt-[10px] w-full cursor-pointer border-[1.5px] border-ink bg-bg px-4 py-[7px] font-narrow text-[11.5px] font-bold uppercase tracking-[0.12em] text-ink hover:bg-sunken"
-      >
-        {t('auth:signOut')}
-      </button>
-    </div>
-  )
-}
-
-/**
- * The header's copy of the account, for the tablet widths where the rail is
- * a drawer and the foot of it is out of sight: role and sign out. Hidden on
- * a desktop (the rail's foot shows it) and on a phone (the More sheet does,
- * and the header has no room).
- */
-function HeaderAccount() {
-  const { t } = useTranslation(['auth', 'nav'])
-  const { email, role, signOut } = useAuth()
-  const navigate = useNavigate()
-  if (!email) return null
-  return (
-    <div className="hidden items-center gap-2 md:flex lg:hidden">
-      <span className="font-narrow text-[11px] font-bold uppercase tracking-[0.1em] text-muted">
-        {role ? t(`auth:role.${role}`) : t('auth:role.none')}
-      </span>
-      <button
-        type="button"
-        onClick={() => {
-          void signOut().then(() => navigate('/', { replace: true }))
-        }}
-        className="cursor-pointer border-[1.5px] border-ink bg-bg px-[11px] py-[5px] font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-ink hover:bg-sunken"
-      >
-        {t('auth:signOut')}
-      </button>
-    </div>
   )
 }
 
@@ -409,7 +371,7 @@ function Brand() {
 }
 
 /**
- * View public site.
+ * Visit the public site.
  *
  * ── WHAT THIS REPLACED, AND WHY IT HAD TO CHANGE ──
  *
@@ -442,95 +404,80 @@ function Brand() {
  * `v_public_opportunity`, which `anon` is granted, so a coordinator sees
  * exactly what a visitor sees.
  *
- * Since 0120 the public site is one page per municipality, so this goes to
- * the current municipality's -- or to the chooser for a super admin who has
- * not switched into one.
+ * ── ONE LINK, THE ACTING MUNICIPALITY'S ──
+ *
+ * Since 0120 the public site is one page per municipality, and this is a
+ * property of the municipality on screen, not a navigation menu. A super
+ * admin used to get one link per municipality, listed together, which is the
+ * wrong shape: acting on Ramtha there is nothing about Sahel Horan anywhere
+ * else on the screen, and the links were the one place the other programme
+ * bled in. So: acting on a municipality, one link naming it; a municipal
+ * account, the same link for its own; no municipality chosen, no link at
+ * all — there is no site to visit until one is. The chooser screen does not
+ * offer both on purpose: its one job is the choice, and a super admin who
+ * wants to see a public site chooses the municipality first, which is also
+ * how they see everything else about it.
+ *
+ * Opens in a new tab for everyone. The municipal preview used to navigate the
+ * same tab; the two behaviours were the two components, and one component
+ * has one behaviour.
  */
-function usePublicSitePath(): string {
+function usePublicSite(): { to: string; label: string } | null {
+  const { t } = useTranslation('nav')
   const municipality = useCurrentMunicipality()
-  return municipality ? `/${municipality.slug}` : '/'
-}
-
-/**
- * The public sites a super admin can open: one per active municipality, each
- * in a new tab, labelled with the municipality's own name. A municipal
- * account has one public site and the preview control below; the list is
- * for the account that has more than one and needs to see both.
- */
-function usePublicSites(): { to: string; label: string }[] {
-  const { isSuperAdmin } = useAuth()
-  const { data } = useMunicipalities()
   const name = useMunicipalityName()
-  if (!isSuperAdmin) return []
-  return (data ?? []).filter((m) => m.is_active).map((m) => ({ to: `/${m.slug}`, label: name(m) }))
+  if (!municipality) return null
+  return { to: `/${municipality.slug}`, label: t('publicSiteOf', { name: name(municipality) }) }
 }
 
 const PUBLIC_LINK_CLASS =
-  'flex min-h-11 flex-none items-center gap-2 whitespace-nowrap border-[1.5px] border-ink bg-bg px-[11px] py-[5px] font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-ink no-underline hover:bg-ink hover:text-bg sm:min-h-0'
+  'flex min-h-11 flex-none items-center gap-2 border-[1.5px] border-ink bg-bg px-[11px] py-[5px] font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-ink no-underline hover:bg-ink hover:text-bg'
 
 /**
- * The header control. A municipal account's single preview link from `sm`
- * up; a super admin's two labelled links only from `lg` up, because at a
- * tablet width the switcher and two labelled links do not fit beside the
- * municipality name -- there they live in the drawer (PublicSiteList).
+ * The one public-site control, wherever it is placed: the header from `sm`
+ * up, the phone's More sheet below it. Renders nothing when no municipality
+ * is acting.
  */
-function ViewPublicSite() {
-  const { t } = useTranslation('nav')
-  const publicPath = usePublicSitePath()
-  const sites = usePublicSites()
-
-  if (sites.length > 0) {
-    return (
-      <div className="hidden gap-[10px] lg:flex">
-        {sites.map((site) => (
-          <a key={site.to} href={site.to} target="_blank" rel="noopener" className={PUBLIC_LINK_CLASS}>
-            <span aria-hidden="true" className="inline-block mirror-rtl">{EXTERNAL}</span>
-            {t('publicSiteOf', { name: site.label })}
-          </a>
-        ))}
-      </div>
-    )
-  }
-
+function PublicSiteLink({ stacked = false, onNavigate }: { stacked?: boolean; onNavigate?: () => void }) {
+  const site = usePublicSite()
+  if (!site) return null
   return (
-    <div className="hidden sm:flex">
-      <NavLink to={publicPath} className={PUBLIC_LINK_CLASS}>
-        <span aria-hidden="true" className="inline-block mirror-rtl">{EXTERNAL}</span>
-        {t('viewPublicSite')}
-      </NavLink>
-    </div>
-  )
-}
-
-/** The super admin's public sites as a stacked list, for the drawer and the phone sheet. */
-function PublicSiteList({ sites }: { sites: { to: string; label: string }[] }) {
-  const { t } = useTranslation('nav')
-  if (sites.length === 0) return null
-  return (
-    <div className="flex flex-col gap-2 border-t border-border-default px-[18px] py-3">
-      {sites.map((site) => (
-        <a
-          key={site.to}
-          href={site.to}
-          target="_blank"
-          rel="noopener"
-          className="flex min-h-11 items-center gap-2 border-[1.5px] border-ink px-3 font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-ink no-underline"
-        >
-          <span aria-hidden="true" className="inline-block mirror-rtl">
-            {EXTERNAL}
-          </span>
-          {t('publicSiteOf', { name: site.label })}
-        </a>
-      ))}
-    </div>
+    <a
+      href={site.to}
+      target="_blank"
+      rel="noopener"
+      onClick={onNavigate}
+      // Stacked in the sheet, the label may wrap: at 320px a municipality's
+      // name does not fit on one line beside the verb. In the header it is
+      // one line, like the chips beside it.
+      className={stacked ? `${PUBLIC_LINK_CLASS} py-2` : `${PUBLIC_LINK_CLASS} whitespace-nowrap sm:min-h-0`}
+    >
+      <span aria-hidden="true" className="inline-block mirror-rtl">{EXTERNAL}</span>
+      {site.label}
+    </a>
   )
 }
 
 export function Shell({ children }: { children: ReactNode }) {
+  // The platform panel's state lives here, above the routed screen, so a
+  // switch of municipality — which remounts the Outlet — does not close it,
+  // and so /accounts and /settings can open it from a route.
+  const [panel, setPanel] = useState<PanelSection | null>(null)
+  const openPanel = useCallback((section: PanelSection) => setPanel(section), [])
+  const closePanel = useCallback(() => setPanel(null), [])
+  const panelState = useMemo(() => ({ open: panel, openPanel, closePanel }), [panel, openPanel, closePanel])
+  return (
+    <PlatformPanelContext.Provider value={panelState}>
+      <ShellFrame>{children}</ShellFrame>
+      <PlatformPanel />
+    </PlatformPanelContext.Provider>
+  )
+}
+
+function ShellFrame({ children }: { children: ReactNode }) {
   const { t } = useTranslation(['nav', 'common'])
   const groups = useNavGroups()
   const municipality = useCurrentMunicipality()
-  const publicPath = usePublicSitePath()
   const name = useMunicipalityName()
   const programme = useProgrammeLine()
   const { isSuperAdmin, municipalityId } = useAuth()
@@ -549,7 +496,6 @@ export function Shell({ children }: { children: ReactNode }) {
       ? t('nav:allMunicipalitiesLine')
       : t('common:programmeLine')
   const all = useFlatDests(groups)
-  const sites = usePublicSites()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [moreOpen, setMoreOpen] = useState(false)
   const primary = all.slice(0, 4)
@@ -562,7 +508,9 @@ export function Shell({ children }: { children: ReactNode }) {
         <nav aria-label={t('nav:landmark')} className="flex-1 overflow-auto pb-2">
           <NavGroups groups={groups} />
         </nav>
-        <SignedInAs />
+        <div className="mt-auto">
+          <AccountMenu placement="up" />
+        </div>
       </aside>
 
       <div className="min-w-0 flex-1">
@@ -585,7 +533,9 @@ export function Shell({ children }: { children: ReactNode }) {
             <div className="min-w-0">
               {/* A super admin is told, on every screen and at every width,
                   that the name below is the municipality they CHOSE. The
-                  switcher is a control, not a statement. */}
+                  switcher is a control, not a statement. These two, and the
+                  Accounts tab in the panel, are the only marks of a super
+                  admin on a municipal screen. */}
               {isSuperAdmin ? (
                 <div className="truncate font-narrow text-[10px] font-bold uppercase tracking-[0.16em] text-amber">
                   {municipality ? t('nav:superAdminActingOn') : t('nav:superAdminNotActing')}
@@ -601,8 +551,17 @@ export function Shell({ children }: { children: ReactNode }) {
           </div>
           <div className="flex flex-initial flex-wrap items-stretch justify-end gap-[10px]">
             <MunicipalitySwitcher />
-            <ViewPublicSite />
-            <HeaderAccount />
+            {/* From sm up. On a phone the More sheet carries it. */}
+            <div className="hidden sm:flex">
+              <PublicSiteLink />
+            </div>
+            {/* The header's copy of the account, for the tablet widths where
+                the rail is a drawer and the foot of it is out of sight.
+                Hidden on a desktop (the rail's foot has it) and on a phone
+                (the More sheet does, and the header has no room). */}
+            <div className="hidden md:flex lg:hidden">
+              <AccountMenu placement="down" compact />
+            </div>
             <LocaleSwitcher />
           </div>
         </header>
@@ -625,12 +584,7 @@ export function Shell({ children }: { children: ReactNode }) {
               <div className="flex-1 overflow-auto pb-2">
                 <NavGroups groups={groups} onNavigate={() => setDrawerOpen(false)} />
               </div>
-              {/* The header hides a super admin's two public-site links
-                  below lg; this is where they are at a tablet width. */}
-              <div className="hidden lg:hidden md:block">
-                <PublicSiteList sites={sites} />
-              </div>
-              <SignedInAs />
+              <AccountMenu placement="up" onAction={() => setDrawerOpen(false)} />
             </nav>
           </div>
         ) : null}
@@ -653,18 +607,7 @@ export function Shell({ children }: { children: ReactNode }) {
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
         {primary.map((d) => (
-          <NavLink
-            key={d.to}
-            to={d.to}
-            onClick={() => setMoreOpen(false)}
-            className={({ isActive }) =>
-              `flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 border-e border-border-default px-1 py-2 text-center font-narrow text-[10.5px] font-bold uppercase tracking-[0.08em] ${
-                isActive ? 'bg-ink text-bg' : 'text-muted'
-              }`
-            }
-          >
-            <span className="line-clamp-2 leading-tight">{t(d.labelKey)}</span>
-          </NavLink>
+          <TabBarItem key={destKey(d)} dest={d} onNavigate={() => setMoreOpen(false)} />
         ))}
         <button
           type="button"
@@ -689,33 +632,47 @@ export function Shell({ children }: { children: ReactNode }) {
             style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)' }}
           >
             <NavGroups groups={groups} onNavigate={() => setMoreOpen(false)} />
-            {/* The header copy of this sits in a `hidden sm:flex` wrapper, so on
-                a phone it does not exist. That was tolerable for the role
-                toggle it replaced; it is not for this one, because checking how
-                the public site looks on a phone is the single most likely
-                reason to press it. */}
-            {sites.length > 0 ? (
-              <div className="md:hidden">
-                <PublicSiteList sites={sites} />
+            {/* The header's copy sits in a `hidden sm:flex` wrapper, so on a
+                phone it does not exist. Checking how the public site looks
+                on a phone is the single most likely reason to press it. */}
+            {municipality ? (
+              <div className="border-t border-border-default px-[18px] py-3">
+                <PublicSiteLink stacked onNavigate={() => setMoreOpen(false)} />
               </div>
-            ) : (
-              <div className="border-t border-border-default px-[18px] py-3 md:hidden">
-                <NavLink
-                  to={publicPath}
-                  onClick={() => setMoreOpen(false)}
-                  className="flex min-h-11 items-center gap-2 border-[1.5px] border-ink px-3 font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-ink no-underline"
-                >
-                  <span aria-hidden="true" className="inline-block mirror-rtl">
-                    {EXTERNAL}
-                  </span>
-                  {t('nav:viewPublicSite')}
-                </NavLink>
-              </div>
-            )}
-            <SignedInAs compact />
+            ) : null}
+            <AccountMenu placement="inline" onAction={() => setMoreOpen(false)} />
           </nav>
         </div>
       ) : null}
     </div>
+  )
+}
+
+/** A phone tab: a route, or a platform entry that opens the panel. */
+function TabBarItem({ dest, onNavigate }: { dest: Dest; onNavigate: () => void }) {
+  const { t } = useTranslation()
+  const { open, openPanel } = usePlatformPanel()
+  const cls = (active: boolean) =>
+    `flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 border-e border-border-default px-1 py-2 text-center font-narrow text-[10.5px] font-bold uppercase tracking-[0.08em] ${
+      active ? 'bg-ink text-bg' : 'text-muted'
+    }`
+  if (dest.panel) {
+    return (
+      <button
+        type="button"
+        onClick={() => {
+          onNavigate()
+          openPanel(dest.panel)
+        }}
+        className={cls(open === dest.panel)}
+      >
+        <span className="line-clamp-2 leading-tight">{t(dest.labelKey)}</span>
+      </button>
+    )
+  }
+  return (
+    <NavLink to={dest.to} onClick={onNavigate} className={({ isActive }) => cls(isActive)}>
+      <span className="line-clamp-2 leading-tight">{t(dest.labelKey)}</span>
+    </NavLink>
   )
 }

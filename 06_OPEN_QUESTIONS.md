@@ -1694,6 +1694,10 @@ the Ramtha admin sees neither the Sahel Horan file nor its bytes in the
 per-municipality breakdown; the platform total is what everyone sees, by
 design.
 
+**Both dev origins are in the rule since 16 September 2026** (5173 and
+5174, per the account holder); only the production origin remains. The
+paragraph below is the 15 September record of the first origin.
+
 **The CORS rule is set, for one origin.** Later on 15 September the bucket
 answered a preflight from `http://localhost:5173` with the right headers
 (PUT, GET, HEAD; `content-type`; one hour), and from that origin the whole

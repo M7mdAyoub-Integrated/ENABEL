@@ -295,6 +295,12 @@ nothing to scope; `v_upcoming_exhibitions` names its municipality (`0135`);
 now a check, `supabase/check_municipality_scope.sql`.
 
 What is left, 16 September 2026 -- the whole project, one list, by who acts.
+The super admin's chrome (`09` Part 10, the same day) changed the shell and
+added nothing to it: the sidebar, the account menu, the platform panel and
+the public-site link are done, no migration, both municipalities' figures
+unchanged. One wording for the native speaker's pass under item 10: two
+Arabic renderings of "super admin" sit on one screen (`auth:role.super_admin`
+and `nav:superAdminActingOn`).
 
 ## Code
 
@@ -305,7 +311,7 @@ What is left, 16 September 2026 -- the whole project, one list, by who acts.
 
 ## Configuration -- the account holder
 
-5. **The bucket's CORS rule**: `http://localhost:5174` now, the Netlify origin when the domain exists. OQ-49 has the JSON and the probe.
+5. **The bucket's CORS rule**: the two dev origins are live since 16 September; the Netlify origin is added when the domain exists. OQ-49 has the JSON and the probe.
 6. **Submit the sign-in form once**, as each kind of account. Everything around it was driven from a cleared browser; the keystroke that types a password is a person's.
 
 ## Decisions -- these need people, and no code moves them
