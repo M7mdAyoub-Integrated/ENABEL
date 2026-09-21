@@ -7,6 +7,7 @@ exhibition guarded
 exhibition_registration guarded
 followup_survey guarded
 guidance_record guarded
+indicator_plan_target guarded
 khld_action_day guarded
 khld_activity guarded
 khld_attendance guarded
