@@ -45,6 +45,7 @@ export const initiativeKeys = {
   list: () => ['initiatives', 'list'] as const,
   one: (id: string) => ['initiatives', 'one', id] as const,
   mentorship: (initiativeId: string) => ['initiatives', 'mentorship', initiativeId] as const,
+  linkages: (initiativeId: string) => ['initiatives', 'linkages', initiativeId] as const,
 }
 
 export type InitiativeListRow = {
@@ -142,6 +143,173 @@ export function useInitiative(id: string | undefined, enabled = true) {
         .is('deleted_at', null)
         .maybeSingle()
       return toListRow(unwrap(res as unknown as { data: InitiativeSelect | null; error: unknown }))
+    },
+  })
+}
+
+/* ── the initiative's own facts ──────────────────────────────────────────── */
+
+/**
+ * The fields 04_DATA_DICTIONARY.md section 8 lists for `production_initiative`
+ * beyond what a linkage creates it with: start date, status, women-led,
+ * youth-led (and the product, which the linkage does set).
+ *
+ * ── WHY `started_on` IS NOT OPTIONAL TIDYING ──
+ *
+ * `v_ind_c1` admits a follow-up survey only where the respondent has an
+ * initiative with `started_on <= contact_date - 6 months`. Both paths that
+ * create an initiative -- matching a request, recording a direct linkage --
+ * leave `started_on` null, and a null never satisfies that test. So until 16
+ * September 2026 no initiative created through the platform could ever put a
+ * survey into C1's denominator, and nothing on any screen could set the date.
+ * C1 read ∅/0 and would have gone on doing so.
+ */
+export type InitiativeDetailsInput = {
+  startedOn: string | null
+  status: 'planned' | 'operating' | 'paused' | 'stopped'
+  mainProduct: string | null
+  isWomenLed: boolean | null
+  isYouthLed: boolean | null
+}
+
+export function useUpdateInitiative() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, input }: { id: string; input: InitiativeDetailsInput }) => {
+      const res = await supabase
+        .from('production_initiative')
+        .update({
+          started_on: input.startedOn,
+          status: input.status,
+          main_product: input.mainProduct?.trim() || null,
+          is_women_led: input.isWomenLed,
+          is_youth_led: input.isYouthLed,
+        })
+        .eq('id', id)
+        .is('deleted_at', null)
+        .select('id')
+      if (res.error) throw toAppError(res.error)
+      // RLS filters an update it will not permit rather than raising. Count.
+      if (!res.data || res.data.length === 0) {
+        throw toAppError({ code: '42501', message: 'update matched no visible row' })
+      }
+      return id
+    },
+    onSuccess: (id) => {
+      void qc.invalidateQueries({ queryKey: initiativeKeys.one(id) })
+      void qc.invalidateQueries({ queryKey: initiativeKeys.list() })
+      // C1's six-month window reads started_on.
+      void qc.invalidateQueries({ queryKey: ['indicators'] })
+    },
+  })
+}
+
+/* ── the initiative's market linkages ────────────────────────────────────── */
+
+/**
+ * Every live linkage on this initiative, with the control that moves it.
+ *
+ * `useSetLinkageStatus` in linkage.ts existed only on the matched-request
+ * screen, so a linkage recorded DIRECTLY (LinkageDirect, `create_direct_linkage`)
+ * -- which has no request and therefore no request screen -- stayed `proposed`
+ * with no way on any screen to make it active. C1.2 counts active and ended
+ * linkages only, so a direct linkage could never reach it. This is the panel
+ * that gives every linkage, direct or matched, the same control, on the record
+ * the indicator actually counts.
+ */
+export type InitiativeLinkage = {
+  id: string
+  partnershipId: string
+  partnerName: string
+  partnershipType: string
+  scope: string
+  request: string | null
+  linkedOn: string
+  status: 'proposed' | 'under_review' | 'active' | 'ended'
+  outcome: string | null
+}
+
+type LinkageSelect = {
+  id: string
+  partnership_id: string
+  scope: string
+  request: string | null
+  linked_on: string
+  status: InitiativeLinkage['status']
+  outcome: string | null
+  partnership: {
+    partnership_type: string
+    partner: { name: string } | null
+  } | null
+}
+
+export function useInitiativeLinkages(initiativeId: string | undefined, enabled = true) {
+  return useQuery({
+    queryKey: initiativeKeys.linkages(initiativeId ?? ''),
+    enabled: enabled && !!initiativeId,
+    queryFn: async (): Promise<InitiativeLinkage[]> => {
+      const res = await supabase
+        .from('market_linkage')
+        .select(
+          'id, partnership_id, scope, request, linked_on, status, outcome, ' +
+            'partnership!market_linkage_partnership_id_fkey ( partnership_type, partner!partnership_partner_id_fkey ( name ) )',
+        )
+        .eq('initiative_id', initiativeId!)
+        .is('deleted_at', null)
+        .order('linked_on', { ascending: false })
+      return unwrapList(res as unknown as { data: LinkageSelect[] | null; error: unknown }).map((l) => ({
+        id: l.id,
+        partnershipId: l.partnership_id,
+        partnerName: l.partnership?.partner?.name ?? '',
+        partnershipType: l.partnership?.partnership_type ?? '',
+        scope: l.scope,
+        request: l.request,
+        linkedOn: l.linked_on,
+        status: l.status,
+        outcome: l.outcome,
+      }))
+    },
+  })
+}
+
+export function useUpdateInitiativeLinkage() {
+  const qc = useQueryClient()
+  return useMutation({
+    retry: false,
+    mutationFn: async ({
+      id,
+      initiativeId,
+      patch,
+    }: {
+      id: string
+      initiativeId: string
+      patch: { status?: InitiativeLinkage['status']; outcome?: string | null; linkedOn?: string }
+    }) => {
+      const res = await supabase
+        .from('market_linkage')
+        .update({
+          ...(patch.status ? { status: patch.status } : {}),
+          ...(patch.outcome !== undefined ? { outcome: patch.outcome?.trim() || null } : {}),
+          ...(patch.linkedOn ? { linked_on: patch.linkedOn } : {}),
+        })
+        .eq('id', id)
+        .is('deleted_at', null)
+        .select('id')
+      if (res.error) throw toAppError(res.error)
+      if (!res.data || res.data.length === 0) {
+        throw toAppError({ code: '42501', message: 'update matched no visible row' })
+      }
+      return initiativeId
+    },
+    onSuccess: (initiativeId) => {
+      void qc.invalidateQueries({ queryKey: initiativeKeys.linkages(initiativeId) })
+      void qc.invalidateQueries({ queryKey: initiativeKeys.one(initiativeId) })
+      void qc.invalidateQueries({ queryKey: initiativeKeys.list() })
+      // The request screen reads the same row, and C1.2 and G0.4 both move
+      // with the status (an active linkage credits the partner).
+      void qc.invalidateQueries({ queryKey: ['linkage-requests'] })
+      void qc.invalidateQueries({ queryKey: ['contributions'] })
+      void qc.invalidateQueries({ queryKey: ['indicators'] })
     },
   })
 }

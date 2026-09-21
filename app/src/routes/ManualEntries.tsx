@@ -14,6 +14,9 @@ import {
 import { formatShortDate } from '../lib/format'
 import { AccentRule, PageHead, SectionRule } from '../ui/primitives'
 import { EvidencePanel } from '../components/EvidencePanel'
+import { usePartnershipOptions } from '../data/partnerships'
+import { useInitiatives } from '../data/initiatives'
+import { usePersonByNationalId, isCompleteNationalId } from '../data/completions'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -166,6 +169,7 @@ function RecordLog({
   isLoading,
   isError,
   form,
+  evidenceEntity,
 }: {
   code: string
   table: 'promotional_action' | 'coordination_meeting' | 'case_study'
@@ -173,10 +177,18 @@ function RecordLog({
   isLoading: boolean
   isError: boolean
   form: React.ReactNode
+  /**
+   * OQ-43: G0.2 and G0.3 require evidence (minutes and attendance; the case
+   * study itself). Both entity types have been admitted since 0128; until 16
+   * September 2026 these rows had nowhere to hang the panel. Each row now
+   * opens its own.
+   */
+  evidenceEntity?: 'coordination_meeting' | 'case_study'
 }) {
   const { t, i18n } = useTranslation('indicators')
   const locale = i18n.resolvedLanguage ?? 'en'
   const withdraw = useWithdrawManualRecord()
+  const [openEvidence, setOpenEvidence] = useState<string | null>(null)
 
   return (
     <div className="border-[1.5px] border-border-strong p-4">
@@ -218,6 +230,16 @@ function RecordLog({
                 <span className="font-narrow text-[12px] tabular-nums text-muted">
                   {formatShortDate(r.date, locale)}
                 </span>
+                {evidenceEntity ? (
+                  <button
+                    type="button"
+                    aria-expanded={openEvidence === r.id}
+                    onClick={() => setOpenEvidence(openEvidence === r.id ? null : r.id)}
+                    className="text-[12.5px] text-muted underline hover:text-ink"
+                  >
+                    {openEvidence === r.id ? t('manual.hideEvidence') : t('manual.evidence')}
+                  </button>
+                ) : null}
                 <button
                   type="button"
                   disabled={withdraw.isPending}
@@ -227,6 +249,11 @@ function RecordLog({
                   {t('manual.withdraw')}
                 </button>
               </span>
+              {evidenceEntity && openEvidence === r.id ? (
+                <div className="basis-full pt-2">
+                  <EvidencePanel entityType={evidenceEntity} entityId={r.id} compact />
+                </div>
+              ) : null}
             </li>
           ))}
         </ul>
@@ -247,6 +274,8 @@ function PromotionalForm() {
   const [title, setTitle] = useState('')
   const [date, setDate] = useState(today())
   const [channelId, setChannelId] = useState('')
+  const [reach, setReach] = useState('')
+  const [description, setDescription] = useState('')
 
   return (
     <form
@@ -255,8 +284,21 @@ function PromotionalForm() {
         e.preventDefault()
         if (!title.trim() || !channelId) return
         create.mutate(
-          { kind: 'promotional', title, date, channelId, reach: null },
-          { onSuccess: () => setTitle('') },
+          {
+            kind: 'promotional',
+            title,
+            date,
+            channelId,
+            reach: reach.trim() === '' ? null : Number(reach),
+            description: description.trim() || null,
+          },
+          {
+            onSuccess: () => {
+              setTitle('')
+              setReach('')
+              setDescription('')
+            },
+          },
         )
       }}
     >
@@ -282,6 +324,16 @@ function PromotionalForm() {
           <input type="date" dir="ltr" className={INPUT} value={date} max={today()} onChange={(e) => setDate(e.target.value)} />
         </Field>
       </div>
+      <div className="min-w-[160px]">
+        <Field label={t('manual.fieldReach')}>
+          <input type="number" min={0} dir="ltr" className={INPUT} value={reach} onChange={(e) => setReach(e.target.value)} />
+        </Field>
+      </div>
+      <div className="min-w-0 basis-full">
+        <Field label={t('manual.fieldDescription')}>
+          <textarea dir="auto" rows={2} className={INPUT} value={description} onChange={(e) => setDescription(e.target.value)} />
+        </Field>
+      </div>
       <button
         type="submit"
         disabled={create.isPending || !title.trim() || !channelId}
@@ -294,10 +346,15 @@ function PromotionalForm() {
 }
 
 function MeetingForm() {
-  const { t } = useTranslation('indicators')
+  const { t } = useTranslation(['indicators', 'forms'])
   const create = useCreateManualRecord()
+  const partnerships = usePartnershipOptions()
   const [subject, setSubject] = useState('')
   const [date, setDate] = useState(today())
+  const [minutesRef, setMinutesRef] = useState('')
+  const [partnershipIds, setPartnershipIds] = useState<string[]>([])
+  const toggle = (id: string) =>
+    setPartnershipIds((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]))
 
   return (
     <form
@@ -305,25 +362,64 @@ function MeetingForm() {
       onSubmit={(e) => {
         e.preventDefault()
         if (!subject.trim()) return
-        create.mutate({ kind: 'meeting', date, subject }, { onSuccess: () => setSubject('') })
+        create.mutate(
+          { kind: 'meeting', date, subject, minutesRef: minutesRef.trim() || null, partnershipIds },
+          {
+            onSuccess: () => {
+              setSubject('')
+              setMinutesRef('')
+              setPartnershipIds([])
+            },
+          },
+        )
       }}
     >
       <div className="min-w-[220px] flex-1">
-        <Field label={t('manual.fieldSubject')}>
+        <Field label={t('indicators:manual.fieldSubject')}>
           <input dir="auto" className={INPUT} value={subject} onChange={(e) => setSubject(e.target.value)} />
         </Field>
       </div>
       <div className="min-w-[160px]">
-        <Field label={t('manual.fieldDate')}>
+        <Field label={t('indicators:manual.fieldDate')}>
           <input type="date" dir="ltr" className={INPUT} value={date} max={today()} onChange={(e) => setDate(e.target.value)} />
         </Field>
+      </div>
+      <div className="min-w-[200px]">
+        <Field label={t('indicators:manual.fieldMinutesRef')}>
+          <input dir="auto" className={INPUT} value={minutesRef} onChange={(e) => setMinutesRef(e.target.value)} />
+        </Field>
+      </div>
+      <div className="min-w-0 basis-full">
+        <div className="font-narrow text-[11.5px] font-bold uppercase tracking-[0.12em] text-muted">
+          {t('indicators:manual.fieldPartners')}
+        </div>
+        <p className="mt-1 max-w-[62ch] text-[13px] leading-[1.5] text-muted">{t('indicators:manual.fieldPartnersHelp')}</p>
+        <div role="group" aria-label={t('indicators:manual.fieldPartners')} className="mt-2 flex flex-wrap gap-[7px]">
+          {partnerships.options.map((o) => {
+            const on = partnershipIds.includes(o.partnershipId)
+            return (
+              <button
+                key={o.partnershipId}
+                type="button"
+                aria-pressed={on}
+                onClick={() => toggle(o.partnershipId)}
+                className={`min-h-10 border-[1.5px] px-3 text-start text-[13.5px] ${on ? 'border-ink bg-ink text-bg' : 'border-border-strong bg-bg text-ink'}`}
+              >
+                <span dir="auto">{[o.name, o.unit].filter(Boolean).join(' · ')}</span>
+                <span className="ms-2 font-narrow text-[11px] uppercase tracking-[0.1em] opacity-80">
+                  {t(`forms:linkageAdmin.partnershipType.${o.type}`)}
+                </span>
+              </button>
+            )
+          })}
+        </div>
       </div>
       <button
         type="submit"
         disabled={create.isPending || !subject.trim()}
         className="min-h-11 bg-ink px-4 font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-bg disabled:bg-track disabled:text-faint"
       >
-        {t('manual.add')}
+        {t('indicators:manual.add')}
       </button>
     </form>
   )
@@ -332,11 +428,19 @@ function MeetingForm() {
 function CaseStudyForm() {
   const { t } = useTranslation('indicators')
   const create = useCreateManualRecord()
+  const initiatives = useInitiatives()
   const [title, setTitle] = useState('')
   const [summary, setSummary] = useState('')
   const [change, setChange] = useState('')
   const [date, setDate] = useState(today())
-  const ready = title.trim() && summary.trim() && change.trim()
+  const [nid, setNid] = useState('')
+  const [initiativeId, setInitiativeId] = useState('')
+  // The person a case study is about, looked up by national ID so the link
+  // points at one row of `person` -- never a retyped name.
+  const nidClean = nid.replace(/\D/g, '').slice(0, 9)
+  const person = usePersonByNationalId(nidClean)
+  const nidDangling = isCompleteNationalId(nidClean) && !person.isFetching && !person.data
+  const ready = title.trim() && summary.trim() && change.trim() && !nidDangling && (nidClean === '' || isCompleteNationalId(nidClean))
 
   return (
     <form
@@ -345,12 +449,22 @@ function CaseStudyForm() {
         e.preventDefault()
         if (!ready) return
         create.mutate(
-          { kind: 'caseStudy', title, date, summary, change },
+          {
+            kind: 'caseStudy',
+            title,
+            date,
+            summary,
+            change,
+            personId: person.data?.id ?? null,
+            initiativeId: initiativeId || null,
+          },
           {
             onSuccess: () => {
               setTitle('')
               setSummary('')
               setChange('')
+              setNid('')
+              setInitiativeId('')
             },
           },
         )
@@ -374,6 +488,30 @@ function CaseStudyForm() {
       <Field label={t('manual.fieldChange')}>
         <textarea dir="auto" rows={2} className={INPUT} value={change} onChange={(e) => setChange(e.target.value)} />
       </Field>
+      <div className="flex flex-wrap items-end gap-3">
+        <div className="min-w-[200px]">
+          <Field label={t('manual.fieldAboutNid')}>
+            <input dir="ltr" inputMode="numeric" className={INPUT} value={nid} onChange={(e) => setNid(e.target.value)} />
+          </Field>
+          {person.data ? (
+            <p className="mt-1 text-[13px] text-success">{t('manual.aboutFound', { name: person.data.fullName })}</p>
+          ) : nidDangling ? (
+            <p role="alert" className="mt-1 text-[13px] font-semibold text-error">{t('manual.aboutNotFound')}</p>
+          ) : null}
+        </div>
+        <div className="min-w-[220px] flex-1">
+          <Field label={t('manual.fieldAboutInitiative')}>
+            <select className={INPUT} value={initiativeId} onChange={(e) => setInitiativeId(e.target.value)}>
+              <option value="">{t('manual.aboutNone')}</option>
+              {(initiatives.data ?? []).map((i) => (
+                <option key={i.id} value={i.id}>
+                  {[i.title, i.personName].join(' · ')}
+                </option>
+              ))}
+            </select>
+          </Field>
+        </div>
+      </div>
       <div>
         <button
           type="submit"
@@ -517,8 +655,13 @@ export function ManualEntries() {
               id: r.id,
               date: r.meeting_date,
               primary: r.subject,
+              secondary: [
+                t('manual.partnersPresent', { count: r.partners.length }),
+                ...(r.minutes_ref ? [r.minutes_ref] : []),
+              ].join(' · '),
             }))}
             form={<MeetingForm />}
+            evidenceEntity="coordination_meeting"
           />
           <RecordLog
             code="G0.3"
@@ -532,6 +675,7 @@ export function ManualEntries() {
               secondary: r.summary,
             }))}
             form={<CaseStudyForm />}
+            evidenceEntity="case_study"
           />
         </div>
       </section>

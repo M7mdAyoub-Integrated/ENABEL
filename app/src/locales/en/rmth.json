@@ -1782,6 +1782,7 @@
     "lookup": "Look up",
     "lookingUp": "Looking up…",
     "onFile": "On file — name is locked; empty details can be added.",
+    "phoneOnFile": "On file. A phone number already recorded is never overwritten from a form; a missing one can be added.",
     "newPerson": "Not on file — a new person will be created.",
     "nidMismatch": "The two numbers are different.",
     "nidInvalid": "A national ID is exactly nine digits.",

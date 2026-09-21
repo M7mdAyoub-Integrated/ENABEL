@@ -100,6 +100,13 @@ function usePartnerWrite(id: string | undefined, enabled: boolean): ModuleWrite 
       type: first?.partnerTypeId ?? '',
       typeOther: first?.partnerTypeOther ?? '',
       role: first?.roleIds ?? [],
+      // One `roleOther_<roleId>` per role that carries free text, so an edit
+      // reopens with the text it saved rather than blanking it.
+      ...Object.fromEntries(
+        Object.entries(first?.roleOther ?? {})
+          .filter(([, text]) => !!text)
+          .map(([roleId, text]) => [`roleOther_${roleId}`, text ?? '']),
+      ),
     }
   }, [existing.data])
 
@@ -131,7 +138,11 @@ function usePartnerWrite(id: string | undefined, enabled: boolean): ModuleWrite 
       partnerTypeId: str(v, 'type'),
       partnerTypeOther: str(v, 'typeOther') || null,
       roleIds: arr(v, 'role'),
-      roleOther: {},
+      // Only for roles that are ticked: a box for a role that was unticked
+      // again is stale, and sending it would attach text to nothing.
+      roleOther: Object.fromEntries(
+        arr(v, 'role').map((roleId) => [roleId, str(v, `roleOther_${roleId}`) || null]),
+      ),
       partnershipType: ptype,
       establishedOn: established,
     }
@@ -244,7 +255,17 @@ function useCompletionWrite(
       age: c.ageRecorded == null ? '' : String(c.ageRecorded),
       phone: c.phone ?? '',
       topic: c.topicId,
-      date: c.startDate,
+      // The date the completion was recorded against, not the session's
+      // start date: a completion entered against day two of a course must
+      // reopen on day two, or saving it unchanged rewrites `registered_on`.
+      date: c.registeredOn,
+      // Loaded so the required picker opens on the session the row already
+      // has. It was absent, so every edit form opened with the picker empty --
+      // and the update path then re-derived a session from topic and date.
+      session: c.sessionId,
+      // OQ-45: both profile fields, now that they are stored.
+      involve: c.agriInvolvementId ?? '',
+      act: c.activityTypeIds,
       met: c.metCriteria === null ? '' : c.metCriteria ? 'yes' : 'no',
     }
   }, [existing.data])
@@ -273,14 +294,29 @@ function useCompletionWrite(
       // picker. Never an omission.
       sessionId: str(v, 'session') === NEW_SESSION ? null : str(v, 'session') || null,
       metCriteria: str(v, 'met') === 'yes' ? true : str(v, 'met') === 'no' ? false : null,
+      // OQ-45: the two agricultural-profile controls, sent at last.
+      agriInvolvementId: str(v, 'involve') || null,
+      activityTypeIds: arr(v, 'act'),
     }
   }
 
   const save = async (v: FormValues) => {
-    if (id && existing.data) {
-      return update.mutateAsync({ id, personId: existing.data.personId, input: toInput(v) })
+    const input = toInput(v)
+    // The picker is required. An empty choice is not "create one" -- that is
+    // NEW_SESSION, chosen with a label on it -- so it is refused here rather
+    // than defaulted, the same way the partnership type and date are.
+    if (!str(v, 'session')) {
+      throw toAppError({ code: '23502', message: 'session is required' })
     }
-    return create.mutateAsync(toInput(v))
+    if (id && existing.data) {
+      return update.mutateAsync({
+        id,
+        personId: existing.data.personId,
+        previous: { metCriteria: existing.data.metCriteria },
+        input,
+      })
+    }
+    return create.mutateAsync(input)
   }
 
   return {

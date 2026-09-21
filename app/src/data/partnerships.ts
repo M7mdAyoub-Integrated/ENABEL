@@ -288,13 +288,17 @@ export function useSavePartner() {
       let partnershipId: string | undefined = held.data?.id
 
       let currentRoleIds: string[] = []
+      let currentRoleOther: Record<string, string | null> = {}
       if (partnershipId) {
         const roles = await supabase
           .from('partnership_role')
-          .select('role_id')
+          .select('role_id, role_other')
           .eq('partnership_id', partnershipId)
         if (roles.error) throw toAppError(roles.error)
         currentRoleIds = (roles.data ?? []).map((r) => r.role_id as string)
+        currentRoleOther = Object.fromEntries(
+          (roles.data ?? []).map((r) => [r.role_id as string, (r.role_other as string | null) ?? null]),
+        )
 
         const upd = await supabase
           .from('partnership')
@@ -330,6 +334,25 @@ export function useSavePartner() {
 
       const added = input.roleIds.filter((r) => !currentRoleIds.includes(r))
       const removed = currentRoleIds.filter((r) => !input.roleIds.includes(r))
+      // A role kept across the edit whose free text changed. `role_other` lives
+      // on the junction row, so it is an UPDATE of that row, counted back.
+      const retexted = input.roleIds.filter(
+        (r) =>
+          currentRoleIds.includes(r) &&
+          (input.roleOther[r]?.trim() || null) !== (currentRoleOther[r] ?? null),
+      )
+      for (const roleId of retexted) {
+        const upd = await supabase
+          .from('partnership_role')
+          .update({ role_other: input.roleOther[roleId]?.trim() || null })
+          .eq('partnership_id', partnershipId)
+          .eq('role_id', roleId)
+          .select('role_id')
+        if (upd.error) throw toAppError(upd.error)
+        if (!upd.data || upd.data.length === 0) {
+          throw toAppError({ code: '42501', message: 'partnership_role update matched no visible row' })
+        }
+      }
 
       if (added.length > 0) {
         const ins = await supabase.from('partnership_role').insert(

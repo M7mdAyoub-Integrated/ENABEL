@@ -279,7 +279,10 @@ export function LinkageDirect() {
                       disabled={activityTypes.isLoading}
                       onChange={(e) => setActivityTypeId(e.target.value)}
                     >
-                      <option value="">{t('forms:linkageAdmin.choosePartner')}</option>
+                      {/* The activity-type list, not the partner list: this read
+                          "Choose a partner" until 16 September 2026, a placeholder
+                          copied from the select below it. */}
+                      <option value="">{t('forms:selectOption')}</option>
                       {(activityTypes.data ?? []).map((a) => (
                         <option key={a.id} value={a.id}>
                           {labelOf(a, locale)}

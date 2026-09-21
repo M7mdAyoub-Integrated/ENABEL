@@ -7,7 +7,12 @@ import {
   useCreateMentorshipSession,
   useUpdateMentorshipSession,
   useDeleteMentorshipSession,
+  useUpdateInitiative,
+  useInitiativeLinkages,
+  useUpdateInitiativeLinkage,
   type MentorshipRow,
+  type InitiativeDetailsInput,
+  type InitiativeLinkage,
 } from '../data/initiatives'
 import {
   useIndicatorRows,
@@ -20,6 +25,7 @@ import { useCurrentMunicipality } from '../data/municipalities'
 import { useAuth } from '../auth/AuthProvider'
 import { can } from '../auth/permissions'
 import { WriteError } from '../ui/states'
+import { useToast } from '../ui/Toast'
 import { BidiIsolate, isolateLtr } from '../components/BidiIsolate'
 import { formatShortDate } from '../lib/format'
 import { ARROW_START, SEP, EMPTY } from '../ui/glyphs'
@@ -58,6 +64,237 @@ type FormState = { id: string | null; date: string; topic: string; adviser: stri
 
 const BLANK: FormState = { id: null, date: '', topic: '', adviser: '' }
 
+const INPUT =
+  'min-h-11 w-full border-[1.5px] border-border-strong bg-bg px-3 text-[15px] text-ink placeholder:text-ghost'
+const LABEL = 'font-narrow text-[11.5px] font-bold uppercase tracking-[0.12em] text-muted'
+
+type DetailsDraft = {
+  startedOn: string
+  status: InitiativeDetailsInput['status']
+  mainProduct: string
+  womenLed: '' | 'yes' | 'no'
+  youthLed: '' | 'yes' | 'no'
+}
+
+const triFrom = (v: boolean | null): '' | 'yes' | 'no' => (v === null ? '' : v ? 'yes' : 'no')
+const triTo = (v: '' | 'yes' | 'no'): boolean | null => (v === '' ? null : v === 'yes')
+
+/**
+ * The initiative's own facts, editable in place.
+ *
+ * A linkage creates an initiative with a title, an activity type and a
+ * product and nothing else. The start date decides whether the producer's
+ * follow-up survey can ever enter C1 (see useUpdateInitiative), and the
+ * status, women-led and youth-led fields are the ones 04_DATA_DICTIONARY.md
+ * section 8 lists for this table. None of them had a control anywhere.
+ */
+function InitiativeDetails({
+  init,
+  mayWrite,
+  locale,
+}: {
+  init: { id: string; startedOn: string | null; status: string; mainProduct: string | null; isWomenLed: boolean | null; isYouthLed: boolean | null }
+  mayWrite: boolean
+  locale: string
+}) {
+  const { t } = useTranslation(['forms', 'common'])
+  const save = useUpdateInitiative()
+  const [editing, setEditing] = useState(false)
+  const [d, setD] = useState<DetailsDraft>({
+    startedOn: init.startedOn ?? '',
+    status: (init.status as InitiativeDetailsInput['status']) ?? 'planned',
+    mainProduct: init.mainProduct ?? '',
+    womenLed: triFrom(init.isWomenLed),
+    youthLed: triFrom(init.isYouthLed),
+  })
+  const open = () => {
+    setD({
+      startedOn: init.startedOn ?? '',
+      status: (init.status as InitiativeDetailsInput['status']) ?? 'planned',
+      mainProduct: init.mainProduct ?? '',
+      womenLed: triFrom(init.isWomenLed),
+      youthLed: triFrom(init.isYouthLed),
+    })
+    setEditing(true)
+  }
+  const tri = (v: boolean | null) => (v === null ? t('forms:initiative.unknown') : v ? t('common:yes') : t('common:no'))
+
+  const rows: { k: string; v: string }[] = [
+    { k: 'initiative.product', v: init.mainProduct ?? '' },
+    { k: 'initiative.startedOn', v: init.startedOn ? formatShortDate(init.startedOn, locale) : '' },
+    { k: 'initiative.statusLabel', v: t(`forms:initiative.status.${init.status}`, { defaultValue: init.status }) },
+    { k: 'initiative.womenLed', v: tri(init.isWomenLed) },
+    { k: 'initiative.youthLed', v: tri(init.isYouthLed) },
+  ]
+
+  return (
+    <section className="mt-6 border-[1.5px] border-border-strong p-4">
+      <h2 className="m-0 font-narrow text-[12px] font-bold uppercase tracking-[0.14em] text-ink">
+        {t('forms:initiative.detailsHeading')}
+      </h2>
+      <p className="mt-1 max-w-[62ch] text-[14px] leading-[1.5] text-body">{t('forms:initiative.detailsBody')}</p>
+
+      {!editing ? (
+        <>
+          <dl className="mt-3 grid grid-cols-1 gap-x-11 sm:grid-cols-2">
+            {rows.map((f) => (
+              <div key={f.k} className="flex justify-between gap-6 border-b border-border-default py-3">
+                <dt className={`flex-none basis-[42%] ${LABEL}`}>{t(`forms:${f.k}`)}</dt>
+                <dd dir="auto" className="text-[15px] font-semibold text-ink" style={{ textAlign: 'end', textWrap: 'pretty' }}>
+                  {f.v || <span className="text-ghost">{EMPTY}</span>}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          {mayWrite ? (
+            <button
+              type="button"
+              onClick={open}
+              className="mt-3 inline-flex min-h-11 items-center border-[1.5px] border-border-strong px-4 font-narrow text-[12px] font-bold uppercase tracking-[0.12em] text-ink hover:bg-sunken"
+            >
+              {t('forms:initiative.editDetails')}
+            </button>
+          ) : null}
+        </>
+      ) : (
+        <div className="mt-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <label className="flex flex-col gap-1">
+              <span className={LABEL}>{t('forms:initiative.startedOn')}</span>
+              <input type="date" dir="ltr" value={d.startedOn} onChange={(e) => setD({ ...d, startedOn: e.target.value })} className={INPUT} />
+            </label>
+            <label className="flex flex-col gap-1">
+              <span className={LABEL}>{t('forms:initiative.statusLabel')}</span>
+              <select value={d.status} onChange={(e) => setD({ ...d, status: e.target.value as DetailsDraft['status'] })} className={INPUT}>
+                {(['planned', 'operating', 'paused', 'stopped'] as const).map((sv) => (
+                  <option key={sv} value={sv}>{t(`forms:initiative.status.${sv}`)}</option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1 sm:col-span-2">
+              <span className={LABEL}>{t('forms:initiative.product')}</span>
+              <input type="text" dir="auto" value={d.mainProduct} onChange={(e) => setD({ ...d, mainProduct: e.target.value })} className={INPUT} />
+            </label>
+            <label className="flex flex-col gap-1">
+              <span className={LABEL}>{t('forms:initiative.womenLed')}</span>
+              <select value={d.womenLed} onChange={(e) => setD({ ...d, womenLed: e.target.value as DetailsDraft['womenLed'] })} className={INPUT}>
+                <option value="">{t('forms:initiative.unknown')}</option>
+                <option value="yes">{t('common:yes')}</option>
+                <option value="no">{t('common:no')}</option>
+              </select>
+            </label>
+            <label className="flex flex-col gap-1">
+              <span className={LABEL}>{t('forms:initiative.youthLed')}</span>
+              <select value={d.youthLed} onChange={(e) => setD({ ...d, youthLed: e.target.value as DetailsDraft['youthLed'] })} className={INPUT}>
+                <option value="">{t('forms:initiative.unknown')}</option>
+                <option value="yes">{t('common:yes')}</option>
+                <option value="no">{t('common:no')}</option>
+              </select>
+            </label>
+          </div>
+          {save.isError ? <WriteError error={save.error} onDismiss={() => save.reset()} /> : null}
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+            <button
+              type="button"
+              disabled={save.isPending}
+              onClick={() =>
+                save.mutate(
+                  {
+                    id: init.id,
+                    input: {
+                      startedOn: d.startedOn || null,
+                      status: d.status,
+                      mainProduct: d.mainProduct.trim() || null,
+                      isWomenLed: triTo(d.womenLed),
+                      isYouthLed: triTo(d.youthLed),
+                    },
+                  },
+                  { onSuccess: () => setEditing(false) },
+                )
+              }
+              className="inline-flex min-h-11 items-center justify-center bg-ink px-5 font-narrow text-[12.5px] font-bold uppercase tracking-[0.12em] text-bg disabled:bg-track disabled:text-faint"
+            >
+              {t('forms:initiative.saveDetails')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setEditing(false)}
+              className="inline-flex min-h-11 items-center justify-center border-[1.5px] border-border-strong px-5 font-narrow text-[12.5px] font-bold uppercase tracking-[0.12em] text-ink"
+            >
+              {t('forms:initiative.cancelDetails')}
+            </button>
+          </div>
+        </div>
+      )}
+    </section>
+  )
+}
+
+/** One linkage row: the status control and the outcome, on the record C1.2 counts. */
+function LinkageRow({ l, initiativeId, mayWrite, locale }: { l: InitiativeLinkage; initiativeId: string; mayWrite: boolean; locale: string }) {
+  const { t } = useTranslation(['forms', 'common'])
+  const toast = useToast()
+  const update = useUpdateInitiativeLinkage()
+  const [outcome, setOutcome] = useState(l.outcome ?? '')
+  const statuses: InitiativeLinkage['status'][] = ['proposed', 'under_review', 'active', 'ended']
+  return (
+    <li className="border-[1.5px] border-border-default bg-bg p-3">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <span dir="auto" className="text-[15px] font-semibold text-ink">{l.partnerName}</span>
+        <span className="font-narrow text-[12px] font-bold uppercase tracking-[0.12em] text-muted">
+          {t('forms:initiative.linkedOn')} {formatShortDate(l.linkedOn, locale)}
+        </span>
+      </div>
+      <p dir="auto" className="mt-1 text-[14px] text-body">{l.scope}</p>
+      {l.request ? <p dir="auto" className="mt-1 text-[13px] text-muted">{l.request}</p> : null}
+      <div className="mt-3 flex flex-wrap gap-2">
+        {statuses.map((sv) => (
+          <button
+            key={sv}
+            type="button"
+            disabled={!mayWrite || sv === l.status || update.isPending}
+            onClick={() =>
+              update.mutate(
+                { id: l.id, initiativeId, patch: { status: sv } },
+                {
+                  onSuccess: () =>
+                    toast.fire({
+                      tag: t('forms:initiative.linkagesHeading'),
+                      title: t('forms:initiative.linkageToast', { status: t(`forms:linkageAdmin.linkStatus.${sv}`) }),
+                      tone: 'ok',
+                    }),
+                },
+              )
+            }
+            className="min-h-11 border-[1.5px] border-border-strong px-3 font-narrow text-[12px] font-bold uppercase tracking-[0.1em] text-ink hover:bg-sunken disabled:border-ink disabled:bg-ink disabled:text-bg"
+          >
+            {t(`forms:linkageAdmin.linkStatus.${sv}`)}
+          </button>
+        ))}
+      </div>
+      {mayWrite ? (
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end">
+          <label className="flex min-w-0 flex-1 flex-col gap-1">
+            <span className={LABEL}>{t('forms:initiative.outcome')}</span>
+            <input type="text" dir="auto" value={outcome} placeholder={t('forms:initiative.outcomePh')} onChange={(e) => setOutcome(e.target.value)} className={INPUT} />
+          </label>
+          <button
+            type="button"
+            disabled={update.isPending || (outcome.trim() || null) === (l.outcome ?? null)}
+            onClick={() => update.mutate({ id: l.id, initiativeId, patch: { outcome } })}
+            className="inline-flex min-h-11 items-center justify-center border-[1.5px] border-border-strong px-4 font-narrow text-[12px] font-bold uppercase tracking-[0.12em] text-ink disabled:text-faint"
+          >
+            {t('forms:initiative.saveOutcome')}
+          </button>
+        </div>
+      ) : l.outcome ? (
+        <p dir="auto" className="mt-2 text-[14px] text-body">{l.outcome}</p>
+      ) : null}
+      {update.isError ? <WriteError error={update.error} onDismiss={() => update.reset()} /> : null}
+    </li>
+  )
+}
+
 export function InitiativeDetail() {
   const { id } = useParams()
   const { t, i18n } = useTranslation(['forms', 'common', 'nav', 'indicators'])
@@ -75,6 +312,8 @@ export function InitiativeDetail() {
   const periodCode = currentPeriodCode(periods.data ?? [])
   const indicators = useIndicatorRows(periodCode, municipalityId)
   const c13 = (indicators.data ?? []).find((r) => r.code === 'C1.3')
+  const c12 = (indicators.data ?? []).find((r) => r.code === 'C1.2')
+  const lq = useInitiativeLinkages(id)
 
   const [form, setForm] = useState<FormState>(BLANK)
   const [touched, setTouched] = useState(false)
@@ -156,15 +395,6 @@ export function InitiativeDetail() {
       <dl className="mt-5 grid grid-cols-1 gap-x-11 sm:grid-cols-2">
         {[
           { k: 'initiative.activity', v: activity },
-          { k: 'initiative.product', v: init.mainProduct ?? '' },
-          {
-            k: 'initiative.startedOn',
-            v: init.startedOn ? formatShortDate(init.startedOn, locale) : '',
-          },
-          {
-            k: 'initiative.statusLabel',
-            v: t(`forms:initiative.status.${init.status}`, { defaultValue: init.status }),
-          },
         ].map((f) => (
           <div
             key={f.k}
@@ -183,6 +413,38 @@ export function InitiativeDetail() {
           </div>
         ))}
       </dl>
+
+      <InitiativeDetails init={init} mayWrite={mayWrite} locale={locale} />
+
+      {/* ── MARKET LINKAGES. What C1.2 counts. ─────────────────────────── */}
+      <section className="mt-8 border-[1.5px] border-amber p-4">
+        <h2 className="m-0 font-narrow text-[12px] font-bold uppercase tracking-[0.14em] text-amber">
+          {t('forms:initiative.linkagesHeading')}
+        </h2>
+        <p className="mt-1 max-w-[62ch] text-[14px] leading-[1.5] text-body">{t('forms:initiative.linkagesBody')}</p>
+        {c12 ? (
+          <p className="mt-2 font-narrow text-[12px] font-bold uppercase tracking-[0.1em] text-muted">
+            {t('forms:initiative.c12Line', {
+              period: isolateLtr(c12.period_code),
+              actual: actualText(c12, t('indicators:noValue')),
+              target: targetText(c12, t('indicators:targetNotSet')),
+            })}
+          </p>
+        ) : null}
+        {lq.isLoading ? (
+          <div aria-hidden="true" className="mt-4 h-16 animate-pulse bg-track" />
+        ) : (lq.data ?? []).length === 0 ? (
+          <p className="mt-4 border-[1.5px] border-dashed border-border-muted p-5 text-center text-[15px] text-muted">
+            {t('forms:initiative.noLinkages')}
+          </p>
+        ) : (
+          <ul className="mt-4 flex list-none flex-col gap-2 p-0">
+            {(lq.data ?? []).map((l) => (
+              <LinkageRow key={l.id} l={l} initiativeId={init.id} mayWrite={mayWrite} locale={locale} />
+            ))}
+          </ul>
+        )}
+      </section>
 
       {/* ── MENTORSHIP. The C1.3 log. ──────────────────────────────────── */}
       <section className="mt-8 border-[1.5px] border-green p-4">

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   useManagedSession,
@@ -18,6 +18,7 @@ import {
 } from '../data/sessions'
 import { formatShortDate, formatDateRange } from '../lib/format'
 import { ARROW_START, SEP } from '../ui/glyphs'
+import { useToast } from '../ui/Toast'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -141,6 +142,9 @@ export function SessionDetail({ kind = 'training' }: { kind?: SessionKind }) {
   const { id } = useParams()
   const { t, i18n } = useTranslation(['forms', 'common'])
   const locale = i18n.resolvedLanguage ?? 'en'
+  const navigate = useNavigate()
+  const toast = useToast()
+  const base = kind === 'advisory' ? '/advisory' : '/sessions'
 
   const sq = useManagedSession(kind, id)
   const pq = useSessionParticipants(kind, id)
@@ -562,7 +566,26 @@ export function SessionDetail({ kind = 'training' }: { kind?: SessionKind }) {
               <button
                 type="button"
                 disabled={softDelete.isPending || impact.isLoading}
-                onClick={() => softDelete.mutate({ id: s.id, kind })}
+                // Leave the screen once the row is gone. The delete used to
+                // stay here: the invalidation refetched a row RLS now hides,
+                // `.single()` errored, and the screen said "Could not load
+                // this. Check your connection" over a delete that had worked.
+                onClick={() =>
+                  softDelete.mutate(
+                    { id: s.id, kind },
+                    {
+                      onSuccess: () => {
+                        toast.fire({
+                          tone: 'destructive',
+                          tag: t('common:toast.deleted'),
+                          title: t('forms:session.deletedToast'),
+                          sub: s.title,
+                        })
+                        navigate(base)
+                      },
+                    },
+                  )
+                }
                 className="min-h-11 border-[1.5px] border-error px-4 font-narrow text-[12px] font-bold uppercase tracking-[0.12em] text-error disabled:border-border-strong disabled:text-faint"
               >
                 {t('session.deleteConfirm')}

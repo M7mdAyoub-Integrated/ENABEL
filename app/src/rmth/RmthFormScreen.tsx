@@ -151,6 +151,17 @@ export function RmthFormScreen({ mode }: { mode: 'new' | 'edit' }) {
   const nidNorm = normaliseNationalId(person.nid)
   const lookup = usePersonByNationalId(hasPerson && !personLocked && isCompleteNationalId(nidNorm) ? nidNorm : '')
   const onFile = !!lookup.data
+  // `rmth_ensure_person` (0127) fills an EMPTY phone on a person already on
+  // file and never overwrites one. Until 16 September 2026 the edit form
+  // showed the phone as editable and then did not send it at all, so a new
+  // number typed there was reported saved and discarded. The control now says
+  // what the database does: locked when a number is on file, open when the
+  // record has none, and sent in that one case.
+  const phoneOnFile = personLocked
+    ? !!rec.data?.person?.phone
+    : onFile
+      ? !!lookup.data?.phone
+      : false
   const [prefilledFrom, setPrefilledFrom] = useState<string | null>(null)
 
   // ── an existing national ID prefills identity and locks it (plan §5.2) ───
@@ -268,6 +279,10 @@ export function RmthFormScreen({ mode }: { mode: 'new' | 'edit' }) {
         ...(person.sex ? { sex: person.sex } : {}),
         ...(values['age_years'] ? { age_years: Number(values['age_years']) } : {}),
       }
+    } else if (hasPerson && personLocked && !phoneOnFile && person.phone.trim()) {
+      // The one thing an edit may add to a locked person: a phone where the
+      // record had none. Identity stays with the record.
+      payload.person = { national_id: nidNorm, phone: person.phone.trim() }
     }
     if (fields.some((f) => f.type === 'grid')) {
       payload.support = Object.entries(support)
@@ -360,6 +375,7 @@ export function RmthFormScreen({ mode }: { mode: 'new' | 'edit' }) {
                 setPerson={setPerson}
                 personLocked={personLocked}
                 onFile={onFile}
+                phoneOnFile={phoneOnFile}
                 lookingUp={lookup.isFetching}
                 error={shown[f.key]}
                 refs={refs}
@@ -456,6 +472,8 @@ type FieldViewProps = {
   setPerson: (u: (p: { nid: string; nid2: string; name: string; phone: string; sex: string }) => { nid: string; nid2: string; name: string; phone: string; sex: string }) => void
   personLocked: boolean
   onFile: boolean
+  /** A phone is already on the person's record, which the database never overwrites. */
+  phoneOnFile: boolean
   lookingUp: boolean
   // `| undefined` explicitly, because exactOptionalPropertyTypes is on and both
   // of these are passed from a possibly-absent source -- an index into `errors`
@@ -518,6 +536,15 @@ function FieldView(p: FieldViewProps) {
     )
   }
   if (f.type === 'person_phone') {
+    if (p.phoneOnFile) {
+      return (
+        <Field
+          spec={{ ...base, type: 'readonly', span: 6, text: p.person.phone, note: t('rmth:form.phoneOnFile') }}
+          value={p.person.phone}
+          onChange={() => {}}
+        />
+      )
+    }
     return (
       <Field
         spec={{ ...base, type: 'tel', ltr: true, span: 6, placeholder: '07XXXXXXXX' }}
@@ -838,7 +865,7 @@ function NewIncubatorDesignCycle({ onCreated }: { onCreated: (id: string) => voi
   const { t, i18n } = useTranslation('rmth')
   const locale = i18n.resolvedLanguage ?? 'en'
   const [open, setOpen] = useState(false)
-  const [d, setD] = useState({ title: '', start: '', end: '', hours: '', deliveredBy: '', modules: [] as string[] })
+  const [d, setD] = useState({ title: '', start: '', end: '', hours: '', deliveredBy: '', deliveredByOther: '', modules: [] as string[] })
   const [outcome, setOutcome] = useState<SaveResult | null>(null)
   const deliveredBy = useRmthRef('e03_delivered_by')
   const modules = useRmthRef('e03_module')
@@ -850,7 +877,8 @@ function NewIncubatorDesignCycle({ onCreated }: { onCreated: (id: string) => voi
       </div>
     )
   }
-  const ready = d.title.trim() && d.start && d.end && d.modules.length > 0
+  const deliveredByNeedsText = !!(deliveredBy.data ?? []).find((r) => r.id === d.deliveredBy)?.allows_free_text
+  const ready = d.title.trim() && d.start && d.end && d.modules.length > 0 && (!deliveredByNeedsText || d.deliveredByOther.trim())
   return (
     <div className="col-span-12 border-s-[3px] border-border-default ps-4">
       <p className="mb-3 mt-0 text-[13.5px] text-muted" style={{ textWrap: 'pretty' }}>{t('form.cycleNew.note')}</p>
@@ -866,11 +894,16 @@ function NewIncubatorDesignCycle({ onCreated }: { onCreated: (id: string) => voi
           value={d.deliveredBy}
           onChange={(x) => setD({ ...d, deliveredBy: x })}
         />
+        {deliveredByNeedsText ? (
+          <Field spec={{ key: 'new_cycle_delivered_by_other', label: t('form.specify'), type: 'text', span: 6, required: true }} value={d.deliveredByOther} onChange={(x) => setD({ ...d, deliveredByOther: x })} />
+        ) : null}
         <Field
           spec={{ key: 'new_cycle_modules', label: t('form.cycleNew.modules'), type: 'checks', twoCol: true, required: true, options: (modules.data ?? []).map((r) => ({ value: r.id, label: refLabel(r, locale) })) }}
           value={d.modules}
           onChange={() => {}}
-          onToggle={(id) => setD({ ...d, modules: d.modules.includes(id) ? d.modules.filter((x) => x !== id) : [...d.modules, id] })}
+          // Functional, not `{ ...d }`: two toggles in one tick each started
+          // from the same stale `d` and the second undid the first.
+          onToggle={(id) => setD((cur) => ({ ...cur, modules: cur.modules.includes(id) ? cur.modules.filter((x) => x !== id) : [...cur.modules, id] }))}
         />
       </div>
       <div className="mt-3 flex gap-2">
@@ -884,6 +917,7 @@ function NewIncubatorDesignCycle({ onCreated }: { onCreated: (id: string) => voi
                 cycle_kind: 'incubator_design', title: d.title.trim(), start_date: d.start, end_date: d.end,
                 contact_hours: d.hours === '' ? null : Number(d.hours),
                 delivered_by_id: d.deliveredBy || null,
+                delivered_by_other: deliveredByNeedsText ? d.deliveredByOther.trim() : null,
               },
               option_questions: ['e03_module'],
               options: d.modules.map((id) => ({ question_code: 'e03_module', option_id: id, option_other: null })),

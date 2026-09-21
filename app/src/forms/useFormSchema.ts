@@ -121,6 +121,20 @@ export function useFormSchema(
       const training = ptype === 'training'
       const chosen = ptype === 'training' || ptype === 'production_support'
       const accent = training ? 'teal' : 'green'
+      // ── "OTHER (PLEASE SPECIFY)" NEEDS SOMEWHERE TO SPECIFY ──
+      //
+      // All four partner lists end in "Other (please specify)", and
+      // `check_partnership_type` / `check_partnership_role` refuse the row
+      // unless the matching free-text column is filled. Until 16 September
+      // 2026 the form offered the option and had no box, so choosing it was
+      // refused with "the free-text box must be filled in" -- naming a control
+      // that did not exist. The box appears the moment such an option is
+      // chosen, and is required while it is.
+      const typeRows = training ? refs.partnerTypeTraining : refs.partnerTypeProduction
+      const roleRows = training ? refs.partnerRoleTraining : refs.partnerRoleProduction
+      const typeNeedsText = !!typeRows.find((r) => r.id === str('type'))?.allows_free_text
+      const chosenRoles = Array.isArray(values['role']) ? (values['role'] as string[]) : []
+      const rolesNeedingText = roleRows.filter((r) => r.allows_free_text && chosenRoles.includes(r.id))
       return [
         {
           id: 'identity',
@@ -199,9 +213,22 @@ export function useFormSchema(
                   key: 'type',
                   label: t('forms:partner.type'),
                   type: 'select',
-                  options: opts(training ? refs.partnerTypeTraining : refs.partnerTypeProduction),
+                  options: opts(typeRows),
                   help: t('forms:partner.typeHelp'),
                 },
+                ...(typeNeedsText
+                  ? [
+                      {
+                        key: 'typeOther',
+                        label: t('forms:partner.typeOther'),
+                        type: 'text' as const,
+                        required: true,
+                        ...(touched && !str('typeOther').trim()
+                          ? { error: t('forms:partner.typeOtherRequired') }
+                          : {}),
+                      },
+                    ]
+                  : []),
               ]
             : [],
         },
@@ -221,9 +248,20 @@ export function useFormSchema(
                   type: 'checks',
                   twoCol: true,
                   accent,
-                  options: opts(training ? refs.partnerRoleTraining : refs.partnerRoleProduction),
+                  options: opts(roleRows),
                   help: training ? t('forms:partner.roleHelpTraining') : t('forms:partner.roleHelpProduction'),
                 },
+                // One box per ticked role that takes free text -- `role_other`
+                // is a column of the junction row, so it is per role.
+                ...rolesNeedingText.map((r) => ({
+                  key: `roleOther_${r.id}`,
+                  label: t('forms:partner.roleOther', { role: refLabel(r, locale) }),
+                  type: 'text' as const,
+                  required: true,
+                  ...(touched && !str(`roleOther_${r.id}`).trim()
+                    ? { error: t('forms:partner.roleOtherRequired') }
+                    : {}),
+                })),
               ]
             : [],
         },
@@ -382,6 +420,11 @@ export function useFormSchema(
               options: sessionOpts,
               ...(str('session') === NEW_SESSION
                 ? { warn: t('forms:completion.willCreateSession') }
+                : {}),
+              // Required, and said so inline: on edit this picker used to open
+              // empty and the update path silently re-derived a session.
+              ...(touched && !str('session')
+                ? { error: t('forms:completion.sessionRequired') }
                 : {}),
             },
           ],

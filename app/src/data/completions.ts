@@ -56,16 +56,25 @@ export type CompletionRow = {
   topicId: string
   sessionTitle: string
   startDate: string
+  /** The date the completion was recorded against -- the form's "training date". */
+  registeredOn: string
   attended: boolean
   metCriteria: boolean | null
   decidedOn: string | null
   createdAt: string
+  /**
+   * OQ-45: the two agricultural-profile fields. Both were on the form from the
+   * start and neither reached the database until 16 September 2026.
+   */
+  agriInvolvementId: string | null
+  activityTypeIds: string[]
 }
 
 type Select = {
   id: string
   person_id: string
   session_id: string
+  registered_on: string
   attended: boolean
   met_criteria: boolean | null
   decided_on: string | null
@@ -77,13 +86,16 @@ type Select = {
     age_recorded: number | null
     date_of_birth: string | null
     phone: string | null
+    agri_involvement_id: string | null
+    person_activity_type: { activity_type_id: string }[] | null
   }
   training_session: { id: string; title: string; topic_id: string; start_date: string }
 }
 
 const SELECT = `
-  id, person_id, session_id, attended, met_criteria, decided_on, created_at,
-  person!inner ( national_id, full_name, sex, age_recorded, date_of_birth, phone ),
+  id, person_id, session_id, registered_on, attended, met_criteria, decided_on, created_at,
+  person!inner ( national_id, full_name, sex, age_recorded, date_of_birth, phone, agri_involvement_id,
+    person_activity_type!person_activity_type_person_id_fkey ( activity_type_id ) ),
   training_session!training_enrolment_session_id_fkey!inner ( id, title, topic_id, start_date )
 `
 
@@ -101,10 +113,13 @@ function toRow(r: Select): CompletionRow {
     topicId: r.training_session.topic_id,
     sessionTitle: r.training_session.title,
     startDate: r.training_session.start_date,
+    registeredOn: r.registered_on,
     attended: r.attended,
     metCriteria: r.met_criteria,
     decidedOn: r.decided_on,
     createdAt: r.created_at,
+    agriInvolvementId: r.person.agri_involvement_id,
+    activityTypeIds: (r.person.person_activity_type ?? []).map((x) => x.activity_type_id),
   }
 }
 
@@ -217,6 +232,15 @@ export type CompletionInput = {
   trainingDate: string
   metCriteria: boolean | null
   /**
+   * OQ-45. "What is your current involvement in agriculture?" and "What type
+   * of agricultural activity are you involved in? (select all)" -- both on the
+   * Completion_form sheet (04_DATA_DICTIONARY.md section 3), both on the
+   * screen since the form was built, and until 16 September 2026 neither was
+   * sent: the form asked, said "saved", and discarded the answer.
+   */
+  agriInvolvementId: string | null
+  activityTypeIds: string[]
+  /**
    * The session this completion belongs to, chosen from the picker.
    *
    * `null` means the coordinator explicitly said none of the existing sessions
@@ -312,6 +336,8 @@ export type PersonDraft = {
   nationalId: string
   fullName: string
   sex: string | null
+  /** OQ-45. Only the completion form asks; the other forms leave it undefined. */
+  agriInvolvementId?: string | null
   /**
    * Recorded age, as a fallback. `age_or_dob` requires one of the two.
    *
@@ -381,11 +407,46 @@ export async function resolvePerson(input: PersonDraft): Promise<{ id: string; c
       age_recorded: input.age,
       date_of_birth: input.dateOfBirth || null,
       phone: input.phone?.trim() || null,
+      ...(input.agriInvolvementId ? { agri_involvement_id: input.agriInvolvementId } : {}),
     })
     .select('id')
     .single()
   const row = unwrap(res as unknown as { data: { id: string } | null; error: unknown })
   return { id: row.id, created: true }
+}
+
+/**
+ * Replace the person's activity types with exactly these -- OQ-45.
+ *
+ * Delete-then-insert, the same shape as the other eight junctions, and for the
+ * same reason the partnership roles count what came back: RLS filters a delete
+ * it will not permit rather than raising, so a missing DELETE policy would
+ * report success and leave the old rows in place. `person_activity_type` has
+ * `op_delete` (can_write), and this reads back to prove it did its job.
+ */
+async function replaceActivityTypes(personId: string, activityTypeIds: string[]): Promise<void> {
+  const del = await supabase
+    .from('person_activity_type')
+    .delete()
+    .eq('person_id', personId)
+    .select('activity_type_id')
+  if (del.error) throw toAppError(del.error)
+  const stillThere = await supabase
+    .from('person_activity_type')
+    .select('activity_type_id')
+    .eq('person_id', personId)
+  if (stillThere.error) throw toAppError(stillThere.error)
+  if ((stillThere.data?.length ?? 0) > 0) {
+    throw toAppError({
+      code: '42501',
+      message: 'person_activity_type rows survived the delete -- a delete RLS refuses reports success',
+    })
+  }
+  if (activityTypeIds.length === 0) return
+  const ins = await supabase
+    .from('person_activity_type')
+    .insert(activityTypeIds.map((activityTypeId) => ({ person_id: personId, activity_type_id: activityTypeId })))
+  if (ins.error) throw toAppError(ins.error)
 }
 
 /**
@@ -474,12 +535,32 @@ export function useCreateCompletion() {
         (await resolveSession(input.topicId, input.trainingDate, input.topicLabel))
       const uid = await currentUserId()
 
+      // A person found on file keeps their profile unless this form says
+      // otherwise; a person created here gets it from resolvePerson. Either
+      // way the activity types are exactly what was ticked -- OQ-45.
+      if (!person.created && input.agriInvolvementId) {
+        const prof = await supabase
+          .from('person')
+          .update({ agri_involvement_id: input.agriInvolvementId })
+          .eq('id', person.id)
+          .select('id')
+        if (prof.error) throw toAppError(prof.error)
+      }
+      await replaceActivityTypes(person.id, input.activityTypeIds)
+
       const res = await supabase
         .from('training_enrolment')
         .insert({
           person_id: person.id,
           session_id: sessionId,
           registered_on: input.trainingDate,
+          // The Municipality is recording that this person took part, so the
+          // enrolment is accepted by definition. Left at the column default
+          // ('submitted') it appeared on /sessions/:id as "awaiting review",
+          // beside "completed", with Accept and Reject buttons -- found by
+          // opening the session screen on 16 September 2026. `submitted` is
+          // for applications made from the public site.
+          application_status: 'approved',
           ...decisionFields(input.metCriteria, uid),
         })
         .select('id')
@@ -500,10 +581,13 @@ export function useUpdateCompletion() {
     mutationFn: async ({
       id,
       personId,
+      previous,
       input,
     }: {
       id: string
       personId: string
+      /** The row as loaded, so an edit can tell what it is changing. */
+      previous: { metCriteria: boolean | null }
       input: CompletionInput
     }) => {
       // Demographics may be corrected; the national ID may not. It is the
@@ -521,19 +605,38 @@ export function useUpdateCompletion() {
           // able to do it.
           date_of_birth: input.dateOfBirth || null,
           phone: input.phone?.trim() || null,
+          agri_involvement_id: input.agriInvolvementId,
         })
         .eq('id', personId)
       if (p.error) throw toAppError(p.error)
+      await replaceActivityTypes(personId, input.activityTypeIds)
 
-      const sessionId = await resolveSession(input.topicId, input.trainingDate, input.topicLabel)
+      // ── THE SESSION IS WHAT THE PICKER SAYS, ON EDIT AS WELL AS ON CREATE ──
+      //
+      // Until 16 September 2026 this ignored `input.sessionId` and called
+      // resolveSession(topic, date) -- an exact match on start_date, or a new
+      // row. So editing a completion recorded against day two of a three-day
+      // course, with the course itself selected in the picker, created a
+      // second one-day session titled after the topic and moved the person
+      // onto it. Found by editing one: the phantom row was in the database
+      // while the screen showed the course. The picker exists so that a
+      // session is chosen, never inferred.
+      const sessionId =
+        input.sessionId ??
+        (await resolveSession(input.topicId, input.trainingDate, input.topicLabel))
       const uid = await currentUserId()
 
+      // A1.3 places a person in the quarter of `decided_on`. Re-stamping it
+      // with today on every edit -- which this did -- would move a decision
+      // taken in July into October the moment somebody corrected a phone
+      // number. The decision fields change only when the decision does.
+      const decisionChanged = input.metCriteria !== previous.metCriteria
       const res = await supabase
         .from('training_enrolment')
         .update({
           session_id: sessionId,
           registered_on: input.trainingDate,
-          ...decisionFields(input.metCriteria, uid),
+          ...(decisionChanged ? decisionFields(input.metCriteria, uid) : {}),
         })
         .eq('id', id)
         .select('id')

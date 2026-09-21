@@ -154,6 +154,7 @@ export type PromotionalAction = {
   action_date: string
   channel_id: string
   reach_estimate: number | null
+  description: string | null
 }
 
 export function usePromotionalActions() {
@@ -162,7 +163,7 @@ export function usePromotionalActions() {
     queryFn: async (): Promise<PromotionalAction[]> => {
       const res = await supabase
         .from('promotional_action')
-        .select('id, title, action_date, channel_id, reach_estimate')
+        .select('id, title, action_date, channel_id, reach_estimate, description')
         .is('deleted_at', null)
         .order('action_date', { ascending: false })
       return unwrapList(res as unknown as { data: PromotionalAction[] | null; error: unknown })
@@ -197,6 +198,21 @@ export type CoordinationMeeting = {
   id: string
   meeting_date: string
   subject: string
+  minutes_ref: string | null
+  /** Partners present, by partnership -- what G0.2 disaggregates by and G0.4 credits. */
+  partners: { partnership_id: string | null; external_name: string | null; partner_name: string | null }[]
+}
+
+type MeetingSelect = {
+  id: string
+  meeting_date: string
+  subject: string
+  minutes_ref: string | null
+  coordination_meeting_partner: {
+    partnership_id: string | null
+    external_name: string | null
+    partnership: { partner: { name: string } | null } | null
+  }[] | null
 }
 
 export function useCoordinationMeetings() {
@@ -205,10 +221,24 @@ export function useCoordinationMeetings() {
     queryFn: async (): Promise<CoordinationMeeting[]> => {
       const res = await supabase
         .from('coordination_meeting')
-        .select('id, meeting_date, subject')
+        .select(
+          'id, meeting_date, subject, minutes_ref, ' +
+            'coordination_meeting_partner!coordination_meeting_partner_meeting_id_fkey ( partnership_id, external_name, ' +
+            'partnership!coordination_meeting_partner_partnership_id_fkey ( partner!partnership_partner_id_fkey ( name ) ) )',
+        )
         .is('deleted_at', null)
         .order('meeting_date', { ascending: false })
-      return unwrapList(res as unknown as { data: CoordinationMeeting[] | null; error: unknown })
+      return unwrapList(res as unknown as { data: MeetingSelect[] | null; error: unknown }).map((m) => ({
+        id: m.id,
+        meeting_date: m.meeting_date,
+        subject: m.subject,
+        minutes_ref: m.minutes_ref,
+        partners: (m.coordination_meeting_partner ?? []).map((p) => ({
+          partnership_id: p.partnership_id,
+          external_name: p.external_name,
+          partner_name: p.partnership?.partner?.name ?? null,
+        })),
+      }))
     },
   })
 }
@@ -221,6 +251,8 @@ export type CaseStudy = {
   documented_on: string
   summary: string
   change_evidenced: string
+  person_id: string | null
+  initiative_id: string | null
 }
 
 export function useCaseStudies() {
@@ -229,7 +261,7 @@ export function useCaseStudies() {
     queryFn: async (): Promise<CaseStudy[]> => {
       const res = await supabase
         .from('case_study')
-        .select('id, title, documented_on, summary, change_evidenced')
+        .select('id, title, documented_on, summary, change_evidenced, person_id, initiative_id')
         .is('deleted_at', null)
         .order('documented_on', { ascending: false })
       return unwrapList(res as unknown as { data: CaseStudy[] | null; error: unknown })
@@ -239,10 +271,34 @@ export function useCaseStudies() {
 
 /* ── creating and withdrawing ─────────────────────────────────────────────── */
 
+/**
+ * The fields 04_DATA_DICTIONARY.md section 8 names for each of the three
+ * record tables. Until 16 September 2026 the forms asked for the first two or
+ * three of each and left the rest -- reach and description, the minutes
+ * reference and the partners present, the person or initiative a case study
+ * is about -- with no control anywhere. The partners present are the only
+ * write path `coordination_meeting_partner` has, which is what
+ * `contribution_from_meeting` credits G0.4 from and G0.2 disaggregates by.
+ */
 type NewRecord =
-  | { kind: 'promotional'; title: string; date: string; channelId: string; reach: number | null }
-  | { kind: 'meeting'; date: string; subject: string }
-  | { kind: 'caseStudy'; title: string; date: string; summary: string; change: string }
+  | {
+      kind: 'promotional'
+      title: string
+      date: string
+      channelId: string
+      reach: number | null
+      description: string | null
+    }
+  | { kind: 'meeting'; date: string; subject: string; minutesRef: string | null; partnershipIds: string[] }
+  | {
+      kind: 'caseStudy'
+      title: string
+      date: string
+      summary: string
+      change: string
+      personId: string | null
+      initiativeId: string | null
+    }
 
 export function useCreateManualRecord() {
   const qc = useQueryClient()
@@ -257,6 +313,7 @@ export function useCreateManualRecord() {
             action_date: rec.date,
             channel_id: rec.channelId,
             ...(rec.reach === null ? {} : { reach_estimate: rec.reach }),
+            description: rec.description?.trim() || null,
           })
           .select('id')
           .single()
@@ -266,10 +323,18 @@ export function useCreateManualRecord() {
       if (rec.kind === 'meeting') {
         const res = await supabase
           .from('coordination_meeting')
-          .insert({ meeting_date: rec.date, subject: rec.subject.trim() })
+          .insert({ meeting_date: rec.date, subject: rec.subject.trim(), minutes_ref: rec.minutesRef?.trim() || null })
           .select('id')
           .single()
         if (res.error) throw toAppError(res.error)
+        if (rec.partnershipIds.length > 0) {
+          // One row per partner present. The trigger on this table writes the
+          // partner's G0.4 contribution; nothing else needs doing here.
+          const ins = await supabase
+            .from('coordination_meeting_partner')
+            .insert(rec.partnershipIds.map((partnershipId) => ({ meeting_id: res.data.id, partnership_id: partnershipId })))
+          if (ins.error) throw toAppError(ins.error)
+        }
         return res.data
       }
       const res = await supabase
@@ -279,6 +344,8 @@ export function useCreateManualRecord() {
           documented_on: rec.date,
           summary: rec.summary.trim(),
           change_evidenced: rec.change.trim(),
+          person_id: rec.personId,
+          initiative_id: rec.initiativeId,
         })
         .select('id')
         .single()
@@ -294,6 +361,8 @@ export function useCreateManualRecord() {
               ? manualKeys.meetings()
               : manualKeys.caseStudies(),
       })
+      // A meeting with partners present credits G0.4 through its trigger.
+      if (rec.kind === 'meeting') void qc.invalidateQueries({ queryKey: ['contributions'] })
       invalidateIndicators(qc)
     },
   })
