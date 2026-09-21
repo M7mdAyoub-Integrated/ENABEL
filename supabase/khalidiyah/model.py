@@ -14,7 +14,7 @@ import re, sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from workbook import load_forms
 from catalogue import (FORMS, TABLES, SHARED_LISTS, OPTION_CODES, OVERRIDES, REFERENCES,
-                       CHECKLIST_PREFIXES, spec_for, list_name, has_blank)
+                       CHECKLIST_PREFIXES, LIST_FIXES, LISTS_ADDED_LATER, effective_free, spec_for, list_name, has_blank)
 
 FREE_TEXT_WORDS = ('specify', 'describe', 'names:', 'name:', 'reason:', 'why:', 'phone:', 'date:',
                    'number:', 'reference:', 'example:', 'explanation:', 'provider:', 'missing:', 'no.:',
@@ -76,8 +76,8 @@ class Model:
         self.lists = {}        # name -> Lst
         self.specs = {}        # fid -> {key: spec}
         self.columns = {}      # table -> [(name, sqltype, nullable, ref_list|None, comment)]
-        self.questions = {}    # table -> [(question_code, list_name)]
-        self.count_fields = {} # table -> [(field_code, list_name)]
+        self.questions = {}    # table -> [(question_code, list_name, milestone_code|None)]
+        self.count_fields = {} # table -> [(field_code, list_name, milestone_code|None)]
         self.checklist_items = {}  # milestone_code -> [(item_no, field_code, list_name, has_detail)]
         self.milestone_columns = {}  # milestone_code -> [column names specific to it]
 
@@ -130,10 +130,22 @@ class Model:
             if o not in cell_ar:
                 raise ValueError('%s: Arabic option %r is not in the sheet cell' % (where, o))
 
+    # The code a multi-select question or a count field is stored under in
+    # its junction. Four milestone forms share khld_milestone_verification,
+    # and khld_question_list is keyed on (table, code), so on that table the
+    # code carries the form id: a1_evidence_attached, b1_evidence_attached,
+    # e1_evidence_attached and f1_evidence_attached are four questions
+    # reading four lists. guard_khld_milestone_child (0147) then requires
+    # the prefix to be the parent's milestone. Everywhere else the code is
+    # the sheet's field key.
+    @staticmethod
+    def qcode(fid, key, mcode):
+        return '%s_%s' % (fid, key) if mcode else key
+
     def _list_for_part(self, fid, f, col, cfg, where):
         en, ar = cfg['options'], cfg['options_ar']
         self._verbatim(f, en, ar, where)
-        return self.add_list(cfg['list'], en, ar, where, codes=cfg.get('codes'), no_other=cfg.get('no_other', False))
+        return self.add_list(cfg['list'], en, ar, cfg.get('used_by', where), codes=cfg.get('codes'), no_other=cfg.get('no_other', False))
 
     # ── build ────────────────────────────────────────────────────────────
     def build(self):
@@ -202,7 +214,7 @@ class Model:
                 self._verbatim(f, opts, opts_ar, where)
             l = self.add_list(name, opts, opts_ar, where, codes=spec.get('codes'), no_other=spec.get('no_other', False))
             self._col(table, f.key + '_id', 'uuid', not req, ref=name, comment=f.q_en, mcode=mcode)
-            if any(o[3] for o in l.options):
+            if any(effective_free(l.name, o[0], o[3]) for o in l.options):
                 self._col(table, f.key + '_other', 'text', True, comment='free text for ' + f.key, mcode=mcode)
             if spec.get('stamp'):
                 self._col(table, f.key + '_recorded_on', 'timestamptz', True, comment='when ' + f.key + ' was recorded', mcode=mcode)
@@ -210,7 +222,7 @@ class Model:
         elif kind == 'multi':
             name = list_name(fid, f, spec)
             self.add_list(name, f.opts_en, f.opts_ar, where)
-            self.questions[table].append((f.key, name, mcode))
+            self.questions[table].append((self.qcode(fid, f.key, mcode), name, mcode))
         elif kind == 'checklist':
             opts = spec.get('options') or f.opts_en
             opts_ar = spec.get('options_ar') or f.opts_ar
@@ -224,28 +236,33 @@ class Model:
             name = '%s_%s' % (fid, f.key)
             cells = spec['cells']
             self.add_list(name, [c[1] for c in cells], [c[2] for c in cells], where, codes=[c[0] for c in cells], cells=True)
-            self.count_fields[table].append((f.key, name, mcode))
+            self.count_fields[table].append((self.qcode(fid, f.key, mcode), name, mcode))
         elif kind == 'parts':
+            # a required compound field makes its FIRST typed part NOT NULL (the
+            # answer that says which case applies); a free-text part never is
+            first = True
             for (col, pkind, en, ar, cfg) in spec['parts']:
                 pwhere = where + '.' + col
+                nullable = not (req and first and pkind in ('select', 'bool', 'number', 'date', 'money'))
+                first = False
                 if pkind in ('text', 'phone'):
                     self._col(table, col, 'text', True, comment=en, mcode=mcode)
                 elif pkind == 'number':
-                    self._col(table, col, 'int', True, comment=en, mcode=mcode)
+                    self._col(table, col, 'int', nullable, comment=en, mcode=mcode)
                 elif pkind == 'money':
-                    self._col(table, col, 'numeric(12,3)', True, comment=en, mcode=mcode)
+                    self._col(table, col, 'numeric(12,3)', nullable, comment=en, mcode=mcode)
                 elif pkind == 'date':
-                    self._col(table, col, 'date', True, comment=en, mcode=mcode)
+                    self._col(table, col, 'date', nullable, comment=en, mcode=mcode)
                 elif pkind == 'bool':
-                    self._col(table, col, 'boolean', True, comment=en, mcode=mcode)
+                    self._col(table, col, 'boolean', nullable, comment=en, mcode=mcode)
                 elif pkind == 'select':
                     l = self._list_for_part(fid, f, col, cfg, pwhere)
-                    self._col(table, col, 'uuid', True, ref=cfg['list'], comment=en, mcode=mcode)
-                    if any(o[3] for o in l.options):
+                    self._col(table, col, 'uuid', nullable, ref=cfg['list'], comment=en, mcode=mcode)
+                    if any(effective_free(l.name, o[0], o[3]) for o in l.options):
                         self._col(table, re.sub(r'_id$', '', col) + '_other', 'text', True, comment='free text for ' + col, mcode=mcode)
                 elif pkind == 'multi':
                     self._list_for_part(fid, f, col, cfg, pwhere)
-                    self.questions[table].append((col, cfg['list'], mcode))
+                    self.questions[table].append((self.qcode(fid, col, mcode), cfg['list'], mcode))
                 elif pkind == 'record':
                     self._col(table, col, 'uuid', True, ref='@' + cfg['table'], comment=en, mcode=mcode)
                 elif pkind == 'person_phone':
@@ -261,7 +278,8 @@ class Model:
             if kind == 'person_sex':
                 self.add_list('sex', f.opts_en, f.opts_ar, where)
         elif kind == 'readonly':
-            pass
+            if spec.get('list'):
+                self.add_list(spec['list'], f.opts_en, f.opts_ar, where)
         elif kind == 'rating':
             items, ratings = parse_matrix(f)
             self.add_list('so20_facility_item', [i[0] for i in items], [i[1] for i in items], where, cells=True)

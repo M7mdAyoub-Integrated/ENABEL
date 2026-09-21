@@ -135,6 +135,35 @@ OPTION_CODES = {
     'e1_municipal_focal': ['in_place', 'not_in_place'],
 }
 
+# Corrections to the option lists AFTER 0141-0143 were applied. gen_0141
+# reproduces the applied files byte for byte, so a list row that later turned
+# out to need a different flag is not changed in the model's list; it is
+# recorded here, emitted by the migration named as an UPDATE, and consulted by
+# the later generators (whether a select needs an "other" column, what the
+# form renders). (list, code) -> {field: value, 'migration': nnnn, 'why': ...}
+LIST_FIXES = {
+    ('d2_duplicate_check', 'yes'): dict(
+        allows_free_text=False, migration='0145',
+        why='the blank is the number of repeat participants; it has its own typed column (repeat_participants)'),
+}
+
+
+# Lists that exist in the model but were NOT part of 0141-0143, because no
+# field of any sheet is a select on them: they serve an ENTITY column
+# (khld_partner.partner_type_id). gen_0141 leaves them out so it keeps
+# reproducing the applied files; the migration named creates them.
+LISTS_ADDED_LATER = {
+    'partner_type': '0145',
+}
+
+
+def effective_free(list_name, code, free):
+    fix = LIST_FIXES.get((list_name, code))
+    if fix and 'allows_free_text' in fix:
+        return fix['allows_free_text']
+    return free
+
+
 # Checklist items whose options differ from the shared three: their codes
 # must START with the status (in_place / partly / not_in_place) so the rule
 # evaluator reads the status from the code (0143, khld_milestone_status).
@@ -157,10 +186,24 @@ OVERRIDES = {
             ('has_children_id', 'select', 'Yes — number / No', 'نعم — العدد / لا', dict(list='imp0_has_children', options=['Yes — number: ____', 'No'], options_ar=['نعم — العدد: ____', 'لا'], codes=['yes', 'no'], no_other=True)),
             ('children_count', 'number', 'number', 'العدد', {})]),
         'recontact': dict(kind='select'),
+        # "Respondents answering 'Never' skip to Q20; they are excluded from the
+        # indicator denominator" (field 12's note) -- so the park-use and
+        # interaction questions (13-19) cannot be NOT NULL: a non-visitor's
+        # questionnaire is a record with those blank. The rule that they are
+        # required for everyone else lives in save_khld_record (0148).
+        'activities_taken': dict(required=False),
+        'mixed_presence': dict(required=False),
+        'new_contact': dict(required=False),
+        'opportunity_increase': dict(required=False),
+        'joint_activity': dict(required=False),
+        'comfort_level': dict(required=False),
     },
     'so10': {
         'partner_name': dict(kind='record', table='khld_partner', create=True, column='partner_id'),
-        'partner_type': dict(kind='readonly', derived='partner_type'),
+        # shown from the partner entity, whose partner_type_id reads this list:
+        # the sheet's ten partner types (01_GUIDANCE), registered here so the
+        # entity's column has a list to point at
+        'partner_type': dict(kind='readonly', derived='partner_type', list='partner_type'),
         'engagement_since': dict(kind='month'),
         'meetings_attended': dict(kind='number'),
     },
@@ -333,7 +376,21 @@ OVERRIDES = {
         'register_attached': dict(kind='select'),
         'consent_informed': dict(kind='select', stamp=True),
         'photo_consent': dict(kind='select', stamp=True),
-        'duplicate_check': dict(kind='select'),
+        # "Yes — number of repeat participants identified: ____": the blank is a
+        # NUMBER, and it is the number the distinct-individuals figure subtracts
+        # (plan Part 6, SO2-D2), so it gets a typed column beside the select.
+        # 0141 seeded the 'yes' option with allows_free_text = true from the
+        # blank; LIST_FIXES below records the correction 0145 applies.
+        'duplicate_check': dict(kind='parts', parts=[
+            ('duplicate_check_id', 'select', 'Yes / No — not yet done / Not possible with this counting method',
+             'نعم / لا — لم يُنفَّذ بعد / غير ممكن بطريقة العدّ هذه',
+             dict(list='d2_duplicate_check',
+                  options=['Yes — number of repeat participants identified: ____', 'No — not yet done', 'Not possible with this counting method'],
+                  options_ar=['نعم — عدد المشاركين المتكررين المحددين: ____', 'لا — لم يُنفَّذ بعد', 'غير ممكن بطريقة العدّ هذه'],
+                  codes=['yes', 'not_yet', 'not_possible'],
+                  # the list was seeded by 0142 while this was a plain select; keep its label
+                  used_by='d2.duplicate_check')),
+            ('repeat_participants', 'number', 'number of repeat participants identified', 'عدد المشاركين المتكررين المحددين', {})]),
         'reconciliation': dict(kind='readonly', derived='reconciliation'),
         'entered_in_db': dict(kind='parts', parts=[
             ('entered_by_name', 'text', 'name', 'الاسم', {}), ('entered_on', 'date', 'date', 'التاريخ', {})]),
@@ -352,6 +409,10 @@ OVERRIDES = {
         'participation_log': dict(kind='participation_log'),
         'activities_count': dict(kind='readonly', derived='activities_count'),
         'hours_total': dict(kind='readonly', derived='hours_total'),
+        # "If inactive or withdrawn, what is the main reason?" -- conditional on
+        # field 14, and the list has no "not applicable" row, so an active
+        # volunteer has no answer; the conditional rule is save_khld_record's
+        'inactive_reason': dict(required=False),
         'verified_by': dict(kind='parts', parts=[
             ('verified_by_name', 'text', 'name, position', 'الاسم والمنصب', {}), ('verified_on', 'date', 'date', 'التاريخ', {})]),
     },

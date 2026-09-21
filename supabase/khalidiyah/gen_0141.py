@@ -12,6 +12,7 @@ Writes LF only (newline=''), per CLAUDE.md rule 5.
 import io, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from model import build
+from catalogue import LISTS_ADDED_LATER
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
 
@@ -21,7 +22,7 @@ def q(s):
 
 
 m = build()
-lists = m.lists
+lists = {k: v for k, v in m.lists.items() if k not in LISTS_ADDED_LATER}
 n_lists = len(lists)
 n_opts = sum(len(l.options) for l in lists.values())
 n_shared = sum(1 for l in lists.values() if len(l.used_by) > 1)
