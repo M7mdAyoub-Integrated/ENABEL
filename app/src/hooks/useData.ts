@@ -116,9 +116,18 @@ export function useRefLookup(name: RefTableName) {
 
 /* ── derived helpers ────────────────────────────────────────────────────── */
 
+/**
+ * The identifier a person is on file with. Since 0138 a person holds a
+ * national ID, a UNHCR number, or both, so a screen that prints "the ID"
+ * prints whichever exists rather than assuming the first.
+ */
+function identifierOf(p: { national_id: string | null; unhcr_number?: string | null }): string {
+  return p.national_id ?? p.unhcr_number ?? ''
+}
+
 export function personById(id: string): { national_id: string; full_name: string; phone: string | null } | undefined {
   const p = db.PEOPLE.find((x) => x.id === id)
-  if (p) return { national_id: p.national_id, full_name: p.full_name, phone: p.phone }
+  if (p) return { national_id: identifierOf(p), full_name: p.full_name, phone: p.phone }
   const ext = db.EXTERNAL_PRODUCERS[id]
   if (ext) return ext
   return undefined
@@ -223,9 +232,9 @@ export function useListRows(module: ModuleId, t: Translate, locale: string): Lis
         return {
           id: e.id,
           filterValue: topic,
-          search: `${person.national_id} ${person.full_name}`,
+          search: `${identifierOf(person)} ${person.full_name}`,
           cells: [
-            { kind: 'ltr', text: person.national_id },
+            { kind: 'ltr', text: identifierOf(person) },
             { kind: 'text', text: person.full_name },
             { kind: 'text', text: t(`common:enums.sex.${person.sex ?? 'unknown'}`) },
             { kind: 'text', text: person.age_recorded == null ? '' : String(person.age_recorded) },
@@ -250,7 +259,7 @@ export function useListRows(module: ModuleId, t: Translate, locale: string): Lis
           filterValue: partner.name,
           search: `${person.full_name} ${partner.name}`,
           cells: [
-            { kind: 'text', text: person.full_name, sub: person.national_id },
+            { kind: 'text', text: person.full_name, sub: identifierOf(person) },
             { kind: 'text', text: partner.name },
             { kind: 'text', text: l.scope },
             { kind: 'text', text: l.linked_on },
@@ -302,10 +311,10 @@ export function useListRows(module: ModuleId, t: Translate, locale: string): Lis
           return {
             id: r.id,
             filterValue: t(`common:chips.status.${status}`),
-            search: `${person.full_name} ${person.national_id}`,
+            search: `${person.full_name} ${identifierOf(person)}`,
             cells: [
               { kind: 'text', text: person.full_name },
-              { kind: 'ltr', text: person.national_id },
+              { kind: 'ltr', text: identifierOf(person) },
               { kind: 'text', text: ex.name },
               { kind: 'text', text: products },
               r.is_first_time
@@ -325,10 +334,10 @@ export function useListRows(module: ModuleId, t: Translate, locale: string): Lis
       return {
         id: f.id,
         filterValue: t(`common:enums.round.${f.round}`),
-        search: `${person.full_name} ${person.national_id}`,
+        search: `${person.full_name} ${identifierOf(person)}`,
         cells: [
           { kind: 'text', text: person.full_name },
-          { kind: 'ltr', text: person.national_id },
+          { kind: 'ltr', text: identifierOf(person) },
           { kind: 'text', text: t(`common:enums.round.${f.round}`) },
           { kind: 'text', text: f.contact_date ? formatShortDate(f.contact_date, locale) : '—' },
           { kind: 'text', text: t(`common:enums.mode.${f.contact_mode ?? 'telephone'}`) },
@@ -582,12 +591,12 @@ export function useDetail(module: ModuleId, id: string, t: Translate, locale: st
       return {
         id,
         title: person.full_name,
-        subtitle: person.national_id,
+        subtitle: identifierOf(person),
         status: e.met_criteria
           ? chipFrom(t('forms:detail.criteriaMet'), 'ok')
           : chipFrom(t('forms:detail.criteriaNotMet'), 'err'),
         fields: [
-          { labelKey: 'detail.nationalId', value: person.national_id, ltr: true },
+          { labelKey: 'detail.nationalId', value: identifierOf(person), ltr: true },
           { labelKey: 'detail.sex', value: t(`common:enums.sex.${person.sex ?? 'unknown'}`) },
           { labelKey: 'detail.age', value: person.age_recorded == null ? '' : String(person.age_recorded) },
           { labelKey: 'detail.phone', value: person.phone ?? '', ltr: true },
@@ -612,7 +621,7 @@ export function useDetail(module: ModuleId, id: string, t: Translate, locale: st
       return {
         id,
         title: person.full_name,
-        subtitle: person.national_id,
+        subtitle: identifierOf(person),
         status: chipFrom(t(`common:enums.linkStatus.${l.status}`), l.status === 'active' ? 'ok' : 'warn'),
         fields: [
           { labelKey: 'detail.partner', value: partner.name },
@@ -659,10 +668,10 @@ export function useDetail(module: ModuleId, id: string, t: Translate, locale: st
       return {
         id,
         title: person.full_name,
-        subtitle: person.national_id,
+        subtitle: identifierOf(person),
         status: chipFrom(t(`common:chips.status.${status}`), tone),
         fields: [
-          { labelKey: 'detail.nationalId', value: person.national_id, ltr: true },
+          { labelKey: 'detail.nationalId', value: identifierOf(person), ltr: true },
           { labelKey: 'detail.phone', value: person.phone ?? '', ltr: true },
           { labelKey: 'detail.exhibition', value: ex.name },
           { labelKey: 'detail.products', value: (db.REGISTRATION_PRODUCTS[r.id] ?? s.extraRegProducts[r.id] ?? []).map((p) => refT(db.REF_PRODUCT, p)).join(', ') },
@@ -682,10 +691,10 @@ export function useDetail(module: ModuleId, id: string, t: Translate, locale: st
     return {
       id,
       title: person.full_name,
-      subtitle: person.national_id,
+      subtitle: identifierOf(person),
       status: chipFrom(t(`common:enums.surveyStatus.${f.status}`), tone),
       fields: [
-        { labelKey: 'detail.nationalId', value: person.national_id, ltr: true },
+        { labelKey: 'detail.nationalId', value: identifierOf(person), ltr: true },
         { labelKey: 'detail.round', value: t(`common:enums.round.${f.round}`) },
         { labelKey: 'detail.contactDate', value: f.contact_date ?? '—' },
         { labelKey: 'detail.mode', value: t(`common:enums.mode.${f.contact_mode ?? 'telephone'}`) },
@@ -780,8 +789,8 @@ export function useEditValues(
       const sess = db.TRAINING_SESSIONS.find((x) => x.id === e.session_id)
       if (!person || !sess) return null
       return {
-        nid: person.national_id,
-        nid2: person.national_id,
+        nid: identifierOf(person),
+        nid2: identifierOf(person),
         name: person.full_name,
         sex: person.sex ?? '',
         age: person.age_recorded == null ? '' : String(person.age_recorded),
@@ -825,8 +834,8 @@ export function useEditValues(
       if (!person) return null
       return {
         exhibition: r.exhibition_id,
-        nid: person.national_id,
-        nid2: person.national_id,
+        nid: identifierOf(person),
+        nid2: identifierOf(person),
         name: person.full_name,
         phone: person.phone ?? '',
         products: db.REGISTRATION_PRODUCTS[r.id] ?? s.extraRegProducts[r.id] ?? [],

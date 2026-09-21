@@ -161,6 +161,7 @@ export const PEOPLE: Person[] = [
   {
     ...base('p1', '2026-03-11T15:40:00Z'),
     national_id: '300000011',
+    unhcr_number: null,
     full_name: 'Demo Person Eleven',
     sex: 'female',
     date_of_birth: null,
@@ -178,6 +179,7 @@ export const PEOPLE: Person[] = [
   {
     ...base('p2', '2026-03-18T12:05:00Z'),
     national_id: '300000012',
+    unhcr_number: null,
     full_name: 'Demo Person Twelve',
     sex: 'male',
     date_of_birth: null,
@@ -195,6 +197,7 @@ export const PEOPLE: Person[] = [
   {
     ...base('p3', '2026-04-02T09:20:00Z'),
     national_id: '300000013',
+    unhcr_number: null,
     full_name: 'Demo Person Thirteen',
     sex: 'female',
     date_of_birth: null,
@@ -212,6 +215,7 @@ export const PEOPLE: Person[] = [
   {
     ...base('p4', '2026-04-09T14:55:00Z'),
     national_id: '300000014',
+    unhcr_number: null,
     full_name: 'Demo Person Fourteen',
     sex: 'male',
     date_of_birth: null,
@@ -229,6 +233,7 @@ export const PEOPLE: Person[] = [
   {
     ...base('p5', '2026-04-23T11:10:00Z'),
     national_id: '300000015',
+    unhcr_number: null,
     full_name: 'Demo Person Fifteen',
     sex: 'female',
     date_of_birth: null,
@@ -246,6 +251,7 @@ export const PEOPLE: Person[] = [
   {
     ...base('p6', '2026-05-07T16:30:00Z'),
     national_id: '300000016',
+    unhcr_number: null,
     full_name: 'Demo Person Sixteen',
     sex: 'male',
     date_of_birth: null,

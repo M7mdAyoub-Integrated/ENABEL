@@ -2304,12 +2304,13 @@ export type Database = {
           has_disability: boolean | null
           id: string
           is_refugee: boolean | null
-          national_id: string
+          national_id: string | null
           nationality_id: string | null
           notes: string | null
           phone: string | null
           sex: Database["public"]["Enums"]["sex_t"] | null
           updated_at: string
+          unhcr_number: string | null
           village: string | null
         }
         Insert: {
@@ -2325,12 +2326,13 @@ export type Database = {
           has_disability?: boolean | null
           id?: string
           is_refugee?: boolean | null
-          national_id: string
+          national_id: string | null
           nationality_id?: string | null
           notes?: string | null
           phone?: string | null
           sex?: Database["public"]["Enums"]["sex_t"] | null
           updated_at?: string
+          unhcr_number?: string | null
           village?: string | null
         }
         Update: {
@@ -2346,12 +2348,13 @@ export type Database = {
           has_disability?: boolean | null
           id?: string
           is_refugee?: boolean | null
-          national_id?: string
+          national_id?: string | null
           nationality_id?: string | null
           notes?: string | null
           phone?: string | null
           sex?: Database["public"]["Enums"]["sex_t"] | null
           updated_at?: string
+          unhcr_number?: string | null
           village?: string | null
         }
         Relationships: [

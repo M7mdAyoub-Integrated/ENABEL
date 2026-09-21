@@ -198,7 +198,9 @@ export function usePersonByNationalId(nid: string) {
       if (!p) return null
       return {
         id: p.id,
-        nationalId: p.national_id,
+        // Nullable since 0138 (a person may hold a UNHCR number instead); a
+        // row matched on national_id carries it, so this is the nid asked for.
+        nationalId: p.national_id ?? nid,
         fullName: p.full_name,
         sex: p.sex,
         ageRecorded: p.age_recorded,
