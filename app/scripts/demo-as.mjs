@@ -4,6 +4,7 @@
  *
  *   node scripts/demo-as.mjs superadmin@platform.test
  *   node scripts/demo-as.mjs admin@ramtha.test
+ *   node scripts/demo-as.mjs admin@khalidiyah.test
  *   node scripts/demo-as.mjs coordinator@shm.test      (the default)
  *
  * Demo mode (src/demo/demoMode.ts) reads VITE_DEMO_EMAIL and
@@ -31,6 +32,8 @@ const ACCOUNTS = {
   // between both. Renamed from superadmin@shm.test on 15 September 2026.
   'superadmin@platform.test': 'SHM_TEST_PW_SUPERADMIN',
   'admin@ramtha.test': 'SHM_TEST_PW_RAMTHA_ADMIN',
+  // Created 21 September 2026 through manage-account by scripts/create-account.mjs.
+  'admin@khalidiyah.test': 'SHM_TEST_PW_KHALIDIYAH_ADMIN',
 }
 
 const email = process.argv[2]
