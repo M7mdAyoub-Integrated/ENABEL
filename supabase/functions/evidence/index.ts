@@ -62,9 +62,10 @@ function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json" } });
 }
 
-// The same list as attachment_entity_type_known (0128). Checked here so the
-// query below is over a known table name and never over a string from the
-// request.
+// The same list as attachment_entity_type_known (0128, 0151). Checked here
+// so the query below is over a known table name and never over a string
+// from the request. The two lists are kept identical by hand; 0151's
+// verification reads the database's, this one is read by opening the file.
 const ENTITY_TABLES = new Set([
   "training_session", "training_enrolment", "exhibition", "exhibition_registration",
   "partnership", "production_initiative", "followup_survey", "coordination_meeting",
@@ -73,6 +74,14 @@ const ENTITY_TABLES = new Set([
   "rmth_event", "rmth_proposal", "rmth_training_programme", "rmth_training_cycle",
   "rmth_training_enrolment", "rmth_project_implementer", "rmth_incubator",
   "rmth_enterprise", "rmth_incubation_service", "rmth_outcome_survey",
+  "khld_partner", "khld_enterprise", "khld_vendor",
+  "khld_works_item", "khld_coordination_meeting", "khld_contribution",
+  "khld_campaign", "khld_activity", "khld_market", "khld_action_day",
+  "khld_volunteer", "khld_attendance",
+  "khld_guidance_completion", "khld_enterprise_support", "khld_vendor_registration",
+  "khld_interaction_survey", "khld_partner_survey", "khld_user_feedback",
+  "khld_volunteer_tracking", "khld_producer_survey",
+  "khld_milestone_verification",
 ]);
 const KINDS = new Set(["photo", "document", "other"]);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
