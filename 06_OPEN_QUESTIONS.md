@@ -378,12 +378,20 @@ than no summary — a reader counts nine reds and stops looking.
 
 | Priority | Count | Codes |
 |---|---|---|
-| 🔴 Blocks a reported number | 12 | OQ-1, OQ-2, OQ-3, OQ-4, OQ-5, OQ-12, OQ-25, OQ-32, OQ-40, OQ-44, OQ-47, OQ-48 |
-| 🟠 Affects the schema, the forms or a permission | 22 | OQ-6, OQ-7, OQ-8, OQ-9, OQ-10, OQ-11, OQ-13, OQ-14, OQ-21, OQ-26, OQ-27, OQ-28, OQ-29, OQ-35, OQ-36, OQ-37, OQ-39, OQ-41, OQ-43, OQ-45, OQ-49, OQ-51 |
-| 🟡 Wording and presentation | 11 | OQ-15, OQ-16, OQ-17, OQ-18, OQ-19, OQ-20, OQ-33, OQ-34, OQ-38, OQ-46, OQ-50 |
+| 🔴 Blocks a reported number | 13 | OQ-1, OQ-2, OQ-3, OQ-4, OQ-5, OQ-12, OQ-25, OQ-32, OQ-40, OQ-44, OQ-47, OQ-48, OQ-56 |
+| 🟠 Affects the schema, the forms or a permission | 25 | OQ-6, OQ-7, OQ-8, OQ-9, OQ-10, OQ-11, OQ-13, OQ-14, OQ-21, OQ-26, OQ-27, OQ-28, OQ-29, OQ-35, OQ-36, OQ-37, OQ-39, OQ-41, OQ-43, OQ-45, OQ-49, OQ-51, OQ-52, OQ-55, OQ-57 |
+| 🟡 Wording and presentation | 13 | OQ-15, OQ-16, OQ-17, OQ-18, OQ-19, OQ-20, OQ-33, OQ-34, OQ-38, OQ-46, OQ-50, OQ-53, OQ-54 |
 | 🟢 Resolved, fixed or moot | 6 | OQ-22, OQ-23, OQ-24, OQ-30, OQ-31, OQ-42 |
 
-**45 open, 6 closed, 51 in total.**
+**51 open, 6 closed, 57 in total.**
+
+Updated 21 September 2026: OQ-52 to OQ-57 are added with the Khalidiyah
+migrations `0138`–`0148` — the UNHCR number's format, the bare "Other",
+the disability instrument, status as at the activity, the two milestone
+rules that name a text and a date as things to be "In place", and the
+person a band-only sheet creates. **OQ-56 is the one to read**: two of the
+four milestones cannot compute until the M&E lead names their critical
+items, and the platform says so rather than guessing.
 
 Updated 16 September 2026 (later): OQ-51 is added — the `app_user` policies
 admit a municipal coordinator to their own municipality's accounts while the
@@ -1922,3 +1930,212 @@ decision — not both edited to agree with whichever was easier.
     select policyname, pg_get_expr(polqual, polrelid) from pg_policies pol
       join pg_policy p on p.polname = pol.policyname
      where schemaname = 'public' and tablename = 'app_user';
+
+---
+
+## 🟠 OQ-52 · The UNHCR number has no format check, because no source gives the format
+
+**Added 21 September 2026**, with migration `0138`.
+
+**What the sheets say.** Khalidiyah's `01_GUIDANCE` collects a national ID
+*or* a UNHCR registration number, and three sheets (SO3-F2, SO4-G1,
+SO4-H2) carry `id_number` with that choice. No sheet, and neither workbook,
+says what a UNHCR number looks like.
+
+**What was built.** `person.unhcr_number`, text, unique where present, and
+`national_id` nullable so that a person may hold either or both
+(`person_has_identifier`). The number is normalised by a trigger — trimmed,
+upper-cased, internal whitespace collapsed — so two spellings of one number
+cannot be two people, and it is immutable under the same rule as the
+national ID (`guard_person_national_id`, extended from its live body). It
+is **not** pattern-checked. An invented regex would refuse real numbers at
+the registration desk, which is the worse failure: OQ-27 is what a
+too-strict identifier rule does to a queue.
+
+**What the form does instead.** The identifier type is an explicit choice
+on the form (`id_type`), never inferred from the digits, so a nine-digit
+UNHCR number is not mistaken for a national ID.
+
+**Decides.** The Municipality's community coordinator, with UNHCR Jordan:
+the format (or formats) a registration number takes. Then a check
+constraint, applied to new rows only — and a sweep of what is already on
+file before it is applied to old ones.
+
+---
+
+## 🟡 OQ-53 · A bare "Other" on a Khalidiyah sheet requires a specification
+
+**Added 21 September 2026**, with migration `0141`.
+
+**What the sheets say.** 81 of the response options carry a blank ("Yes —
+names: ____", "Cancelled — reason: ____"), say *(specify)* or *describe*,
+or are simply **Other**. 26 of those are the bare word, with nothing after
+it, and the sheets are not consistent about which "Other" gets a
+*(specify)*.
+
+**What was built.** All 81 have `allows_free_text = true`, and choosing
+one requires the record's `<field>_other` text (`guard_rmth_other` on the
+columns, `guard_khld_option` on the multi-selects). A bare "Other" is
+treated exactly like "Other (specify)". The alternative — an "Other" that
+cannot say what it was — is the OQ-28 defect, and an option that records
+only that something unlisted happened is a figure nobody can disaggregate.
+
+**Why it is a question.** It is a stricter rule than the paper: an
+enumerator who ticks Other on paper and writes nothing can file the paper
+and cannot save the screen. The 26 are the ones to confirm.
+
+**Decides.** M&E lead. If any of the 26 should stay a plain answer, it is
+one `update ... set allows_free_text = false`, recorded in
+`catalogue.LIST_FIXES` so the generator still reproduces `0141`–`0143`
+(the `d2_duplicate_check.yes` correction in `0147` is the pattern).
+
+---
+
+## 🟡 OQ-54 · Khalidiyah asks disability the Washington Group way; Sahel Horan and Ramtha do not
+
+**Added 21 September 2026**, with migration `0141`.
+
+**What the sheets say.** Khalidiyah's disability question is the Washington
+Group short set — *"Do you have difficulty doing any of the following:
+seeing, hearing, walking or climbing steps, remembering or concentrating,
+self-care, communicating?"* — with four degrees and *Prefer not to say*.
+Sahel Horan's `ref_disability_type` is a list of impairments, and Ramtha's
+list follows Sahel Horan's, because neither of those workbooks named an
+instrument.
+
+**What was built.** `ref_khld_disability` carries Khalidiyah's five answers
+verbatim, on Khalidiyah's own rows. It is not mapped onto
+`ref_disability_type`, and no Khalidiyah form writes `person.has_disability`
+or `person.disability_type_id`. A cross-municipality disability figure
+would be adding two different questions, and no report asks for one.
+
+**Why it is recorded.** So nobody "harmonises" the three lists later. The
+asymmetry is the workbooks', not a defect: Khalidiyah's instrument is the
+international one and it is the other two that name none.
+
+**Decides.** Enabel, if a platform-wide disability figure is ever wanted:
+which question the other two municipalities should ask. Until then the
+three are reported separately and labelled.
+
+---
+
+## 🟠 OQ-55 · Khalidiyah records nationality and status on its own rows, as at the activity; `person.is_refugee` is not written
+
+**Added 21 September 2026**, with migration `0145` (plan decision D4).
+
+**What the sheets say.** Khalidiyah's status list is *Jordanian (host
+community) · Syrian refugee registered with UNHCR · Syrian, not registered
+· Other nationality · Prefer not to say*. The shared `person.is_refugee`
+boolean cannot express registered versus unregistered — the distinction
+the UNHCR number exists for — and `person.nationality_id` reads Sahel
+Horan's list.
+
+**What was built.** Every Khalidiyah form that asks status stores the
+answer on its own record (`nationality_id → ref_khld_nationality`), at the
+time of the activity. A person who registers with UNHCR between two
+activities has two different answers, and both are right. Nothing in
+`0138`–`0148` reads or writes `person.is_refugee` or
+`person.nationality_id`.
+
+**Why it is a question.** Sahel Horan's and Ramtha's refugee figures read
+`person.is_refugee`. A person who appears in two programmes could be a
+Syrian refugee on a Khalidiyah row and `is_refugee = false` on the shared
+row, and each programme's figure would be internally consistent and
+mutually contradictory. Today no person is in two programmes.
+
+**Decides.** M&E lead: whether a Khalidiyah status of *Syrian refugee*
+(registered or not) should ever update `person.is_refugee`. If yes, it is
+a one-way write on save, dated; if no, the two figures are documented as
+answering different questions.
+
+---
+
+## 🔴 OQ-56 · Two of the four milestone rules point at fields that cannot be "In place"
+
+**Added 21 September 2026**, with migration `0147` (plan Part 7).
+
+**What the sheets say.** Each milestone sheet ends with a calculation line
+naming the checklist items that must all be *In place* for the milestone
+to read *Established*, by the sheet's own **No.** column:
+
+| Milestone | Rule, verbatim | Where the numbers land |
+|---|---|---|
+| SO1-A1 | *"Status = 'Established' only when items 4, 7, 10 and 11 are all recorded 'In place'"* | 4 is `period_covered` (**text**), 10 is `stakeholder_updated` (**date**). Neither can be In place. |
+| SO1-B1 | *"Status = 'Established' when items 3, 4, 6, 7 and 8 are all 'In place'"* | 4 is `protocol_ref` (**text**). |
+| SO3-E1 | *"Status = 'Established' when items 5, 6, 8 and 10 are all in place"* | All four are checklist rows. |
+| SO3-F1 | *"Status = 'Established' when items 3, 5, 7 and 9 are all in place"* | All four are checklist rows. |
+
+The sheets' *Notes* column marks a different set *Required for
+Established* on three of the four: **5, 8, 11, 12** on SO1-A1 (the rule's
+numbers plus one, and the definition's four components), **3, 5, 7, 8, 10**
+on SO1-B1, and **3, 5, 8, 10** on SO3-F1 (`roles_defined` and
+`coordination_procedure` rather than `registration_form` and
+`assignment_procedure`). The plan (7.1) read SO3-E1 as having no rule at
+all; the sheet has one, and it is valid.
+
+**What was built.** `khld_milestone_rule` holds each rule's source text,
+its source numbers and its *critical items* as data, and
+`guard_khld_milestone_rule` refuses any critical item that is not a
+checklist row of that milestone — so the two broken rules are stored with
+`critical_items = null`, and `khld_milestone_status` answers
+`not_computable` for them, naming the broken references (*"4 =
+period_covered (text), 10 = stakeholder_updated (date)"*). SO3-E1 and
+SO3-F1 compute as written. The boundary the sheet leaves undefined (7.3)
+is: Established when every critical item is In place; Not established when
+none is In place or Partly; Partly established otherwise. Only Established
+counts.
+
+**Why nothing was inferred.** SO1-A1 looks like its numbers shifted when
+fields were inserted, but the shift is not consistent and the Notes column
+disagrees with the rule on three sheets. A guessed rule is a milestone in
+a donor report.
+
+**Interim behaviour.** The four checklists are fully usable; every row is
+recorded. Two milestone statuses read *not computable* with the reason,
+and their indicators (KHLD-SO1-A1, KHLD-SO1-B1) will read the same.
+
+**Decides.** M&E lead, per milestone: the critical items, by field name
+not number. Deciding is an `update public.khld_milestone_rule set
+critical_items = array[...]` as a coordinator — the trigger validates it,
+stamps `decided_by` and `decided_on`, and the status computes from the next
+read. Never a migration. The SO3-F1 disagreement between the rule and the
+Notes column is the third question in the same update.
+
+---
+
+## 🟠 OQ-57 · A person can now exist with neither an age nor a date of birth, when a sheet records a band only
+
+**Added 21 September 2026**, with migration `0148`.
+
+**What the sheets say.** SO4-G1 identifies the enterprise owner by national
+ID or UNHCR number and records their age as one of the seven bands (field
+6, *Age group*) — no date of birth and no age in years, by design:
+`01_GUIDANCE` collects personal data *only where the indicator requires*.
+The other two identifying sheets (SO3-F2, SO4-H2) collect a date of birth
+or an age.
+
+**What was built.** `person.age_or_dob` (0004) required one of the two for
+every person and refused the enterprise owner outright — the `0148` probe
+found it. The constraint keeps its name and is widened by one column:
+`age_unrecorded_reason`, allowed value `khld_band_only`, which
+`khld_ensure_person` sets when a Khalidiyah form creates a person with
+neither. A person therefore has an age, or a date, or a **recorded reason
+for having neither**; a Sahel Horan or Ramtha insert without an age is
+refused exactly as before (the reason is never set for them — the probe
+checks that too). The row says why the field is empty rather than carrying
+a guessed number, which is `0063`'s rule about by-product rows.
+
+**What it changes elsewhere.** `age_band()` and `khld_age_band()` both
+answer `not_recorded` for such a person, so a Sahel Horan or Ramtha view
+that ever met one would report them in the not-recorded band. The
+Khalidiyah views read the band from the record, where the sheet put it.
+
+**Why it is a question.** The alternative was to ask G1 for a date of
+birth the sheet does not ask for, against the guidance's data-minimisation
+rule — a form the clerk could not complete from the paper. This was the
+smaller change, but it is a change to a shared table's invariant.
+
+**Decides.** M&E lead, with the Municipality: whether SO4-G1 should collect
+the owner's date of birth after all (then the column stays as history and
+the form gains a field), or whether the band is enough (then this is
+closed).

@@ -671,6 +671,7 @@ period_dates
 person_activity_type_activity_type_id_fkey
 person_activity_type_person_id_fkey
 person_activity_type_pkey
+person_age_unrecorded_reason_known
 person_agri_involvement_id_fkey
 person_auth_user_id_fkey
 person_auth_user_id_key
