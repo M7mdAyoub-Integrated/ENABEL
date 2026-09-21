@@ -380,16 +380,17 @@ than no summary — a reader counts nine reds and stops looking.
 |---|---|---|
 | 🔴 Blocks a reported number | 13 | OQ-1, OQ-2, OQ-3, OQ-4, OQ-5, OQ-12, OQ-25, OQ-32, OQ-40, OQ-44, OQ-47, OQ-48, OQ-56 |
 | 🟠 Affects the schema, the forms or a permission | 25 | OQ-6, OQ-7, OQ-8, OQ-9, OQ-10, OQ-11, OQ-13, OQ-14, OQ-21, OQ-26, OQ-27, OQ-28, OQ-29, OQ-35, OQ-36, OQ-37, OQ-39, OQ-41, OQ-43, OQ-45, OQ-49, OQ-51, OQ-52, OQ-55, OQ-57 |
-| 🟡 Wording and presentation | 13 | OQ-15, OQ-16, OQ-17, OQ-18, OQ-19, OQ-20, OQ-33, OQ-34, OQ-38, OQ-46, OQ-50, OQ-53, OQ-54 |
+| 🟡 Wording and presentation | 14 | OQ-15, OQ-16, OQ-17, OQ-18, OQ-19, OQ-20, OQ-33, OQ-34, OQ-38, OQ-46, OQ-50, OQ-53, OQ-54, OQ-58 |
 | 🟢 Resolved, fixed or moot | 6 | OQ-22, OQ-23, OQ-24, OQ-30, OQ-31, OQ-42 |
 
-**51 open, 6 closed, 57 in total.**
+**52 open, 6 closed, 58 in total.**
 
-Updated 21 September 2026: OQ-52 to OQ-57 are added with the Khalidiyah
-migrations `0138`–`0148` — the UNHCR number's format, the bare "Other",
+Updated 21 September 2026: OQ-52 to OQ-58 are added with the Khalidiyah
+migrations `0138`–`0150` — the UNHCR number's format, the bare "Other",
 the disability instrument, status as at the activity, the two milestone
-rules that name a text and a date as things to be "In place", and the
-person a band-only sheet creates. **OQ-56 is the one to read**: two of the
+rules that name a text and a date as things to be "In place", the person
+a band-only sheet creates, and the five calculation lines that number
+their indicator question wrongly. **OQ-56 is the one to read**: two of the
 four milestones cannot compute until the M&E lead names their critical
 items, and the platform says so rather than guessing.
 
@@ -2139,3 +2140,43 @@ smaller change, but it is a change to a shared table's invariant.
 the owner's date of birth after all (then the column stays as history and
 the form gains a field), or whether the band is enough (then this is
 closed).
+
+---
+
+## 🟡 OQ-58 · Five Khalidiyah calculation lines number their indicator question wrongly; the marked field governs
+
+**Added 21 September 2026**, with migration `0150`.
+
+**What the sheets say.** Each form's head block gives the calculation, and
+five of them name a question by number:
+
+| Form | The calculation says | The field the sheet MARKS (Notes column) |
+|---|---|---|
+| KHLD-IMP-0 | *"'Strongly agree' or 'Agree' to Q15"* | field 17, `opportunity_increase` — *INDICATOR QUESTION* |
+| KHLD-SO1-0 | *"'Strongly agree' or 'Agree' on Q14"* | field 17, `q_improved` — *INDICATOR QUESTION* |
+| KHLD-SO2-0 | *"'Very satisfied' or 'Satisfied' on Q9"* | field 9, `overall_satisfaction` — *INDICATOR QUESTION* (agrees) |
+| KHLD-SO3-0 | *"Use Q12 as the numerator test"* | field 11, `activities_count` — *INDICATOR TEST* |
+| KHLD-SO4-0 | *"'Yes, significantly' or 'Yes, to some extent' to Q20"* | field 22, `overall_opportunity` — *INDICATOR QUESTION* |
+| KHLD-SO1-A2 | *"only meetings where Q18 = 'Yes, prepared and filed'"* | field 21, `minutes_prepared` — *Counting condition* |
+
+On four of the five, the number in the calculation is not the number of
+the marked field, and on none of the four does the numbered field carry
+the options the calculation names (IMP-0's field 15 is `mixed_presence`,
+whose options are *Yes, both regularly / Yes, sometimes / ...*; there is
+no *Agree* to select). The numbering looks like the question numbering of
+an earlier draft of each sheet, before the header fields were inserted.
+
+**What was built.** Every view in `0150` reads the MARKED field, because it
+is the one whose options the calculation names and the one the enumerator
+is told is the indicator question. The formula stored on
+`indicator.formula` is the sheet's text verbatim, wrong number included,
+so the dashboard shows the source and the view comment says which field
+implements it.
+
+**Why it is a question.** A reader checking a figure against the sheet
+will count from the wrong line. It costs nothing in the data; it costs a
+conversation every audit.
+
+**Decides.** M&E lead: correct the five numbers in the sheets (Q17, Q17,
+Q11, Q22, Q21). Then `indicator.formula` is regenerated from the corrected
+workbook by `gen_0149.py`; the views do not change.
