@@ -95,17 +95,19 @@ begin
 
   begin
     -- 2. a published future activity is listed; an unpublished one, a past
-    --    one and a deleted one are not
+    --    one and a deleted one are not. Each list's first option that takes
+    --    no free text: the first feedback_collected option carries a blank,
+    --    and guard_rmth_other refused the probe for its missing *_other.
     insert into public.khld_activity (municipality_id, event_title, event_date, location_id, activity_type_id, calendar_status_id,
                                       frequency_type_id, organiser_id, partner_count, content_summary, participants_planned,
                                       participants_actual, cash_cost_jod, feedback_collected_id, lessons, is_published)
-    select v_khld, '0152 probe open day', current_date + 30, (select id from public.ref_khld_d1_location order by sort_order limit 1),
-           (select id from public.ref_khld_d1_activity_type order by sort_order limit 1),
-           (select id from public.ref_khld_d1_calendar_status order by sort_order limit 1),
-           (select id from public.ref_khld_d1_frequency_type order by sort_order limit 1),
-           (select id from public.ref_khld_d1_organiser order by sort_order limit 1),
+    select v_khld, '0152 probe open day', current_date + 30, (select id from public.ref_khld_d1_location where not allows_free_text order by sort_order limit 1),
+           (select id from public.ref_khld_d1_activity_type where not allows_free_text order by sort_order limit 1),
+           (select id from public.ref_khld_d1_calendar_status where not allows_free_text order by sort_order limit 1),
+           (select id from public.ref_khld_d1_frequency_type where not allows_free_text order by sort_order limit 1),
+           (select id from public.ref_khld_d1_organiser where not allows_free_text order by sort_order limit 1),
            0, '0152 probe summary', 10, 0, 0,
-           (select id from public.ref_khld_d1_feedback_collected order by sort_order limit 1), '-', true
+           (select id from public.ref_khld_d1_feedback_collected where not allows_free_text order by sort_order limit 1), '-', true
     returning id into v_act;
     insert into public.khld_activity (municipality_id, event_title, event_date, location_id, activity_type_id, calendar_status_id,
                                       frequency_type_id, organiser_id, partner_count, content_summary, participants_planned,

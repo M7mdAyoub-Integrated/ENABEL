@@ -256,3 +256,18 @@ People under 18: **0**, including soft-deleted rows
 - `check_function_reversions.py`: 16 flags, the calibration count
 - app: all seven `check-*.mjs`, `tsc -b`, `eslint --max-warnings=0`: PASS
 - `git status`: clean at `20a9959` apart from the three Khalidiyah source files
+
+## Compared 22 September 2026, after 0152 and the probe clean-up
+
+Same queries, same connection. The 37-line matrix reads
+`c9d7dedc923819cf9a0b5164d47a38c1` — identical. All seven per-municipality view
+hashes identical (`0bad6f26…`, `7a7e1045…`, `15987387…`, `80111f91…`, `208d1a04…`,
+`1edea0a1…`, `661c10c7…`); Khalidiyah's own rows are 273 in each of
+`v_indicator_actual` and `v_indicator_progress`, under the third id. Every table's
+counts identical except the growth this file predicted — `activity` 12→20,
+`objective` 9→14, `indicator` 38→59, `indicator_target` 494→767, `reporting_period`
+26→39, `municipality` 2→3, `app_user` 8→9, `audit_log` 3402→5128 — the new
+`khld_*` and `indicator_plan_target` lines, and **`person` 14/3 → 14/5**: the two
+probe people the Khalidiyah screens were driven with (`399000980`, `399000981`),
+soft-deleted with their records as the Khalidiyah coordinator; the live count is
+unchanged. `check_migration_files.sh`: exact=151, PASS.

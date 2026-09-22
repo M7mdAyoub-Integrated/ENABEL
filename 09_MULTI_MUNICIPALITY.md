@@ -1272,7 +1272,7 @@ made by the verification. The super admin is back to acting nowhere.
 
 ---
 
-## Part 12 — the third municipality: Al Khalidiyah (21–22 September 2026, migrations 0138–0151, `0152` pending, `supabase/khalidiyah`, `app/src/khld`)
+## Part 12 — the third municipality: Al Khalidiyah (21–22 September 2026, migrations 0138–0152, `supabase/khalidiyah`, `app/src/khld`)
 
 How Khalidiyah was added beside the other two, following
 `KHALIDIYAH_IMPLEMENTATION_PLAN.md`, and where this build departed from it
@@ -1553,17 +1553,24 @@ mention of applications or accounts. `publicJourney(code)` decides which
 page a slug gets; the D1 and H1 record screens carry the coordinator's
 publish switch, because no sheet has a field for `is_published`.
 
-The view behind it, `v_public_khld_whats_on`, is 0152 — **written as
-`PENDING_0152_…` and not applied**: the Supabase MCP could not be reached
-from the session that wrote it. Its verify block asserts the anon surface
-grew by exactly one view, drives the view as anon (published and future
-listed; unpublished, past and deleted not; no route to the base table), and
-rolls its probe back. Until it is applied and renamed,
-`check_migration_files.sh` reports it `NOT APPLIED`, and the page shows its
-loading state rather than an empty list — which found a defect in the
-existing public home: a query paused between retries rendered "nothing
-open", the register's list that says none yet. Both pages now render the
-empty state only from a query that succeeded.
+The view behind it, `v_public_khld_whats_on`, is 0152: security definer
+over the two base tables and their ref lists, the four filters in the view,
+the sixth and only new anon grant. It was written as `PENDING_0152_…` while
+the Supabase MCP could not be reached, and applied once it could: its verify
+block asserts the anon surface grew by exactly one view, drives the view
+**as anon** (published and future listed; unpublished, past and deleted
+not; no route to the base table), and rolls its probe back. The first
+attempt was refused by `guard_rmth_other` — the probe had picked the first
+`feedback_collected` option, which carries a blank — and rolled back
+cleanly; the probe now picks each list's first option that takes no free
+text. Read through the REST API with the anon key the view answers 200 and
+the base table 42501.
+
+Writing the page before the view existed found a defect in the existing
+public home: a query paused between retries (react-query reports pending,
+not fetching, not error) rendered "nothing open" — the register's list
+that says none yet. Both public pages now render the empty state only from
+a query that succeeded.
 
 ### Departures from the plan, and what it left open
 
@@ -1581,14 +1588,26 @@ empty state only from a query that succeeded.
   disaggregated` view was built, and the panel says so from
   `is_disaggregable` as it does for Ramtha. The person-level rows carry
   every dimension, so it is a view away.
-- **Verification still owed to the MCP**: the role tests as the three
-  admins across every scoped table, the removal of the probe rows the app
-  drove (listed in `KHALIDIYAH_REPORT.md`), and the final comparison
-  against `supabase/baselines/2026-09-21_all_before_khalidiyah.md`. 0149
-  and 0150 assert the five view hashes and every Sahel Horan and Ramtha
-  row of `v_indicator_actual` unchanged; the whole-baseline comparison has
-  not been re-run since 0151.
-- **`types/database.ts` is not regenerated** for 0138–0151. Every
-  Khalidiyah read and write goes through loosely typed handles by name,
-  as Ramtha's do, so `tsc` is clean without it; regenerate and strip when
-  the MCP is back.
+- **Verification** (plan Part 11), done on 22 September once the MCP was
+  reachable again. Isolation: the five account shapes over 27 Khalidiyah
+  tables holding 58 rows, in a rolled-back transaction — the Khalidiyah
+  admin and the super admin acting on Khalidiyah see every row; the Ramtha
+  admin, the Sahel Horan coordinator and the super admin acting on Ramtha
+  see none; the super admin acting nowhere sees every municipality, which
+  `can_see_municipality` (0117) says. The Ramtha admin writing into
+  Khalidiyah three ways left 0 rows, counted. The probe rows the screens
+  were driven with — persons `399000980` and `399000981`, KHLD-VOL-0001
+  and its participation, KHLD-EV-2027-01 with its attendance sheet and
+  feedback row, KHLD-VC-2027-01, the SO3-F1 verification, *App Probe
+  Association* and its survey, KHLD-ENT-001 with its completion,
+  KHLD-ENT-002 — are **soft-deleted** as the Khalidiyah coordinator
+  through RLS, every row counted, the way the Ramtha probes were; 0 live
+  Khalidiyah rows remain and the reference counters stay. The whole of
+  `supabase/baselines/2026-09-21_all_before_khalidiyah.md` was re-run: the
+  matrix and all seven view hashes identical, every table's counts
+  identical except the lines the baseline said would grow and `person`
+  14/3 → 14/5 (the two probe people, soft-deleted).
+- **`types/database.ts`** regenerated at head 0152 and stripped. The six
+  mock people gained `age_unrecorded_reason: null`; nothing else changed,
+  because every Khalidiyah read and write goes through a loosely typed
+  handle by name, as Ramtha's do.

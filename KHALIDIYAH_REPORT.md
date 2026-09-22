@@ -6,14 +6,13 @@ Part 12 asks for. The full account, part by part, is
 are OQ-52 to OQ-58 in `06_OPEN_QUESTIONS.md`. This is the short version, for
 the M&E lead.
 
-What exists: migrations `0138`–`0151` (fourteen, every one byte-identical
-to the ledger), one more written and **not yet applied** (`0152`, section
-7), the `evidence` Edge Function at version 5, Khalidiyah's twenty-one forms
-as screens with one save path, twenty-one indicators with twenty-one views,
-the same dashboard as the other two municipalities with a third entry, a
-Milestone rules screen, and a public page that lists what is on. Sahel
-Horan's twenty indicators and Ramtha's eighteen are asserted unchanged by
-the migrations that could have moved them (section 8).
+What exists: migrations `0138`–`0152` (fifteen, every one byte-identical
+to the ledger), the `evidence` Edge Function at version 5, Khalidiyah's
+twenty-one forms as screens with one save path, twenty-one indicators with
+twenty-one views, the same dashboard as the other two municipalities with a
+third entry, a Milestone rules screen, and a public page that lists what is
+on. Sahel Horan's twenty indicators and Ramtha's eighteen read exactly as
+they did in the baseline taken before any of it (section 8).
 
 ---
 
@@ -156,52 +155,64 @@ rest.
 - Everything else on a Khalidiyah screen — questions, options, section
   headings, notes, the indicator statements — is the sheets' own Arabic.
 
-## 7. What is not finished, and what it needs
+## 7. Verification, and the one thing not built
 
-The Supabase MCP could not be reached from the session that finished the
-app, so four things are written and not done:
+Done on 22 September 2026, after the app was finished:
 
-1. **`0152` — the public view.** `supabase/migrations/PENDING_0152_
-   khalidiyah_public_whats_on.sql` is in the repository and **not
-   applied**. `check_migration_files.sh` reports it `NOT APPLIED` until it
-   is applied through the MCP, renamed with `finish_pending_migration.sh`,
-   and its verify block — which drives the view **as anon** and asserts the
-   anon surface grew by exactly one view — has run. Until then
-   `/khalidiyah` shows its loading state, never an empty list.
-2. **The probe rows** the screens were driven with, all created on 22
-   September 2026 by `admin@khalidiyah.test` and all still live. They
-   should be removed as the owner (plan Part 11, *clean up*), and they are
-   the complete list: persons `399000980` (App Probe Volunteer One) and
-   `399000981` (App Probe Owner); `khld_volunteer` KHLD-VOL-0001 and its
-   participation on KHLD-VC-2027-01; `khld_activity` KHLD-EV-2027-01 (App
-   Probe Open Day) with its `khld_attendance` sheet and its `khld_user_
-   feedback` row; `khld_campaign` KHLD-VC-2027-01; the SO3-F1
-   `khld_milestone_verification` of 20 April 2027; `khld_partner` *App
-   Probe Association* and its `khld_partner_survey`; `khld_enterprise`
-   KHLD-ENT-001 (App Probe Owner's) with its `khld_guidance_completion`,
-   and KHLD-ENT-002 (App Probe Soaps); plus every option, count, checklist
-   and rating row hanging off them. Leave the reference counters where they
-   are.
-3. **The isolation and baseline checks** of plan Part 11: every scoped
-   table read as the five account shapes, and the whole of
-   `supabase/baselines/2026-09-21_all_before_khalidiyah.md` re-run. 0140,
-   0149 and 0150 assert the pieces that could have moved (the two other
-   municipalities' figures, the five view hashes, every Sahel Horan and
-   Ramtha row of `v_indicator_actual`); the full comparison has not been
-   re-run since 0151.
-4. **`types/database.ts`** is at head 0135. Every Khalidiyah read and
-   write goes through a loosely typed handle by name, so the build is
-   clean without it; regenerate and strip when the MCP is back.
+1. **`0152` — the public view** — applied, renamed to its ledger version,
+   its verify block run: the anon surface is six views and four RPCs, the
+   view is security definer, and **as anon** a published future activity is
+   listed while an unpublished, a past and a deleted one are not, with no
+   route to the base table. Read through the REST API with the anon key:
+   the view answers 200 with the one published probe activity; the base
+   table answers 42501. `/khalidiyah` showed it in both languages.
+2. **Isolation**, as the five account shapes over 27 Khalidiyah tables
+   holding 58 rows, in a rolled-back transaction: the Khalidiyah admin and
+   the super admin acting on Khalidiyah see every row; the Ramtha admin,
+   the Sahel Horan coordinator and the super admin acting on Ramtha see
+   none; the super admin acting nowhere sees every municipality, which is
+   the platform's own rule (`can_see_municipality`, 0117). The Ramtha admin
+   writing into Khalidiyah — an insert naming Khalidiyah's id, an update of
+   its rows, `save_khld_record` with `municipality_id` in the row — left 0
+   rows, counted, not trusted from the error.
+3. **The probe rows** the screens were driven with are **soft-deleted**, the
+   way the Ramtha probes were, as the Khalidiyah coordinator through RLS,
+   every row counted: eleven records, two entities and two people
+   (`399000980`, `399000981`), 0 live Khalidiyah rows after. They remain
+   under *Show deleted*; the reference counters are left where they are.
+   If the M&E lead prefers them gone, that is an owner's delete of the rows
+   named in `09_MULTI_MUNICIPALITY.md` Part 12.
+4. **The baseline.** The full comparison against `supabase/baselines/
+   2026-09-21_all_before_khalidiyah.md` was re-run after 0152 and the
+   clean-up (section 8).
+5. **`types/database.ts`** regenerated at head 0152 and stripped; `tsc`
+   and `eslint` clean.
 
-And one thing the plan asks for that was not built: the **disaggregation
-panel** for Khalidiyah's seven age bands and nationality list. The rows
-carry every dimension; the breakdown view does not exist yet, and the panel
-says so from the data rather than from a sentence.
+One thing the plan asks for was not built: the **disaggregation panel**
+for Khalidiyah's seven age bands and nationality list. The rows carry
+every dimension; the breakdown view does not exist yet, and the panel says
+so from the data rather than from a sentence.
 
 ## 8. Sahel Horan and Ramtha are untouched
 
+Compared on 22 September 2026, after 0152 and the clean-up, against
+`supabase/baselines/2026-09-21_all_before_khalidiyah.md`:
+
+- the 37-line indicator matrix (`v_indicator_actual`, both municipalities):
+  `c9d7dedc923819cf9a0b5164d47a38c1` — **identical**;
+- every one of the seven per-municipality view hashes — `v_indicator_actual`
+  SHM `0bad6f26…` / RMTH `7a7e1045…`, `v_indicator_progress` SHM
+  `15987387…` / RMTH `80111f91…`, `v_indicator_disaggregated` SHM
+  `208d1a04…`, `v_rmth_indicator_status` `1edea0a1…`,
+  `v_rmth_indicator_unique` `661c10c7…` — **identical**;
+- every non-`ref_` table's live / soft-deleted counts identical, except the
+  lines the baseline said would grow — `activity` 12→20, `objective` 9→14,
+  `indicator` 38→59, `indicator_target` 494→767, `reporting_period` 26→39,
+  `municipality` 2→3, `app_user` 8→9, `audit_log` — and `person` 14/3 →
+  14/5: the two probe people, soft-deleted, the live count unchanged.
+
 Nothing of theirs was modified except the two shared-table changes the plan
-required (D1, D3), and each migration that could have moved a figure
+required (D1, D3), and each migration that could have moved a figure also
 asserts it did not: 0138 (every existing person still has a national ID),
 0139 (every per-municipality view hash before and after), 0140 (twenty
 Sahel Horan and seventeen Ramtha branches with a third `27/Q1` present),
@@ -216,12 +227,13 @@ it.
 
 ## What to do next, in order
 
-1. Apply `0152` through the MCP and rename it; open `/khalidiyah` as a
-   visitor and publish one activity from its record screen to see it.
-2. Remove the probe rows in section 7.2 and re-run the baseline comparison.
-3. Decide the two milestone rules and confirm the third on `/khld/rules`
+1. Decide the two milestone rules and confirm the third on `/khld/rules`
    (section 2).
-4. Correct the five question numbers in the sheets (section 3) and
+2. Correct the five question numbers in the sheets (section 3) and
    regenerate `0149`'s successor from the corrected workbook.
-5. Answer OQ-52 (the UNHCR format), OQ-55 (`is_refugee`) and OQ-57 (a
+3. Answer OQ-52 (the UNHCR format), OQ-55 (`is_refugee`) and OQ-57 (a
    band-only person) — all three are the M&E lead's.
+4. Say whether the soft-deleted probe rows (section 7.3) should be removed
+   outright.
+5. Ask for the breakdown view when the disaggregation panel is wanted
+   (section 7).
