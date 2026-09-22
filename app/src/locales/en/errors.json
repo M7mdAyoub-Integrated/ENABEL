@@ -39,7 +39,17 @@
     "ownAccount": "You cannot deactivate your own account. Another super admin can.",
     "lastSuperAdmin": "This is the last active super admin. Create another before removing this one.",
     "superAdminOnlyRow": "Only a super admin can change a super admin account.",
-    "superAdminOnlyMove": "Only a super admin can move an account to another municipality."
+    "superAdminOnlyMove": "Only a super admin can move an account to another municipality.",
+    "khldVolunteerRegistered": "This person is already registered as a volunteer. Open their registration instead of adding another.",
+    "khldAttendanceExists": "An attendance sheet already exists for this activity. Open it and edit it.",
+    "khldSupportLogExists": "A support log already exists for this enterprise. Open it and add to it.",
+    "khldCompletionExists": "This enterprise already has a completion record for that cycle year.",
+    "khldPartnerExists": "A partner with this name is already on file. Pick it from the list.",
+    "khldPartnerSurveyed": "This partner has already answered this survey round.",
+    "khldVendorRegistered": "This vendor is already registered for this market day.",
+    "khldConsentData": "Registration cannot proceed without the volunteer's consent to keep their details.",
+    "khldSafetyCommitment": "Registration cannot proceed without the volunteer's commitment to the safety instructions.",
+    "khldParticipationExists": "This volunteer is already listed on this occasion."
   },
   "state": {
     "failedTitle": "Could not load",

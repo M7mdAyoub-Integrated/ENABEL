@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/check-no-demo-credential.mjs && node scripts/check-constraint-names.mjs && node scripts/check-soft-delete-guards.mjs && node scripts/check-untranslated.mjs && node scripts/check-module-keys.mjs && node scripts/check-rmth-forms.mjs && node scripts/check-elsewhere-routes.mjs && tsc -b && eslint . --max-warnings=0 && vite build",
+    "build": "node scripts/check-no-demo-credential.mjs && node scripts/check-constraint-names.mjs && node scripts/check-soft-delete-guards.mjs && node scripts/check-untranslated.mjs && node scripts/check-module-keys.mjs && node scripts/check-rmth-forms.mjs && node scripts/check-khld-forms.mjs && node scripts/check-elsewhere-routes.mjs && tsc -b && eslint . --max-warnings=0 && vite build",
     "postbuild": "node scripts/check-no-demo-credential.mjs --bundle",
     "lint": "eslint . --max-warnings=0",
     "preview": "vite preview",
@@ -14,7 +14,8 @@
     "check:constraints": "node scripts/check-constraint-names.mjs",
     "check:modulekeys": "node scripts/check-module-keys.mjs",
     "check:elsewhere": "node scripts/check-elsewhere-routes.mjs",
-    "check:rmthforms": "node scripts/check-rmth-forms.mjs"
+    "check:rmthforms": "node scripts/check-rmth-forms.mjs",
+    "check:khldforms": "node scripts/check-khld-forms.mjs"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",

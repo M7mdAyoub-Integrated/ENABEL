@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import { unwrapList } from './errors'
+import { formatJOD } from '../lib/format'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -103,28 +104,56 @@ export type IndicatorSource = {
 }
 
 /**
- * Why a row has no figure, from `v_rmth_indicator_status` (0132), which reads
- * the same rows the views do -- so the screen and the figure cannot disagree.
+ * Why a row has no figure, from `v_rmth_indicator_status` (0132) and
+ * `v_khld_indicator_status` (0150), each of which reads the same rows its
+ * programme's views do -- so the screen and the figure cannot disagree.
  *
- *   threshold_unset   the view returns null because a definition in
- *                     `rmth_threshold` is still null; `missing_keys` names it
- *   no_statement      the framework gives the code and no indicator text
+ *   threshold_unset      the view returns null because a definition in
+ *                        `rmth_threshold` is still null; `missing_keys` names it
+ *   no_statement         the framework gives the code and no indicator text
+ *   rule_not_evaluable   a Khalidiyah milestone's rule names items that are
+ *                        not checklist rows (OQ-56); `detail` names them
  *
- * The view is Ramtha's, because only Ramtha has undecided definitions, and it
- * is queried for every municipality anyway: the alternative is a branch on the
- * municipality's code in the component, which is the shape that put Sahel
- * Horan's copy on an advisory screen. For Sahel Horan it returns no rows, and
- * no row is marked not computable -- which is the truth, not a special case.
+ * Both views are queried for every municipality: the alternative is a branch
+ * on the municipality's code in the component, which is the shape that put
+ * Sahel Horan's copy on an advisory screen. Each view answers only its own
+ * programme's rows; for Sahel Horan neither returns any, and no row is marked
+ * not computable -- which is the truth, not a special case.
  */
 export type IndicatorStatusRow = {
   code: string
   full_code: string
-  reason: 'no_statement' | 'threshold_unset' | null
+  reason: 'no_statement' | 'threshold_unset' | 'rule_not_evaluable' | null
   missing_keys: string[] | null
+  /** Khalidiyah: the rule's broken references, `4 = period_covered (text), ...`. */
+  detail?: string | null
+  milestone_code?: string | null
 }
 
-/** "Of whom unique" beside a completion count, from `v_rmth_indicator_unique` (0133). */
+/** "Of whom unique" beside a count, from `v_rmth_indicator_unique` (0133) and `v_khld_indicator_unique` (0150). */
 export type IndicatorUniqueRow = { code: string; period_code: string; unique_actual: number }
+
+/**
+ * A target the Plan states for the whole period, by year or as a percentage
+ * (`indicator_plan_target`, 0149): never a quarterly figure, so it sits
+ * beside the quarterly column, which reads "not set". `source_*` is the
+ * framework's sentence verbatim; the typed columns are what could be read
+ * from it. A parent row's children are the shares of one target (SO3-F2's
+ * "of whom >= 40% women").
+ */
+export type PlanTarget = {
+  id: string
+  indicator_code: string
+  parent_id: string | null
+  source_en: string
+  source_ar: string | null
+  basis: 'percentage' | 'annual' | 'plan' | 'range' | 'narrative'
+  minimum: number | null
+  maximum: number | null
+  unit: '#' | '%' | 'JOD' | null
+  subgroup: string | null
+  sort_order: number
+}
 
 /* ── periods ──────────────────────────────────────────────────────────────── */
 
@@ -190,17 +219,36 @@ export function useIndicatorSources(municipalityId: string | null) {
   })
 }
 
+/**
+ * The Khalidiyah views and the plan-target table by name: the generated
+ * types are regenerated with each migration set, and these hooks must not
+ * change with them (see data/khld.ts).
+ */
+type LooseResult = Promise<{ data: unknown; error: unknown }>
+type LooseQuery = LooseResult & {
+  eq: (c: string, v: unknown) => LooseQuery
+  is: (c: string, v: null) => LooseQuery
+  order: (c: string) => LooseQuery
+}
+const loose = supabase as unknown as { from: (t: string) => { select: (c: string) => LooseQuery } }
+
 export function useIndicatorStatus(municipalityId: string | null) {
   return useQuery({
     queryKey: ['indicators', 'status', municipalityId],
     enabled: !!municipalityId,
     staleTime: 60_000,
     queryFn: async (): Promise<IndicatorStatusRow[]> => {
-      const res = await supabase
-        .from('v_rmth_indicator_status')
-        .select('code, full_code, reason, missing_keys')
-        .eq('municipality_id', municipalityId!)
-      return unwrapList(res as unknown as { data: IndicatorStatusRow[] | null; error: unknown })
+      const [rmth, khld] = await Promise.all([
+        supabase
+          .from('v_rmth_indicator_status')
+          .select('code, full_code, reason, missing_keys')
+          .eq('municipality_id', municipalityId!),
+        loose.from('v_khld_indicator_status').select('code, full_code, reason, detail, milestone_code').eq('municipality_id', municipalityId!),
+      ])
+      return [
+        ...unwrapList(rmth as unknown as { data: IndicatorStatusRow[] | null; error: unknown }),
+        ...unwrapList(khld as unknown as { data: IndicatorStatusRow[] | null; error: unknown }).map((r) => ({ ...r, missing_keys: null })),
+      ]
     },
   })
 }
@@ -210,12 +258,38 @@ export function useIndicatorUnique(periodCode: string | undefined, municipalityI
     queryKey: ['indicators', 'unique', municipalityId, periodCode],
     enabled: !!periodCode && !!municipalityId,
     queryFn: async (): Promise<IndicatorUniqueRow[]> => {
-      const res = await supabase
-        .from('v_rmth_indicator_unique')
-        .select('code, period_code, unique_actual')
+      const [rmth, khld] = await Promise.all([
+        supabase
+          .from('v_rmth_indicator_unique')
+          .select('code, period_code, unique_actual')
+          .eq('municipality_id', municipalityId!)
+          .eq('period_code', periodCode!),
+        loose.from('v_khld_indicator_unique').select('code, period_code, unique_actual').eq('municipality_id', municipalityId!).eq('period_code', periodCode!),
+      ])
+      return [
+        ...unwrapList(rmth as unknown as { data: IndicatorUniqueRow[] | null; error: unknown }),
+        // the Khalidiyah view carries a row for every quarter, null until there is a figure
+        ...unwrapList(khld as unknown as { data: IndicatorUniqueRow[] | null; error: unknown }).filter((r) => r.unique_actual !== null),
+      ]
+    },
+  })
+}
+
+/** The Plan's own targets for a municipality: empty for Sahel Horan and Ramtha, whose targets are quarterly. */
+export function usePlanTargets(municipalityId: string | null) {
+  return useQuery({
+    queryKey: ['indicators', 'planTargets', municipalityId],
+    enabled: !!municipalityId,
+    staleTime: 60 * 60_000,
+    queryFn: async (): Promise<PlanTarget[]> => {
+      const res = await loose
+        .from('indicator_plan_target')
+        .select('id, parent_id, source_en, source_ar, basis, minimum, maximum, unit, subgroup, sort_order, indicator:indicator!indicator_plan_target_indicator_id_fkey ( code )')
         .eq('municipality_id', municipalityId!)
-        .eq('period_code', periodCode!)
-      return unwrapList(res as unknown as { data: IndicatorUniqueRow[] | null; error: unknown })
+        .is('deleted_at', null)
+        .order('sort_order')
+      type Raw = Omit<PlanTarget, 'indicator_code'> & { indicator: { code: string } | null }
+      return unwrapList(res as unknown as { data: Raw[] | null; error: unknown }).map(({ indicator, ...r }) => ({ ...r, indicator_code: indicator?.code ?? '' }))
     },
   })
 }
@@ -283,14 +357,26 @@ export function hasTarget(row: IndicatorRow): boolean {
  * CLAUDE.md rule 1: a missing target is not a zero target. Neither is a zero
  * one. Both render as words, never a digit.
  */
-export function targetText(row: IndicatorRow, notSet: string): string {
+export function targetText(row: IndicatorRow, notSet: string, locale = 'en'): string {
   if (!hasTarget(row)) return notSet
-  return row.unit === '%' ? `${row.target}%` : String(row.target)
+  return figureText(row.unit, Number(row.target), locale)
 }
 
-export function actualText(row: IndicatorRow, none: string): string {
+export function actualText(row: IndicatorRow, none: string, locale = 'en'): string {
   if (row.actual === null) return none
-  return row.unit === '%' ? `${row.actual}%` : String(row.actual)
+  return figureText(row.unit, Number(row.actual), locale)
+}
+
+/**
+ * By `indicator.unit`, never by code: '%' and '#' are the only units Sahel
+ * Horan and Ramtha carry, so the JOD branch (Khalidiyah's SO1-A3, 0149)
+ * cannot change a row of theirs. Money is written the platform's way --
+ * three decimals, the currency named.
+ */
+function figureText(unit: string, value: number, locale: string): string {
+  if (unit === '%') return `${value}%`
+  if (unit === 'JOD') return formatJOD(value, locale)
+  return String(value)
 }
 
 /** Bar width. No target means no bar -- not a full one, and not an empty one. */

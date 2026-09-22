@@ -85,6 +85,28 @@ const CONSTRAINT_MESSAGES: Record<string, string> = {
   // The function refuses a blank reason first and names the field; this only
   // surfaces for a write that did not go through it.
   rejected_has_a_reason: 'errors:db.rejectionNeedsReason',
+  // Khalidiyah (0145-0147). The names a form can hit through
+  // save_khld_record, which answers {ok:false, constraint} rather than
+  // throwing; KhldFormScreen's RefusalBand reads them through
+  // constraintMessageKey below. Each read from `supabase/.constraint_names`.
+  khld_volunteer_person_key: 'errors:db.khldVolunteerRegistered',
+  khld_attendance_activity_live: 'errors:db.khldAttendanceExists',
+  khld_enterprise_support_enterprise_live: 'errors:db.khldSupportLogExists',
+  khld_guidance_completion_enterprise_year_live: 'errors:db.khldCompletionExists',
+  khld_partner_name_key: 'errors:db.khldPartnerExists',
+  khld_partner_survey_partner_round_live: 'errors:db.khldPartnerSurveyed',
+  khld_vendor_registration_market_vendor_live: 'errors:db.khldVendorRegistered',
+  khld_volunteer_consent_data_given: 'errors:db.khldConsentData',
+  khld_volunteer_safety_commitment_given: 'errors:db.khldSafetyCommitment',
+  khld_volunteer_participation_campaign_live: 'errors:db.khldParticipationExists',
+  khld_volunteer_participation_action_day_live: 'errors:db.khldParticipationExists',
+  khld_volunteer_participation_activity_live: 'errors:db.khldParticipationExists',
+  khld_volunteer_participation_market_live: 'errors:db.khldParticipationExists',
+}
+
+/** The message key for a constraint a save function REPORTED (rather than threw), or null. */
+export function constraintMessageKey(name: string | null | undefined): string | null {
+  return name ? (CONSTRAINT_MESSAGES[name] ?? null) : null
 }
 
 /** Trigger messages we recognise, matched on a distinctive fragment. */

@@ -15,6 +15,7 @@ import enAuth from '../locales/en/auth.json'
 import enPublic from '../locales/en/public.json'
 import enAccounts from '../locales/en/accounts.json'
 import enRmth from '../locales/en/rmth.json'
+import enKhld from '../locales/en/khld.json'
 
 import arCommon from '../locales/ar/common.json'
 import arNav from '../locales/ar/nav.json'
@@ -27,6 +28,7 @@ import arAuth from '../locales/ar/auth.json'
 import arPublic from '../locales/ar/public.json'
 import arAccounts from '../locales/ar/accounts.json'
 import arRmth from '../locales/ar/rmth.json'
+import arKhld from '../locales/ar/khld.json'
 
 export const SUPPORTED_LOCALES = ['en', 'ar'] as const
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number]
@@ -43,6 +45,7 @@ export const NAMESPACES = [
   'public',
   'accounts',
   'rmth',
+  'khld',
 ] as const
 
 const resources = {
@@ -58,6 +61,7 @@ const resources = {
     public: enPublic,
     accounts: enAccounts,
     rmth: enRmth,
+    khld: enKhld,
   },
   ar: {
     common: arCommon,
@@ -71,6 +75,7 @@ const resources = {
     public: arPublic,
     accounts: arAccounts,
     rmth: arRmth,
+    khld: arKhld,
   },
 } as const
 

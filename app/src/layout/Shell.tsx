@@ -11,6 +11,8 @@ import { EXTERNAL } from '../ui/glyphs'
 import { MunicipalitySwitcher } from '../components/MunicipalitySwitcher'
 import { useCurrentMunicipality, useMunicipalityName, useProgrammeLine } from '../data/municipalities'
 import { RMTH_FORMS, RMTH_FORM_IDS, type RmthFormId } from '../rmth/forms.generated'
+import { KHLD_FORM_IDS } from '../khld/forms.generated'
+import { khldGroupOf } from '../khld/labels'
 import { AccountMenu } from './AccountMenu'
 import { PlatformDialog } from './PlatformDialog'
 import {
@@ -77,6 +79,7 @@ function rmthGroupOf(fid: RmthFormId): 'impact' | 'so1' | 'so2' | 'so3' | undefi
 }
 
 const RMTH_GROUP_ORDER = ['impact', 'so1', 'so2', 'so3'] as const
+const KHLD_GROUP_ORDER = ['impact', 'so1', 'so2', 'so3', 'so4'] as const
 
 /**
  * Two scopes, never mixed.
@@ -240,6 +243,39 @@ function useNavGroups(): Group[] {
       items: [{ to: '/rmth/thresholds', labelKey: 'rmth:nav.thresholds', num: String(n + 1).padStart(2, '0') }],
     })
 
+    return [...platform, ...ordered].filter((g) => g.items.length > 0)
+  }
+
+  // ── Khalidiyah ────────────────────────────────────────────────────────────
+  //
+  // The same replacement as Ramtha's: twenty-one forms under the framework's
+  // five objectives, the group of each derived from its code (khldGroupOf),
+  // then the milestone rules where two of the four milestones wait on a
+  // coordinator's decision (OQ-56).
+  if (municipality?.code === 'KHLD') {
+    const keep = new Set(['/dashboard'])
+    const platform = groups
+      .map((g) => ({ ...g, items: g.items.filter((d) => d.to !== undefined && keep.has(d.to)) }))
+      .filter((g) => g.items.length > 0)
+
+    const byGroup = new Map<string, Dest[]>()
+    let n = 0
+    for (const fid of KHLD_FORM_IDS) {
+      const key = khldGroupOf(fid) ?? 'other'
+      n += 1
+      const dest: Dest = { to: `/khld/${fid}`, labelKey: `khld:forms.${fid}.short`, num: String(n).padStart(2, '0') }
+      byGroup.set(key, [...(byGroup.get(key) ?? []), dest])
+    }
+    const ordered: Group[] = [...KHLD_GROUP_ORDER, 'other']
+      .filter((k) => byGroup.has(k))
+      .map((k) => ({
+        labelKey: k === 'other' ? 'rmth:nav.group.other' : `khld:nav.group.${k}`,
+        items: byGroup.get(k) ?? [],
+      }))
+    ordered.push({
+      labelKey: 'khld:nav.group.definitions',
+      items: [{ to: '/khld/rules', labelKey: 'khld:nav.rules', num: String(n + 1).padStart(2, '0') }],
+    })
     return [...platform, ...ordered].filter((g) => g.items.length > 0)
   }
 

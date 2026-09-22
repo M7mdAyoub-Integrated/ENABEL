@@ -1,11 +1,12 @@
 import { RMTH_FORMS, RMTH_FORM_IDS, type RmthFormId } from '../rmth/forms.generated'
+import { KHLD_FORMS, KHLD_FORM_IDS, type KhldFormId } from '../khld/forms.generated'
 import type { Translate } from '../i18n/tx'
 import type { Dimension } from './disaggregation'
 import type { IndicatorRow, IndicatorSource } from './indicators'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
- *  What differs between the two municipalities' dashboards. Nothing else does.
+ *  What differs between the three municipalities' dashboards. Nothing else does.
  *
  *  One screen (routes/Dashboard.tsx) renders both programmes. The figures,
  *  the objectives, the statements and the reasons a figure is missing all
@@ -72,8 +73,17 @@ export type DashboardConfig = {
   uncollectedDimensions: readonly Dimension[]
   /** Where an undecided definition is decided, if this programme has any. */
   openItemsRoute?: string
+  /** What that screen is called on the link; `indicators:openItems` when unset. */
+  openItemsLabelKey?: string
   /** A locale key explaining why no target exists in any quarter, if there is something to say beyond the fact. */
   noTargetsNoteKey?: string
+  /**
+   * The words for a unique count beside a row's figure, when "unique people"
+   * would be wrong: Khalidiyah's D2 counts distinct individuals out of an
+   * estimated attendance and its H2 unique vendors out of participations,
+   * and the plan says to label both so nobody sums them.
+   */
+  uniqueText?: (code: string, count: number, ctx: LabelContext) => string
 }
 
 /** The framework's own statement, from the view, in the reader's language. */
@@ -210,6 +220,47 @@ const RMTH: DashboardConfig = {
   noTargetsNoteKey: 'indicators:noTargetsNote.RMTH',
 }
 
+/* ── Khalidiyah ──────────────────────────────────────────────────────────── */
+
+/** The form that feeds an indicator, from the catalogue's own `code`, matched on the FULL code. */
+function khldFormFor(fullCode: string | undefined): KhldFormId | undefined {
+  if (!fullCode) return undefined
+  return KHLD_FORM_IDS.find((fid) => (KHLD_FORMS[fid] as { code: string }).code === fullCode)
+}
+
+const KHLD: DashboardConfig = {
+  // Four rows with a form each and a rule that computes -- coordination
+  // meetings, community activities, volunteers recruited, market days. One
+  // per objective; the milestones are left out because two of the four wait
+  // on a decision (OQ-56).
+  kpi: ['A2', 'D1', 'F2', 'H1'],
+  kpiTone: { A2: 'teal', D1: 'green', F2: 'amber', H1: 'raised' },
+  // The form's short name, as in the sidebar. Found by the full code
+  // (`KHLD-SO1-A2`), so `A2` here can only ever be Khalidiyah's.
+  indicatorName: (row, { t, exists, ar, source }) => {
+    const fid = khldFormFor(source?.full_code)
+    const key = fid ? `khld:forms.${fid}.short` : ''
+    return fid && exists(key) ? t(key) : statement(row, ar)
+  },
+  objectiveTitle: (code, row, { t, exists, ar }) => {
+    const key = `khld:objective.${code.toLowerCase()}`
+    return exists(key) ? t(key) : objectiveStatement(row, ar)
+  },
+  sourceLinks: (_row, source) => {
+    const fid = khldFormFor(source?.full_code)
+    return fid ? [{ to: `/khld/${fid}`, labelKey: `khld:forms.${fid}.short` }] : []
+  },
+  // The person-level forms collect sex, the seven age bands, nationality and
+  // status, the Washington Group disability question and the neighbourhood
+  // (0141). Nothing is uncollected by design; what is missing is a breakdown
+  // VIEW, which the panel states from `is_disaggregable`.
+  uncollectedDimensions: [],
+  openItemsRoute: '/khld/rules',
+  openItemsLabelKey: 'khld:nav.rules',
+  noTargetsNoteKey: 'khld:dashboard.planTargetNote',
+  uniqueText: (code, count, { t, exists }) => (exists(`khld:dashboard.unique.${code}`) ? t(`khld:dashboard.unique.${code}`, { count }) : ''),
+}
+
 /* ── the registry ────────────────────────────────────────────────────────── */
 
 /**
@@ -228,7 +279,7 @@ const DATA_ONLY: DashboardConfig = {
   uncollectedDimensions: [],
 }
 
-const CONFIGS: Record<string, DashboardConfig> = { SHM, RMTH }
+const CONFIGS: Record<string, DashboardConfig> = { SHM, RMTH, KHLD }
 
 export function dashboardConfigFor(municipalityCode: string): DashboardConfig {
   return CONFIGS[municipalityCode] ?? DATA_ONLY

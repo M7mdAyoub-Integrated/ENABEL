@@ -22,6 +22,12 @@ import { RmthListScreen } from './rmth/RmthListScreen'
 import { RmthFormScreen } from './rmth/RmthFormScreen'
 import { RmthDetailScreen } from './rmth/RmthDetailScreen'
 import { RmthThresholds } from './rmth/RmthThresholds'
+import { RequireKhalidiyah } from './khld/RequireKhalidiyah'
+import { KhldListScreen } from './khld/KhldListScreen'
+import { KhldFormScreen } from './khld/KhldFormScreen'
+import { KhldDetailScreen } from './khld/KhldDetailScreen'
+import { KhldRules } from './khld/KhldRules'
+import { KHLD_FORM_IDS } from './khld/forms.generated'
 import Dashboard from './routes/Dashboard'
 import NotFound from './routes/NotFound'
 import PublicHome from './routes/public/PublicHome'
@@ -466,6 +472,55 @@ const router = createBrowserRouter([
         element: guard(<RmthFormScreen mode="edit" />, (n) => (
           <RequireCapability capability="record.edit">
             <RequireRamtha>{n}</RequireRamtha>
+          </RequireCapability>
+        )),
+      },
+
+      // ── Khalidiyah's twenty-one forms ─────────────────────────────────────
+      //
+      // The same shape as Ramtha's: `:form` is the form id, the screens read
+      // their structure from KHLD_FORMS, and RequireKhalidiyah refuses an id
+      // that is not one of the twenty-one and an account whose municipality
+      // is not Khalidiyah. `/khld/rules` is the milestone rules screen, a
+      // static segment ahead of `/khld/:form` for the reason given above.
+      { path: '/khld', element: <Navigate to={`/khld/${KHLD_FORM_IDS[0]}`} replace /> },
+      {
+        path: '/khld/rules',
+        element: guard(<KhldRules />, (n) => (
+          <RequireCapability capability="dashboard.view">
+            <RequireKhalidiyah>{n}</RequireKhalidiyah>
+          </RequireCapability>
+        )),
+      },
+      {
+        path: '/khld/:form',
+        element: guard(<KhldListScreen />, (n) => (
+          <RequireCapability capability="dashboard.view">
+            <RequireKhalidiyah>{n}</RequireKhalidiyah>
+          </RequireCapability>
+        )),
+      },
+      {
+        path: '/khld/:form/new',
+        element: guard(<KhldFormScreen mode="new" />, (n) => (
+          <RequireCapability capability="record.create">
+            <RequireKhalidiyah>{n}</RequireKhalidiyah>
+          </RequireCapability>
+        )),
+      },
+      {
+        path: '/khld/:form/:id',
+        element: guard(<KhldDetailScreen />, (n) => (
+          <RequireCapability capability="dashboard.view">
+            <RequireKhalidiyah>{n}</RequireKhalidiyah>
+          </RequireCapability>
+        )),
+      },
+      {
+        path: '/khld/:form/:id/edit',
+        element: guard(<KhldFormScreen mode="edit" />, (n) => (
+          <RequireCapability capability="record.edit">
+            <RequireKhalidiyah>{n}</RequireKhalidiyah>
           </RequireCapability>
         )),
       },

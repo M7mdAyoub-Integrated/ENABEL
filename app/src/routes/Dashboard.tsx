@@ -6,6 +6,7 @@ import {
   useIndicatorSources,
   useIndicatorStatus,
   useIndicatorUnique,
+  usePlanTargets,
   useAnyTarget,
   currentPeriodCode,
   groupByObjective,
@@ -16,6 +17,7 @@ import {
   type IndicatorRow,
   type IndicatorSource,
   type IndicatorStatusRow,
+  type PlanTarget,
 } from '../data/indicators'
 import { dashboardConfigFor, type DashboardConfig, type LabelContext } from '../data/dashboardConfig'
 import { useCurrentMunicipality, useMunicipalityName } from '../data/municipalities'
@@ -74,7 +76,7 @@ import { SEP } from '../ui/glyphs'
 /* ── shared label context ────────────────────────────────────────────────── */
 
 function useLabels(config: DashboardConfig, sourceOf: Map<string, IndicatorSource>) {
-  const { t, i18n } = useTranslation(['indicators', 'nav', 'rmth'])
+  const { t, i18n } = useTranslation(['indicators', 'nav', 'rmth', 'khld'])
   const tr = makeTranslate(t)
   const ar = i18n.language.startsWith('ar')
   const ctx = (row: IndicatorRow): LabelContext => ({
@@ -87,6 +89,8 @@ function useLabels(config: DashboardConfig, sourceOf: Map<string, IndicatorSourc
     ar,
     name: (row: IndicatorRow) => config.indicatorName(row, ctx(row)),
     objective: (code: string, row: IndicatorRow) => config.objectiveTitle(code, row, ctx(row)),
+    unique: (row: IndicatorRow, count: number | undefined) =>
+      count === undefined || !config.uniqueText ? '' : config.uniqueText(row.code, count, ctx(row)),
   }
 }
 
@@ -125,7 +129,8 @@ function KpiBlock({
   tone: string
   status: IndicatorStatusRow | undefined
 }) {
-  const { t } = useTranslation('indicators')
+  const { t, i18n } = useTranslation('indicators')
+  const locale = i18n.resolvedLanguage ?? 'en'
   const tone = TONE[toneName] ?? TONE.raised!
   const width = barWidth(row)
   const blocked = !!status?.reason
@@ -139,11 +144,11 @@ function KpiBlock({
       </div>
       <div>
         <div className="flex items-baseline gap-1.5">
-          <span className="text-[58px] font-black leading-[0.8] tracking-[-0.05em] tabular-nums">
-            {actualText(row, t('noValue'))}
+          <span className={`font-black leading-[0.8] tracking-[-0.05em] tabular-nums ${row.unit === 'JOD' ? 'text-[34px]' : 'text-[58px]'}`}>
+            {actualText(row, t('noValue'), locale)}
           </span>
           <span className="font-narrow text-[15px] font-semibold tabular-nums opacity-75">
-            {t('slashTarget', { target: targetText(row, t('targetNotSet')) })}
+            {t('slashTarget', { target: targetText(row, t('targetNotSet'), locale) })}
           </span>
         </div>
 
@@ -185,7 +190,10 @@ function Row({
   status,
   missing,
   unique,
+  uniqueText,
+  planTargets,
   openItemsRoute,
+  openItemsLabelKey,
 }: {
   row: IndicatorRow
   name: string
@@ -194,9 +202,15 @@ function Row({
   status: IndicatorStatusRow | undefined
   missing: string[]
   unique: number | undefined
+  /** The programme's own words for the unique count, when it has some. */
+  uniqueText: string
+  /** The Plan's targets for this row, verbatim, in the reader's language. */
+  planTargets: string[]
   openItemsRoute: string | undefined
+  openItemsLabelKey: string | undefined
 }) {
-  const { t } = useTranslation(['indicators', 'nav', 'rmth'])
+  const { t, i18n } = useTranslation(['indicators', 'nav', 'rmth', 'khld'])
+  const locale = i18n.resolvedLanguage ?? 'en'
   const width = barWidth(row)
   const reason = status?.reason ?? null
   // Greyed for the same reason a manual row is: the figure is not something a
@@ -206,14 +220,14 @@ function Row({
   // A "3 unique people" beside a completion count, only while the count is
   // real: the unique view counts completers whatever the rule says, and a
   // count beside a dash would read as the figure the rule has not produced.
-  const uniqueText = unique === undefined || reason ? '' : t('indicators:ofWhomUnique', { count: unique })
+  const uniqueLine = unique === undefined || reason ? '' : uniqueText || t('indicators:ofWhomUnique', { count: unique })
   // The denominator of a percentage, only once there is a percentage. "— of 0"
   // is the reading this screen exists to avoid.
   const denominatorText =
     row.unit === '%' && row.actual !== null && row.denominator !== null
       ? t('indicators:denominator', { count: row.denominator })
       : ''
-  const subline = uniqueText || denominatorText
+  const subline = uniqueLine || denominatorText
 
   const figure = (
     <span className="flex items-baseline justify-end gap-[7px]">
@@ -222,10 +236,10 @@ function Row({
           faint ? 'text-faint' : 'text-ink'
         }`}
       >
-        {actualText(row, t('indicators:noValue'))}
+        {actualText(row, t('indicators:noValue'), locale)}
       </span>
       <span className="font-narrow text-[12px] font-semibold tabular-nums text-faint">
-        {t('indicators:ofTarget', { target: targetText(row, t('indicators:targetNotSet')) })}
+        {t('indicators:ofTarget', { target: targetText(row, t('indicators:targetNotSet'), locale) })}
       </span>
     </span>
   )
@@ -258,6 +272,20 @@ function Row({
             {t('indicators:noStatement')}
           </span>
         ) : null}
+        {reason === 'rule_not_evaluable' ? (
+          // The view names the broken references itself (`4 = period_covered (text)`).
+          <span className="mt-1 block text-[12.5px] leading-[1.35] text-attention-ink">
+            {t('indicators:notComputable', { definition: status?.detail ?? '' })}
+          </span>
+        ) : null}
+        {/* The Plan's own target, where the programme states one for the
+            whole period rather than per quarter: the framework's sentence,
+            verbatim, under the name. The quarterly column stays "not set". */}
+        {planTargets.map((p) => (
+          <span key={p} className="mt-1 block text-[12.5px] leading-[1.35] text-muted" style={{ textWrap: 'pretty' }}>
+            {t('khld:dashboard.planTarget')} {SEP} {p}
+          </span>
+        ))}
       </span>
 
       <span className="flex flex-wrap gap-x-2 gap-y-[5px]">
@@ -279,12 +307,12 @@ function Row({
             </Link>
           ))
         )}
-        {reason === 'threshold_unset' && openItemsRoute ? (
+        {(reason === 'threshold_unset' || reason === 'rule_not_evaluable') && openItemsRoute ? (
           <Link
             to={openItemsRoute}
             className="border-b-[1.5px] border-dashed border-attention-border font-narrow text-[11.5px] font-bold uppercase tracking-[0.08em] text-amber"
           >
-            {t('indicators:openItems')}
+            {t(openItemsLabelKey ?? 'indicators:openItems')}
           </Link>
         ) : null}
       </span>
@@ -343,6 +371,7 @@ export function Dashboard() {
   const sourcesQ = useIndicatorSources(municipalityId)
   const statusQ = useIndicatorStatus(municipalityId)
   const uniqueQ = useIndicatorUnique(periodCode, municipalityId)
+  const planTargetsQ = usePlanTargets(municipalityId)
   const anyTargetQ = useAnyTarget(municipalityId)
 
   const rows = rowsQ.data ?? []
@@ -350,15 +379,17 @@ export function Dashboard() {
   const statusOf = new Map((statusQ.data ?? []).map((s) => [s.code, s]))
   const uniqueOf = new Map((uniqueQ.data ?? []).map((u) => [u.code, Number(u.unique_actual)]))
   const labels = useLabels(config, sourceOf)
-  const blockedRows = rows.filter((r) => statusOf.get(r.code)?.reason === 'threshold_unset')
+  const planTargetsOf = new Map<string, PlanTarget[]>()
+  for (const p of planTargetsQ.data ?? []) planTargetsOf.set(p.indicator_code, [...(planTargetsOf.get(p.indicator_code) ?? []), p])
+  const blockedRows = rows.filter((r) => ['threshold_unset', 'rule_not_evaluable'].includes(statusOf.get(r.code)?.reason ?? ''))
   const noStatementRows = rows.filter((r) => statusOf.get(r.code)?.reason === 'no_statement')
   const missingFor = useMissingDefinitionLabels(blockedRows.length > 0, labels.ar)
   const groups = groupByObjective(rows)
   const period = periods.find((p) => p.code === periodCode)
 
-  const failed = periodsQ.isError || rowsQ.isError || statusQ.isError || anyTargetQ.isError
+  const failed = periodsQ.isError || rowsQ.isError || statusQ.isError || anyTargetQ.isError || planTargetsQ.isError
   const loading =
-    !municipality || periodsQ.isLoading || rowsQ.isLoading || statusQ.isLoading || anyTargetQ.isLoading
+    !municipality || periodsQ.isLoading || rowsQ.isLoading || statusQ.isLoading || anyTargetQ.isLoading || planTargetsQ.isLoading
 
   // Every target absent for this quarter is a fact about the plan, not a fault.
   // Which fact depends on the whole matrix: none anywhere (Ramtha, OQ-48), or
@@ -436,7 +467,7 @@ export function Dashboard() {
               {t('indicators:blockedNotice', { count: blockedRows.length })}
               {config.openItemsRoute ? (
                 <Link to={config.openItemsRoute} className="ms-2 underline">
-                  {t('indicators:openItems')}
+                  {t(config.openItemsLabelKey ?? 'indicators:openItems')}
                 </Link>
               ) : null}
             </p>
@@ -483,7 +514,15 @@ export function Dashboard() {
                         status={status}
                         missing={missingFor(status?.missing_keys ?? null)}
                         unique={uniqueOf.get(r.code)}
+                        uniqueText={labels.unique(r, uniqueOf.get(r.code))}
+                        // A parent's shares (SO3-F2's "of whom >= 40% women") are
+                        // one sentence with it, so only top-level rows are listed;
+                        // and one sentence read two ways ("≥ 4 per year (≥ 12 over
+                        // the Plan period)" is an annual row and a plan row) is
+                        // shown once.
+                        planTargets={Array.from(new Set((planTargetsOf.get(r.code) ?? []).filter((p) => !p.parent_id).map((p) => (labels.ar ? p.source_ar : null) ?? p.source_en)))}
                         openItemsRoute={config.openItemsRoute}
+                        openItemsLabelKey={config.openItemsLabelKey}
                       />
                     )
                   })}
