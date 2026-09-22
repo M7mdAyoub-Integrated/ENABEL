@@ -267,7 +267,9 @@ hashes identical (`0bad6f26…`, `7a7e1045…`, `15987387…`, `80111f91…`, `2
 counts identical except the growth this file predicted — `activity` 12→20,
 `objective` 9→14, `indicator` 38→59, `indicator_target` 494→767, `reporting_period`
 26→39, `municipality` 2→3, `app_user` 8→9, `audit_log` 3402→5128 — the new
-`khld_*` and `indicator_plan_target` lines, and **`person` 14/3 → 14/5**: the two
-probe people the Khalidiyah screens were driven with (`399000980`, `399000981`),
+`khld_*` and `indicator_plan_target` lines, and **`person` 14/3 → 14/7**: the four
+probe people the Khalidiyah screens were driven with (`399000980`–`399000983`),
 soft-deleted with their records as the Khalidiyah coordinator; the live count is
-unchanged. `check_migration_files.sh`: exact=151, PASS.
+unchanged. Re-checked after the second round of screen probes (all 21 forms) and
+their clean-up: matrix `c9d7dedc…`, 0 live Khalidiyah rows.
+`check_migration_files.sh`: exact=151, PASS.

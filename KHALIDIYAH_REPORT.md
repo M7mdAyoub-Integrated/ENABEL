@@ -159,6 +159,27 @@ rest.
 
 Done on 22 September 2026, after the app was finished:
 
+0. **Every one of the 21 forms** was driven through its screen with every
+   field filled, saved through `save_khld_record`, and read back column by
+   column on its record screen — the plan's own bar for a form. The
+   dependencies were built in order (an activity before its count sheet
+   and its feedback, a market before its vendor, a volunteer before an
+   action day and a tracking sheet, a works item before a contribution),
+   and the refusals were seen on screen: IMP-0 without consent, IMP-0
+   *Never visited* with the skipped block filled, a second attendance
+   sheet for one activity. The edit path was checked on F2, C2 and A1 —
+   one field changed, every other value, count cell, checklist row and
+   part still there.
+
+   One gap found and left as it is: a sub-field that belongs to the
+   branch NOT chosen — a fee on a stall marked *free of charge*, a repeat
+   count with the duplicate check *not yet done* — is accepted. The
+   database refuses a missing one (`guard_khld_rules`) and does not refuse
+   a stray one, and the screen does not clear it. A stray value never
+   reaches a figure (the views test the branch, not the sub-field); it is
+   listed here as a data-quality rule the M&E lead may want, as a
+   migration on the guard, not as a screen rule.
+
 1. **`0152` — the public view** — applied, renamed to its ledger version,
    its verify block run: the anon surface is six views and four RPCs, the
    view is security definer, and **as anon** a published future activity is
@@ -177,11 +198,11 @@ Done on 22 September 2026, after the app was finished:
    rows, counted, not trusted from the error.
 3. **The probe rows** the screens were driven with are **soft-deleted**, the
    way the Ramtha probes were, as the Khalidiyah coordinator through RLS,
-   every row counted: eleven records, two entities and two people
-   (`399000980`, `399000981`), 0 live Khalidiyah rows after. They remain
-   under *Show deleted*; the reference counters are left where they are.
-   If the M&E lead prefers them gone, that is an owner's delete of the rows
-   named in `09_MULTI_MUNICIPALITY.md` Part 12.
+   every row counted: one record per form (two for IMP-0, four for the
+   milestones), the entities, and four people (`399000980`–`399000983`);
+   0 live Khalidiyah rows after, the live `person` count back at 14. They
+   remain under *Show deleted*; the reference counters are left where they
+   are. If the M&E lead prefers them gone, that is an owner's delete.
 4. **The baseline.** The full comparison against `supabase/baselines/
    2026-09-21_all_before_khalidiyah.md` was re-run after 0152 and the
    clean-up (section 8).
@@ -209,7 +230,7 @@ Compared on 22 September 2026, after 0152 and the clean-up, against
   lines the baseline said would grow — `activity` 12→20, `objective` 9→14,
   `indicator` 38→59, `indicator_target` 494→767, `reporting_period` 26→39,
   `municipality` 2→3, `app_user` 8→9, `audit_log` — and `person` 14/3 →
-  14/5: the two probe people, soft-deleted, the live count unchanged.
+  14/7: the four probe people, soft-deleted, the live count unchanged.
 
 Nothing of theirs was modified except the two shared-table changes the plan
 required (D1, D3), and each migration that could have moved a figure also

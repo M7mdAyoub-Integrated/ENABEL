@@ -819,7 +819,9 @@ function FieldView(p: FieldViewProps) {
     return (
       <Block label={`${no}. ${label}`} required={!!f.required} help={help} error={p.error} counting={false}>
         <div className="grid grid-cols-12 gap-x-[18px] gap-y-[14px]">
-          <Field spec={{ key: `${f.key}_status`, label: t('form.checklist.status'), type: 'radio', span: 12, options: opts(rows) }} value={cur.status} onChange={(x) => set({ status: x })} />
+          {/* the item number on the label, because every checklist row has a
+              status control and a screen reader hears the group's name alone */}
+          <Field spec={{ key: `${f.key}_status`, label: `${t('form.checklist.status')} ${SEP} ${no}`, type: 'radio', span: 12, options: opts(rows) }} value={cur.status} onChange={(x) => set({ status: x })} />
           {needsDetail ? <Field spec={{ key: `${f.key}_detail`, label: t('form.checklist.detail'), type: 'text', span: 6, required: true }} value={cur.detail} onChange={(x) => set({ detail: x })} /> : null}
           <Field spec={{ key: `${f.key}_date`, label: t('form.checklist.date'), type: 'date', span: 3 }} value={cur.date} onChange={(x) => set({ date: x })} />
           <Field spec={{ key: `${f.key}_evidence`, label: t('form.checklist.evidence'), type: 'text', span: needsDetail ? 3 : 6 }} value={cur.evidence} onChange={(x) => set({ evidence: x })} />

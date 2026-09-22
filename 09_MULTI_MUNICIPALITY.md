@@ -1538,6 +1538,18 @@ programmes' views for every municipality, JOD is rendered by
 that cannot compute links to the rules screen. The four objectives take the
 existing colours, with SO4 as the prototype draws it.
 
+Every one of the 21 forms was then driven through its screen with every
+field filled, saved and read back column by column, in dependency order,
+with the refusals seen on screen (IMP-0's consent and its *Never*
+block, a duplicate attendance sheet) and the edit path checked on F2, C2
+and A1. Two things came out of it. The checklist status controls all had
+the accessible name *Status* — eight identical radiogroups on one form —
+and now carry the item number. And a sub-field of the branch not chosen
+(a fee on a free stall) is accepted: the guard refuses a missing one and
+not a stray one, and the screen does not clear it; a stray value reaches
+no figure, and it is recorded in the report as a rule for the M&E lead
+rather than added as a screen rule (one copy of a rule, in the database).
+
 `check-khld-forms.mjs` fails the build on any key the screens build at
 runtime that is missing in either locale — headers, sections, labels, the
 bool answers, every part heading, and the static keys built from a code —
@@ -1606,7 +1618,8 @@ a query that succeeded.
   `supabase/baselines/2026-09-21_all_before_khalidiyah.md` was re-run: the
   matrix and all seven view hashes identical, every table's counts
   identical except the lines the baseline said would grow and `person`
-  14/3 → 14/5 (the two probe people, soft-deleted).
+  14/3 → 14/7 (the four probe people, soft-deleted, the live count
+  unchanged).
 - **`types/database.ts`** regenerated at head 0152 and stripped. The six
   mock people gained `age_unrecorded_reason: null`; nothing else changed,
   because every Khalidiyah read and write goes through a loosely typed
