@@ -5,7 +5,7 @@
  *   node scripts/demo-as.mjs superadmin@platform.test
  *   node scripts/demo-as.mjs admin@ramtha.test
  *   node scripts/demo-as.mjs admin@khalidiyah.test
- *   node scripts/demo-as.mjs coordinator@shm.test      (the default)
+ *   node scripts/demo-as.mjs admin@shm.test            (the default)
  *
  * Demo mode (src/demo/demoMode.ts) reads VITE_DEMO_EMAIL and
  * VITE_DEMO_PASSWORD from .env.local. The per-account passwords live in the
@@ -22,14 +22,11 @@ import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ACCOUNTS = {
-  'coordinator@shm.test': 'SHM_TEST_PW_COORDINATOR',
-  'dataentry@shm.test': 'SHM_TEST_PW_DATAENTRY',
-  'enumerator@shm.test': 'SHM_TEST_PW_ENUMERATOR',
-  'viewer@shm.test': 'SHM_TEST_PW_VIEWER',
-  'producer@shm.test': 'SHM_TEST_PW_PRODUCER',
-  'unlinked@shm.test': 'SHM_TEST_PW_UNLINKED',
+  // Renamed from coordinator@shm.test on 22 September 2026, through
+  // manage-account's set_email by scripts/set-email.mjs.
+  'admin@shm.test': 'SHM_TEST_PW_COORDINATOR',
   // Not a Sahel Horan account: its municipality is null and it switches
-  // between both. Renamed from superadmin@shm.test on 15 September 2026.
+  // between all three. Renamed from superadmin@shm.test on 15 September 2026.
   'superadmin@platform.test': 'SHM_TEST_PW_SUPERADMIN',
   'admin@ramtha.test': 'SHM_TEST_PW_RAMTHA_ADMIN',
   // Created 21 September 2026 through manage-account by scripts/create-account.mjs.
@@ -58,8 +55,8 @@ const set = (k, v) => {
 // under its own name the first time this runs, so switching away is reversible.
 if (get('SHM_TEST_PW_COORDINATOR') === null) {
   const current = get('VITE_DEMO_PASSWORD')
-  const currentEmail = get('VITE_DEMO_EMAIL') || 'coordinator@shm.test'
-  if (current && currentEmail === 'coordinator@shm.test') set('SHM_TEST_PW_COORDINATOR', current)
+  const currentEmail = get('VITE_DEMO_EMAIL') || 'admin@shm.test'
+  if (current && currentEmail === 'admin@shm.test') set('SHM_TEST_PW_COORDINATOR', current)
 }
 
 const pw = get(ACCOUNTS[email])

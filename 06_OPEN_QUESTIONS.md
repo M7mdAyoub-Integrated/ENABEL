@@ -2201,3 +2201,49 @@ conversation every audit.
 **Decides.** M&E lead: correct the five numbers in the sheets (Q17, Q17,
 Q11, Q22, Q21). Then `indicator.formula` is regenerated from the corrected
 workbook by `gen_0149.py`; the views do not change.
+
+---
+
+## 🟠 OQ-59 · The four non-admin roles no longer have an account to test RLS as
+
+**Decided on 22 September 2026, by the project owner.** The platform's five
+test accounts other than the municipal admins — `dataentry@shm.test`,
+`enumerator@shm.test`, `viewer@shm.test`, `producer@shm.test` and
+`unlinked@shm.test` — were **hard-deleted**, leaving four logins: one
+coordinator per municipality (`admin@shm.test`, renamed from
+`coordinator@shm.test`, `admin@ramtha.test`, `admin@khalidiyah.test`) and
+`superadmin@platform.test`.
+
+`0109`'s guard refused the delete first, which is what it is for, and it was
+taken through that migration's own named escape hatch — owner plus
+`app.allow_hard_delete = 'on'`, in one transaction — which `0109`'s header
+writes for exactly this purpose ("retire the demo data before go-live").
+Two references had to be unlinked first, as the Sahel Horan coordinator
+through RLS because `auth_user_id` is staff-only (`0069`): one `person` lost
+its login (the row and everything hanging off it is untouched, it simply has
+no account) and one `partner` lost its `created_by`. Nothing else moved:
+`person` still 14 live, the 37-line indicator matrix still
+`c9d7dedc923819cf9a0b5164d47a38c1`.
+
+**What it costs, and it is the thing to remember.** `audit_log.actor` has no
+foreign key, deliberately, so all 150 of the enumerator's and data-entry
+account's audit rows are still there — but the `app_user` row that said what
+those actors were *allowed* to do is gone, which is the loss `0109`'s refusal
+names in its own hint. And there is now no account at `data_entry`,
+`enumerator`, `partner_viewer` or `participant`.
+
+That matters more than it looks. `05_ROLES_AND_RLS.md` §14's technique —
+`set local role authenticated` with `request.jwt.claims` — needs an
+`app_user` id to impersonate, and four of the five roles no longer have one.
+Every entry in `CLAUDE.md`'s register that begins "tested as the owner" is
+about precisely this gap. So:
+
+> **Before role-testing anything at those four roles, create a throwaway
+> account for the role** with `node app/scripts/create-account.mjs`, test,
+> and delete it the same way these five went. Do not conclude that a policy
+> is correct because the coordinator's behaviour looked right — the
+> coordinator is the role that can see everything.
+
+**Decides.** Whoever does the go-live pass: whether the four roles get
+permanent fixture accounts again, on this project or on a separate one.
+

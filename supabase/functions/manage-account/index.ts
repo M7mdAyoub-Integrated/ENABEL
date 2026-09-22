@@ -7,7 +7,8 @@
 // tried the other route — inserting into auth.users directly — and every
 // sign-in failed until 0031 repaired the rows GoTrue could not read. This
 // function runs server-side with the service key the runtime injects, and
-// does exactly two things: create an account, and set an account's password.
+// does three things: create an account, set an account's password, and change
+// an account's email (which is two writes -- see set_email).
 //
 // Everything else about an account — role, municipality, is_active — is a
 // plain UPDATE on public.app_user from the screen, under RLS (0118) and the
@@ -150,6 +151,46 @@ Deno.serve(async (req: Request) => {
       return json({ ok: false, result: "app_user_mismatch", user_id: created.user.id, app_user: row }, 500);
     }
     return json({ ok: true, result: "created", user_id: created.user.id });
+  }
+
+  // ── set_email ───────────────────────────────────────────────────────────
+  //
+  // An account's email lives in TWO places: auth.users (GoTrue's own, with a
+  // copy inside auth.identities' identity_data) and public.app_user.email,
+  // which handle_new_user copies at creation and nothing keeps in step
+  // afterwards. So this writes both, app_user second, and reports the pair it
+  // read back -- a change that moved one and not the other would leave the
+  // account signing in under one address and listed under the other.
+  //
+  // Through the admin API rather than SQL for the reason in this file's
+  // header: 0030 wrote auth.users by hand and GoTrue could not read the rows.
+  if (body.action === "set_email") {
+    const userId = String(body.user_id ?? "");
+    const email = String(body.email ?? "").trim().toLowerCase();
+    if (!userId) return json({ ok: false, result: "user_required" }, 400);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({ ok: false, result: "bad_email" }, 400);
+
+    const { data: target } = await admin.from("app_user").select("id").eq("id", userId).maybeSingle();
+    if (!target) return json({ ok: false, result: "not_found" }, 404);
+
+    const taken = await admin.from("app_user").select("id").eq("email", email).neq("id", userId).maybeSingle();
+    if (taken.data) return json({ ok: false, result: "email_taken" }, 409);
+
+    // email_confirm keeps the address usable immediately; without it GoTrue
+    // parks the new address in email_change and the account goes on signing
+    // in under the old one, which is the failure this action exists to avoid.
+    const { error } = await admin.auth.admin.updateUserById(userId, { email, email_confirm: true });
+    if (error) return json({ ok: false, result: "update_failed", detail: error.message }, 400);
+
+    const { error: rowError } = await admin.from("app_user").update({ email }).eq("id", userId);
+    if (rowError) return json({ ok: false, result: "row_update_failed", detail: rowError.message }, 400);
+
+    const { data: authUser } = await admin.auth.admin.getUserById(userId);
+    const { data: row } = await admin.from("app_user").select("email").eq("id", userId).maybeSingle();
+    if (authUser?.user?.email !== email || row?.email !== email) {
+      return json({ ok: false, result: "read_back_mismatch", auth: authUser?.user?.email ?? null, row: row?.email ?? null }, 500);
+    }
+    return json({ ok: true, result: "email_set", email });
   }
 
   // ── set_password ────────────────────────────────────────────────────────

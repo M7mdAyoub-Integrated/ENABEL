@@ -121,7 +121,7 @@ export const DEMO_ACCOUNT = {
   // admin, the super admin) so the other municipality and the switcher can
   // be exercised in development without a sign-in screen. Its password
   // still comes from VITE_DEMO_PASSWORD, same rules as before.
-  email: import.meta.env['VITE_DEMO_EMAIL'] || 'coordinator@shm.test',
+  email: import.meta.env['VITE_DEMO_EMAIL'] || 'admin@shm.test',
   password: import.meta.env['VITE_DEMO_PASSWORD'] ?? '',
 } as const
 
