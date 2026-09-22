@@ -1545,10 +1545,17 @@ block, a duplicate attendance sheet) and the edit path checked on F2, C2
 and A1. Two things came out of it. The checklist status controls all had
 the accessible name *Status* — eight identical radiogroups on one form —
 and now carry the item number. And a sub-field of the branch not chosen
-(a fee on a free stall) is accepted: the guard refuses a missing one and
-not a stray one, and the screen does not clear it; a stray value reaches
-no figure, and it is recorded in the report as a rule for the M&E lead
-rather than added as a screen rule (one copy of a rule, in the database).
+(a fee on a free stall, IMP-0's block under *Never*) was accepted with a
+value in it: the guard refuses a missing one and not a stray one, and the
+screen did not clear it. The dependency is now in the catalogue —
+`when=(column, codes | bool)` on 44 controls — emitted by `gen_forms.py`
+as `when` on the field or part, and `appliesNow()` on the screen dims and
+disables a control whose governing answer is not chosen and sends it
+blank. The rules that REFUSE stay in the database; the screen only stops
+a value being typed where none belongs. The two restore paths (a deleted
+volunteer's identifier on F2, a deleted partner's name on SO1-0) and the
+evidence flow against the real R2 store were driven from the browser and
+are described in the report's §7.
 
 `check-khld-forms.mjs` fails the build on any key the screens build at
 runtime that is missing in either locale — headers, sections, labels, the

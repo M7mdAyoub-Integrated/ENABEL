@@ -20,7 +20,7 @@ import {
 import { DERIVED_LISTS, useDerived } from './derived'
 import { allFields, formDef, useKhldLabels } from './labels'
 import type { KhldFormId } from './forms.generated'
-import type { KhldFieldDef, KhldPartDef, KhldTable } from './types'
+import type { KhldFieldDef, KhldPartDef, KhldTable, KhldWhen } from './types'
 import { HOOK, REQUIRED, SEP } from '../ui/glyphs'
 
 /**
@@ -198,8 +198,11 @@ export function KhldFormScreen({ mode }: { mode: 'new' | 'edit' }) {
   /* ── validation ───────────────────────────────────────────────────────── */
   const errors: Record<string, string> = {}
   const req = t('khld:form.required')
+  const on = (w: KhldWhen | undefined) => appliesNow(w, values, refs, fields)
   for (const f of fields) {
     const col = f.column ?? f.key
+    // a control whose answer is not chosen is neither required nor checked
+    if (!on(f.when)) continue
     switch (f.type) {
       case 'ident':
         if (!personLocked && !idComplete) errors[f.key] = person.idType === 'national_id' ? t('khld:form.nidInvalid') : t('khld:form.unhcrEmpty')
@@ -260,6 +263,7 @@ export function KhldFormScreen({ mode }: { mode: 'new' | 'edit' }) {
         break
       case 'parts':
         for (const p of f.parts ?? []) {
+          if (!on(p.when)) continue
           if (p.required && !values[p.column]) errors[f.key] = req
           if (p.type === 'select' && p.other) {
             const chosen = (refs[p.ref ?? ''] ?? []).find((r) => r.id === values[p.column])
@@ -284,12 +288,19 @@ export function KhldFormScreen({ mode }: { mode: 'new' | 'edit' }) {
       else if (type === 'month') row[col] = v === '' ? null : `${v}-01`
       else row[col] = v === '' ? null : v
     }
+    // A control whose answer is not chosen is sent BLANK, whatever it holds:
+    // the fee of a stall that became free, the block a respondent who never
+    // visited skipped. Its question code stays in option_questions, so its
+    // old option rows are cleared too.
+    const on = (w: KhldWhen | undefined) => appliesNow(w, values, refs, fields)
     for (const f of fields) {
+      const fieldOn = on(f.when)
       if (f.type === 'parts') {
         for (const p of f.parts ?? []) {
           if (p.type === 'multi' || p.type === 'person_phone') continue
-          put(p.column, p.type, values[p.column])
-          if (p.other) put(p.other, 'text', values[p.other])
+          const partOn = fieldOn && on(p.when)
+          put(p.column, p.type, partOn ? values[p.column] : '')
+          if (p.other) put(p.other, 'text', partOn ? values[p.other] : '')
         }
       } else if (f.type === 'session' && f.column && f.dateColumn) {
         put(f.column, 'select', values[f.column])
@@ -298,16 +309,23 @@ export function KhldFormScreen({ mode }: { mode: 'new' | 'edit' }) {
       } else if (isSingle(f.type) && f.column) {
         // the entity pickers are sent as their block, below, so the function can refuse a deleted one by name
         if (f.type === 'record' && (f.table === 'khld_partner' || f.table === 'khld_enterprise')) continue
-        put(f.column, f.type, values[f.column])
-        if (f.other) put(f.other, 'text', values[f.other])
+        put(f.column, f.type, fieldOn ? values[f.column] : '')
+        if (f.other) put(f.other, 'text', fieldOn ? values[f.other] : '')
       }
+    }
+    const questionOn = (q: string): boolean => {
+      for (const f of fields) {
+        if (f.type === 'multi' && f.question === q) return on(f.when)
+        for (const p of f.parts ?? []) if (p.type === 'multi' && p.question === q) return on(f.when) && on(p.when)
+      }
+      return true
     }
     if (mode === 'new') for (const [k, v] of Object.entries(def.fixed)) row[k] = v
 
     const options: KhldOption[] = []
     for (const q of questions) {
       const m = multi[q]
-      if (!m) continue
+      if (!m || !questionOn(q)) continue
       const list = refs[listOfQuestion(fields, q)] ?? []
       for (const oid of m.ids) {
         const r = list.find((x) => x.id === oid)
@@ -471,6 +489,7 @@ export function KhldFormScreen({ mode }: { mode: 'new' | 'edit' }) {
                 refs={refs}
                 record={rec.data}
                 personId={personId}
+                fields={fields}
               />
             ))}
           </div>
@@ -506,6 +525,32 @@ function listOfQuestion(fields: KhldFieldDef[], q: string): string {
     for (const p of f.parts ?? []) if (p.type === 'multi' && p.question === q) return p.ref ?? ''
   }
   return ''
+}
+
+/** The ref list a column reads, when it is one of this form's select fields or parts. */
+function listOfColumn(fields: KhldFieldDef[], column: string): string | undefined {
+  for (const f of fields) {
+    if (f.type === 'select' && f.column === column) return f.ref
+    for (const p of f.parts ?? []) if (p.type === 'select' && p.column === column) return p.ref
+  }
+  return undefined
+}
+
+/**
+ * Does a control apply, given the answers so far? A control with no `when`
+ * always does. One governed by a boolean applies while that answer is
+ * chosen; one governed by a select applies while the chosen option's CODE
+ * is among those named. An unanswered governing control means "not yet",
+ * which reads as not applicable: the sub-field is dimmed until the answer
+ * that owns it is given.
+ */
+export function appliesNow(when: KhldWhen | undefined, values: Values, refs: Record<string, RefRow[]>, fields: KhldFieldDef[]): boolean {
+  if (!when) return true
+  const v = values[when.column] ?? ''
+  if (when.value !== undefined) return v === String(when.value)
+  const list = listOfColumn(fields, when.column)
+  const code = (refs[list ?? ''] ?? []).find((r) => r.id === v)?.code
+  return !!code && (when.codes ?? []).includes(code)
 }
 
 /** Every ref_khld list the form reads, derived fields' lists included. */
@@ -634,6 +679,8 @@ type FieldViewProps = {
   refs: Record<string, RefRow[]>
   record?: KhldRecord | undefined
   personId?: string | undefined
+  /** Every field of the form, for the lists a `when` is checked against. */
+  fields: KhldFieldDef[]
 }
 
 const INPUT = 'w-full min-h-10 border-[1.5px] border-ink bg-input px-2 text-[14px] text-ink'
@@ -645,13 +692,16 @@ function FieldView(p: FieldViewProps) {
   const label = L.label(f)
   const help = L.help(f)
   const sub = L.sub(f)
-  const base: Pick<FieldSpec, 'key' | 'label' | 'help' | 'required' | 'error' | 'tag' | 'tagAccent'> = {
+  // a control whose answer is not chosen: present, dimmed, not answerable
+  const off = !appliesNow(f.when, p.values, p.refs, p.fields)
+  const base: Pick<FieldSpec, 'key' | 'label' | 'help' | 'required' | 'error' | 'tag' | 'tagAccent' | 'dim' | 'disabled'> = {
     key: f.key,
     label,
     ...(help ? { help } : {}),
     ...(f.required ? { required: true } : {}),
     ...(p.error ? { error: p.error } : {}),
     ...(f.counting ? { tag: t('form.countingField'), tagAccent: 'amber' as const } : {}),
+    ...(off ? { dim: true, disabled: true } : {}),
   }
   const opts = (rows: RefRow[]): FieldOption[] => rows.map((r) => ({ value: r.id, label: refLabel(r, L.locale) }))
   const v = (k: string) => p.values[k] ?? ''
@@ -760,8 +810,8 @@ function FieldView(p: FieldViewProps) {
     const otherOn = rows.some((r) => r.allows_free_text && m.ids.includes(r.id))
     return (
       <>
-        <Field spec={{ ...base, type: 'checks', twoCol: rows.length > 4, options: opts(rows) }} value={m.ids} onChange={() => {}} onToggle={(oid) => p.toggleMulti(q, oid)} />
-        {otherOn ? (
+        <Field spec={{ ...base, type: 'checks', twoCol: rows.length > 4, options: opts(rows) }} value={m.ids} onChange={() => {}} onToggle={(oid) => { if (!off) p.toggleMulti(q, oid) }} />
+        {otherOn && !off ? (
           <Field spec={{ key: `${q}_other`, label: t('form.specify'), type: 'text', span: 6, required: true }} value={m.other} onChange={(x) => p.setMultiOther(q, x)} />
         ) : null}
       </>
@@ -784,8 +834,8 @@ function FieldView(p: FieldViewProps) {
           {f.counting ? <span className="bg-amber px-2 py-0.5 font-narrow text-[10.5px] font-bold uppercase tracking-[0.1em] text-bg"><span aria-hidden="true">{HOOK} </span>{t('form.countingField')}</span> : null}
         </div>
         {help ? <p className="mb-3 mt-0 text-[13.5px] text-muted" style={{ textWrap: 'pretty' }}>{help}</p> : null}
-        <div className="grid grid-cols-12 gap-x-[18px] gap-y-[14px] border-s-[3px] border-border-default ps-4">
-          {(f.parts ?? []).map((part) => <PartView key={part.column} f={f} part={part} p={p} />)}
+        <div className={`grid grid-cols-12 gap-x-[18px] gap-y-[14px] border-s-[3px] border-border-default ps-4 ${off ? 'opacity-50' : ''}`}>
+          {(f.parts ?? []).map((part) => <PartView key={part.column} f={f} part={part} p={p} off={off || !appliesNow(part.when, p.values, p.refs, p.fields)} />)}
         </div>
         {p.error ? <div role="alert" className="mt-2 text-[13.5px] font-semibold text-error">{p.error}</div> : null}
       </div>
@@ -917,12 +967,12 @@ function MonthField({ spec, value, onChange }: { spec: Omit<FieldSpec, 'type'>; 
   )
 }
 
-function PartView({ f, part, p }: { f: KhldFieldDef; part: KhldPartDef; p: FieldViewProps }) {
+function PartView({ f, part, p, off }: { f: KhldFieldDef; part: KhldPartDef; p: FieldViewProps; off: boolean }) {
   const L = useKhldLabels(p.fid)
   const { t } = useTranslation('khld')
   const label = L.part(f, part.column) ?? L.label(f)
   const v = (k: string) => p.values[k] ?? ''
-  const spec = { key: part.column, label, ...(part.required ? { required: true } : {}) }
+  const spec = { key: part.column, label, ...(part.required ? { required: true } : {}), ...(off ? { dim: true, disabled: true } : {}) }
   if (part.type === 'text' || part.type === 'phone') {
     return <Field spec={{ ...spec, type: part.type === 'phone' ? 'tel' : 'text', span: 6, ...(part.type === 'phone' ? { ltr: true } : {}) }} value={v(part.column)} onChange={(x) => p.setValue(part.column, x)} />
   }
@@ -956,17 +1006,17 @@ function PartView({ f, part, p }: { f: KhldFieldDef; part: KhldPartDef; p: Field
     const q = part.question ?? ''
     const rows = p.refs[part.ref ?? ''] ?? []
     const m = p.multi[q] ?? { ids: [], other: '' }
-    return <Field spec={{ ...spec, type: 'checks', twoCol: rows.length > 4, options: rows.map((r) => ({ value: r.id, label: refLabel(r, L.locale) })) }} value={m.ids} onChange={() => {}} onToggle={(oid) => p.toggleMulti(q, oid)} />
+    return <Field spec={{ ...spec, type: 'checks', twoCol: rows.length > 4, options: rows.map((r) => ({ value: r.id, label: refLabel(r, L.locale) })) }} value={m.ids} onChange={() => {}} onToggle={(oid) => { if (!off) p.toggleMulti(q, oid) }} />
   }
   if (part.type === 'record') {
-    return <RecordPickerField base={{ key: part.column, label }} f={{ key: part.column, type: 'record', column: part.column, ...(part.table ? { table: part.table } : {}) }} value={v(part.column)} onChange={(x) => p.setValue(part.column, x)} p={p} />
+    return <RecordPickerField base={{ key: part.column, label, ...(off ? { dim: true, disabled: true } : {}) }} f={{ key: part.column, type: 'record', column: part.column, ...(part.table ? { table: part.table } : {}) }} value={v(part.column)} onChange={(x) => p.setValue(part.column, x)} p={p} />
   }
   return null
 }
 
 /** A select over another Khalidiyah table's live rows, by reference and title; a partner or enterprise may be typed new. */
 function RecordPickerField({ base, f, value, onChange, sub, p }: {
-  base: Pick<FieldSpec, 'key' | 'label' | 'help' | 'required' | 'error' | 'tag' | 'tagAccent'>
+  base: Pick<FieldSpec, 'key' | 'label' | 'help' | 'required' | 'error' | 'tag' | 'tagAccent' | 'dim' | 'disabled'>
   f: Pick<KhldFieldDef, 'key' | 'type' | 'table' | 'create' | 'column'>
   value: string
   onChange: (v: string) => void
@@ -1141,7 +1191,7 @@ function OccasionRef({ p }: { p: { kind: string; campaign_id: string | null; act
 
 /** A column the database assigns or works out: shown, never typed. */
 function DerivedField({ base, f, p, sub }: {
-  base: Pick<FieldSpec, 'key' | 'label' | 'help' | 'required' | 'error' | 'tag' | 'tagAccent'>
+  base: Pick<FieldSpec, 'key' | 'label' | 'help' | 'required' | 'error' | 'tag' | 'tagAccent' | 'dim' | 'disabled'>
   f: KhldFieldDef
   p: FieldViewProps
   sub?: string | undefined

@@ -114,6 +114,33 @@ def yes_no_labels(f, en, ar):
     return ('Yes', 'No'), ('نعم', 'لا')
 
 
+def when_of(when, fid, where):
+    """The catalogue's `when=(column, value)` as the definition carries it:
+    {column, codes: [...]} for a select column, {column, value: bool} for a
+    boolean one. The codes are checked against the model's lists where the
+    column is one of this form's own select parts or fields."""
+    column, value = when
+    if isinstance(value, bool):
+        return OrderedDict(column=column, value=value)
+    codes = list(value) if isinstance(value, (list, tuple)) else [value]
+    # the list the governing column reads, if it is a select of this form
+    lst = None
+    for fk, sp in m.specs[fid].items():
+        if sp['kind'] == 'select' and fk + '_id' == column:
+            lst = M.list_name(fid, m.forms[fid].field(fk), sp)
+        for (pc, pk, _e, _a, pcfg) in sp.get('parts', []) or []:
+            if pc == column and pk == 'select':
+                lst = pcfg['list']
+    if lst is None:
+        err('%s: when= names %s, which is not a select of this form' % (where, column))
+    else:
+        known = [o[0] for o in m.lists[lst].options]
+        for c in codes:
+            if c not in known:
+                err('%s: when= code %r is not an option of %s (%s)' % (where, c, lst, ', '.join(known)))
+    return OrderedDict(column=column, codes=codes)
+
+
 def part_required(spec, i, pkind):
     """model._plan_field: a required compound field makes its FIRST typed part NOT NULL."""
     return bool(spec.get('required')) and i == 0 and pkind in ('select', 'bool', 'number', 'date', 'money')
@@ -179,6 +206,8 @@ for fid, form in m.forms.items():
         d = OrderedDict(key=key, type=kind)
         if req:
             d['required'] = True
+        if spec.get('when'):
+            d['when'] = when_of(spec['when'], fid, key)
         if spec.get('gate'):
             d['counting'] = True
         if spec.get('stamp'):
@@ -258,6 +287,8 @@ for fid, form in m.forms.items():
                 pd = OrderedDict(column=col, type=pkind)
                 if part_required(spec, i, pkind):
                     pd['required'] = True
+                if cfg.get('when'):
+                    pd['when'] = when_of(cfg['when'], fid, key + '.' + col)
                 if pkind == 'select':
                     pd['ref'] = cfg['list']
                     l = m.lists.get(cfg['list'])

@@ -175,6 +175,14 @@ def _cells(*pairs):
     return [tuple(p) for p in pairs]
 
 
+# A control that belongs to one answer of another control: `when=(column,
+# value)` on a part's cfg or a field's spec, the value a code (or list of
+# codes) for a select column and True/False for a boolean one. The screens
+# dim and blank a control whose answer is not chosen; the rules that REFUSE
+# a missing one live in guard_khld_rules (0148) and are not repeated here.
+# NOT_NEVER is IMP-0's park-use block: every answer to field 12 but "Never".
+NOT_NEVER = ['once_or_twice', 'every_few_months', 'about_monthly', 'weekly_or_more']
+
 # ── per-field overrides ───────────────────────────────────────────────────
 # Anything not listed follows default_spec(). The label of a part or cell is
 # the sheet's own segment of the option text (English, Arabic).
@@ -184,19 +192,20 @@ OVERRIDES = {
         'consent': dict(kind='select', gate='consent'),
         'has_children': dict(kind='parts', parts=[
             ('has_children_id', 'select', 'Yes — number / No', 'نعم — العدد / لا', dict(list='imp0_has_children', options=['Yes — number: ____', 'No'], options_ar=['نعم — العدد: ____', 'لا'], codes=['yes', 'no'], no_other=True)),
-            ('children_count', 'number', 'number', 'العدد', {})]),
+            ('children_count', 'number', 'number', 'العدد', dict(when=('has_children_id', 'yes')))]),
         'recontact': dict(kind='select'),
         # "Respondents answering 'Never' skip to Q20; they are excluded from the
         # indicator denominator" (field 12's note) -- so the park-use and
         # interaction questions (13-19) cannot be NOT NULL: a non-visitor's
         # questionnaire is a record with those blank. The rule that they are
         # required for everyone else lives in save_khld_record (0148).
-        'activities_taken': dict(required=False),
-        'mixed_presence': dict(required=False),
-        'new_contact': dict(required=False),
-        'opportunity_increase': dict(required=False),
-        'joint_activity': dict(required=False),
-        'comfort_level': dict(required=False),
+        'activities_taken': dict(required=False, when=('visit_freq_id', NOT_NEVER)),
+        'accompanied_by': dict(required=False, when=('visit_freq_id', NOT_NEVER)),
+        'mixed_presence': dict(required=False, when=('visit_freq_id', NOT_NEVER)),
+        'new_contact': dict(required=False, when=('visit_freq_id', NOT_NEVER)),
+        'opportunity_increase': dict(required=False, when=('visit_freq_id', NOT_NEVER)),
+        'joint_activity': dict(required=False, when=('visit_freq_id', NOT_NEVER)),
+        'comfort_level': dict(required=False, when=('visit_freq_id', NOT_NEVER)),
     },
     'so10': {
         'partner_name': dict(kind='record', table='khld_partner', create=True, column='partner_id'),
@@ -290,8 +299,8 @@ OVERRIDES = {
             ('on_priority_list_id', 'select', 'Yes — priority rank / No — added later', 'نعم — ترتيب الأولوية / لا — أُضيف لاحقاً',
              dict(list='c1_on_priority_list', options=['Yes — priority rank: ____', 'No — added later, justification: ____'],
                   options_ar=['نعم — ترتيب الأولوية: ____', 'لا — أُضيف لاحقاً، التبرير: ____'], codes=['yes', 'no'], no_other=True)),
-            ('priority_rank', 'number', 'priority rank', 'ترتيب الأولوية', {}),
-            ('addition_justification', 'text', 'justification', 'التبرير', {})]),
+            ('priority_rank', 'number', 'priority rank', 'ترتيب الأولوية', dict(when=('on_priority_list_id', 'yes'))),
+            ('addition_justification', 'text', 'justification', 'التبرير', dict(when=('on_priority_list_id', 'no')))]),
         'status': dict(kind='select', gate='completed'),
         'dates': dict(kind='parts', parts=[
             ('planned_start', 'date', 'Planned start', 'البدء المخطط', {}), ('actual_start', 'date', 'Actual start', 'البدء الفعلي', {}),
@@ -313,7 +322,7 @@ OVERRIDES = {
         'linked_item': dict(kind='parts', parts=[
             ('linked_item_id', 'select', 'Yes — item reference / No — general upkeep', 'نعم — مرجع البند / لا — أعمال عناية عامة',
              dict(list='c2_linked_item', options=['Yes — item reference: ____', 'No — general upkeep'], options_ar=['نعم — مرجع البند: ____', 'لا — أعمال عناية عامة'], no_other=True)),
-            ('works_item_id', 'record', 'Item reference', 'مرجع البند', dict(table='khld_works_item'))]),
+            ('works_item_id', 'record', 'Item reference', 'مرجع البند', dict(table='khld_works_item', when=('linked_item_id', 'yes_item_reference')))]),
         'volunteers_total': dict(kind='number'), 'new_volunteers': dict(kind='number'), 'person_hours': dict(kind='number'),
         'volunteers_breakdown': dict(kind='counts', cells=_cells(
             ('women', 'Women', 'نساء'), ('men', 'Men', 'رجال'), ('under_18', 'Under 18', 'دون ١٨'), ('youth_15_24', 'Youth 15–24', 'شباب ١٥–٢٤'),
@@ -353,7 +362,7 @@ OVERRIDES = {
     'd2': {
         'event_id': dict(kind='record', table='khld_activity', column='activity_id'),
         'event_name_date': dict(kind='readonly', derived='activity_title'),
-        'estimate_basis': dict(kind='parts', parts=[
+        'estimate_basis': dict(kind='parts', when=('count_method_id', 'organisers_estimate'), parts=[
             ('estimate_by', 'text', 'Name and position', 'الاسم والمنصب', {}),
             ('estimate_basis', 'text', 'Basis (e.g. count of seating areas, photographs, average per station)', 'الأساس (مثل: عدّ مناطق الجلوس، الصور، المتوسط لكل محطة)', {})]),
         'total_participants': dict(kind='number'),
@@ -390,7 +399,7 @@ OVERRIDES = {
                   codes=['yes', 'not_yet', 'not_possible'],
                   # the list was seeded by 0142 while this was a plain select; keep its label
                   used_by='d2.duplicate_check')),
-            ('repeat_participants', 'number', 'number of repeat participants identified', 'عدد المشاركين المتكررين المحددين', {})]),
+            ('repeat_participants', 'number', 'number of repeat participants identified', 'عدد المشاركين المتكررين المحددين', dict(when=('duplicate_check_id', 'yes')))]),
         'reconciliation': dict(kind='readonly', derived='reconciliation'),
         'entered_in_db': dict(kind='parts', parts=[
             ('entered_by_name', 'text', 'name', 'الاسم', {}), ('entered_on', 'date', 'date', 'التاريخ', {})]),
@@ -412,7 +421,7 @@ OVERRIDES = {
         # "If inactive or withdrawn, what is the main reason?" -- conditional on
         # field 14, and the list has no "not applicable" row, so an active
         # volunteer has no answer; the conditional rule is save_khld_record's
-        'inactive_reason': dict(required=False),
+        'inactive_reason': dict(required=False, when=('status_end_period_id', ['inactive_no_participation_for_more_than_six_mont', 'withdrew_formally'])),
         'verified_by': dict(kind='parts', parts=[
             ('verified_by_name', 'text', 'name, position', 'الاسم والمنصب', {}), ('verified_on', 'date', 'date', 'التاريخ', {})]),
     },
@@ -496,9 +505,9 @@ OVERRIDES = {
                 options=['Rehabilitation campaign — reference: ____ (form 10)', 'Community activity — reference: ____ (form 11)', 'Market day — reference: ____ (form 21)', 'Stand-alone action day'],
                 options_ar=['حملة تأهيل — المرجع: ____ (النموذج ١٠)', 'نشاط مجتمعي — المرجع: ____ (النموذج ١١)', 'يوم سوق — المرجع: ____ (النموذج ٢١)', 'يوم عمل تطوعي مستقل'],
                 codes=['campaign', 'activity', 'market', 'stand_alone'], no_other=True)),
-            ('campaign_id', 'record', 'Rehabilitation campaign', 'حملة تأهيل', dict(table='khld_campaign')),
-            ('activity_id', 'record', 'Community activity', 'نشاط مجتمعي', dict(table='khld_activity')),
-            ('market_id', 'record', 'Market day', 'يوم سوق', dict(table='khld_market'))]),
+            ('campaign_id', 'record', 'Rehabilitation campaign', 'حملة تأهيل', dict(table='khld_campaign', when=('linked_kind_id', 'campaign'))),
+            ('activity_id', 'record', 'Community activity', 'نشاط مجتمعي', dict(table='khld_activity', when=('linked_kind_id', 'activity'))),
+            ('market_id', 'record', 'Market day', 'يوم سوق', dict(table='khld_market', when=('linked_kind_id', 'market')))]),
         'called_by': dict(kind='parts', parts=[
             ('called_by_id', 'select', 'Called by', 'الجهة الداعية', dict(list='f3_called_by',
                 options=['Municipality', 'community coordination committee', 'local association', 'youth initiative', 'school or university'],
@@ -512,7 +521,7 @@ OVERRIDES = {
         'volunteer_ids': dict(kind='participants'),
         'roles_assigned': dict(kind='parts', parts=[
             ('roles_assigned', 'bool', 'Yes — roles used / No — general tasks only', 'نعم — الأدوار المستخدمة / لا — مهام عامة فقط', {}),
-            ('roles_used', 'multi', 'roles used', 'الأدوار المستخدمة', dict(list='f3_roles_used',
+            ('roles_used', 'multi', 'roles used', 'الأدوار المستخدمة', dict(list='f3_roles_used', when=('roles_assigned', True),
                 options=['event hosting', 'site safety', 'maintenance', 'planting', 'documentation', "children's activities", 'outreach'],
                 options_ar=['استقبال الفعاليات', 'سلامة الموقع', 'الصيانة', 'التشجير', 'التوثيق', 'أنشطة الأطفال', 'التوعية']))]),
         'tasks_completed': dict(kind='area'), 'materials': dict(kind='area'),
@@ -548,7 +557,7 @@ OVERRIDES = {
         'completion': dict(kind='readonly', derived='completion'),
         'knowledge_check': dict(kind='parts', parts=[
             ('knowledge_check_done', 'bool', 'Yes / No', 'نعم / لا', {}),
-            ('knowledge_score', 'number', 'score', 'النتيجة', {}), ('knowledge_score_of', 'number', 'out of', 'من', {})]),
+            ('knowledge_score', 'number', 'score', 'النتيجة', dict(when=('knowledge_check_done', True))), ('knowledge_score_of', 'number', 'out of', 'من', dict(when=('knowledge_check_done', True)))]),
         'recorded_by': dict(kind='parts', parts=[
             ('recorded_by_name', 'text', 'name', 'الاسم', {}), ('recorded_by_position', 'text', 'position', 'المنصب', {}),
             ('recorded_on', 'date', 'date', 'التاريخ', {})]),
@@ -560,35 +569,35 @@ OVERRIDES = {
         'owner_name_contact': dict(kind='readonly', derived='enterprise_owner'),
         'sup_guidance': dict(kind='parts', parts=[
             ('sup_guidance', 'bool', 'Yes / No', 'نعم / لا', {}),
-            ('sup_guidance_sessions', 'number', 'number of sessions', 'عدد الجلسات', {}),
-            ('sup_guidance_dates', 'text', 'Dates', 'التواريخ', {}), ('sup_guidance_provider', 'text', 'Provider', 'الجهة المقدِّمة', {})]),
+            ('sup_guidance_sessions', 'number', 'number of sessions', 'عدد الجلسات', dict(when=('sup_guidance', True))),
+            ('sup_guidance_dates', 'text', 'Dates', 'التواريخ', dict(when=('sup_guidance', True))), ('sup_guidance_provider', 'text', 'Provider', 'الجهة المقدِّمة', dict(when=('sup_guidance', True)))]),
         'sup_licensing_info': dict(kind='parts', parts=[
             ('sup_licensing_info', 'bool', 'Yes / No', 'نعم / لا', {}),
-            ('sup_licensing_info_date', 'date', 'date', 'التاريخ', {}), ('sup_licensing_info_provider', 'text', 'Provider', 'الجهة المقدِّمة', {})]),
+            ('sup_licensing_info_date', 'date', 'date', 'التاريخ', dict(when=('sup_licensing_info', True))), ('sup_licensing_info_provider', 'text', 'Provider', 'الجهة المقدِّمة', dict(when=('sup_licensing_info', True)))]),
         'sup_hygiene': dict(kind='parts', parts=[
             ('sup_hygiene_id', 'select', 'Yes / No / Not applicable — non-food products', 'نعم / لا / لا ينطبق — منتجات غير غذائية',
              dict(list='g2_sup_hygiene', options=['Yes — date: ____ Provider: ____', 'No', 'Not applicable — non-food products'],
                   options_ar=['نعم — التاريخ: ____ الجهة المقدِّمة: ____', 'لا', 'لا ينطبق — منتجات غير غذائية'], no_other=True)),
-            ('sup_hygiene_date', 'date', 'date', 'التاريخ', {}), ('sup_hygiene_provider', 'text', 'Provider', 'الجهة المقدِّمة', {})]),
+            ('sup_hygiene_date', 'date', 'date', 'التاريخ', dict(when=('sup_hygiene_id', 'yes'))), ('sup_hygiene_provider', 'text', 'Provider', 'الجهة المقدِّمة', dict(when=('sup_hygiene_id', 'yes')))]),
         'sup_referral': dict(kind='parts', parts=[
             ('sup_referral', 'bool', 'Yes / No', 'نعم / لا', {}),
-            ('sup_referral_entity', 'text', 'entity', 'الجهة', {}), ('sup_referral_purpose', 'text', 'Purpose', 'الغرض', {}),
-            ('sup_referral_date', 'date', 'Date', 'التاريخ', {}),
-            ('sup_referral_outcome_id', 'select', 'Outcome', 'النتيجة', dict(list='g2_sup_referral_outcome', options=['accepted', 'pending', 'declined'], options_ar=['قُبل', 'قيد الإجراء', 'رُفض']))]),
+            ('sup_referral_entity', 'text', 'entity', 'الجهة', dict(when=('sup_referral', True))), ('sup_referral_purpose', 'text', 'Purpose', 'الغرض', dict(when=('sup_referral', True))),
+            ('sup_referral_date', 'date', 'Date', 'التاريخ', dict(when=('sup_referral', True))),
+            ('sup_referral_outcome_id', 'select', 'Outcome', 'النتيجة', dict(list='g2_sup_referral_outcome', options=['accepted', 'pending', 'declined'], options_ar=['قُبل', 'قيد الإجراء', 'رُفض'], when=('sup_referral', True)))]),
         'sup_peer_network': dict(kind='parts', parts=[
             ('sup_peer_network', 'bool', 'Yes / No', 'نعم / لا', {}),
-            ('sup_peer_network_date', 'date', 'date', 'التاريخ', {}), ('sup_peer_network_meetings', 'number', 'Number of exchange meetings attended', 'عدد لقاءات التبادل التي حضرها', {})]),
+            ('sup_peer_network_date', 'date', 'date', 'التاريخ', dict(when=('sup_peer_network', True))), ('sup_peer_network_meetings', 'number', 'Number of exchange meetings attended', 'عدد لقاءات التبادل التي حضرها', dict(when=('sup_peer_network', True)))]),
         'sup_market_access': dict(kind='parts', parts=[
             ('sup_market_access', 'bool', 'Yes / No', 'نعم / لا', {}),
-            ('sup_market_access_refs', 'text', 'market day references', 'مراجع أيام السوق', {}), ('sup_market_access_count', 'number', 'Number of markets', 'عدد الأسواق', {})]),
+            ('sup_market_access_refs', 'text', 'market day references', 'مراجع أيام السوق', dict(when=('sup_market_access', True))), ('sup_market_access_count', 'number', 'Number of markets', 'عدد الأسواق', dict(when=('sup_market_access', True)))]),
         'sup_inkind': dict(kind='parts', parts=[
             ('sup_inkind', 'bool', 'Yes / No', 'نعم / لا', {}),
-            ('sup_inkind_description', 'text', 'describe, with estimated value in JOD and provider', 'يُوصف مع القيمة التقديرية بالدينار والجهة المقدِّمة', {})]),
+            ('sup_inkind_description', 'text', 'describe, with estimated value in JOD and provider', 'يُوصف مع القيمة التقديرية بالدينار والجهة المقدِّمة', dict(when=('sup_inkind', True)))]),
         'sup_marketing': dict(kind='parts', parts=[
-            ('sup_marketing', 'bool', 'Yes / No', 'نعم / لا', {}), ('sup_marketing_description', 'text', 'describe', 'يُوصف', {})]),
+            ('sup_marketing', 'bool', 'Yes / No', 'نعم / لا', {}), ('sup_marketing_description', 'text', 'describe', 'يُوصف', dict(when=('sup_marketing', True)))]),
         'sup_site_visit': dict(kind='parts', parts=[
             ('sup_site_visit', 'bool', 'Yes / No', 'نعم / لا', {}),
-            ('sup_site_visit_count', 'number', 'number of visits', 'عدد الزيارات', {}), ('sup_site_visit_dates', 'text', 'Dates', 'التواريخ', {})]),
+            ('sup_site_visit_count', 'number', 'number of visits', 'عدد الزيارات', dict(when=('sup_site_visit', True))), ('sup_site_visit_dates', 'text', 'Dates', 'التواريخ', dict(when=('sup_site_visit', True)))]),
         'support_types_count': dict(kind='readonly', derived='support_types_count'),
         'entered_by': dict(kind='parts', parts=[
             ('entered_by_name', 'text', 'name', 'الاسم', {}), ('entered_by_organisation', 'text', 'organisation', 'المؤسسة', {}),
@@ -615,8 +624,8 @@ OVERRIDES = {
             ('persons_with_disabilities', 'Persons with disabilities', 'ذوو إعاقة'), ('low_income_families', 'Low-income families', 'أسر منخفضة الدخل'))),
         'fee_charged': dict(kind='parts', parts=[
             ('fee_charged', 'bool', 'No — free of charge / Yes — fee', 'لا — مجانية / نعم — رسم', {}),
-            ('fee_per_stall_jod', 'money', 'amount per stall (JOD)', 'المبلغ لكل كشك (دينار)', {}),
-            ('fee_basis', 'text', 'Basis and authorisation', 'الأساس والتخويل', {})]),
+            ('fee_per_stall_jod', 'money', 'amount per stall (JOD)', 'المبلغ لكل كشك (دينار)', dict(when=('fee_charged', True))),
+            ('fee_basis', 'text', 'Basis and authorisation', 'الأساس والتخويل', dict(when=('fee_charged', True)))]),
         'visitors': dict(kind='parts', parts=[
             ('visitors_estimated', 'number', 'Estimated visitors', 'العدد التقديري للزوار', {}),
             ('visitors_method_id', 'select', 'Method', 'الطريقة', dict(list='h1_visitors_method',
@@ -636,7 +645,7 @@ OVERRIDES = {
             ('feedback_collected_id', 'select', 'Yes / Verbal feedback only / No', 'نعم / تغذية راجعة شفهية فقط / لا',
              dict(list='h1_feedback_collected', options=['Yes — vendor forms: ____ visitor forms: ____', 'Verbal feedback only', 'No'],
                   options_ar=['نعم — نماذج العارضين: ____ نماذج الزوار: ____', 'تغذية راجعة شفهية فقط', 'لا'], no_other=True)),
-            ('vendor_forms', 'number', 'vendor forms', 'نماذج العارضين', {}), ('visitor_forms', 'number', 'visitor forms', 'نماذج الزوار', {})]),
+            ('vendor_forms', 'number', 'vendor forms', 'نماذج العارضين', dict(when=('feedback_collected_id', 'yes_vendor_forms'))), ('visitor_forms', 'number', 'visitor forms', 'نماذج الزوار', dict(when=('feedback_collected_id', 'yes_vendor_forms')))]),
         'recorded_by': dict(kind='parts', parts=[
             ('recorded_by_name', 'text', 'Recorded by (name, position)', 'عُبئ بواسطة (الاسم والمنصب)', {}),
             ('recorded_on', 'date', 'date', 'التاريخ', {}),
@@ -656,7 +665,7 @@ OVERRIDES = {
         'stall_number': dict(kind='text'),
         'stall_free': dict(kind='parts', parts=[
             ('stall_free', 'bool', 'Yes — free of charge / No — fee paid', 'نعم — مجاناً / لا — دُفع رسم', {}),
-            ('stall_fee_jod', 'money', 'fee paid (JOD)', 'الرسم المدفوع (دينار)', {})]),
+            ('stall_fee_jod', 'money', 'fee paid (JOD)', 'الرسم المدفوع (دينار)', dict(when=('stall_free', False)))]),
         'attended': dict(kind='select', gate='attended'),
         'consent': dict(kind='select', stamp=True),
         'signature': dict(kind='parts', parts=[('signed_by', 'text', 'Vendor', 'العارض', {}), ('signed_on', 'date', 'date', 'التاريخ', {})]),

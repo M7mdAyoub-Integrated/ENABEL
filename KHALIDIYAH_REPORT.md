@@ -171,14 +171,31 @@ Done on 22 September 2026, after the app was finished:
    one field changed, every other value, count cell, checklist row and
    part still there.
 
-   One gap found and left as it is: a sub-field that belongs to the
-   branch NOT chosen — a fee on a stall marked *free of charge*, a repeat
-   count with the duplicate check *not yet done* — is accepted. The
+   One gap found and closed on the screen: a sub-field that belongs to
+   the branch NOT chosen — a fee on a stall marked *free of charge*, a
+   repeat count with the duplicate check *not yet done*, IMP-0's park-use
+   block under *Never visited* — was accepted with a value in it. The
    database refuses a missing one (`guard_khld_rules`) and does not refuse
-   a stray one, and the screen does not clear it. A stray value never
-   reaches a figure (the views test the branch, not the sub-field); it is
-   listed here as a data-quality rule the M&E lead may want, as a
-   migration on the guard, not as a screen rule.
+   a stray one, so the dependency is now written once, in the catalogue
+   (`when=` on 44 controls across IMP-0, C1, C2, D2, SO3-0, F3, G1, G2, H1
+   and H2), and the screen dims and disables a control whose governing
+   answer is not chosen and sends it blank. Seen on screen: H2's fee input
+   disabled until *No — fee paid*; IMP-0 with its block filled and then
+   *Never* chosen saved with the block empty. The seven applied migrations
+   the catalogue generates were confirmed byte-identical after the change.
+
+   The two restore paths were driven as well. F2 with a soft-deleted
+   volunteer's national ID: the amber band names her, when and by whom,
+   *Restore and continue* brings her back as *On file — name is locked*,
+   and the save is then refused with *This person is already registered as
+   a volunteer* — her registration is soft-deleted and the key is global
+   (restored, never recreated). SO1-0 typing a soft-deleted partner's name:
+   `partner_deleted`, the red band's *Restore and continue*, and the second
+   save attached the survey to the restored row — one partner with that
+   name in the table, not two. The evidence flow was driven on a
+   Khalidiyah record against the real store: presign, the browser's PUT to
+   R2, confirm, the listing, a signed download, and remove; the attachment
+   is soft-deleted and the object gone.
 
 1. **`0152` — the public view** — applied, renamed to its ledger version,
    its verify block run: the anon surface is six views and four RPCs, the

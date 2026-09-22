@@ -12,10 +12,20 @@
 export type KhldPartType =
   | 'text' | 'number' | 'money' | 'date' | 'phone' | 'select' | 'multi' | 'bool' | 'record' | 'person_phone'
 
+/**
+ * A control that belongs to one answer of another control on the same form:
+ * the fee to "No — fee paid", the score to "Yes", IMP-0's park-use block to
+ * any visit but "Never". `codes` for a select column, `value` for a boolean
+ * one. The screens dim and blank a control whose answer is not chosen; the
+ * rules that REFUSE a missing one live in the database (guard_khld_rules).
+ */
+export type KhldWhen = { column: string; codes?: readonly string[]; value?: boolean }
+
 export type KhldPartDef = {
   column: string
   type: KhldPartType
   required?: boolean
+  when?: KhldWhen
   /** A select or multi part: the ref_khld_ list it reads. */
   ref?: string
   /** A select part whose list has a free-text option: the `_other` column. */
@@ -58,6 +68,7 @@ export type KhldFieldDef = {
   key: string
   type: KhldFieldType
   required?: boolean
+  when?: KhldWhen
   /** The sheet's count gate: this field decides whether the record counts (plan §5.3). */
   counting?: boolean
   /** A readonly field: what the database assigns or works out, or which linked record's column is shown. */

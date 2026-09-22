@@ -100,7 +100,13 @@ export const KHLD_FORMS = {
               },
               {
                 "column": "children_count",
-                "type": "number"
+                "type": "number",
+                "when": {
+                  "column": "has_children_id",
+                  "codes": [
+                    "yes"
+                  ]
+                }
               }
             ]
           }
@@ -119,12 +125,30 @@ export const KHLD_FORMS = {
           {
             "key": "activities_taken",
             "type": "multi",
+            "when": {
+              "column": "visit_freq_id",
+              "codes": [
+                "once_or_twice",
+                "every_few_months",
+                "about_monthly",
+                "weekly_or_more"
+              ]
+            },
             "question": "activities_taken",
             "ref": "imp0_activities_taken"
           },
           {
             "key": "accompanied_by",
             "type": "multi",
+            "when": {
+              "column": "visit_freq_id",
+              "codes": [
+                "once_or_twice",
+                "every_few_months",
+                "about_monthly",
+                "weekly_or_more"
+              ]
+            },
             "question": "accompanied_by",
             "ref": "imp0_accompanied_by"
           }
@@ -136,30 +160,75 @@ export const KHLD_FORMS = {
           {
             "key": "mixed_presence",
             "type": "select",
+            "when": {
+              "column": "visit_freq_id",
+              "codes": [
+                "once_or_twice",
+                "every_few_months",
+                "about_monthly",
+                "weekly_or_more"
+              ]
+            },
             "column": "mixed_presence_id",
             "ref": "imp0_mixed_presence"
           },
           {
             "key": "new_contact",
             "type": "select",
+            "when": {
+              "column": "visit_freq_id",
+              "codes": [
+                "once_or_twice",
+                "every_few_months",
+                "about_monthly",
+                "weekly_or_more"
+              ]
+            },
             "column": "new_contact_id",
             "ref": "imp0_new_contact"
           },
           {
             "key": "opportunity_increase",
             "type": "select",
+            "when": {
+              "column": "visit_freq_id",
+              "codes": [
+                "once_or_twice",
+                "every_few_months",
+                "about_monthly",
+                "weekly_or_more"
+              ]
+            },
             "column": "opportunity_increase_id",
             "ref": "agree_scale"
           },
           {
             "key": "joint_activity",
             "type": "select",
+            "when": {
+              "column": "visit_freq_id",
+              "codes": [
+                "once_or_twice",
+                "every_few_months",
+                "about_monthly",
+                "weekly_or_more"
+              ]
+            },
             "column": "joint_activity_id",
             "ref": "imp0_joint_activity"
           },
           {
             "key": "comfort_level",
             "type": "select",
+            "when": {
+              "column": "visit_freq_id",
+              "codes": [
+                "once_or_twice",
+                "every_few_months",
+                "about_monthly",
+                "weekly_or_more"
+              ]
+            },
             "column": "comfort_level_id",
             "ref": "imp0_comfort_level"
           },
@@ -1500,11 +1569,23 @@ export const KHLD_FORMS = {
               },
               {
                 "column": "priority_rank",
-                "type": "number"
+                "type": "number",
+                "when": {
+                  "column": "on_priority_list_id",
+                  "codes": [
+                    "yes"
+                  ]
+                }
               },
               {
                 "column": "addition_justification",
-                "type": "text"
+                "type": "text",
+                "when": {
+                  "column": "on_priority_list_id",
+                  "codes": [
+                    "no"
+                  ]
+                }
               }
             ]
           },
@@ -1750,6 +1831,12 @@ export const KHLD_FORMS = {
               {
                 "column": "works_item_id",
                 "type": "record",
+                "when": {
+                  "column": "linked_item_id",
+                  "codes": [
+                    "yes_item_reference"
+                  ]
+                },
                 "table": "khld_works_item"
               }
             ]
@@ -2180,6 +2267,12 @@ export const KHLD_FORMS = {
             "key": "estimate_basis",
             "type": "parts",
             "required": true,
+            "when": {
+              "column": "count_method_id",
+              "codes": [
+                "organisers_estimate"
+              ]
+            },
             "parts": [
               {
                 "column": "estimate_by",
@@ -2306,7 +2399,13 @@ export const KHLD_FORMS = {
               },
               {
                 "column": "repeat_participants",
-                "type": "number"
+                "type": "number",
+                "when": {
+                  "column": "duplicate_check_id",
+                  "codes": [
+                    "yes"
+                  ]
+                }
               }
             ]
           },
@@ -2460,6 +2559,13 @@ export const KHLD_FORMS = {
           {
             "key": "inactive_reason",
             "type": "select",
+            "when": {
+              "column": "status_end_period_id",
+              "codes": [
+                "inactive_no_participation_for_more_than_six_mont",
+                "withdrew_formally"
+              ]
+            },
             "column": "inactive_reason_id",
             "ref": "so30_inactive_reason",
             "other": "inactive_reason_other"
@@ -3373,16 +3479,34 @@ export const KHLD_FORMS = {
               {
                 "column": "campaign_id",
                 "type": "record",
+                "when": {
+                  "column": "linked_kind_id",
+                  "codes": [
+                    "campaign"
+                  ]
+                },
                 "table": "khld_campaign"
               },
               {
                 "column": "activity_id",
                 "type": "record",
+                "when": {
+                  "column": "linked_kind_id",
+                  "codes": [
+                    "activity"
+                  ]
+                },
                 "table": "khld_activity"
               },
               {
                 "column": "market_id",
                 "type": "record",
+                "when": {
+                  "column": "linked_kind_id",
+                  "codes": [
+                    "market"
+                  ]
+                },
                 "table": "khld_market"
               }
             ]
@@ -3456,6 +3580,10 @@ export const KHLD_FORMS = {
               {
                 "column": "roles_used",
                 "type": "multi",
+                "when": {
+                  "column": "roles_assigned",
+                  "value": true
+                },
                 "question": "roles_used",
                 "ref": "f3_roles_used"
               }
@@ -4064,11 +4192,19 @@ export const KHLD_FORMS = {
               },
               {
                 "column": "knowledge_score",
-                "type": "number"
+                "type": "number",
+                "when": {
+                  "column": "knowledge_check_done",
+                  "value": true
+                }
               },
               {
                 "column": "knowledge_score_of",
-                "type": "number"
+                "type": "number",
+                "when": {
+                  "column": "knowledge_check_done",
+                  "value": true
+                }
               }
             ]
           },
@@ -4239,15 +4375,27 @@ export const KHLD_FORMS = {
               },
               {
                 "column": "sup_guidance_sessions",
-                "type": "number"
+                "type": "number",
+                "when": {
+                  "column": "sup_guidance",
+                  "value": true
+                }
               },
               {
                 "column": "sup_guidance_dates",
-                "type": "text"
+                "type": "text",
+                "when": {
+                  "column": "sup_guidance",
+                  "value": true
+                }
               },
               {
                 "column": "sup_guidance_provider",
-                "type": "text"
+                "type": "text",
+                "when": {
+                  "column": "sup_guidance",
+                  "value": true
+                }
               }
             ]
           },
@@ -4267,11 +4415,19 @@ export const KHLD_FORMS = {
               },
               {
                 "column": "sup_licensing_info_date",
-                "type": "date"
+                "type": "date",
+                "when": {
+                  "column": "sup_licensing_info",
+                  "value": true
+                }
               },
               {
                 "column": "sup_licensing_info_provider",
-                "type": "text"
+                "type": "text",
+                "when": {
+                  "column": "sup_licensing_info",
+                  "value": true
+                }
               }
             ]
           },
@@ -4288,11 +4444,23 @@ export const KHLD_FORMS = {
               },
               {
                 "column": "sup_hygiene_date",
-                "type": "date"
+                "type": "date",
+                "when": {
+                  "column": "sup_hygiene_id",
+                  "codes": [
+                    "yes"
+                  ]
+                }
               },
               {
                 "column": "sup_hygiene_provider",
-                "type": "text"
+                "type": "text",
+                "when": {
+                  "column": "sup_hygiene_id",
+                  "codes": [
+                    "yes"
+                  ]
+                }
               }
             ]
           },
@@ -4312,19 +4480,35 @@ export const KHLD_FORMS = {
               },
               {
                 "column": "sup_referral_entity",
-                "type": "text"
+                "type": "text",
+                "when": {
+                  "column": "sup_referral",
+                  "value": true
+                }
               },
               {
                 "column": "sup_referral_purpose",
-                "type": "text"
+                "type": "text",
+                "when": {
+                  "column": "sup_referral",
+                  "value": true
+                }
               },
               {
                 "column": "sup_referral_date",
-                "type": "date"
+                "type": "date",
+                "when": {
+                  "column": "sup_referral",
+                  "value": true
+                }
               },
               {
                 "column": "sup_referral_outcome_id",
                 "type": "select",
+                "when": {
+                  "column": "sup_referral",
+                  "value": true
+                },
                 "ref": "g2_sup_referral_outcome"
               }
             ]
@@ -4345,11 +4529,19 @@ export const KHLD_FORMS = {
               },
               {
                 "column": "sup_peer_network_date",
-                "type": "date"
+                "type": "date",
+                "when": {
+                  "column": "sup_peer_network",
+                  "value": true
+                }
               },
               {
                 "column": "sup_peer_network_meetings",
-                "type": "number"
+                "type": "number",
+                "when": {
+                  "column": "sup_peer_network",
+                  "value": true
+                }
               }
             ]
           },
@@ -4369,11 +4561,19 @@ export const KHLD_FORMS = {
               },
               {
                 "column": "sup_market_access_refs",
-                "type": "text"
+                "type": "text",
+                "when": {
+                  "column": "sup_market_access",
+                  "value": true
+                }
               },
               {
                 "column": "sup_market_access_count",
-                "type": "number"
+                "type": "number",
+                "when": {
+                  "column": "sup_market_access",
+                  "value": true
+                }
               }
             ]
           },
@@ -4391,7 +4591,11 @@ export const KHLD_FORMS = {
               },
               {
                 "column": "sup_inkind_description",
-                "type": "text"
+                "type": "text",
+                "when": {
+                  "column": "sup_inkind",
+                  "value": true
+                }
               }
             ]
           },
@@ -4409,7 +4613,11 @@ export const KHLD_FORMS = {
               },
               {
                 "column": "sup_marketing_description",
-                "type": "text"
+                "type": "text",
+                "when": {
+                  "column": "sup_marketing",
+                  "value": true
+                }
               }
             ]
           },
@@ -4427,11 +4635,19 @@ export const KHLD_FORMS = {
               },
               {
                 "column": "sup_site_visit_count",
-                "type": "number"
+                "type": "number",
+                "when": {
+                  "column": "sup_site_visit",
+                  "value": true
+                }
               },
               {
                 "column": "sup_site_visit_dates",
-                "type": "text"
+                "type": "text",
+                "when": {
+                  "column": "sup_site_visit",
+                  "value": true
+                }
               }
             ]
           },
@@ -4703,11 +4919,19 @@ export const KHLD_FORMS = {
               },
               {
                 "column": "fee_per_stall_jod",
-                "type": "money"
+                "type": "money",
+                "when": {
+                  "column": "fee_charged",
+                  "value": true
+                }
               },
               {
                 "column": "fee_basis",
-                "type": "text"
+                "type": "text",
+                "when": {
+                  "column": "fee_charged",
+                  "value": true
+                }
               }
             ]
           },
@@ -4836,11 +5060,23 @@ export const KHLD_FORMS = {
               },
               {
                 "column": "vendor_forms",
-                "type": "number"
+                "type": "number",
+                "when": {
+                  "column": "feedback_collected_id",
+                  "codes": [
+                    "yes_vendor_forms"
+                  ]
+                }
               },
               {
                 "column": "visitor_forms",
-                "type": "number"
+                "type": "number",
+                "when": {
+                  "column": "feedback_collected_id",
+                  "codes": [
+                    "yes_vendor_forms"
+                  ]
+                }
               }
             ]
           },
@@ -5062,7 +5298,11 @@ export const KHLD_FORMS = {
               },
               {
                 "column": "stall_fee_jod",
-                "type": "money"
+                "type": "money",
+                "when": {
+                  "column": "stall_free",
+                  "value": false
+                }
               }
             ]
           },
