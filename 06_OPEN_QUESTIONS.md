@@ -1731,9 +1731,12 @@ a second server refuses to start rather than drifting. The dev origin is
 it fails for some other reason than CORS.
 
 **The rule to paste** (R2 → the bucket → Settings → CORS policy → edit as
-JSON). Replace the placeholder line with the Netlify site's origin when the
-domain is set; until then leave it out entirely, because a wrong origin in
-the list is silently ignored rather than reported:
+JSON). The production origin is the Netlify site connected to the
+repository on 22 September 2026, `https://enabel-platform.netlify.app`; the
+probe below answered **403** for it that day, so the rule on the bucket
+still lists only the two local origins until this is pasted. A wrong origin
+in the list is silently ignored rather than reported, so paste it exactly,
+scheme included and no trailing slash:
 
 ```json
 [
@@ -1741,7 +1744,7 @@ the list is silently ignored rather than reported:
     "AllowedOrigins": [
       "http://localhost:5173",
       "http://localhost:5174",
-      "https://REPLACE-WITH-THE-NETLIFY-ORIGIN"
+      "https://enabel-platform.netlify.app"
     ],
     "AllowedMethods": ["PUT", "GET", "HEAD"],
     "AllowedHeaders": ["Content-Type"],
@@ -1763,7 +1766,20 @@ headers echoed back. The failure is `HTTP/1.1 403 Forbidden` and nothing
 else -- no `Access-Control-*` line at all. Run it once per origin in the
 list, and once with an origin that is NOT in it to see that the bucket says
 no to strangers. Verified this way on 15 September: 5173 passed, 5174 and
-`https://example.org` were refused.
+`https://example.org` were refused. On 22 September, with the production
+site live: 5173 passed, `https://enabel-platform.netlify.app` was refused —
+the rule had not yet been pasted.
+
+**The second setting outside the repository: Supabase Auth's redirect
+list.** `AuthProvider.tsx` asks for a password reset with
+`redirectTo: <origin>/reset`, and GoTrue honours a `redirectTo` only when
+it matches the project's Site URL or one of its Redirect URLs — otherwise
+the link in the email goes to the Site URL and the reset never reaches
+`/reset`. Dashboard → Authentication → URL Configuration: Site URL
+`https://enabel-platform.netlify.app`, and `https://enabel-platform.netlify.app/**`
+under Redirect URLs (keep `http://localhost:5173/**` for development).
+Neither the CLI on this machine nor the MCP can set it; it is a dashboard
+change and it is not versioned, so it is written here.
 
 ```json
 [

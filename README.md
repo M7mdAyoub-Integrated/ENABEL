@@ -84,6 +84,29 @@ React + TypeScript + Vite + Tailwind v4, in [`app/`](app). Bilingual
 English/Arabic with full RTL. Deployed with Netlify from
 [`netlify.toml`](netlify.toml).
 
+### Deployment
+
+The Netlify site `enabel-platform` (`https://enabel-platform.netlify.app`)
+builds **from this repository**, not from a folder upload: a push to `main`
+reaches Netlify through a webhook on the GitHub repo, Netlify clones with a
+read-only deploy key, and `netlify.toml` gives it the base (`app`), the
+command (`npm run build`) and the publish directory. The build runs the
+whole check suite before `vite build` and refuses to ship a bundle holding
+a demo credential, so the site's environment carries exactly two variables,
+`VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (the publishable key,
+which is public by design), and must never carry `VITE_DEMO_PASSWORD` or
+`VITE_DEMO_EMAIL`. Connected on 22 September 2026 from commit `75ea2a7`;
+the first build took 42 s and the SPA redirect and the three security
+headers were verified on the live origin.
+
+Two settings live outside the repository and are listed in
+`06_OPEN_QUESTIONS.md` OQ-49: the evidence bucket's CORS rule must name
+the production origin (an upload from a domain the bucket has never heard
+of fails in the browser as a bare network error), and Supabase Auth's
+redirect URLs must include `https://enabel-platform.netlify.app/**` for
+the password-reset link to come back to the app rather than to the site
+URL. Neither is versioned; both are checked by the probes written there.
+
 ### Sahel Horan
 
 Every screen reads and writes the database. The forms modules
