@@ -1,9 +1,10 @@
-# 09 — Two municipalities on one platform
+# 09 — Three municipalities on one platform
 
 How Ramtha was added beside Sahel Horan without either seeing the other, and the
 decisions taken on the way that the plan (`RAMTHA_IMPLEMENTATION_PLAN.md`) left
 open or that this build departed from. Written as the work was done, one section
-per part, so that nothing here is recalled.
+per part, so that nothing here is recalled. Part 12 is Al Khalidiyah, the third,
+added the same way from `KHALIDIYAH_IMPLEMENTATION_PLAN.md`.
 
 ---
 
@@ -1267,3 +1268,327 @@ The matrix, all seven view hashes and every table's counts read the same at
 the end as in `supabase/baselines/2026-09-16_both_before_platform_modal.md`;
 `audit_log` +5, all of them the super admin's acting-municipality switches
 made by the verification. The super admin is back to acting nowhere.
+
+
+---
+
+## Part 12 — the third municipality: Al Khalidiyah (21–22 September 2026, migrations 0138–0151, `0152` pending, `supabase/khalidiyah`, `app/src/khld`)
+
+How Khalidiyah was added beside the other two, following
+`KHALIDIYAH_IMPLEMENTATION_PLAN.md`, and where this build departed from it
+or had to decide something it left open. The short version for the M&E
+lead is `KHALIDIYAH_REPORT.md`; the decisions that must not be guessed are
+OQ-52 to OQ-58.
+
+Khalidiyah is a different kind of programme from the other two: a park, a
+partnership mechanism, a volunteer programme and home-based enterprises,
+with **twenty-one forms feeding twenty-one indicators** and **no public
+forms at all** — its residents are recorded by staff, on paper, and the
+sheets arrived with their Arabic already written. That last fact shaped the
+build: nothing on a Khalidiyah screen is drafted except the sidebar names
+and the words around the controls.
+
+### One reading of the workbook, five generators
+
+Everything under `supabase/khalidiyah/` reads the two workbooks once
+(`workbook.py`) through one structural catalogue (`catalogue.py`, one entry
+per field that is not a plain column) into one resolved model
+(`model.py`). The list migration (`gen_0141.py`), the table migrations
+(`gen_0145.py`), the framework migration (`gen_0149.py`) and the app's form
+definitions and both locale files (`gen_forms.py`) are generated from that
+model, so a field cannot read one list on the form and another in the
+database. Each generator reproduces its applied file byte for byte; a
+change to the catalogue that would alter an applied migration is refused
+by `check_migration_files.sh`, and recorded instead as a correction the
+next migration applies (`LIST_FIXES`, `LISTS_ADDED_LATER` in the
+catalogue).
+
+### 0138–0140 — the shared table changes, and the row
+
+- **A second identifier on `person`** (0138, plan D1). `national_id`
+  becomes nullable — its name, format and uniqueness do not change, because
+  two municipalities' lookups, the throttle hash and every person-level
+  form read it — and `unhcr_number` is added beside it, unique where
+  present, normalised by a trigger, **with no format check** (OQ-52: no
+  source gives the format). `person_has_identifier` requires one of the
+  two. Sahel Horan's and Ramtha's rows are asserted unchanged.
+- **`age_band()` named a child as a young adult** (0139, plan D3). The live
+  body put every age under 25 into `18-24`; harmless only because nobody
+  under 18 existed. An `under_18` branch is added, every per-municipality
+  view hash is taken before and after, and Khalidiyah gets its own seven
+  bands in `khld_age_band()` — never `age_band()`.
+- **The municipality and its thirteen quarters** (0140): code `KHLD`, slug
+  `khalidiyah`, names and programme line verbatim from the index sheet,
+  the platform's common calendar. Its period codes repeat the other two
+  municipalities', which is what 0114 anchored every view against, and the
+  migration asserts that no Sahel Horan or Ramtha figure moved when a third
+  `27/Q1` appeared.
+
+### 0141–0144 — 237 lists, and the helpers
+
+One `ref_khld_*` table per response list — 237 of them, 1,250 options,
+both labels verbatim in the sheet's order — split across three migrations
+only because each is one pasted text. Thirteen lists are shared between
+sheets and exist once (`sex`, `age_group`, `nationality`, `disability`,
+`neighbourhood`, `agree_scale`, `checklist_status`, `product_type`, …); two
+sheets share a table only when every option matches in both languages.
+`partner_type` is listed in 0141's header but created by 0145, because no
+sheet field selects from it — it serves the partner entity's column
+(`LISTS_ADDED_LATER`).
+
+0144 gives Khalidiyah its own reference counter (three-letter prefixes,
+series without a year, the sheet's width, never reset), its own
+"other (specify)" guard, `khld_ensure_person(jsonb)` with the identifier
+type chosen **explicitly** (`national_id` | `unhcr_number`; a soft-deleted
+match raises `P0KHL` with the id, never recreates), `khld_person_lookup`
+for the screens (the deleter's name through the 0108 definer, so
+`authenticated` can call it), and the guardian guard: a volunteer under
+18 on the registration date cannot be saved without the guardian's name,
+relationship, phone, written consent and its date. Minor status is
+derived from the date of birth, never stored.
+
+### 0145–0147 — twenty-one forms onto twenty-one tables, three entities, and their children
+
+Every sheet was read in full first. One table per form; every sheet field
+name is a column name except the compound fields (split into the facts
+they name) and the "by …" counts (a child row per cell, never a column per
+cell, never JSON); the column comments carry the sheet's question. The
+four milestone forms share **one** table, `khld_milestone_verification`,
+told apart by `milestone_code`, with a `khld_milestone_checklist_item`
+child (status, detail, date, evidence reference) and the milestone
+catalogue and rules described below.
+
+| form | table | class | fields | reference | count gate | keys on |
+|---|---|---|---|---|---|---|
+| KHLD-IMP-0 | `khld_interaction_survey` | anonymous | 26 | — | consent | — |
+| KHLD-SO1-0 | `khld_partner_survey` | organisation | 24 | — | — | partner |
+| KHLD-SO1-A1 | `khld_milestone_verification` | record | 23 | — | — | — |
+| KHLD-SO1-A2 | `khld_coordination_meeting` | record | 25 | KHLD-CM | minutes_prepared | — |
+| KHLD-SO1-A3 | `khld_contribution` | organisation | 24 | KHLD-CON | status | works item |
+| KHLD-SO1-B1 | `khld_milestone_verification` | record | 22 | — | — | — |
+| KHLD-SO2-0 | `khld_user_feedback` | anonymous | 21 | — | — | activity |
+| KHLD-SO2-C1 | `khld_works_item` | record | 20 | KHLD-REH | status | — |
+| KHLD-SO2-C2 | `khld_campaign` | record | 24 | KHLD-VC | evidence_attached | — |
+| KHLD-SO2-D1 | `khld_activity` | record | 24 | KHLD-EV | evidence_attached | — |
+| KHLD-SO2-D2 | `khld_attendance` | aggregate | 20 | — | — | activity |
+| KHLD-SO3-0 | `khld_volunteer_tracking` | linked | 22 | — | — | volunteer |
+| KHLD-SO3-E1 | `khld_milestone_verification` | record | 23 | — | — | — |
+| KHLD-SO3-F1 | `khld_milestone_verification` | record | 22 | — | — | — |
+| KHLD-SO3-F2 | `khld_volunteer` | person | 28 | KHLD-VOL | — | person |
+| KHLD-SO3-F3 | `khld_action_day` | record | 25 | KHLD-AD | evidence_attached | — |
+| KHLD-SO4-0 | `khld_producer_survey` | linked | 33 | — | respondent_is_vendor | vendor |
+| KHLD-SO4-G1 | `khld_guidance_completion` | person | 33 | KHLD-ENT | — | enterprise (its owner is the person) |
+| KHLD-SO4-G2 | `khld_enterprise_support` | linked | 29 | — | — | enterprise |
+| KHLD-SO4-H1 | `khld_market` | record | 29 | KHLD-MKT | — | — |
+| KHLD-SO4-H2 | `khld_vendor_registration` | person | 29 | KHLD-VEN | attended | market, vendor, enterprise |
+
+Three things the sheets refer to across forms are entities with a table
+of their own: `khld_partner` (one row however many surveys and
+contributions name it), `khld_enterprise` (SO4-G1's owner, SO4-G2's
+record, SO4-H2's optional link) and `khld_vendor` (stable across market
+days, the person behind it in `person`). `khld_volunteer` is itself the
+entity of SO3-F2: one per person, registered once.
+
+Two things were found while applying, both by the migrations' own probes:
+
+- **The shared milestone table needs its question codes prefixed.** Four
+  forms' `evidence_attached` multi-selects read four different lists, and
+  `khld_question_list` is keyed on `(table, question_code)`. On that table
+  the code carries the form id (`a1_evidence_attached`, …,
+  `a1_stakeholder_count`), and `guard_khld_milestone_child` requires the
+  prefix to be the parent's milestone. Found when 0147 hit the primary key.
+- **`guard_soft_delete` refuses the owner.** A probe that soft-deletes must
+  do it as the Khalidiyah admin (`set local role authenticated` with the
+  admin's claims) and read back — which is also the only honest way to
+  test a policy.
+
+`d2.duplicate_check`'s *Yes* option was seeded with `allows_free_text`
+from its blank, but the blank is a **number** (the repeat participants the
+distinct-individuals figure subtracts) and has a typed column; 0145
+corrects the flag and `LIST_FIXES` records why the list migration is not
+edited.
+
+### 0148 — one save path, and the rules the sheets state in prose
+
+`save_khld_record(p_table, p)` takes `{id?, row, person?, partner?,
+enterprise?, option_questions?, options?, count_fields?, counts?,
+checklist?, ratings?, participations?}`, writes only the columns the
+payload names, refuses an unknown column or a block the table cannot take,
+resolves the person and the entity the form keys on, replaces the named
+children by delete-then-insert **with a read-back**, and **merges**
+participations by volunteer (an occasion's attendance sheet is added to,
+never rewritten). One exception block covers the whole thing (0090's
+lesson), and it answers `{ok:false, result}` for the refusals a screen
+must distinguish: `person_deleted`, `partner_deleted`,
+`enterprise_deleted`, `vendor_deleted` (each with the id, so the screen can
+offer restore), `consent_refused` (IMP-0's field 4), and `invalid` with the
+constraint name.
+
+The conditional rules the sheets write in their notes column live in one
+trigger, `guard_khld_rules()`, each with a named constraint
+(`khld_imp0_visit_block_skipped`, `khld_so30_inactive_reason_required`,
+`khld_d2_repeat_participants_required`, `khld_h2_stall_fee_required`,
+`khld_f3_linked_record_mismatch`, …); IMP-0's "at least one activity
+unless *Never*" is checked in the save function because its rows arrive
+after the header.
+
+Applying it found that SO4-G1 records the owner's **age band only** — no
+date of birth, no age in years — and `person.age_or_dob` refused every
+owner. 0148 widens the constraint with `age_unrecorded_reason
+('khld_band_only')`, set by `khld_ensure_person` only when a sheet gave
+neither, and re-asserts that every Sahel Horan and Ramtha person still
+carries one of the two (OQ-57).
+
+### 0149 — the framework: every quarterly target null, the Plan's targets as data
+
+Four objectives, eight activities, twenty-one indicators, 273 target rows
+— **every one null**. The framework's quarterly columns are empty for all
+21, and the targets the forms do state are annual, plan-period, a range or
+a percentage: none is quarterly, and nothing was divided into quarters
+(plan 4.2). They are held instead in `indicator_plan_target`, one row per
+stated figure with the framework's sentence verbatim (`source_en`) and the
+form's *المستهدف …* sentence where the form states one (`source_ar`, 13 of
+21), a basis, and the figures that could be read from the sentence; a
+parent's children are the shares of one target (SO3-F2's "of whom ≥ 40%
+women"). The dashboard shows the sentence under the row while the
+quarterly column reads *not set*.
+
+What was drafted, and where: **the objectives' and activities' Arabic
+names** — neither workbook names them in Arabic — in the same position as
+Ramtha's activities in 0131. The indicator statements are the index
+sheet's in both languages. **Every unit is inferred** (the framework's Unit
+column is blank): `%` for the five statements that begin with a percentage
+or multiply by 100, `JOD` for SO1-A3 (the unit check gains it), `#` for
+the rest. The framework's type column writes *Outocme* and *Ouput*;
+stored corrected.
+
+And one thing the sheets get wrong that the platform keeps verbatim:
+**five calculation lines number their indicator question wrongly**
+(IMP-0 says Q15, the marked field is 17; SO1-0 Q14 → 17; SO3-0 Q12 → 11;
+SO4-0 Q20 → 22; SO1-A2 Q18 → 21). Every view reads the field the sheet
+**marks** as the indicator question; `indicator.formula` is the sheet's
+text, wrong number included, so the dashboard shows the source (OQ-58).
+
+### 0150 — twenty-one views, the milestone rules as data, and what cannot compute
+
+Each view implements its form's calculation line and the count gate of
+plan 5.3, anchored on the municipality: a meeting counts with minutes
+*prepared and filed* and at least one organisation present; a contribution
+enters the JOD total when *received* or *partly received*, never pledged; a
+works item on completion, with its priority list as denominator; a
+campaign, an action day and an activity only with the evidence the sheet
+names declared; SO3-0 as a cumulative ratio of volunteers with two or more
+**verified** participations; SO3-F2 unique volunteers on first
+participation; SO4-G1 on first completed cycle; SO4-H1 only with a vendor
+registered; SO4-H2 attended in whole or part. `v_khld_indicator_unique`
+gives SO2-D2's distinct individuals and SO4-H2's unique vendors beside the
+participation figures, labelled so nobody sums them. `v_indicator_actual`
+is recreated from its 0132 text plus 21 branches, and the migration
+asserts every Sahel Horan and Ramtha row of it unchanged.
+
+**The milestones** (plan Part 7). Each rule's critical item numbers are
+data in `khld_milestone_rule`, validated by a guard against
+`khld_milestone_item` (every number must be a checklist row of that
+milestone). Two of the four cannot be evaluated as written — SO1-A1's rule
+names a text and a date, SO1-B1's a text — so their `critical_items` is
+null, `khld_milestone_status()` and the views answer **not computable**
+naming the broken references, and `v_khld_indicator_status` carries the
+reason to the dashboard (OQ-56). SO3-E1 and SO3-F1 compute. The boundary
+between *Partly* and *Not established* is plan 7.3's default, recorded for
+the M&E lead. A coordinator decides the two undecided rules on
+`/khld/rules`; the views read the decision on the next query.
+
+`check_municipality_scope.sql` passes with three municipalities (62 views).
+
+### 0151 — evidence on the twenty-one record tables
+
+`attachment_entity_type_known` is rewritten from the live definition with
+the 21 names appended (45 in all; junctions and participations excluded),
+and `ENTITY_TABLES` in the `evidence` Edge Function gains the same 21,
+deployed as version 5 and confirmed equal to the database's list.
+
+### The screens (`app/src/khld`, no migration)
+
+Three screens render all twenty-one forms (list, form, detail), the
+Ramtha shape: `forms.generated.ts` says what a field **is** and which
+column, junction question, count list, checklist item or child block it
+writes; `khld.json` says what it is **called**, in both languages, verbatim
+from the sheets; the database says whether it is right. Controls the
+Ramtha screens did not have: the identifier type chosen explicitly; count
+cells with their sum; checklist rows with status, detail, date and
+evidence reference; SO2-0's rating matrix; SO4-G1's sessions with the date
+beside *attended*; the volunteers present at an occasion, merged on save;
+SO3-0's read-only participation log with its in-period tally; a partner
+typed new under the picker and sent as the `partner` block; an enterprise
+made from its owner (SO4-G1) or typed new (SO4-G2). The derived fields are
+one module shared by the form and the detail screen — the age band comes
+from `khld_age_band` by RPC, never a copy of the bands; the milestone
+status and the attendance reconciliation come from the 0147 functions.
+
+Where a save is refused on a soft-deleted person, partner, enterprise or
+vendor, the screen names who was deleted, when and by whom, and offers a
+coordinator restore; the Khalidiyah constraint names a form can hit are
+mapped to sentences in `errors.json` and checked against the schema
+snapshot like the others.
+
+The dashboard gains its third entry in `dashboardConfig.ts` (no third
+dashboard): status and unique-count rows are read from **both**
+programmes' views for every municipality, JOD is rendered by
+`indicator.unit`, the Plan's sentence sits under each row, and a milestone
+that cannot compute links to the rules screen. The four objectives take the
+existing colours, with SO4 as the prototype draws it.
+
+`check-khld-forms.mjs` fails the build on any key the screens build at
+runtime that is missing in either locale — headers, sections, labels, the
+bool answers, every part heading, and the static keys built from a code —
+and was confirmed by removing a label, a part answer and a static key.
+`check-untranslated` learned the `KHLD-` code prefix; `khld.json` is
+baselined at zero because both locales are the sheets' own words.
+
+### The public page, and 0152
+
+`/khalidiyah` shows **what's on** — published, upcoming activities and
+market days: title, kind, date, time, place — with no apply button and no
+mention of applications or accounts. `publicJourney(code)` decides which
+page a slug gets; the D1 and H1 record screens carry the coordinator's
+publish switch, because no sheet has a field for `is_published`.
+
+The view behind it, `v_public_khld_whats_on`, is 0152 — **written as
+`PENDING_0152_…` and not applied**: the Supabase MCP could not be reached
+from the session that wrote it. Its verify block asserts the anon surface
+grew by exactly one view, drives the view as anon (published and future
+listed; unpublished, past and deleted not; no route to the base table), and
+rolls its probe back. Until it is applied and renamed,
+`check_migration_files.sh` reports it `NOT APPLIED`, and the page shows its
+loading state rather than an empty list — which found a defect in the
+existing public home: a query paused between retries rendered "nothing
+open", the register's list that says none yet. Both pages now render the
+empty state only from a query that succeeded.
+
+### Departures from the plan, and what it left open
+
+- **Part headings are the catalogue's words**, not the sheet's — "Recorded
+  by (name, position)" for a cell that reads "Recorded by and verified by
+  (names, positions, dates)". They are the column comments 0145 applied;
+  the sheet's own words are the field label above and the options beside.
+- **One control no sheet asks for**: the volunteers present at a
+  rehabilitation campaign (SO2-C2), which SO3-0's retention indicator
+  counts from. The sheet asks only for totals; the control is labelled as
+  the platform's.
+- **The publish switch** on D1 and H1, likewise the platform's.
+- **The disaggregation panel**. The plan asks for a Khalidiyah breakdown by
+  its seven age bands and nationality list; no `v_khld_indicator_
+  disaggregated` view was built, and the panel says so from
+  `is_disaggregable` as it does for Ramtha. The person-level rows carry
+  every dimension, so it is a view away.
+- **Verification still owed to the MCP**: the role tests as the three
+  admins across every scoped table, the removal of the probe rows the app
+  drove (listed in `KHALIDIYAH_REPORT.md`), and the final comparison
+  against `supabase/baselines/2026-09-21_all_before_khalidiyah.md`. 0149
+  and 0150 assert the five view hashes and every Sahel Horan and Ramtha
+  row of `v_indicator_actual` unchanged; the whole-baseline comparison has
+  not been re-run since 0151.
+- **`types/database.ts` is not regenerated** for 0138–0151. Every
+  Khalidiyah read and write goes through loosely typed handles by name,
+  as Ramtha's do, so `tsc` is clean without it; regenerate and strip when
+  the MCP is back.

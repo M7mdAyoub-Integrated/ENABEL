@@ -43,13 +43,16 @@ docs/04_DATA_DICTIONARY.md     ← every field of every form, with option lists
 docs/05_ROLES_AND_RLS.md       ← the five roles and the policy for every table
 docs/06_OPEN_QUESTIONS.md      ← decisions that must NOT be guessed
 docs/07_BUILD_CHECKLIST.md     ← the 17 migrations, in order, with verification
-09_MULTI_MUNICIPALITY.md       ← the second municipality (Ramtha), part by part, 0111–0135; Parts 10–11 are the super admin's chrome and the platform dialog
+09_MULTI_MUNICIPALITY.md       ← the second municipality (Ramtha), part by part, 0111–0135; Parts 10–11 are the super admin's chrome and the platform dialog; Part 12 is the third (Khalidiyah), 0138–0151
 RAMTHA_IMPLEMENTATION_PLAN.md  ← the brief that work followed
 RAMTHA_REPORT.md               ← where Ramtha stands: what computes, what waits on a decision
+KHALIDIYAH_IMPLEMENTATION_PLAN.md ← the brief the third municipality followed
+KHALIDIYAH_REPORT.md           ← where Khalidiyah stands: 19 of 21 compute, two milestones wait on the M&E lead, 0152 pending
+supabase/khalidiyah/           ← one reading of the Khalidiyah workbooks and the generators for 0141, 0145 and 0149 and for app/src/khld; edit the catalogue, never the output
 supabase/migrations/           ← the SQL you write
 ```
 
-When a task touches indicators, open `03_INDICATORS.md`. When it touches a form field, open `04_DATA_DICTIONARY.md`. Do not work from memory on either — the definitions have known conflicts and the exact wording matters.
+When a task touches indicators, open `03_INDICATORS.md`. When it touches a form field, open `04_DATA_DICTIONARY.md`. Do not work from memory on either — the definitions have known conflicts and the exact wording matters. For a Khalidiyah field the dictionary is the workbook itself, read through `supabase/khalidiyah/workbook.py`; the app's labels and the tables' columns are generated from that one reading, so a fix goes into `catalogue.py` and a regeneration, never into a generated file.
 
 This applies to the small things too, not only to formulas and targets. The
 coordination office module was given the objective label `SO2`, written from
