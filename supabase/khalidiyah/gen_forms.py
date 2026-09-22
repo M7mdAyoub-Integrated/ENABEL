@@ -458,6 +458,11 @@ common_en = OrderedDict([
         ])),
         ('participations', 'Participations'),
         ('sessionsOf', '{count} of 5'),
+        ('publish', OrderedDict([
+            ('title', 'Public page'), ('on', 'Published'), ('off', 'Not published'),
+            ('publish', 'Publish on the public page'), ('unpublish', 'Take off the public page'),
+            ('note', 'The public page at /khalidiyah lists published activities and market days whose date has not passed: the title, kind, date, time and place, and nothing else.'),
+        ])),
         ('completion', OrderedDict([('true', 'Completed'), ('false', 'Not completed')])),
     ])),
     ('gate', OrderedDict([('title', 'Khalidiyah screens'), ('body', 'These forms belong to Al Khalidiyah Municipality. Your account works in another municipality.')])),
@@ -613,6 +618,11 @@ common_ar = OrderedDict([
         ])),
         ('participations', 'المشاركات'),
         ('sessionsOf', '{count} من 5'),
+        ('publish', OrderedDict([
+            ('title', 'الصفحة العامة'), ('on', 'منشور'), ('off', 'غير منشور'),
+            ('publish', 'نشر على الصفحة العامة'), ('unpublish', 'إزالة من الصفحة العامة'),
+            ('note', 'تعرض الصفحة العامة على /khalidiyah الأنشطة وأيام السوق المنشورة التي لم يمضِ تاريخها: العنوان والنوع والتاريخ والوقت والمكان، ولا شيء غير ذلك.'),
+        ])),
         ('completion', OrderedDict([('true', 'أتمّ'), ('false', 'لم يتمّ')])),
     ])),
     ('gate', OrderedDict([('title', 'شاشات الخالدية'), ('body', 'هذه النماذج تخص بلدية الخالدية. حسابك يعمل في بلدية أخرى.')])),

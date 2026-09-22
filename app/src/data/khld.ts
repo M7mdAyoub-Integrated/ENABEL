@@ -619,6 +619,33 @@ export function useSetKhldDeleted(table: KhldTable) {
 }
 
 /**
+ * Publishing an activity or a market day on the public page (0152):
+ * `is_published` (0145) is a plain column a coordinator flips, never a form
+ * field, because no sheet asks for it. Read back, because RLS filters rather
+ * than refuses.
+ */
+export function useSetKhldPublished(table: 'khld_activity' | 'khld_market') {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationKey: ['khld', table, 'published'],
+    retry: false,
+    mutationFn: async ({ id, published }: { id: string; published: boolean }) => {
+      const res = await (db.from(table)
+        .update({ is_published: published })
+        .eq('id', id)
+        .select('id') as unknown as Promise<{ data: { id: string }[] | null; error: unknown }>)
+      if (res.error) throw toAppError(res.error)
+      if (!res.data || res.data.length !== 1) throw toAppError({ code: '42501', message: 'forbidden' })
+      return res.data[0]!.id
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: khldKeys.all(table) })
+      void qc.invalidateQueries({ queryKey: ['public', 'whatsOn'] })
+    },
+  })
+}
+
+/**
  * Restoring a soft-deleted person the save refused on (restore_person, 0107:
  * a coordinator's, with its own read-back). The person is the platform's, not
  * Khalidiyah's, so the same function serves all three municipalities.

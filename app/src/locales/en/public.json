@@ -1,6 +1,7 @@
 {
   "programmeSHM": "Agriculture and Food Production Programme",
   "programmeRMTH": "Employment and Entrepreneurship Programme",
+  "programmeKHLD": "Park, Partnerships and Volunteering Programme",
   "home": {
     "heading": "Training and markets, open to apply",
     "headingGeneric": "Open to apply",
@@ -236,5 +237,17 @@
     "title": "There is no page here",
     "body": "Check the link you were given, or choose a municipality from the list.",
     "action": "Choose a municipality"
+  },
+  "whatsOn": {
+    "heading": "What's on in the park",
+    "intro": "Al Khalidiyah Public Park hosts community activities, events and market days. Anything the Municipality has announced is listed here, soonest first. Everything is open to residents; there is nothing to sign up for.",
+    "comingUp": "Coming up",
+    "count": "{count, plural, =0 {Nothing announced at the moment} one {# coming up} other {# coming up}}",
+    "emptyTitle": "Nothing announced right now",
+    "emptyBody": "Activities and market days are announced through the year — check back, or look at the notice board in the park.",
+    "kind": {
+      "activity": "Community activity",
+      "market": "Market day"
+    }
   }
 }

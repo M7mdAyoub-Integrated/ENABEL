@@ -4,7 +4,8 @@ import { usePublicOpportunities } from '../../data/publicOpportunities'
 import { PublicShell } from './PublicShell'
 import { OpportunityCard } from './OpportunityCard'
 import { PrimaryButton } from '../../ui/primitives'
-import { hasLinkageJourney, usePublicSite } from './PublicSite'
+import { hasLinkageJourney, publicJourney, usePublicSite } from './PublicSite'
+import { WhatsOn } from './WhatsOn'
 
 /**
  * The public home page.
@@ -31,6 +32,14 @@ import { hasLinkageJourney, usePublicSite } from './PublicSite'
  * linkage panel is offered only where the journey exists.
  */
 export function PublicHome() {
+  const site = usePublicSite()
+  // A municipality with nothing to apply for gets the what's-on page: same
+  // shell, same masthead, none of the application copy (see publicJourney).
+  if (publicJourney(site.municipality.code) === 'whats_on') return <WhatsOn />
+  return <OpportunitiesHome />
+}
+
+function OpportunitiesHome() {
   const { t } = useTranslation('public')
   const site = usePublicSite()
   const shm = site.municipality.code === 'SHM'
@@ -56,20 +65,18 @@ export function PublicHome() {
           <h2 className="m-0 text-[14px] font-extrabold uppercase tracking-[0.1em] sm:text-[15px]">
             {t('home.openNow')}
           </h2>
-          {!q.isLoading && !q.isError ? (
+          {q.isSuccess ? (
             <span className="font-narrow text-[12px] font-bold uppercase tracking-[0.1em] text-muted">
               {t('home.count', { count: items.length })}
             </span>
           ) : null}
         </div>
 
-        {q.isLoading ? (
-          <ul className="mt-4 flex list-none flex-col gap-3 p-0" aria-hidden="true">
-            {[0, 1, 2].map((i) => (
-              <li key={i} className="h-[150px] animate-pulse border-[1.5px] border-border-default bg-track" />
-            ))}
-          </ul>
-        ) : q.isError ? (
+        {/* Only a query that SUCCEEDED may say "nothing open": a query paused
+            between retries is pending, not fetching and not an error, and used
+            to fall through to the empty state (found on the what's-on page,
+            22 September 2026). */}
+        {q.isError ? (
           // No error codes, no "42501", no retry jargon. One sentence and a
           // button -- this reader cannot act on anything more technical.
           <div
@@ -81,6 +88,12 @@ export function PublicHome() {
               <PrimaryButton onClick={() => void q.refetch()}>{t('detail.back')}</PrimaryButton>
             </div>
           </div>
+        ) : !q.isSuccess ? (
+          <ul className="mt-4 flex list-none flex-col gap-3 p-0" aria-hidden="true">
+            {[0, 1, 2].map((i) => (
+              <li key={i} className="h-[150px] animate-pulse border-[1.5px] border-border-default bg-track" />
+            ))}
+          </ul>
         ) : items.length === 0 ? (
           <div className="mt-4 border-[1.5px] border-dashed border-border-muted bg-sunken p-6 text-center sm:p-8">
             <p className="m-0 text-[19px] font-extrabold tracking-[-0.02em] sm:text-[22px]">

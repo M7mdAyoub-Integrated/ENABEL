@@ -2991,6 +2991,14 @@
     },
     "participations": "Participations",
     "sessionsOf": "{count} of 5",
+    "publish": {
+      "title": "Public page",
+      "on": "Published",
+      "off": "Not published",
+      "publish": "Publish on the public page",
+      "unpublish": "Take off the public page",
+      "note": "The public page at /khalidiyah lists published activities and market days whose date has not passed: the title, kind, date, time and place, and nothing else."
+    },
     "completion": {
       "true": "Completed",
       "false": "Not completed"

@@ -8,7 +8,7 @@ import { Modal } from '../ui/Modal'
 import { useToast } from '../ui/Toast'
 import { refLabel, type RefRow } from '../data/refTables'
 import {
-  khldRefQuery, useKhldAttendanceFigures, useKhldMilestoneStatus, useKhldRecord, useSetKhldDeleted,
+  khldRefQuery, useKhldAttendanceFigures, useKhldMilestoneStatus, useKhldRecord, useSetKhldDeleted, useSetKhldPublished,
   type KhldRecord,
 } from '../data/khld'
 import { refListsOf, ParticipationLog } from './KhldFormScreen'
@@ -81,6 +81,9 @@ export function KhldDetailScreen() {
 
       {def.milestone ? <MilestonePanel id={id!} /> : null}
       {def.table === 'khld_attendance' ? <AttendancePanel id={id!} /> : null}
+      {(def.table === 'khld_activity' || def.table === 'khld_market') && !deleted ? (
+        <PublishPanel table={def.table} id={id!} published={r.row['is_published'] === true} />
+      ) : null}
 
       {def.sections.map((s) => (
         <section key={s.key} className="mt-[26px]">
@@ -132,6 +135,32 @@ function MilestonePanel({ id }: { id: string }) {
       <span className="text-[15px] font-semibold text-ink">{d.text ?? ELLIPSIS}</span>
       {d.note ? <p className="mb-0 mt-1 text-[13.5px] text-body" style={{ textWrap: 'pretty' }}>{d.note}</p> : null}
       <p className="mb-0 mt-1 text-[12.5px] text-muted"><Link to="/khld/rules" className="underline">{t('nav.rules')}</Link></p>
+    </div>
+  )
+}
+
+/**
+ * Whether this activity or market day is on the public page (0152). A
+ * coordinator's switch; the public view also requires the date to be today
+ * or later, which is said here so a published past event is not looked for.
+ */
+function PublishPanel({ table, id, published }: { table: 'khld_activity' | 'khld_market'; id: string; published: boolean }) {
+  const { t } = useTranslation('khld')
+  const { role } = useAuth()
+  const set = useSetKhldPublished(table)
+  return (
+    <div className={`mt-2 flex flex-wrap items-center justify-between gap-3 border-s-[3px] px-4 py-3 ${published ? 'border-success' : 'border-border-default'}`}>
+      <div>
+        <span className="font-narrow text-[11px] font-bold uppercase tracking-[0.12em] text-muted">{t('detail.publish.title')}{COLON} </span>
+        <span className="text-[15px] font-semibold text-ink">{published ? t('detail.publish.on') : t('detail.publish.off')}</span>
+        <p className="mb-0 mt-1 text-[13px] text-muted" style={{ textWrap: 'pretty' }}>{t('detail.publish.note')}</p>
+        {set.error ? <WriteError error={set.error} onDismiss={set.reset} /> : null}
+      </div>
+      {can(role, 'record.edit') ? (
+        <SecondaryButton disabled={set.isPending} onClick={() => void set.mutateAsync({ id, published: !published })}>
+          {published ? t('detail.publish.unpublish') : t('detail.publish.publish')}
+        </SecondaryButton>
+      ) : null}
     </div>
   )
 }

@@ -64,6 +64,20 @@ export function hasLinkageJourney(code: string): boolean {
 }
 
 /**
+ * Whether the page lists things to APPLY for, or only what is on.
+ *
+ * Khalidiyah has no public forms at all (KHALIDIYAH_IMPLEMENTATION_PLAN.md
+ * §0.2): its activities are open, and its volunteers and vendors are
+ * registered by staff. Its page therefore shows the published activities and
+ * market days from v_public_khld_whats_on (0152) and never mentions applying,
+ * applications or accounts. The other two, and any fourth municipality until
+ * someone says otherwise, list opportunities.
+ */
+export function publicJourney(code: string): 'apply' | 'whats_on' {
+  return code === 'KHLD' ? 'whats_on' : 'apply'
+}
+
+/**
  * The plain-language programme line under the municipality's name on the
  * public masthead. Sahel Horan's public page has always read "Agriculture and
  * Food Production Programme" rather than the Action Plan's full donor line,
@@ -77,6 +91,7 @@ export function usePublicProgrammeLine() {
   return (m: PublicMunicipality): string => {
     if (m.code === 'SHM') return t('programmeSHM')
     if (m.code === 'RMTH') return t('programmeRMTH')
+    if (m.code === 'KHLD') return t('programmeKHLD')
     return programme(m)
   }
 }
