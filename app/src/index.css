@@ -131,6 +131,26 @@ body {
     color: inherit;
     border-radius: 0;
   }
+  /* Tailwind v4's preflight, unlike v3's, sets no cursor on buttons, so every
+     one of them renders with the arrow unless it says otherwise -- and a
+     control that does not look clickable does not get clicked. Here rather
+     than on each button because there are ~140 of them and the dozen that
+     carried `cursor-pointer` by hand are how the other ~130 stayed wrong.
+     The same is true of a checkbox or radio and of the label that wraps one,
+     which is clickable because the label is. A utility still wins over this:
+     `disabled:cursor-not-allowed` and any deliberate `cursor-default` are
+     unaffected, and `select` is left alone -- it opens a native menu and the
+     arrow there is the platform's, not an oversight. */
+  button:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled),
+  label:has(input[type="checkbox"]:not(:disabled)),
+  label:has(input[type="radio"]:not(:disabled)) {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
   input::placeholder,
   textarea::placeholder {
     color: var(--color-ghost);

@@ -198,11 +198,11 @@ export function EvidencePanel({
                 <span className="text-muted">{formatShortDate(a.uploaded_at, locale)}</span>
                 <Chip tone="mute">{t(`common:evidence.kind.${a.content_kind}`)}</Chip>
                 <span className="text-[13px] text-muted">{sizeText}</span>
-                <button type="button" className="underline" onClick={() => open(a)}>{t('common:evidence.open')}</button>
+                <button type="button" className="text-teal underline hover:text-ink" onClick={() => open(a)}>{t('common:evidence.open')}</button>
                 {can(role, 'record.delete') ? (
                   <button
                     type="button"
-                    className="text-error underline"
+                    className="text-error underline hover:bg-error hover:text-bg hover:no-underline disabled:text-faint disabled:no-underline"
                     disabled={remove.isPending}
                     onClick={() => void remove.mutateAsync(a.id).then((r) => setObjectKept(!r.objectDeleted)).catch(() => {})}
                   >
