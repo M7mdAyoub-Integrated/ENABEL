@@ -1767,8 +1767,13 @@ else -- no `Access-Control-*` line at all. Run it once per origin in the
 list, and once with an origin that is NOT in it to see that the bucket says
 no to strangers. Verified this way on 15 September: 5173 passed, 5174 and
 `https://example.org` were refused. On 22 September, with the production
-site live: 5173 passed, `https://enabel-platform.netlify.app` was refused —
-the rule had not yet been pasted.
+site live, the rule above was pasted and all three directions checked:
+5173 and `https://enabel-platform.netlify.app` answered 204 with the origin
+echoed, `https://example.org` still 403 — an allowlist, not a wildcard. The
+`evidence` function's own preflight (a second, separate gate: the browser
+calls Supabase cross-origin too) answers 200 with `*`. Closed by an actual
+upload from the live site into a Ramtha record: 551 KB chosen, 68 KB
+stored, the attachment row written with `bucket = evidence`.
 
 **The second setting outside the repository: Supabase Auth's redirect
 list.** `AuthProvider.tsx` asks for a password reset with
