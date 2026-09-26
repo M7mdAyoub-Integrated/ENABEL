@@ -372,6 +372,7 @@ export type Database = {
           deleted_at: string | null
           entity_id: string
           entity_type: string
+          field_code: string | null
           file_name: string
           id: string
           mime_type: string | null
@@ -390,6 +391,7 @@ export type Database = {
           deleted_at?: string | null
           entity_id: string
           entity_type: string
+          field_code?: string | null
           file_name: string
           id?: string
           mime_type?: string | null
@@ -408,6 +410,7 @@ export type Database = {
           deleted_at?: string | null
           entity_id?: string
           entity_type?: string
+          field_code?: string | null
           file_name?: string
           id?: string
           mime_type?: string | null
@@ -1663,413 +1666,73 @@ export type Database = {
           }
         ]
       }
-      khld_action_day: {
-        Row: {
-          activity_id: string | null
-          called_by_id: string
-          campaign_id: string | null
-          client_uuid: string | null
-          created_at: string
-          created_by: string | null
-          date: string
-          deleted_at: string | null
-          id: string
-          incident_id: string
-          incident_other: string | null
-          linked_kind_id: string
-          location_id: string
-          location_other: string | null
-          market_id: string | null
-          materials: string
-          municipality_id: string
-          new_registrations: number
-          notice_days: number | null
-          person_hours: number
-          recorded_by_name: string | null
-          recorded_by_position: string | null
-          recorded_on: string | null
-          reference: string | null
-          refreshments_id: string | null
-          refreshments_other: string | null
-          remaining_tasks: string
-          roles_assigned: boolean
-          supervisor: string
-          tasks_completed: string
-          team_leaders: string | null
-          times_from: string | null
-          times_to: string | null
-          updated_at: string
-          volunteer_feedback_id: string | null
-          volunteer_feedback_other: string | null
-          volunteers_total: number
-        }
-        Insert: {
-          activity_id?: string | null
-          called_by_id: string
-          campaign_id?: string | null
-          client_uuid?: string | null
-          created_at?: string
-          created_by?: string | null
-          date: string
-          deleted_at?: string | null
-          id?: string
-          incident_id: string
-          incident_other?: string | null
-          linked_kind_id: string
-          location_id: string
-          location_other?: string | null
-          market_id?: string | null
-          materials: string
-          municipality_id?: string
-          new_registrations: number
-          notice_days?: number | null
-          person_hours: number
-          recorded_by_name?: string | null
-          recorded_by_position?: string | null
-          recorded_on?: string | null
-          reference?: string | null
-          refreshments_id?: string | null
-          refreshments_other?: string | null
-          remaining_tasks: string
-          roles_assigned: boolean
-          supervisor: string
-          tasks_completed: string
-          team_leaders?: string | null
-          times_from?: string | null
-          times_to?: string | null
-          updated_at?: string
-          volunteer_feedback_id?: string | null
-          volunteer_feedback_other?: string | null
-          volunteers_total: number
-        }
-        Update: {
-          activity_id?: string | null
-          called_by_id?: string
-          campaign_id?: string | null
-          client_uuid?: string | null
-          created_at?: string
-          created_by?: string | null
-          date?: string
-          deleted_at?: string | null
-          id?: string
-          incident_id?: string
-          incident_other?: string | null
-          linked_kind_id?: string
-          location_id?: string
-          location_other?: string | null
-          market_id?: string | null
-          materials?: string
-          municipality_id?: string
-          new_registrations?: number
-          notice_days?: number | null
-          person_hours?: number
-          recorded_by_name?: string | null
-          recorded_by_position?: string | null
-          recorded_on?: string | null
-          reference?: string | null
-          refreshments_id?: string | null
-          refreshments_other?: string | null
-          remaining_tasks?: string
-          roles_assigned?: boolean
-          supervisor?: string
-          tasks_completed?: string
-          team_leaders?: string | null
-          times_from?: string | null
-          times_to?: string | null
-          updated_at?: string
-          volunteer_feedback_id?: string | null
-          volunteer_feedback_other?: string | null
-          volunteers_total?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_action_day_activity_id_fkey"
-            columns: ["activity_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_activity"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "khld_action_day_called_by_id_fkey"
-            columns: ["called_by_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_f3_called_by"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_action_day_campaign_id_fkey"
-            columns: ["campaign_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_campaign"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "khld_action_day_incident_id_fkey"
-            columns: ["incident_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_incident"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_action_day_linked_kind_id_fkey"
-            columns: ["linked_kind_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_f3_linked_records"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_action_day_location_id_fkey"
-            columns: ["location_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_f3_location"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_action_day_market_id_fkey"
-            columns: ["market_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_market"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "khld_action_day_municipality_id_fkey"
-            columns: ["municipality_id"]
-            isOneToOne: false
-            referencedRelation: "municipality"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_action_day_refreshments_id_fkey"
-            columns: ["refreshments_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_f3_refreshments"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_action_day_volunteer_feedback_id_fkey"
-            columns: ["volunteer_feedback_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_f3_volunteer_feedback"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      khld_action_day_count: {
-        Row: {
-          action_day_id: string
-          cell_id: string
-          count: number
-          created_at: string
-          field_code: string
-          municipality_id: string
-        }
-        Insert: {
-          action_day_id: string
-          cell_id: string
-          count: number
-          created_at?: string
-          field_code: string
-          municipality_id?: string
-        }
-        Update: {
-          action_day_id?: string
-          cell_id?: string
-          count?: number
-          created_at?: string
-          field_code?: string
-          municipality_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_action_day_count_action_day_id_fkey"
-            columns: ["action_day_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_action_day"
-            referencedColumns: ["id", "municipality_id"]
-          }
-        ]
-      }
-      khld_action_day_option: {
-        Row: {
-          action_day_id: string
-          created_at: string
-          municipality_id: string
-          option_id: string
-          option_other: string | null
-          question_code: string
-        }
-        Insert: {
-          action_day_id: string
-          created_at?: string
-          municipality_id?: string
-          option_id: string
-          option_other?: string | null
-          question_code: string
-        }
-        Update: {
-          action_day_id?: string
-          created_at?: string
-          municipality_id?: string
-          option_id?: string
-          option_other?: string | null
-          question_code?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_action_day_option_action_day_id_fkey"
-            columns: ["action_day_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_action_day"
-            referencedColumns: ["id", "municipality_id"]
-          }
-        ]
-      }
       khld_activity: {
         Row: {
+          activity_name: string
           activity_type_id: string
-          announcement_days_advance: number | null
-          calendar_status_id: string
-          cash_cost_jod: number
           client_uuid: string | null
-          content_summary: string
           created_at: string
           created_by: string | null
           deleted_at: string | null
-          event_date: string
-          event_time_from: string | null
-          event_time_to: string | null
-          event_title: string
-          feedback_collected_id: string
-          feedback_collected_other: string | null
-          frequency_type_id: string
+          description: string
+          end_date: string
           id: string
-          inkind_source: string | null
-          inkind_value_jod: number | null
           is_published: boolean
-          lessons: string
-          location_id: string
           municipality_id: string
           organiser_id: string
           organiser_other: string | null
-          participants_actual: number
-          participants_planned: number
-          partner_count: number
-          recorded_by_name: string | null
-          recorded_on: string | null
           reference: string | null
+          start_date: string
+          status_id: string
+          target_audience_id: string
           updated_at: string
-          verified_by_name: string | null
-          verified_on: string | null
-          volunteers_supporting: number | null
         }
         Insert: {
+          activity_name: string
           activity_type_id: string
-          announcement_days_advance?: number | null
-          calendar_status_id: string
-          cash_cost_jod: number
           client_uuid?: string | null
-          content_summary: string
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
-          event_date: string
-          event_time_from?: string | null
-          event_time_to?: string | null
-          event_title: string
-          feedback_collected_id: string
-          feedback_collected_other?: string | null
-          frequency_type_id: string
+          description: string
+          end_date: string
           id?: string
-          inkind_source?: string | null
-          inkind_value_jod?: number | null
           is_published?: boolean
-          lessons: string
-          location_id: string
           municipality_id?: string
           organiser_id: string
           organiser_other?: string | null
-          participants_actual: number
-          participants_planned: number
-          partner_count: number
-          recorded_by_name?: string | null
-          recorded_on?: string | null
           reference?: string | null
+          start_date: string
+          status_id: string
+          target_audience_id: string
           updated_at?: string
-          verified_by_name?: string | null
-          verified_on?: string | null
-          volunteers_supporting?: number | null
         }
         Update: {
+          activity_name?: string
           activity_type_id?: string
-          announcement_days_advance?: number | null
-          calendar_status_id?: string
-          cash_cost_jod?: number
           client_uuid?: string | null
-          content_summary?: string
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
-          event_date?: string
-          event_time_from?: string | null
-          event_time_to?: string | null
-          event_title?: string
-          feedback_collected_id?: string
-          feedback_collected_other?: string | null
-          frequency_type_id?: string
+          description?: string
+          end_date?: string
           id?: string
-          inkind_source?: string | null
-          inkind_value_jod?: number | null
           is_published?: boolean
-          lessons?: string
-          location_id?: string
           municipality_id?: string
           organiser_id?: string
           organiser_other?: string | null
-          participants_actual?: number
-          participants_planned?: number
-          partner_count?: number
-          recorded_by_name?: string | null
-          recorded_on?: string | null
           reference?: string | null
+          start_date?: string
+          status_id?: string
+          target_audience_id?: string
           updated_at?: string
-          verified_by_name?: string | null
-          verified_on?: string | null
-          volunteers_supporting?: number | null
         }
         Relationships: [
           {
             foreignKeyName: "khld_activity_activity_type_id_fkey"
             columns: ["activity_type_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_d1_activity_type"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_activity_calendar_status_id_fkey"
-            columns: ["calendar_status_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_d1_calendar_status"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_activity_feedback_collected_id_fkey"
-            columns: ["feedback_collected_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_d1_feedback_collected"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_activity_frequency_type_id_fkey"
-            columns: ["frequency_type_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_d1_frequency_type"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_activity_location_id_fkey"
-            columns: ["location_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_d1_location"
+            referencedRelation: "ref_khld_activity_type"
             referencedColumns: ["id"]
           },
           {
@@ -2083,14 +1746,129 @@ export type Database = {
             foreignKeyName: "khld_activity_organiser_id_fkey"
             columns: ["organiser_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_d1_organiser"
+            referencedRelation: "ref_khld_organiser"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "khld_activity_status_id_fkey"
+            columns: ["status_id"]
+            isOneToOne: false
+            referencedRelation: "ref_khld_event_status"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "khld_activity_target_audience_id_fkey"
+            columns: ["target_audience_id"]
+            isOneToOne: false
+            referencedRelation: "ref_khld_target_audience"
             referencedColumns: ["id"]
           }
         ]
       }
-      khld_activity_option: {
+      khld_activity_attendance: {
         Row: {
           activity_id: string
+          client_uuid: string | null
+          counting_method_id: string
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          municipality_id: string
+          observed_interaction_id: string
+          pct_adults: number
+          pct_children: number
+          pct_disability: number
+          pct_female: number
+          pct_jordanian: number
+          pct_male: number
+          pct_syrian: number
+          pct_youth: number
+          report_date: string
+          social_media_links: string | null
+          total_participants: number
+          updated_at: string
+        }
+        Insert: {
+          activity_id: string
+          client_uuid?: string | null
+          counting_method_id: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          municipality_id?: string
+          observed_interaction_id: string
+          pct_adults: number
+          pct_children: number
+          pct_disability: number
+          pct_female: number
+          pct_jordanian: number
+          pct_male: number
+          pct_syrian: number
+          pct_youth: number
+          report_date: string
+          social_media_links?: string | null
+          total_participants: number
+          updated_at?: string
+        }
+        Update: {
+          activity_id?: string
+          client_uuid?: string | null
+          counting_method_id?: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          municipality_id?: string
+          observed_interaction_id?: string
+          pct_adults?: number
+          pct_children?: number
+          pct_disability?: number
+          pct_female?: number
+          pct_jordanian?: number
+          pct_male?: number
+          pct_syrian?: number
+          pct_youth?: number
+          report_date?: string
+          social_media_links?: string | null
+          total_participants?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "khld_activity_attendance_activity_id_fkey"
+            columns: ["activity_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "khld_activity"
+            referencedColumns: ["id", "municipality_id"]
+          },
+          {
+            foreignKeyName: "khld_activity_attendance_counting_method_id_fkey"
+            columns: ["counting_method_id"]
+            isOneToOne: false
+            referencedRelation: "ref_khld_counting_method"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "khld_activity_attendance_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "khld_activity_attendance_observed_interaction_id_fkey"
+            columns: ["observed_interaction_id"]
+            isOneToOne: false
+            referencedRelation: "ref_khld_observed_interaction"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      khld_activity_attendance_option: {
+        Row: {
+          attendance_id: string
           created_at: string
           municipality_id: string
           option_id: string
@@ -2098,7 +1876,7 @@ export type Database = {
           question_code: string
         }
         Insert: {
-          activity_id: string
+          attendance_id: string
           created_at?: string
           municipality_id?: string
           option_id: string
@@ -2106,7 +1884,7 @@ export type Database = {
           question_code: string
         }
         Update: {
-          activity_id?: string
+          attendance_id?: string
           created_at?: string
           municipality_id?: string
           option_id?: string
@@ -2115,361 +1893,112 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "khld_activity_option_activity_id_fkey"
-            columns: ["activity_id", "municipality_id"]
+            foreignKeyName: "khld_activity_attendance_option_attendance_id_fkey"
+            columns: ["attendance_id", "municipality_id"]
             isOneToOne: false
-            referencedRelation: "khld_activity"
+            referencedRelation: "khld_activity_attendance"
             referencedColumns: ["id", "municipality_id"]
           }
         ]
       }
-      khld_attendance: {
+      khld_activity_partner: {
         Row: {
           activity_id: string
-          client_uuid: string | null
-          consent_informed_id: string
-          consent_informed_recorded_by: string | null
-          consent_informed_recorded_on: string | null
-          count_method_id: string
-          counters: string
           created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          duplicate_check_id: string
-          entered_by_name: string | null
-          entered_on: string | null
-          estimate_basis: string | null
-          estimate_by: string | null
-          first_time: number | null
-          id: string
-          mothers_children: number | null
           municipality_id: string
-          notes: string | null
-          photo_consent_id: string
-          photo_consent_recorded_by: string | null
-          photo_consent_recorded_on: string | null
-          pwd_count: number | null
-          register_attached_id: string
-          register_attached_other: string | null
-          repeat_participants: number | null
-          staff_municipal: number | null
-          staff_partner: number | null
-          staff_volunteers: number
-          total_participants: number
-          updated_at: string
+          partner_id: string
         }
         Insert: {
           activity_id: string
-          client_uuid?: string | null
-          consent_informed_id: string
-          consent_informed_recorded_by?: string | null
-          consent_informed_recorded_on?: string | null
-          count_method_id: string
-          counters: string
           created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          duplicate_check_id: string
-          entered_by_name?: string | null
-          entered_on?: string | null
-          estimate_basis?: string | null
-          estimate_by?: string | null
-          first_time?: number | null
-          id?: string
-          mothers_children?: number | null
           municipality_id?: string
-          notes?: string | null
-          photo_consent_id: string
-          photo_consent_recorded_by?: string | null
-          photo_consent_recorded_on?: string | null
-          pwd_count?: number | null
-          register_attached_id: string
-          register_attached_other?: string | null
-          repeat_participants?: number | null
-          staff_municipal?: number | null
-          staff_partner?: number | null
-          staff_volunteers: number
-          total_participants: number
-          updated_at?: string
+          partner_id: string
         }
         Update: {
           activity_id?: string
-          client_uuid?: string | null
-          consent_informed_id?: string
-          consent_informed_recorded_by?: string | null
-          consent_informed_recorded_on?: string | null
-          count_method_id?: string
-          counters?: string
           created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          duplicate_check_id?: string
-          entered_by_name?: string | null
-          entered_on?: string | null
-          estimate_basis?: string | null
-          estimate_by?: string | null
-          first_time?: number | null
-          id?: string
-          mothers_children?: number | null
           municipality_id?: string
-          notes?: string | null
-          photo_consent_id?: string
-          photo_consent_recorded_by?: string | null
-          photo_consent_recorded_on?: string | null
-          pwd_count?: number | null
-          register_attached_id?: string
-          register_attached_other?: string | null
-          repeat_participants?: number | null
-          staff_municipal?: number | null
-          staff_partner?: number | null
-          staff_volunteers?: number
-          total_participants?: number
-          updated_at?: string
+          partner_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "khld_attendance_activity_id_fkey"
+            foreignKeyName: "khld_activity_partner_activity_id_fkey"
             columns: ["activity_id", "municipality_id"]
             isOneToOne: false
             referencedRelation: "khld_activity"
             referencedColumns: ["id", "municipality_id"]
           },
           {
-            foreignKeyName: "khld_attendance_consent_informed_id_fkey"
-            columns: ["consent_informed_id"]
+            foreignKeyName: "khld_activity_partner_partner_id_fkey"
+            columns: ["partner_id", "municipality_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_d2_consent_informed"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_attendance_count_method_id_fkey"
-            columns: ["count_method_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_d2_count_method"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_attendance_duplicate_check_id_fkey"
-            columns: ["duplicate_check_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_d2_duplicate_check"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_attendance_municipality_id_fkey"
-            columns: ["municipality_id"]
-            isOneToOne: false
-            referencedRelation: "municipality"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_attendance_photo_consent_id_fkey"
-            columns: ["photo_consent_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_d2_photo_consent"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_attendance_register_attached_id_fkey"
-            columns: ["register_attached_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_d2_register_attached"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      khld_attendance_count: {
-        Row: {
-          attendance_id: string
-          cell_id: string
-          count: number
-          created_at: string
-          field_code: string
-          municipality_id: string
-        }
-        Insert: {
-          attendance_id: string
-          cell_id: string
-          count: number
-          created_at?: string
-          field_code: string
-          municipality_id?: string
-        }
-        Update: {
-          attendance_id?: string
-          cell_id?: string
-          count?: number
-          created_at?: string
-          field_code?: string
-          municipality_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_attendance_count_attendance_id_fkey"
-            columns: ["attendance_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_attendance"
+            referencedRelation: "khld_partner"
             referencedColumns: ["id", "municipality_id"]
           }
         ]
       }
       khld_campaign: {
         Row: {
-          area_m2: number | null
-          area_section: string | null
-          campaign_date: string
-          campaign_time_from: string | null
-          campaign_time_to: string | null
+          action_days: number | null
+          applications_close: string
+          applications_open: string
+          campaign_name: string
           client_uuid: string | null
           created_at: string
           created_by: string | null
           deleted_at: string | null
+          description: string
+          end_date: string
+          has_sponsor: boolean
           id: string
-          incident_id: string
-          incident_other: string | null
-          inkind_value: number | null
-          is_first_campaign_id: string | null
-          lead_organiser_id: string
-          lead_organiser_other: string | null
-          linked_item_id: string | null
-          materials: string
-          municipal_supervision_id: string
-          municipal_supervision_other: string | null
           municipality_id: string
-          new_volunteers: number
-          outputs: string
-          partners_involved: string | null
-          person_hours: number
-          recognition_id: string | null
-          recognition_other: string | null
-          recorded_by_name: string | null
-          recorded_by_position: string | null
-          recorded_on: string | null
           reference: string | null
-          remaining_work: string
-          safety_briefing_id: string
-          school_linked_id: string | null
-          school_linked_other: string | null
+          sponsor_name: string | null
+          start_date: string
+          status_id: string
           updated_at: string
-          volunteers_total: number
-          works_item_id: string | null
         }
         Insert: {
-          area_m2?: number | null
-          area_section?: string | null
-          campaign_date: string
-          campaign_time_from?: string | null
-          campaign_time_to?: string | null
+          action_days?: number | null
+          applications_close: string
+          applications_open: string
+          campaign_name: string
           client_uuid?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
+          description: string
+          end_date: string
+          has_sponsor: boolean
           id?: string
-          incident_id: string
-          incident_other?: string | null
-          inkind_value?: number | null
-          is_first_campaign_id?: string | null
-          lead_organiser_id: string
-          lead_organiser_other?: string | null
-          linked_item_id?: string | null
-          materials: string
-          municipal_supervision_id: string
-          municipal_supervision_other?: string | null
           municipality_id?: string
-          new_volunteers: number
-          outputs: string
-          partners_involved?: string | null
-          person_hours: number
-          recognition_id?: string | null
-          recognition_other?: string | null
-          recorded_by_name?: string | null
-          recorded_by_position?: string | null
-          recorded_on?: string | null
           reference?: string | null
-          remaining_work: string
-          safety_briefing_id: string
-          school_linked_id?: string | null
-          school_linked_other?: string | null
+          sponsor_name?: string | null
+          start_date: string
+          status_id: string
           updated_at?: string
-          volunteers_total: number
-          works_item_id?: string | null
         }
         Update: {
-          area_m2?: number | null
-          area_section?: string | null
-          campaign_date?: string
-          campaign_time_from?: string | null
-          campaign_time_to?: string | null
+          action_days?: number | null
+          applications_close?: string
+          applications_open?: string
+          campaign_name?: string
           client_uuid?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
+          description?: string
+          end_date?: string
+          has_sponsor?: boolean
           id?: string
-          incident_id?: string
-          incident_other?: string | null
-          inkind_value?: number | null
-          is_first_campaign_id?: string | null
-          lead_organiser_id?: string
-          lead_organiser_other?: string | null
-          linked_item_id?: string | null
-          materials?: string
-          municipal_supervision_id?: string
-          municipal_supervision_other?: string | null
           municipality_id?: string
-          new_volunteers?: number
-          outputs?: string
-          partners_involved?: string | null
-          person_hours?: number
-          recognition_id?: string | null
-          recognition_other?: string | null
-          recorded_by_name?: string | null
-          recorded_by_position?: string | null
-          recorded_on?: string | null
           reference?: string | null
-          remaining_work?: string
-          safety_briefing_id?: string
-          school_linked_id?: string | null
-          school_linked_other?: string | null
+          sponsor_name?: string | null
+          start_date?: string
+          status_id?: string
           updated_at?: string
-          volunteers_total?: number
-          works_item_id?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "khld_campaign_incident_id_fkey"
-            columns: ["incident_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_incident"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_campaign_is_first_campaign_id_fkey"
-            columns: ["is_first_campaign_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_c2_is_first_campaign"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_campaign_lead_organiser_id_fkey"
-            columns: ["lead_organiser_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_c2_lead_organiser"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_campaign_linked_item_id_fkey"
-            columns: ["linked_item_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_c2_linked_item"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_campaign_municipal_supervision_id_fkey"
-            columns: ["municipal_supervision_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_c2_municipal_supervision"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "khld_campaign_municipality_id_fkey"
             columns: ["municipality_id"]
@@ -2478,67 +2007,11 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "khld_campaign_recognition_id_fkey"
-            columns: ["recognition_id"]
+            foreignKeyName: "khld_campaign_status_id_fkey"
+            columns: ["status_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_c2_recognition"
+            referencedRelation: "ref_khld_event_status"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_campaign_safety_briefing_id_fkey"
-            columns: ["safety_briefing_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_c2_safety_briefing"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_campaign_school_linked_id_fkey"
-            columns: ["school_linked_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_c2_school_linked"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_campaign_works_item_id_fkey"
-            columns: ["works_item_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_works_item"
-            referencedColumns: ["id", "municipality_id"]
-          }
-        ]
-      }
-      khld_campaign_count: {
-        Row: {
-          campaign_id: string
-          cell_id: string
-          count: number
-          created_at: string
-          field_code: string
-          municipality_id: string
-        }
-        Insert: {
-          campaign_id: string
-          cell_id: string
-          count: number
-          created_at?: string
-          field_code: string
-          municipality_id?: string
-        }
-        Update: {
-          campaign_id?: string
-          cell_id?: string
-          count?: number
-          created_at?: string
-          field_code?: string
-          municipality_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_campaign_count_campaign_id_fkey"
-            columns: ["campaign_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_campaign"
-            referencedColumns: ["id", "municipality_id"]
           }
         ]
       }
@@ -2577,178 +2050,210 @@ export type Database = {
           }
         ]
       }
-      khld_contribution: {
+      khld_committee_meeting: {
         Row: {
-          acknowledged_id: string
           client_uuid: string | null
-          conditions_id: string
-          conditions_other: string | null
-          contribution_type_id: string
-          contributor_contact: string | null
-          contributor_name: string
-          contributor_type_id: string
-          contributor_type_other: string | null
           created_at: string
           created_by: string | null
-          csr_linked_id: string | null
-          date_pledged: string | null
-          date_received: string | null
           deleted_at: string | null
-          description: string
-          first_contribution_id: string
-          first_contribution_other: string | null
           id: string
-          municipal_acceptance_id: string
-          municipal_acceptance_other: string | null
+          is_founding: boolean
+          meeting_date: string
+          members_present: number
           municipality_id: string
-          notes: string | null
-          partner_id: string | null
-          quantity: string | null
-          quantity_unit: string | null
-          recorded_by_name: string | null
-          recorded_by_position: string | null
-          recorded_on: string | null
           reference: string | null
-          source_meeting_id: string | null
-          source_meeting_other: string | null
-          status_id: string
+          summary: string | null
           updated_at: string
-          valuation_basis_id: string
-          value_jod: number
-          volunteer_labour_person_hours: number | null
-          volunteer_labour_volunteers: number | null
-          works_item_id: string | null
+          workplan_discussed: boolean
         }
         Insert: {
-          acknowledged_id: string
           client_uuid?: string | null
-          conditions_id: string
-          conditions_other?: string | null
-          contribution_type_id: string
-          contributor_contact?: string | null
-          contributor_name: string
-          contributor_type_id: string
-          contributor_type_other?: string | null
           created_at?: string
           created_by?: string | null
-          csr_linked_id?: string | null
-          date_pledged?: string | null
-          date_received?: string | null
           deleted_at?: string | null
-          description: string
-          first_contribution_id: string
-          first_contribution_other?: string | null
           id?: string
-          municipal_acceptance_id: string
-          municipal_acceptance_other?: string | null
+          is_founding: boolean
+          meeting_date: string
+          members_present: number
           municipality_id?: string
-          notes?: string | null
-          partner_id?: string | null
-          quantity?: string | null
-          quantity_unit?: string | null
-          recorded_by_name?: string | null
-          recorded_by_position?: string | null
-          recorded_on?: string | null
           reference?: string | null
-          source_meeting_id?: string | null
-          source_meeting_other?: string | null
-          status_id: string
+          summary?: string | null
           updated_at?: string
-          valuation_basis_id: string
-          value_jod: number
-          volunteer_labour_person_hours?: number | null
-          volunteer_labour_volunteers?: number | null
-          works_item_id?: string | null
+          workplan_discussed: boolean
         }
         Update: {
-          acknowledged_id?: string
           client_uuid?: string | null
-          conditions_id?: string
-          conditions_other?: string | null
-          contribution_type_id?: string
-          contributor_contact?: string | null
-          contributor_name?: string
-          contributor_type_id?: string
-          contributor_type_other?: string | null
           created_at?: string
           created_by?: string | null
-          csr_linked_id?: string | null
-          date_pledged?: string | null
-          date_received?: string | null
           deleted_at?: string | null
-          description?: string
-          first_contribution_id?: string
-          first_contribution_other?: string | null
           id?: string
-          municipal_acceptance_id?: string
-          municipal_acceptance_other?: string | null
+          is_founding?: boolean
+          meeting_date?: string
+          members_present?: number
           municipality_id?: string
-          notes?: string | null
-          partner_id?: string | null
-          quantity?: string | null
-          quantity_unit?: string | null
-          recorded_by_name?: string | null
-          recorded_by_position?: string | null
-          recorded_on?: string | null
           reference?: string | null
-          source_meeting_id?: string | null
-          source_meeting_other?: string | null
-          status_id?: string
+          summary?: string | null
           updated_at?: string
-          valuation_basis_id?: string
-          value_jod?: number
-          volunteer_labour_person_hours?: number | null
-          volunteer_labour_volunteers?: number | null
-          works_item_id?: string | null
+          workplan_discussed?: boolean
         }
         Relationships: [
           {
-            foreignKeyName: "khld_contribution_acknowledged_id_fkey"
-            columns: ["acknowledged_id"]
+            foreignKeyName: "khld_committee_meeting_municipality_id_fkey"
+            columns: ["municipality_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_a3_acknowledged"
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      khld_committee_member: {
+        Row: {
+          appointed_on: string
+          client_uuid: string | null
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          member_name: string
+          municipality_id: string
+          organisation: string
+          organisation_type_id: string
+          phone: string
+          role_id: string
+          sex_id: string
+          updated_at: string
+        }
+        Insert: {
+          appointed_on: string
+          client_uuid?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          member_name: string
+          municipality_id?: string
+          organisation: string
+          organisation_type_id: string
+          phone: string
+          role_id: string
+          sex_id: string
+          updated_at?: string
+        }
+        Update: {
+          appointed_on?: string
+          client_uuid?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          member_name?: string
+          municipality_id?: string
+          organisation?: string
+          organisation_type_id?: string
+          phone?: string
+          role_id?: string
+          sex_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "khld_committee_member_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "khld_contribution_conditions_id_fkey"
-            columns: ["conditions_id"]
+            foreignKeyName: "khld_committee_member_organisation_type_id_fkey"
+            columns: ["organisation_type_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_a3_conditions"
+            referencedRelation: "ref_khld_organisation_type"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "khld_committee_member_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "ref_khld_committee_role"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "khld_committee_member_sex_id_fkey"
+            columns: ["sex_id"]
+            isOneToOne: false
+            referencedRelation: "ref_khld_sex"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      khld_contribution: {
+        Row: {
+          activity_supported_id: string
+          activity_supported_other: string | null
+          client_uuid: string | null
+          contribution_type_id: string
+          contributor_name: string | null
+          created_at: string
+          created_by: string | null
+          date_received: string
+          deleted_at: string | null
+          description: string
+          id: string
+          municipality_id: string
+          partner_id: string | null
+          reference: string | null
+          updated_at: string
+          value_jod: number
+        }
+        Insert: {
+          activity_supported_id: string
+          activity_supported_other?: string | null
+          client_uuid?: string | null
+          contribution_type_id: string
+          contributor_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          date_received: string
+          deleted_at?: string | null
+          description: string
+          id?: string
+          municipality_id?: string
+          partner_id?: string | null
+          reference?: string | null
+          updated_at?: string
+          value_jod: number
+        }
+        Update: {
+          activity_supported_id?: string
+          activity_supported_other?: string | null
+          client_uuid?: string | null
+          contribution_type_id?: string
+          contributor_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          date_received?: string
+          deleted_at?: string | null
+          description?: string
+          id?: string
+          municipality_id?: string
+          partner_id?: string | null
+          reference?: string | null
+          updated_at?: string
+          value_jod?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "khld_contribution_activity_supported_id_fkey"
+            columns: ["activity_supported_id"]
+            isOneToOne: false
+            referencedRelation: "ref_khld_activity_supported"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "khld_contribution_contribution_type_id_fkey"
             columns: ["contribution_type_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_a3_contribution_type"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_contribution_contributor_type_id_fkey"
-            columns: ["contributor_type_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_a3_contributor_type"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_contribution_csr_linked_id_fkey"
-            columns: ["csr_linked_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_a3_csr_linked"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_contribution_first_contribution_id_fkey"
-            columns: ["first_contribution_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_a3_first_contribution"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_contribution_municipal_acceptance_id_fkey"
-            columns: ["municipal_acceptance_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_a3_municipal_acceptance"
+            referencedRelation: "ref_khld_contribution_type"
             referencedColumns: ["id"]
           },
           {
@@ -2764,549 +2269,182 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "khld_partner"
             referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "khld_contribution_source_meeting_id_fkey"
-            columns: ["source_meeting_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_a3_source_meeting"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_contribution_status_id_fkey"
-            columns: ["status_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_a3_status"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_contribution_valuation_basis_id_fkey"
-            columns: ["valuation_basis_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_a3_valuation_basis"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_contribution_works_item_id_fkey"
-            columns: ["works_item_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_works_item"
-            referencedColumns: ["id", "municipality_id"]
           }
         ]
       }
-      khld_contribution_option: {
-        Row: {
-          contribution_id: string
-          created_at: string
-          municipality_id: string
-          option_id: string
-          option_other: string | null
-          question_code: string
-        }
-        Insert: {
-          contribution_id: string
-          created_at?: string
-          municipality_id?: string
-          option_id: string
-          option_other?: string | null
-          question_code: string
-        }
-        Update: {
-          contribution_id?: string
-          created_at?: string
-          municipality_id?: string
-          option_id?: string
-          option_other?: string | null
-          question_code?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_contribution_option_contribution_id_fkey"
-            columns: ["contribution_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_contribution"
-            referencedColumns: ["id", "municipality_id"]
-          }
-        ]
-      }
-      khld_coordination_meeting: {
-        Row: {
-          actions_assigned: string
-          agenda: string
-          attendance_sheet: boolean
-          attendees_total: number
-          chaired_by: string
-          client_uuid: string | null
-          contributions_pledged_id: string
-          convened_by_id: string
-          created_at: string
-          created_by: string | null
-          decisions: string
-          deleted_at: string | null
-          id: string
-          issues_raised: string | null
-          meeting_date: string
-          meeting_time_from: string | null
-          meeting_time_to: string | null
-          meeting_type_id: string
-          minutes_prepared_id: string
-          municipality_id: string
-          new_partners_id: string
-          new_partners_other: string | null
-          next_meeting: string | null
-          notes: string | null
-          orgs_invited: number
-          orgs_present: number
-          prev_followup_id: string
-          recorded_by_name: string | null
-          recorded_by_position: string | null
-          recorded_on: string | null
-          reference: string | null
-          updated_at: string
-          venue_id: string
-          venue_other: string | null
-        }
-        Insert: {
-          actions_assigned: string
-          agenda: string
-          attendance_sheet: boolean
-          attendees_total: number
-          chaired_by: string
-          client_uuid?: string | null
-          contributions_pledged_id: string
-          convened_by_id: string
-          created_at?: string
-          created_by?: string | null
-          decisions: string
-          deleted_at?: string | null
-          id?: string
-          issues_raised?: string | null
-          meeting_date: string
-          meeting_time_from?: string | null
-          meeting_time_to?: string | null
-          meeting_type_id: string
-          minutes_prepared_id: string
-          municipality_id?: string
-          new_partners_id: string
-          new_partners_other?: string | null
-          next_meeting?: string | null
-          notes?: string | null
-          orgs_invited: number
-          orgs_present: number
-          prev_followup_id: string
-          recorded_by_name?: string | null
-          recorded_by_position?: string | null
-          recorded_on?: string | null
-          reference?: string | null
-          updated_at?: string
-          venue_id: string
-          venue_other?: string | null
-        }
-        Update: {
-          actions_assigned?: string
-          agenda?: string
-          attendance_sheet?: boolean
-          attendees_total?: number
-          chaired_by?: string
-          client_uuid?: string | null
-          contributions_pledged_id?: string
-          convened_by_id?: string
-          created_at?: string
-          created_by?: string | null
-          decisions?: string
-          deleted_at?: string | null
-          id?: string
-          issues_raised?: string | null
-          meeting_date?: string
-          meeting_time_from?: string | null
-          meeting_time_to?: string | null
-          meeting_type_id?: string
-          minutes_prepared_id?: string
-          municipality_id?: string
-          new_partners_id?: string
-          new_partners_other?: string | null
-          next_meeting?: string | null
-          notes?: string | null
-          orgs_invited?: number
-          orgs_present?: number
-          prev_followup_id?: string
-          recorded_by_name?: string | null
-          recorded_by_position?: string | null
-          recorded_on?: string | null
-          reference?: string | null
-          updated_at?: string
-          venue_id?: string
-          venue_other?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_coordination_meeting_contributions_pledged_id_fkey"
-            columns: ["contributions_pledged_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_a2_contributions_pledged"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_coordination_meeting_convened_by_id_fkey"
-            columns: ["convened_by_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_a2_convened_by"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_coordination_meeting_meeting_type_id_fkey"
-            columns: ["meeting_type_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_a2_meeting_type"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_coordination_meeting_minutes_prepared_id_fkey"
-            columns: ["minutes_prepared_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_a2_minutes_prepared"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_coordination_meeting_municipality_id_fkey"
-            columns: ["municipality_id"]
-            isOneToOne: false
-            referencedRelation: "municipality"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_coordination_meeting_new_partners_id_fkey"
-            columns: ["new_partners_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_a2_new_partners"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_coordination_meeting_prev_followup_id_fkey"
-            columns: ["prev_followup_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_a2_prev_followup"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_coordination_meeting_venue_id_fkey"
-            columns: ["venue_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_a2_venue"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      khld_coordination_meeting_count: {
-        Row: {
-          cell_id: string
-          count: number
-          created_at: string
-          field_code: string
-          meeting_id: string
-          municipality_id: string
-        }
-        Insert: {
-          cell_id: string
-          count: number
-          created_at?: string
-          field_code: string
-          meeting_id: string
-          municipality_id?: string
-        }
-        Update: {
-          cell_id?: string
-          count?: number
-          created_at?: string
-          field_code?: string
-          meeting_id?: string
-          municipality_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_coordination_meeting_count_meeting_id_fkey"
-            columns: ["meeting_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_coordination_meeting"
-            referencedColumns: ["id", "municipality_id"]
-          }
-        ]
-      }
-      khld_coordination_meeting_option: {
-        Row: {
-          created_at: string
-          meeting_id: string
-          municipality_id: string
-          option_id: string
-          option_other: string | null
-          question_code: string
-        }
-        Insert: {
-          created_at?: string
-          meeting_id: string
-          municipality_id?: string
-          option_id: string
-          option_other?: string | null
-          question_code: string
-        }
-        Update: {
-          created_at?: string
-          meeting_id?: string
-          municipality_id?: string
-          option_id?: string
-          option_other?: string | null
-          question_code?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_coordination_meeting_option_meeting_id_fkey"
-            columns: ["meeting_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_coordination_meeting"
-            referencedColumns: ["id", "municipality_id"]
-          }
-        ]
-      }
-      khld_enterprise: {
+      khld_enterprise_request: {
         Row: {
           client_uuid: string | null
           created_at: string
           created_by: string | null
           deleted_at: string | null
-          enterprise_name: string | null
+          disability_id: string
+          has_business: boolean
           id: string
-          municipality_id: string
-          owner_name: string | null
-          owner_person_id: string | null
-          owner_phone: string | null
-          reference: string | null
-          updated_at: string
-        }
-        Insert: {
-          client_uuid?: string | null
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          enterprise_name?: string | null
-          id?: string
-          municipality_id?: string
-          owner_name?: string | null
-          owner_person_id?: string | null
-          owner_phone?: string | null
-          reference?: string | null
-          updated_at?: string
-        }
-        Update: {
-          client_uuid?: string | null
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          enterprise_name?: string | null
-          id?: string
-          municipality_id?: string
-          owner_name?: string | null
-          owner_person_id?: string | null
-          owner_phone?: string | null
-          reference?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_enterprise_municipality_id_fkey"
-            columns: ["municipality_id"]
-            isOneToOne: false
-            referencedRelation: "municipality"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_enterprise_owner_person_id_fkey"
-            columns: ["owner_person_id"]
-            isOneToOne: false
-            referencedRelation: "person"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      khld_enterprise_support: {
-        Row: {
-          age_group_id: string
-          client_uuid: string | null
-          consolidated_by_name: string | null
-          consolidated_on: string | null
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          disability_id: string | null
-          entered_by_name: string | null
-          entered_by_organisation: string | null
-          entered_on: string | null
-          enterprise_id: string
-          first_support_date: string
-          id: string
+          id_type_id: string
+          is_resident: boolean
           municipality_id: string
           nationality_id: string
-          outstanding_needs: string
-          sex_id: string
-          status_last_contact_id: string
-          sup_guidance: boolean
-          sup_guidance_dates: string | null
-          sup_guidance_provider: string | null
-          sup_guidance_sessions: number | null
-          sup_hygiene_date: string | null
-          sup_hygiene_id: string
-          sup_hygiene_provider: string | null
-          sup_inkind: boolean | null
-          sup_inkind_description: string | null
-          sup_licensing_info: boolean
-          sup_licensing_info_date: string | null
-          sup_licensing_info_provider: string | null
-          sup_market_access: boolean
-          sup_market_access_count: number | null
-          sup_market_access_refs: string | null
-          sup_marketing: boolean | null
-          sup_marketing_description: string | null
-          sup_other: string | null
-          sup_peer_network: boolean
-          sup_peer_network_date: string | null
-          sup_peer_network_meetings: number | null
-          sup_referral: boolean
-          sup_referral_date: string | null
-          sup_referral_entity: string | null
-          sup_referral_outcome_id: string | null
-          sup_referral_purpose: string | null
-          sup_site_visit: boolean | null
-          sup_site_visit_count: number | null
-          sup_site_visit_dates: string | null
-          support_types_count: number | null
+          nationality_other: string | null
+          person_id: string
+          product_type_id: string
+          product_type_other: string | null
+          session_id: string
           updated_at: string
+          working_status_id: string
         }
         Insert: {
-          age_group_id: string
           client_uuid?: string | null
-          consolidated_by_name?: string | null
-          consolidated_on?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
-          disability_id?: string | null
-          entered_by_name?: string | null
-          entered_by_organisation?: string | null
-          entered_on?: string | null
-          enterprise_id: string
-          first_support_date: string
+          disability_id: string
+          has_business: boolean
           id?: string
+          id_type_id: string
+          is_resident: boolean
           municipality_id?: string
           nationality_id: string
-          outstanding_needs: string
-          sex_id: string
-          status_last_contact_id: string
-          sup_guidance: boolean
-          sup_guidance_dates?: string | null
-          sup_guidance_provider?: string | null
-          sup_guidance_sessions?: number | null
-          sup_hygiene_date?: string | null
-          sup_hygiene_id: string
-          sup_hygiene_provider?: string | null
-          sup_inkind?: boolean | null
-          sup_inkind_description?: string | null
-          sup_licensing_info: boolean
-          sup_licensing_info_date?: string | null
-          sup_licensing_info_provider?: string | null
-          sup_market_access: boolean
-          sup_market_access_count?: number | null
-          sup_market_access_refs?: string | null
-          sup_marketing?: boolean | null
-          sup_marketing_description?: string | null
-          sup_other?: string | null
-          sup_peer_network: boolean
-          sup_peer_network_date?: string | null
-          sup_peer_network_meetings?: number | null
-          sup_referral: boolean
-          sup_referral_date?: string | null
-          sup_referral_entity?: string | null
-          sup_referral_outcome_id?: string | null
-          sup_referral_purpose?: string | null
-          sup_site_visit?: boolean | null
-          sup_site_visit_count?: number | null
-          sup_site_visit_dates?: string | null
-          support_types_count?: number | null
+          nationality_other?: string | null
+          person_id: string
+          product_type_id: string
+          product_type_other?: string | null
+          session_id: string
           updated_at?: string
+          working_status_id: string
         }
         Update: {
-          age_group_id?: string
           client_uuid?: string | null
-          consolidated_by_name?: string | null
-          consolidated_on?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
-          disability_id?: string | null
-          entered_by_name?: string | null
-          entered_by_organisation?: string | null
-          entered_on?: string | null
-          enterprise_id?: string
-          first_support_date?: string
+          disability_id?: string
+          has_business?: boolean
           id?: string
+          id_type_id?: string
+          is_resident?: boolean
           municipality_id?: string
           nationality_id?: string
-          outstanding_needs?: string
-          sex_id?: string
-          status_last_contact_id?: string
-          sup_guidance?: boolean
-          sup_guidance_dates?: string | null
-          sup_guidance_provider?: string | null
-          sup_guidance_sessions?: number | null
-          sup_hygiene_date?: string | null
-          sup_hygiene_id?: string
-          sup_hygiene_provider?: string | null
-          sup_inkind?: boolean | null
-          sup_inkind_description?: string | null
-          sup_licensing_info?: boolean
-          sup_licensing_info_date?: string | null
-          sup_licensing_info_provider?: string | null
-          sup_market_access?: boolean
-          sup_market_access_count?: number | null
-          sup_market_access_refs?: string | null
-          sup_marketing?: boolean | null
-          sup_marketing_description?: string | null
-          sup_other?: string | null
-          sup_peer_network?: boolean
-          sup_peer_network_date?: string | null
-          sup_peer_network_meetings?: number | null
-          sup_referral?: boolean
-          sup_referral_date?: string | null
-          sup_referral_entity?: string | null
-          sup_referral_outcome_id?: string | null
-          sup_referral_purpose?: string | null
-          sup_site_visit?: boolean | null
-          sup_site_visit_count?: number | null
-          sup_site_visit_dates?: string | null
-          support_types_count?: number | null
+          nationality_other?: string | null
+          person_id?: string
+          product_type_id?: string
+          product_type_other?: string | null
+          session_id?: string
           updated_at?: string
+          working_status_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "khld_enterprise_support_age_group_id_fkey"
-            columns: ["age_group_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_age_group"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_enterprise_support_disability_id_fkey"
+            foreignKeyName: "khld_enterprise_request_disability_id_fkey"
             columns: ["disability_id"]
             isOneToOne: false
             referencedRelation: "ref_khld_disability"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "khld_enterprise_support_enterprise_id_fkey"
-            columns: ["enterprise_id", "municipality_id"]
+            foreignKeyName: "khld_enterprise_request_id_type_id_fkey"
+            columns: ["id_type_id"]
             isOneToOne: false
-            referencedRelation: "khld_enterprise"
+            referencedRelation: "ref_khld_id_type"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "khld_enterprise_request_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "khld_enterprise_request_nationality_id_fkey"
+            columns: ["nationality_id"]
+            isOneToOne: false
+            referencedRelation: "ref_khld_nationality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "khld_enterprise_request_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "person"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "khld_enterprise_request_product_type_id_fkey"
+            columns: ["product_type_id"]
+            isOneToOne: false
+            referencedRelation: "ref_khld_product_type"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "khld_enterprise_request_session_id_fkey"
+            columns: ["session_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "khld_guidance_session"
             referencedColumns: ["id", "municipality_id"]
           },
+          {
+            foreignKeyName: "khld_enterprise_request_working_status_id_fkey"
+            columns: ["working_status_id"]
+            isOneToOne: false
+            referencedRelation: "ref_khld_working_status"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      khld_enterprise_support: {
+        Row: {
+          attended: boolean | null
+          client_uuid: string | null
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          municipality_id: string
+          notes: string | null
+          person_id: string
+          provided_by_id: string
+          referred_to: string | null
+          session_id: string | null
+          support_date: string
+          support_type_id: string
+          updated_at: string
+        }
+        Insert: {
+          attended?: boolean | null
+          client_uuid?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          municipality_id?: string
+          notes?: string | null
+          person_id: string
+          provided_by_id: string
+          referred_to?: string | null
+          session_id?: string | null
+          support_date: string
+          support_type_id: string
+          updated_at?: string
+        }
+        Update: {
+          attended?: boolean | null
+          client_uuid?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          municipality_id?: string
+          notes?: string | null
+          person_id?: string
+          provided_by_id?: string
+          referred_to?: string | null
+          session_id?: string | null
+          support_date?: string
+          support_type_id?: string
+          updated_at?: string
+        }
+        Relationships: [
           {
             foreignKeyName: "khld_enterprise_support_municipality_id_fkey"
             columns: ["municipality_id"]
@@ -3315,875 +2453,282 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "khld_enterprise_support_nationality_id_fkey"
-            columns: ["nationality_id"]
+            foreignKeyName: "khld_enterprise_support_person_id_fkey"
+            columns: ["person_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_nationality"
+            referencedRelation: "person"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "khld_enterprise_support_sex_id_fkey"
-            columns: ["sex_id"]
+            foreignKeyName: "khld_enterprise_support_provided_by_id_fkey"
+            columns: ["provided_by_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_sex"
+            referencedRelation: "ref_khld_support_provider"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "khld_enterprise_support_status_last_contact_id_fkey"
-            columns: ["status_last_contact_id"]
+            foreignKeyName: "khld_enterprise_support_session_id_fkey"
+            columns: ["session_id", "municipality_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_g2_status_last_contact"
-            referencedColumns: ["id"]
+            referencedRelation: "khld_guidance_session"
+            referencedColumns: ["id", "municipality_id"]
           },
           {
-            foreignKeyName: "khld_enterprise_support_sup_hygiene_id_fkey"
-            columns: ["sup_hygiene_id"]
+            foreignKeyName: "khld_enterprise_support_support_type_id_fkey"
+            columns: ["support_type_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_g2_sup_hygiene"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_enterprise_support_sup_referral_outcome_id_fkey"
-            columns: ["sup_referral_outcome_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_g2_sup_referral_outcome"
+            referencedRelation: "ref_khld_support_type"
             referencedColumns: ["id"]
           }
         ]
       }
-      khld_enterprise_support_option: {
+      khld_field_rule: {
         Row: {
-          created_at: string
-          municipality_id: string
-          option_id: string
-          option_other: string | null
-          question_code: string
-          support_id: string
+          column_name: string
+          conditions: Json
+          field_code: string
+          required: boolean
+          table_name: string
+          when_text: string
         }
         Insert: {
-          created_at?: string
-          municipality_id?: string
-          option_id: string
-          option_other?: string | null
-          question_code: string
-          support_id: string
+          column_name: string
+          conditions: Json
+          field_code: string
+          required: boolean
+          table_name: string
+          when_text: string
         }
         Update: {
-          created_at?: string
-          municipality_id?: string
-          option_id?: string
-          option_other?: string | null
-          question_code?: string
-          support_id?: string
+          column_name?: string
+          conditions?: Json
+          field_code?: string
+          required?: boolean
+          table_name?: string
+          when_text?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "khld_enterprise_support_option_support_id_fkey"
-            columns: ["support_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_enterprise_support"
-            referencedColumns: ["id", "municipality_id"]
-          }
-        ]
+        Relationships: []
       }
-      khld_guidance_completion: {
+      khld_file_field: {
         Row: {
-          age_group_id: string
-          certificate_id: string
-          certificate_other: string | null
+          field_code: string
+          max_files: number
+          required: boolean
+          table_name: string
+        }
+        Insert: {
+          field_code: string
+          max_files: number
+          required: boolean
+          table_name: string
+        }
+        Update: {
+          field_code?: string
+          max_files?: number
+          required?: boolean
+          table_name?: string
+        }
+        Relationships: []
+      }
+      khld_focal_point: {
+        Row: {
+          assigned_on: string
           client_uuid: string | null
-          completion: string | null
           created_at: string
           created_by: string | null
-          cycle_reference: string | null
-          cycle_year: string | null
           deleted_at: string | null
-          disability_id: string | null
-          enterprise_id: string
-          enterprise_name: string | null
-          enterprise_status_id: string
-          extra_sessions: string | null
+          focal_point_name: string
           id: string
-          knowledge_check_done: boolean | null
-          knowledge_score: number | null
-          knowledge_score_of: number | null
-          most_useful_id: string | null
           municipality_id: string
-          nationality_id: string
-          neighbourhood_id: string | null
-          non_completion_reason_id: string
-          non_completion_reason_other: string | null
-          peer_network_id: string
-          recorded_by_name: string | null
-          recorded_by_position: string | null
-          recorded_on: string | null
-          referral_made_id: string
-          referral_made_other: string | null
-          s1_date: string | null
-          s1_status_id: string | null
-          s2_date: string | null
-          s2_status_id: string | null
-          s3_date: string | null
-          s3_status_id: string | null
-          s4_date: string | null
-          s4_status_id: string | null
-          s5_date: string | null
-          s5_status_id: string | null
-          sessions_attended_count: number | null
+          phone: string
           updated_at: string
-          venue_id: string | null
-          venue_other: string | null
-          workers_total: number | null
-          workers_under_30: number | null
-          workers_women: number | null
         }
         Insert: {
-          age_group_id: string
-          certificate_id: string
-          certificate_other?: string | null
+          assigned_on: string
           client_uuid?: string | null
-          completion?: string | null
           created_at?: string
           created_by?: string | null
-          cycle_reference?: string | null
-          cycle_year?: string | null
           deleted_at?: string | null
-          disability_id?: string | null
-          enterprise_id: string
-          enterprise_name?: string | null
-          enterprise_status_id: string
-          extra_sessions?: string | null
+          focal_point_name: string
           id?: string
-          knowledge_check_done?: boolean | null
-          knowledge_score?: number | null
-          knowledge_score_of?: number | null
-          most_useful_id?: string | null
           municipality_id?: string
-          nationality_id: string
-          neighbourhood_id?: string | null
-          non_completion_reason_id: string
-          non_completion_reason_other?: string | null
-          peer_network_id: string
-          recorded_by_name?: string | null
-          recorded_by_position?: string | null
-          recorded_on?: string | null
-          referral_made_id: string
-          referral_made_other?: string | null
-          s1_date?: string | null
-          s1_status_id?: string | null
-          s2_date?: string | null
-          s2_status_id?: string | null
-          s3_date?: string | null
-          s3_status_id?: string | null
-          s4_date?: string | null
-          s4_status_id?: string | null
-          s5_date?: string | null
-          s5_status_id?: string | null
-          sessions_attended_count?: number | null
+          phone: string
           updated_at?: string
-          venue_id?: string | null
-          venue_other?: string | null
-          workers_total?: number | null
-          workers_under_30?: number | null
-          workers_women?: number | null
         }
         Update: {
-          age_group_id?: string
-          certificate_id?: string
-          certificate_other?: string | null
+          assigned_on?: string
           client_uuid?: string | null
-          completion?: string | null
           created_at?: string
           created_by?: string | null
-          cycle_reference?: string | null
-          cycle_year?: string | null
           deleted_at?: string | null
-          disability_id?: string | null
-          enterprise_id?: string
-          enterprise_name?: string | null
-          enterprise_status_id?: string
-          extra_sessions?: string | null
+          focal_point_name?: string
           id?: string
-          knowledge_check_done?: boolean | null
-          knowledge_score?: number | null
-          knowledge_score_of?: number | null
-          most_useful_id?: string | null
           municipality_id?: string
-          nationality_id?: string
-          neighbourhood_id?: string | null
-          non_completion_reason_id?: string
-          non_completion_reason_other?: string | null
-          peer_network_id?: string
-          recorded_by_name?: string | null
-          recorded_by_position?: string | null
-          recorded_on?: string | null
-          referral_made_id?: string
-          referral_made_other?: string | null
-          s1_date?: string | null
-          s1_status_id?: string | null
-          s2_date?: string | null
-          s2_status_id?: string | null
-          s3_date?: string | null
-          s3_status_id?: string | null
-          s4_date?: string | null
-          s4_status_id?: string | null
-          s5_date?: string | null
-          s5_status_id?: string | null
-          sessions_attended_count?: number | null
+          phone?: string
           updated_at?: string
-          venue_id?: string | null
-          venue_other?: string | null
-          workers_total?: number | null
-          workers_under_30?: number | null
-          workers_women?: number | null
         }
         Relationships: [
           {
-            foreignKeyName: "khld_guidance_completion_age_group_id_fkey"
-            columns: ["age_group_id"]
+            foreignKeyName: "khld_focal_point_municipality_id_fkey"
+            columns: ["municipality_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_age_group"
+            referencedRelation: "municipality"
             referencedColumns: ["id"]
-          },
+          }
+        ]
+      }
+      khld_guidance_session: {
+        Row: {
+          applications_close: string
+          applications_open: string
+          client_uuid: string | null
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          description: string
+          end_date: string
+          executing_entity: string
+          id: string
+          is_core: boolean
+          municipality_id: string
+          reference: string | null
+          start_date: string
+          title: string
+          topic_id: string
+          topic_other: string | null
+          updated_at: string
+        }
+        Insert: {
+          applications_close: string
+          applications_open: string
+          client_uuid?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          description: string
+          end_date: string
+          executing_entity: string
+          id?: string
+          is_core: boolean
+          municipality_id?: string
+          reference?: string | null
+          start_date: string
+          title: string
+          topic_id: string
+          topic_other?: string | null
+          updated_at?: string
+        }
+        Update: {
+          applications_close?: string
+          applications_open?: string
+          client_uuid?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          description?: string
+          end_date?: string
+          executing_entity?: string
+          id?: string
+          is_core?: boolean
+          municipality_id?: string
+          reference?: string | null
+          start_date?: string
+          title?: string
+          topic_id?: string
+          topic_other?: string | null
+          updated_at?: string
+        }
+        Relationships: [
           {
-            foreignKeyName: "khld_guidance_completion_certificate_id_fkey"
-            columns: ["certificate_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_g1_certificate"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_guidance_completion_cycle_year_fkey"
-            columns: ["cycle_year"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_g1_cycle_year"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_guidance_completion_disability_id_fkey"
-            columns: ["disability_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_disability"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_guidance_completion_enterprise_id_fkey"
-            columns: ["enterprise_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_enterprise"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "khld_guidance_completion_enterprise_status_id_fkey"
-            columns: ["enterprise_status_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_g1_enterprise_status"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_guidance_completion_most_useful_id_fkey"
-            columns: ["most_useful_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_g1_most_useful"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_guidance_completion_municipality_id_fkey"
+            foreignKeyName: "khld_guidance_session_municipality_id_fkey"
             columns: ["municipality_id"]
             isOneToOne: false
             referencedRelation: "municipality"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "khld_guidance_completion_nationality_id_fkey"
-            columns: ["nationality_id"]
+            foreignKeyName: "khld_guidance_session_topic_id_fkey"
+            columns: ["topic_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_nationality"
+            referencedRelation: "ref_khld_session_topic"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_guidance_completion_neighbourhood_id_fkey"
-            columns: ["neighbourhood_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_neighbourhood"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_guidance_completion_non_completion_reason_id_fkey"
-            columns: ["non_completion_reason_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_g1_non_completion_reason"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_guidance_completion_peer_network_id_fkey"
-            columns: ["peer_network_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_g1_peer_network"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_guidance_completion_referral_made_id_fkey"
-            columns: ["referral_made_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_g1_referral_made"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_guidance_completion_s1_status_id_fkey"
-            columns: ["s1_status_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_session_attendance"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_guidance_completion_s2_status_id_fkey"
-            columns: ["s2_status_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_session_attendance"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_guidance_completion_s3_status_id_fkey"
-            columns: ["s3_status_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_g1_s3_hygiene"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_guidance_completion_s4_status_id_fkey"
-            columns: ["s4_status_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_session_attendance"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_guidance_completion_s5_status_id_fkey"
-            columns: ["s5_status_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_session_attendance"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_guidance_completion_venue_id_fkey"
-            columns: ["venue_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_g1_venue"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      khld_guidance_completion_option: {
-        Row: {
-          completion_id: string
-          created_at: string
-          municipality_id: string
-          option_id: string
-          option_other: string | null
-          question_code: string
-        }
-        Insert: {
-          completion_id: string
-          created_at?: string
-          municipality_id?: string
-          option_id: string
-          option_other?: string | null
-          question_code: string
-        }
-        Update: {
-          completion_id?: string
-          created_at?: string
-          municipality_id?: string
-          option_id?: string
-          option_other?: string | null
-          question_code?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_guidance_completion_option_completion_id_fkey"
-            columns: ["completion_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_guidance_completion"
-            referencedColumns: ["id", "municipality_id"]
-          }
-        ]
-      }
-      khld_interaction_survey: {
-        Row: {
-          age_group_id: string
-          change_narrative: string
-          children_count: number | null
-          client_uuid: string | null
-          comfort_level_id: string | null
-          consent_id: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          disability_id: string
-          enum_name: string
-          enum_notes: string | null
-          has_children_id: string
-          id: string
-          int_date: string
-          int_place_id: string
-          joint_activity_id: string | null
-          mixed_presence_id: string | null
-          municipality_id: string
-          nationality_id: string
-          neighbourhood_id: string
-          new_contact_id: string | null
-          opportunity_increase_id: string | null
-          recontact_id: string
-          recontact_other: string | null
-          relations_change_id: string
-          sex_id: string
-          suggestions: string | null
-          suitable_women_children_id: string
-          survey_round_id: string
-          updated_at: string
-          visit_freq_id: string
-        }
-        Insert: {
-          age_group_id: string
-          change_narrative: string
-          children_count?: number | null
-          client_uuid?: string | null
-          comfort_level_id?: string | null
-          consent_id: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          disability_id: string
-          enum_name: string
-          enum_notes?: string | null
-          has_children_id: string
-          id?: string
-          int_date: string
-          int_place_id: string
-          joint_activity_id?: string | null
-          mixed_presence_id?: string | null
-          municipality_id?: string
-          nationality_id: string
-          neighbourhood_id: string
-          new_contact_id?: string | null
-          opportunity_increase_id?: string | null
-          recontact_id: string
-          recontact_other?: string | null
-          relations_change_id: string
-          sex_id: string
-          suggestions?: string | null
-          suitable_women_children_id: string
-          survey_round_id: string
-          updated_at?: string
-          visit_freq_id: string
-        }
-        Update: {
-          age_group_id?: string
-          change_narrative?: string
-          children_count?: number | null
-          client_uuid?: string | null
-          comfort_level_id?: string | null
-          consent_id?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          disability_id?: string
-          enum_name?: string
-          enum_notes?: string | null
-          has_children_id?: string
-          id?: string
-          int_date?: string
-          int_place_id?: string
-          joint_activity_id?: string | null
-          mixed_presence_id?: string | null
-          municipality_id?: string
-          nationality_id?: string
-          neighbourhood_id?: string
-          new_contact_id?: string | null
-          opportunity_increase_id?: string | null
-          recontact_id?: string
-          recontact_other?: string | null
-          relations_change_id?: string
-          sex_id?: string
-          suggestions?: string | null
-          suitable_women_children_id?: string
-          survey_round_id?: string
-          updated_at?: string
-          visit_freq_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_interaction_survey_age_group_id_fkey"
-            columns: ["age_group_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_age_group"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_interaction_survey_comfort_level_id_fkey"
-            columns: ["comfort_level_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_imp0_comfort_level"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_interaction_survey_consent_id_fkey"
-            columns: ["consent_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_imp0_consent"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_interaction_survey_disability_id_fkey"
-            columns: ["disability_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_disability"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_interaction_survey_has_children_id_fkey"
-            columns: ["has_children_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_imp0_has_children"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_interaction_survey_int_place_id_fkey"
-            columns: ["int_place_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_imp0_int_place"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_interaction_survey_joint_activity_id_fkey"
-            columns: ["joint_activity_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_imp0_joint_activity"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_interaction_survey_mixed_presence_id_fkey"
-            columns: ["mixed_presence_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_imp0_mixed_presence"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_interaction_survey_municipality_id_fkey"
-            columns: ["municipality_id"]
-            isOneToOne: false
-            referencedRelation: "municipality"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_interaction_survey_nationality_id_fkey"
-            columns: ["nationality_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_nationality"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_interaction_survey_neighbourhood_id_fkey"
-            columns: ["neighbourhood_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_neighbourhood"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_interaction_survey_new_contact_id_fkey"
-            columns: ["new_contact_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_imp0_new_contact"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_interaction_survey_opportunity_increase_id_fkey"
-            columns: ["opportunity_increase_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_agree_scale"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_interaction_survey_recontact_id_fkey"
-            columns: ["recontact_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_recontact"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_interaction_survey_relations_change_id_fkey"
-            columns: ["relations_change_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_imp0_relations_change"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_interaction_survey_sex_id_fkey"
-            columns: ["sex_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_sex"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_interaction_survey_suitable_women_children_id_fkey"
-            columns: ["suitable_women_children_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_yes_fully_partly_no"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_interaction_survey_survey_round_id_fkey"
-            columns: ["survey_round_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_imp0_survey_round"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_interaction_survey_visit_freq_id_fkey"
-            columns: ["visit_freq_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_imp0_visit_freq"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      khld_interaction_survey_option: {
-        Row: {
-          created_at: string
-          municipality_id: string
-          option_id: string
-          option_other: string | null
-          question_code: string
-          survey_id: string
-        }
-        Insert: {
-          created_at?: string
-          municipality_id?: string
-          option_id: string
-          option_other?: string | null
-          question_code: string
-          survey_id: string
-        }
-        Update: {
-          created_at?: string
-          municipality_id?: string
-          option_id?: string
-          option_other?: string | null
-          question_code?: string
-          survey_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_interaction_survey_option_survey_id_fkey"
-            columns: ["survey_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_interaction_survey"
-            referencedColumns: ["id", "municipality_id"]
           }
         ]
       }
       khld_market: {
         Row: {
-          accessibility_id: string
-          accessibility_other: string | null
-          announcement_days_before: number | null
-          applications_accepted: number | null
-          applications_declined: number | null
-          applications_received: number
-          cash_cost_jod: number
-          cash_source_id: string | null
+          actual_days: number
+          applications_close: string
+          applications_open: string
           client_uuid: string | null
           created_at: string
           created_by: string | null
-          decline_reason: string | null
           deleted_at: string | null
-          fee_basis: string | null
-          fee_charged: boolean
-          fee_per_stall_jod: number | null
-          feedback_collected_id: string
-          hygiene_check_id: string
-          hygiene_check_other: string | null
+          description: string
+          end_date: string
+          has_sponsor: boolean
           id: string
-          inkind_provider: string | null
-          inkind_value_jod: number | null
           is_published: boolean
-          lessons: string
-          location_id: string
-          location_other: string | null
-          market_date: string
-          market_name: string
+          kiosks_available: number
           municipality_id: string
+          name: string
           occasion_id: string
           occasion_other: string | null
-          permit_date: string | null
-          permit_reference: string | null
-          phase_id: string
-          recorded_by_name: string | null
-          recorded_on: string | null
           reference: string | null
-          refreshment_point_id: string | null
-          refreshment_point_other: string | null
-          selection_method_id: string
-          stalls_occupied: number
-          stalls_offered: number
-          times_from: string | null
-          times_to: string | null
-          total_sales_jod: number
-          total_sales_method_id: string | null
+          sponsor_name: string | null
+          start_date: string
+          status_id: string
           updated_at: string
-          vendor_forms: number | null
-          verified_by_name: string | null
-          verified_on: string | null
-          visitor_forms: number | null
-          visitors_estimated: number
-          visitors_method_id: string | null
         }
         Insert: {
-          accessibility_id: string
-          accessibility_other?: string | null
-          announcement_days_before?: number | null
-          applications_accepted?: number | null
-          applications_declined?: number | null
-          applications_received: number
-          cash_cost_jod: number
-          cash_source_id?: string | null
+          actual_days: number
+          applications_close: string
+          applications_open: string
           client_uuid?: string | null
           created_at?: string
           created_by?: string | null
-          decline_reason?: string | null
           deleted_at?: string | null
-          fee_basis?: string | null
-          fee_charged: boolean
-          fee_per_stall_jod?: number | null
-          feedback_collected_id: string
-          hygiene_check_id: string
-          hygiene_check_other?: string | null
+          description: string
+          end_date: string
+          has_sponsor: boolean
           id?: string
-          inkind_provider?: string | null
-          inkind_value_jod?: number | null
           is_published?: boolean
-          lessons: string
-          location_id: string
-          location_other?: string | null
-          market_date: string
-          market_name: string
+          kiosks_available: number
           municipality_id?: string
+          name: string
           occasion_id: string
           occasion_other?: string | null
-          permit_date?: string | null
-          permit_reference?: string | null
-          phase_id: string
-          recorded_by_name?: string | null
-          recorded_on?: string | null
           reference?: string | null
-          refreshment_point_id?: string | null
-          refreshment_point_other?: string | null
-          selection_method_id: string
-          stalls_occupied: number
-          stalls_offered: number
-          times_from?: string | null
-          times_to?: string | null
-          total_sales_jod: number
-          total_sales_method_id?: string | null
+          sponsor_name?: string | null
+          start_date: string
+          status_id: string
           updated_at?: string
-          vendor_forms?: number | null
-          verified_by_name?: string | null
-          verified_on?: string | null
-          visitor_forms?: number | null
-          visitors_estimated: number
-          visitors_method_id?: string | null
         }
         Update: {
-          accessibility_id?: string
-          accessibility_other?: string | null
-          announcement_days_before?: number | null
-          applications_accepted?: number | null
-          applications_declined?: number | null
-          applications_received?: number
-          cash_cost_jod?: number
-          cash_source_id?: string | null
+          actual_days?: number
+          applications_close?: string
+          applications_open?: string
           client_uuid?: string | null
           created_at?: string
           created_by?: string | null
-          decline_reason?: string | null
           deleted_at?: string | null
-          fee_basis?: string | null
-          fee_charged?: boolean
-          fee_per_stall_jod?: number | null
-          feedback_collected_id?: string
-          hygiene_check_id?: string
-          hygiene_check_other?: string | null
+          description?: string
+          end_date?: string
+          has_sponsor?: boolean
           id?: string
-          inkind_provider?: string | null
-          inkind_value_jod?: number | null
           is_published?: boolean
-          lessons?: string
-          location_id?: string
-          location_other?: string | null
-          market_date?: string
-          market_name?: string
+          kiosks_available?: number
           municipality_id?: string
+          name?: string
           occasion_id?: string
           occasion_other?: string | null
-          permit_date?: string | null
-          permit_reference?: string | null
-          phase_id?: string
-          recorded_by_name?: string | null
-          recorded_on?: string | null
           reference?: string | null
-          refreshment_point_id?: string | null
-          refreshment_point_other?: string | null
-          selection_method_id?: string
-          stalls_occupied?: number
-          stalls_offered?: number
-          times_from?: string | null
-          times_to?: string | null
-          total_sales_jod?: number
-          total_sales_method_id?: string | null
+          sponsor_name?: string | null
+          start_date?: string
+          status_id?: string
           updated_at?: string
-          vendor_forms?: number | null
-          verified_by_name?: string | null
-          verified_on?: string | null
-          visitor_forms?: number | null
-          visitors_estimated?: number
-          visitors_method_id?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "khld_market_accessibility_id_fkey"
-            columns: ["accessibility_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_h1_accessibility"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_market_cash_source_id_fkey"
-            columns: ["cash_source_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_h1_cost_source"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_market_feedback_collected_id_fkey"
-            columns: ["feedback_collected_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_h1_feedback_collected"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_market_hygiene_check_id_fkey"
-            columns: ["hygiene_check_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_h1_hygiene_check"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_market_location_id_fkey"
-            columns: ["location_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_h1_location"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "khld_market_municipality_id_fkey"
             columns: ["municipality_id"]
@@ -4195,589 +2740,457 @@ export type Database = {
             foreignKeyName: "khld_market_occasion_id_fkey"
             columns: ["occasion_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_h1_occasion"
+            referencedRelation: "ref_khld_market_occasion"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "khld_market_phase_id_fkey"
-            columns: ["phase_id"]
+            foreignKeyName: "khld_market_status_id_fkey"
+            columns: ["status_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_h1_phase"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_market_refreshment_point_id_fkey"
-            columns: ["refreshment_point_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_h1_refreshment_point"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_market_selection_method_id_fkey"
-            columns: ["selection_method_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_h1_selection_method"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_market_total_sales_method_id_fkey"
-            columns: ["total_sales_method_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_h1_total_sales_method"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_market_visitors_method_id_fkey"
-            columns: ["visitors_method_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_h1_visitors_method"
+            referencedRelation: "ref_khld_event_status"
             referencedColumns: ["id"]
           }
         ]
       }
-      khld_market_count: {
+      khld_market_attendance: {
         Row: {
-          cell_id: string
-          count: number
+          client_uuid: string | null
           created_at: string
-          field_code: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          kiosk_rating: number
           market_id: string
           municipality_id: string
+          notes: string | null
+          person_id: string
+          report_date: string
+          updated_at: string
         }
         Insert: {
-          cell_id: string
-          count: number
+          client_uuid?: string | null
           created_at?: string
-          field_code: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          kiosk_rating: number
           market_id: string
           municipality_id?: string
+          notes?: string | null
+          person_id: string
+          report_date: string
+          updated_at?: string
         }
         Update: {
-          cell_id?: string
-          count?: number
+          client_uuid?: string | null
           created_at?: string
-          field_code?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          kiosk_rating?: number
           market_id?: string
           municipality_id?: string
+          notes?: string | null
+          person_id?: string
+          report_date?: string
+          updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "khld_market_count_market_id_fkey"
+            foreignKeyName: "khld_market_attendance_market_id_fkey"
             columns: ["market_id", "municipality_id"]
             isOneToOne: false
             referencedRelation: "khld_market"
             referencedColumns: ["id", "municipality_id"]
+          },
+          {
+            foreignKeyName: "khld_market_attendance_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "khld_market_attendance_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "person"
+            referencedColumns: ["id"]
           }
         ]
       }
-      khld_market_option: {
+      khld_meeting: {
         Row: {
+          attendees_count: number
+          client_uuid: string | null
           created_at: string
-          market_id: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          meeting_date: string
+          meeting_type_id: string
+          meeting_type_other: string | null
           municipality_id: string
-          option_id: string
-          option_other: string | null
-          question_code: string
+          priorities_identified: boolean
+          reference: string | null
+          summary: string | null
+          updated_at: string
         }
         Insert: {
+          attendees_count: number
+          client_uuid?: string | null
           created_at?: string
-          market_id: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          meeting_date: string
+          meeting_type_id: string
+          meeting_type_other?: string | null
           municipality_id?: string
-          option_id: string
-          option_other?: string | null
-          question_code: string
+          priorities_identified: boolean
+          reference?: string | null
+          summary?: string | null
+          updated_at?: string
         }
         Update: {
+          attendees_count?: number
+          client_uuid?: string | null
           created_at?: string
-          market_id?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          meeting_date?: string
+          meeting_type_id?: string
+          meeting_type_other?: string | null
           municipality_id?: string
-          option_id?: string
-          option_other?: string | null
-          question_code?: string
+          priorities_identified?: boolean
+          reference?: string | null
+          summary?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "khld_market_option_market_id_fkey"
-            columns: ["market_id", "municipality_id"]
+            foreignKeyName: "khld_meeting_meeting_type_id_fkey"
+            columns: ["meeting_type_id"]
             isOneToOne: false
-            referencedRelation: "khld_market"
+            referencedRelation: "ref_khld_meeting_type"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "khld_meeting_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      khld_meeting_partner: {
+        Row: {
+          created_at: string
+          meeting_id: string
+          municipality_id: string
+          partner_id: string
+        }
+        Insert: {
+          created_at?: string
+          meeting_id: string
+          municipality_id?: string
+          partner_id: string
+        }
+        Update: {
+          created_at?: string
+          meeting_id?: string
+          municipality_id?: string
+          partner_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "khld_meeting_partner_meeting_id_fkey"
+            columns: ["meeting_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "khld_meeting"
+            referencedColumns: ["id", "municipality_id"]
+          },
+          {
+            foreignKeyName: "khld_meeting_partner_partner_id_fkey"
+            columns: ["partner_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "khld_partner"
             referencedColumns: ["id", "municipality_id"]
           }
         ]
       }
-      khld_milestone_checklist_item: {
+      khld_milestone_record: {
         Row: {
+          client_uuid: string | null
           created_at: string
-          detail: string | null
-          evidence_ref: string | null
-          field_code: string
-          item_no: number
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          milestone_id: string
           municipality_id: string
           status_date: string | null
           status_id: string
-          verification_id: string
+          updated_at: string
         }
         Insert: {
+          client_uuid?: string | null
           created_at?: string
-          detail?: string | null
-          evidence_ref?: string | null
-          field_code: string
-          item_no: number
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          milestone_id: string
           municipality_id?: string
           status_date?: string | null
           status_id: string
-          verification_id: string
+          updated_at?: string
         }
         Update: {
+          client_uuid?: string | null
           created_at?: string
-          detail?: string | null
-          evidence_ref?: string | null
-          field_code?: string
-          item_no?: number
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          milestone_id?: string
           municipality_id?: string
           status_date?: string | null
           status_id?: string
-          verification_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_milestone_checklist_item_verification_id_fkey"
-            columns: ["verification_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_milestone_verification"
-            referencedColumns: ["id", "municipality_id"]
-          }
-        ]
-      }
-      khld_milestone_item: {
-        Row: {
-          field_code: string
-          field_type: string
-          item_no: number
-          label_ar: string
-          label_en: string
-          list_name: string | null
-          milestone_code: string
-        }
-        Insert: {
-          field_code: string
-          field_type: string
-          item_no: number
-          label_ar: string
-          label_en: string
-          list_name?: string | null
-          milestone_code: string
-        }
-        Update: {
-          field_code?: string
-          field_type?: string
-          item_no?: number
-          label_ar?: string
-          label_en?: string
-          list_name?: string | null
-          milestone_code?: string
-        }
-        Relationships: []
-      }
-      khld_milestone_rule: {
-        Row: {
-          created_at: string
-          critical_items: number[] | null
-          decided_by: string | null
-          decided_on: string | null
-          milestone_code: string
-          municipality_id: string
-          note_ar: string | null
-          note_en: string | null
-          source_items: number[]
-          source_rule_ar: string
-          source_rule_en: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          critical_items?: number[] | null
-          decided_by?: string | null
-          decided_on?: string | null
-          milestone_code: string
-          municipality_id?: string
-          note_ar?: string | null
-          note_en?: string | null
-          source_items: number[]
-          source_rule_ar: string
-          source_rule_en: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          critical_items?: number[] | null
-          decided_by?: string | null
-          decided_on?: string | null
-          milestone_code?: string
-          municipality_id?: string
-          note_ar?: string | null
-          note_en?: string | null
-          source_items?: number[]
-          source_rule_ar?: string
-          source_rule_en?: string
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "khld_milestone_rule_municipality_id_fkey"
-            columns: ["municipality_id"]
+            foreignKeyName: "khld_milestone_record_milestone_id_fkey"
+            columns: ["milestone_id"]
             isOneToOne: false
-            referencedRelation: "municipality"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      khld_milestone_verification: {
-        Row: {
-          action_days_since_launch: number | null
-          attended_count: number | null
-          calendar_horizon_id: string | null
-          client_uuid: string | null
-          committee_coordinator_name: string | null
-          community_coordinator_name: string | null
-          coordinator_decision_date: string | null
-          coordinator_decision_no: string | null
-          coordinator_officer_name: string | null
-          council_decision_id: string | null
-          council_decision_other: string | null
-          countersign_date: string | null
-          countersign_name: string | null
-          created_at: string
-          created_by: string | null
-          database_format_id: string | null
-          deleted_at: string | null
-          duplication_avoided_id: string | null
-          duplication_avoided_other: string | null
-          focal_point_id: string | null
-          focal_point_other: string | null
-          founding_meeting_date: string | null
-          founding_meeting_venue: string | null
-          gaps: string
-          id: string
-          intro_meetings: number | null
-          invited_count: number | null
-          last_updated: string | null
-          launch_date: string | null
-          meeting_cycle_id: string | null
-          meetings_held: number | null
-          meetings_with_minutes: number | null
-          milestone_code: string
-          municipality_id: string
-          orgs_joined: string | null
-          orgs_withdrew: string | null
-          period_covered_from: string | null
-          period_covered_to: string | null
-          protocol_ref: string | null
-          recognition_delivered: number | null
-          registered_count: number | null
-          registered_pwd: number | null
-          registered_refugees: number | null
-          registered_women: number | null
-          registered_youth: number | null
-          requests_approved: number | null
-          requests_declined: number | null
-          requests_received: number | null
-          signed_on: string | null
-          stakeholder_updated: string | null
-          tracking_format_id: string | null
-          updated_at: string
-          verif_by: string
-          verif_date: string
-          verif_round_id: string | null
-        }
-        Insert: {
-          action_days_since_launch?: number | null
-          attended_count?: number | null
-          calendar_horizon_id?: string | null
-          client_uuid?: string | null
-          committee_coordinator_name?: string | null
-          community_coordinator_name?: string | null
-          coordinator_decision_date?: string | null
-          coordinator_decision_no?: string | null
-          coordinator_officer_name?: string | null
-          council_decision_id?: string | null
-          council_decision_other?: string | null
-          countersign_date?: string | null
-          countersign_name?: string | null
-          created_at?: string
-          created_by?: string | null
-          database_format_id?: string | null
-          deleted_at?: string | null
-          duplication_avoided_id?: string | null
-          duplication_avoided_other?: string | null
-          focal_point_id?: string | null
-          focal_point_other?: string | null
-          founding_meeting_date?: string | null
-          founding_meeting_venue?: string | null
-          gaps: string
-          id?: string
-          intro_meetings?: number | null
-          invited_count?: number | null
-          last_updated?: string | null
-          launch_date?: string | null
-          meeting_cycle_id?: string | null
-          meetings_held?: number | null
-          meetings_with_minutes?: number | null
-          milestone_code: string
-          municipality_id?: string
-          orgs_joined?: string | null
-          orgs_withdrew?: string | null
-          period_covered_from?: string | null
-          period_covered_to?: string | null
-          protocol_ref?: string | null
-          recognition_delivered?: number | null
-          registered_count?: number | null
-          registered_pwd?: number | null
-          registered_refugees?: number | null
-          registered_women?: number | null
-          registered_youth?: number | null
-          requests_approved?: number | null
-          requests_declined?: number | null
-          requests_received?: number | null
-          signed_on?: string | null
-          stakeholder_updated?: string | null
-          tracking_format_id?: string | null
-          updated_at?: string
-          verif_by: string
-          verif_date: string
-          verif_round_id?: string | null
-        }
-        Update: {
-          action_days_since_launch?: number | null
-          attended_count?: number | null
-          calendar_horizon_id?: string | null
-          client_uuid?: string | null
-          committee_coordinator_name?: string | null
-          community_coordinator_name?: string | null
-          coordinator_decision_date?: string | null
-          coordinator_decision_no?: string | null
-          coordinator_officer_name?: string | null
-          council_decision_id?: string | null
-          council_decision_other?: string | null
-          countersign_date?: string | null
-          countersign_name?: string | null
-          created_at?: string
-          created_by?: string | null
-          database_format_id?: string | null
-          deleted_at?: string | null
-          duplication_avoided_id?: string | null
-          duplication_avoided_other?: string | null
-          focal_point_id?: string | null
-          focal_point_other?: string | null
-          founding_meeting_date?: string | null
-          founding_meeting_venue?: string | null
-          gaps?: string
-          id?: string
-          intro_meetings?: number | null
-          invited_count?: number | null
-          last_updated?: string | null
-          launch_date?: string | null
-          meeting_cycle_id?: string | null
-          meetings_held?: number | null
-          meetings_with_minutes?: number | null
-          milestone_code?: string
-          municipality_id?: string
-          orgs_joined?: string | null
-          orgs_withdrew?: string | null
-          period_covered_from?: string | null
-          period_covered_to?: string | null
-          protocol_ref?: string | null
-          recognition_delivered?: number | null
-          registered_count?: number | null
-          registered_pwd?: number | null
-          registered_refugees?: number | null
-          registered_women?: number | null
-          registered_youth?: number | null
-          requests_approved?: number | null
-          requests_declined?: number | null
-          requests_received?: number | null
-          signed_on?: string | null
-          stakeholder_updated?: string | null
-          tracking_format_id?: string | null
-          updated_at?: string
-          verif_by?: string
-          verif_date?: string
-          verif_round_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_milestone_verification_calendar_horizon_id_fkey"
-            columns: ["calendar_horizon_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_b1_calendar_horizon"
+            referencedRelation: "ref_khld_milestone"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "khld_milestone_verification_council_decision_id_fkey"
-            columns: ["council_decision_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_a1_council_decision"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_milestone_verification_database_format_id_fkey"
-            columns: ["database_format_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_f1_database_format"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_milestone_verification_duplication_avoided_id_fkey"
-            columns: ["duplication_avoided_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_e1_duplication_avoided"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_milestone_verification_focal_point_id_fkey"
-            columns: ["focal_point_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_f1_focal_point"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_milestone_verification_meeting_cycle_id_fkey"
-            columns: ["meeting_cycle_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_e1_meeting_cycle"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_milestone_verification_municipality_id_fkey"
+            foreignKeyName: "khld_milestone_record_municipality_id_fkey"
             columns: ["municipality_id"]
             isOneToOne: false
             referencedRelation: "municipality"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "khld_milestone_verification_tracking_format_id_fkey"
-            columns: ["tracking_format_id"]
+            foreignKeyName: "khld_milestone_record_status_id_fkey"
+            columns: ["status_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_a1_tracking_format"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_milestone_verification_verif_round_id_fkey"
-            columns: ["verif_round_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_a1_verif_round"
+            referencedRelation: "ref_khld_milestone_status"
             referencedColumns: ["id"]
           }
         ]
       }
-      khld_milestone_verification_count: {
-        Row: {
-          cell_id: string
-          count: number
-          created_at: string
-          field_code: string
-          municipality_id: string
-          verification_id: string
-        }
-        Insert: {
-          cell_id: string
-          count: number
-          created_at?: string
-          field_code: string
-          municipality_id?: string
-          verification_id: string
-        }
-        Update: {
-          cell_id?: string
-          count?: number
-          created_at?: string
-          field_code?: string
-          municipality_id?: string
-          verification_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_milestone_verification_count_verification_id_fkey"
-            columns: ["verification_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_milestone_verification"
-            referencedColumns: ["id", "municipality_id"]
-          }
-        ]
-      }
-      khld_milestone_verification_option: {
+      khld_milestone_record_option: {
         Row: {
           created_at: string
+          milestone_record_id: string
           municipality_id: string
           option_id: string
           option_other: string | null
           question_code: string
-          verification_id: string
         }
         Insert: {
           created_at?: string
+          milestone_record_id: string
           municipality_id?: string
           option_id: string
           option_other?: string | null
           question_code: string
-          verification_id: string
         }
         Update: {
           created_at?: string
+          milestone_record_id?: string
           municipality_id?: string
           option_id?: string
           option_other?: string | null
           question_code?: string
-          verification_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "khld_milestone_verification_option_verification_id_fkey"
-            columns: ["verification_id", "municipality_id"]
+            foreignKeyName: "khld_milestone_record_option_milestone_record_id_fkey"
+            columns: ["milestone_record_id", "municipality_id"]
             isOneToOne: false
-            referencedRelation: "khld_milestone_verification"
+            referencedRelation: "khld_milestone_record"
             referencedColumns: ["id", "municipality_id"]
+          }
+        ]
+      }
+      khld_park_survey: {
+        Row: {
+          activity_id: string | null
+          age_group_id: string | null
+          client_uuid: string | null
+          consent: boolean
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          disability_id: string | null
+          id: string
+          interaction_score: number | null
+          is_general_visit: boolean
+          is_resident: boolean | null
+          municipality_id: string
+          nationality_id: string | null
+          nationality_other: string | null
+          safe_score: number | null
+          satisfaction_score: number | null
+          sex_id: string | null
+          shared_participation: boolean | null
+          suggestions: string | null
+          suitability_score: number | null
+          surveyed_at: string
+          updated_at: string
+          welcoming_score: number | null
+        }
+        Insert: {
+          activity_id?: string | null
+          age_group_id?: string | null
+          client_uuid?: string | null
+          consent: boolean
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          disability_id?: string | null
+          id?: string
+          interaction_score?: number | null
+          is_general_visit?: boolean
+          is_resident?: boolean | null
+          municipality_id?: string
+          nationality_id?: string | null
+          nationality_other?: string | null
+          safe_score?: number | null
+          satisfaction_score?: number | null
+          sex_id?: string | null
+          shared_participation?: boolean | null
+          suggestions?: string | null
+          suitability_score?: number | null
+          surveyed_at?: string
+          updated_at?: string
+          welcoming_score?: number | null
+        }
+        Update: {
+          activity_id?: string | null
+          age_group_id?: string | null
+          client_uuid?: string | null
+          consent?: boolean
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          disability_id?: string | null
+          id?: string
+          interaction_score?: number | null
+          is_general_visit?: boolean
+          is_resident?: boolean | null
+          municipality_id?: string
+          nationality_id?: string | null
+          nationality_other?: string | null
+          safe_score?: number | null
+          satisfaction_score?: number | null
+          sex_id?: string | null
+          shared_participation?: boolean | null
+          suggestions?: string | null
+          suitability_score?: number | null
+          surveyed_at?: string
+          updated_at?: string
+          welcoming_score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "khld_park_survey_activity_id_fkey"
+            columns: ["activity_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "khld_activity"
+            referencedColumns: ["id", "municipality_id"]
+          },
+          {
+            foreignKeyName: "khld_park_survey_age_group_id_fkey"
+            columns: ["age_group_id"]
+            isOneToOne: false
+            referencedRelation: "ref_khld_survey_age_group"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "khld_park_survey_disability_id_fkey"
+            columns: ["disability_id"]
+            isOneToOne: false
+            referencedRelation: "ref_khld_disability"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "khld_park_survey_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "khld_park_survey_nationality_id_fkey"
+            columns: ["nationality_id"]
+            isOneToOne: false
+            referencedRelation: "ref_khld_nationality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "khld_park_survey_sex_id_fkey"
+            columns: ["sex_id"]
+            isOneToOne: false
+            referencedRelation: "ref_khld_sex"
+            referencedColumns: ["id"]
           }
         ]
       }
       khld_partner: {
         Row: {
           client_uuid: string | null
-          contact: string | null
+          contact_position: string | null
           created_at: string
           created_by: string | null
           deleted_at: string | null
+          email: string | null
+          expected_contribution: string | null
           id: string
           municipality_id: string
           name: string
-          partner_type_id: string | null
-          partner_type_other: string | null
+          partner_category_id: string
+          partner_category_other: string | null
+          partner_type_id: string
+          phone: string
           updated_at: string
         }
         Insert: {
           client_uuid?: string | null
-          contact?: string | null
+          contact_position?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
+          email?: string | null
+          expected_contribution?: string | null
           id?: string
           municipality_id?: string
           name: string
-          partner_type_id?: string | null
-          partner_type_other?: string | null
+          partner_category_id: string
+          partner_category_other?: string | null
+          partner_type_id: string
+          phone: string
           updated_at?: string
         }
         Update: {
           client_uuid?: string | null
-          contact?: string | null
+          contact_position?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
+          email?: string | null
+          expected_contribution?: string | null
           id?: string
           municipality_id?: string
           name?: string
-          partner_type_id?: string | null
-          partner_type_other?: string | null
+          partner_category_id?: string
+          partner_category_other?: string | null
+          partner_type_id?: string
+          phone?: string
           updated_at?: string
         }
         Relationships: [
@@ -4789,6 +3202,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "khld_partner_partner_category_id_fkey"
+            columns: ["partner_category_id"]
+            isOneToOne: false
+            referencedRelation: "ref_khld_partner_category"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "khld_partner_partner_type_id_fkey"
             columns: ["partner_type_id"]
             isOneToOne: false
@@ -4797,131 +3217,144 @@ export type Database = {
           }
         ]
       }
-      khld_partner_survey: {
+      khld_partner_contact: {
         Row: {
+          attempt_case_id: string
+          attempted_at: string
           client_uuid: string | null
-          continue_intent_id: string
-          continue_intent_other: string | null
-          coord_notes: string | null
           created_at: string
           created_by: string | null
           deleted_at: string | null
-          duplication_id: string
-          engagement_since: string
-          focal_point_id: string
+          evaluation_id: string | null
           id: string
-          improve_suggestion: string
-          meetings_attended: number
           municipality_id: string
-          overall_rating_id: string
+          notes: string | null
           partner_id: string
-          q_communication_id: string
-          q_followup_id: string
-          q_improved_id: string
-          q_joint_planning_id: string
-          q_roles_id: string
-          q_transparency_id: string
-          resp_contact: string | null
-          resp_date: string
-          resp_name: string
-          resp_sex_id: string | null
-          survey_round_id: string
+          partnership_confirmed: boolean | null
+          reference: string | null
           updated_at: string
         }
         Insert: {
+          attempt_case_id: string
+          attempted_at?: string
           client_uuid?: string | null
-          continue_intent_id: string
-          continue_intent_other?: string | null
-          coord_notes?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
-          duplication_id: string
-          engagement_since: string
-          focal_point_id: string
+          evaluation_id?: string | null
           id?: string
-          improve_suggestion: string
-          meetings_attended: number
           municipality_id?: string
-          overall_rating_id: string
+          notes?: string | null
           partner_id: string
-          q_communication_id: string
-          q_followup_id: string
-          q_improved_id: string
-          q_joint_planning_id: string
-          q_roles_id: string
-          q_transparency_id: string
-          resp_contact?: string | null
-          resp_date: string
-          resp_name: string
-          resp_sex_id?: string | null
-          survey_round_id: string
+          partnership_confirmed?: boolean | null
+          reference?: string | null
           updated_at?: string
         }
         Update: {
+          attempt_case_id?: string
+          attempted_at?: string
           client_uuid?: string | null
-          continue_intent_id?: string
-          continue_intent_other?: string | null
-          coord_notes?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
-          duplication_id?: string
-          engagement_since?: string
-          focal_point_id?: string
+          evaluation_id?: string | null
           id?: string
-          improve_suggestion?: string
-          meetings_attended?: number
           municipality_id?: string
-          overall_rating_id?: string
+          notes?: string | null
           partner_id?: string
-          q_communication_id?: string
-          q_followup_id?: string
-          q_improved_id?: string
-          q_joint_planning_id?: string
-          q_roles_id?: string
-          q_transparency_id?: string
-          resp_contact?: string | null
-          resp_date?: string
-          resp_name?: string
-          resp_sex_id?: string | null
-          survey_round_id?: string
+          partnership_confirmed?: boolean | null
+          reference?: string | null
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "khld_partner_survey_continue_intent_id_fkey"
-            columns: ["continue_intent_id"]
+            foreignKeyName: "khld_partner_contact_attempt_case_id_fkey"
+            columns: ["attempt_case_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_so10_continue_intent"
+            referencedRelation: "ref_khld_attempt_case"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "khld_partner_survey_duplication_id_fkey"
-            columns: ["duplication_id"]
+            foreignKeyName: "khld_partner_contact_evaluation_id_fkey"
+            columns: ["evaluation_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_so10_duplication"
+            referencedRelation: "ref_khld_attempt_evaluation"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "khld_partner_survey_focal_point_id_fkey"
-            columns: ["focal_point_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so10_focal_point"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_partner_survey_municipality_id_fkey"
+            foreignKeyName: "khld_partner_contact_municipality_id_fkey"
             columns: ["municipality_id"]
             isOneToOne: false
             referencedRelation: "municipality"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "khld_partner_survey_overall_rating_id_fkey"
-            columns: ["overall_rating_id"]
+            foreignKeyName: "khld_partner_contact_partner_id_fkey"
+            columns: ["partner_id", "municipality_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_so10_overall_rating"
+            referencedRelation: "khld_partner"
+            referencedColumns: ["id", "municipality_id"]
+          }
+        ]
+      }
+      khld_partner_survey: {
+        Row: {
+          client_uuid: string | null
+          coordination_score: number
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          joint_planning_score: number
+          municipality_id: string
+          overall_effective: boolean
+          partner_id: string
+          respondent_position: string
+          respondent_sex_id: string
+          suggestions: string | null
+          survey_date: string
+          updated_at: string
+        }
+        Insert: {
+          client_uuid?: string | null
+          coordination_score: number
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          joint_planning_score: number
+          municipality_id?: string
+          overall_effective: boolean
+          partner_id: string
+          respondent_position: string
+          respondent_sex_id: string
+          suggestions?: string | null
+          survey_date: string
+          updated_at?: string
+        }
+        Update: {
+          client_uuid?: string | null
+          coordination_score?: number
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          joint_planning_score?: number
+          municipality_id?: string
+          overall_effective?: boolean
+          partner_id?: string
+          respondent_position?: string
+          respondent_sex_id?: string
+          suggestions?: string | null
+          survey_date?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "khld_partner_survey_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
             referencedColumns: ["id"]
           },
           {
@@ -4932,259 +3365,76 @@ export type Database = {
             referencedColumns: ["id", "municipality_id"]
           },
           {
-            foreignKeyName: "khld_partner_survey_q_communication_id_fkey"
-            columns: ["q_communication_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_agree_scale"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_partner_survey_q_followup_id_fkey"
-            columns: ["q_followup_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_agree_scale"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_partner_survey_q_improved_id_fkey"
-            columns: ["q_improved_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_agree_scale"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_partner_survey_q_joint_planning_id_fkey"
-            columns: ["q_joint_planning_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_agree_scale"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_partner_survey_q_roles_id_fkey"
-            columns: ["q_roles_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_agree_scale"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_partner_survey_q_transparency_id_fkey"
-            columns: ["q_transparency_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_agree_scale"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_partner_survey_resp_sex_id_fkey"
-            columns: ["resp_sex_id"]
+            foreignKeyName: "khld_partner_survey_respondent_sex_id_fkey"
+            columns: ["respondent_sex_id"]
             isOneToOne: false
             referencedRelation: "ref_khld_sex"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_partner_survey_survey_round_id_fkey"
-            columns: ["survey_round_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so10_survey_round"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      khld_partner_survey_option: {
-        Row: {
-          created_at: string
-          municipality_id: string
-          option_id: string
-          option_other: string | null
-          question_code: string
-          survey_id: string
-        }
-        Insert: {
-          created_at?: string
-          municipality_id?: string
-          option_id: string
-          option_other?: string | null
-          question_code: string
-          survey_id: string
-        }
-        Update: {
-          created_at?: string
-          municipality_id?: string
-          option_id?: string
-          option_other?: string | null
-          question_code?: string
-          survey_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_partner_survey_option_survey_id_fkey"
-            columns: ["survey_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_partner_survey"
-            referencedColumns: ["id", "municipality_id"]
           }
         ]
       }
       khld_producer_survey: {
         Row: {
-          age_group_id: string
           client_uuid: string | null
           created_at: string
           created_by: string | null
           deleted_at: string | null
-          disability_id: string | null
-          enumerator: string
-          exposure_id: string
-          first_organised_market_id: string
-          guidance_received_id: string
           id: string
-          int_date: string
-          made_sales_id: string
-          markets_count: number
-          mode_id: string
+          increased_opportunities: boolean
+          made_sales: boolean
+          market_id: string
           municipality_id: string
-          nationality_id: string
-          neighbourhood_id: string | null
-          new_customers_id: string
-          notes: string | null
-          overall_opportunity_id: string
-          participate_again_id: string
-          production_change_id: string
-          quote: string | null
-          recontact_id: string
-          recontact_other: string | null
-          repeat_orders_id: string
-          respondent_is_vendor_id: string
-          sales_last_market_id: string
-          sex_id: string
-          still_active_id: string
-          stop_reason_id: string
-          stop_reason_other: string | null
+          new_customers: boolean
+          person_id: string
+          received_orders: boolean | null
+          sales_value_jod: number | null
+          suggestions: string | null
+          survey_date: string
           updated_at: string
-          vendor_id: string
         }
         Insert: {
-          age_group_id: string
           client_uuid?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
-          disability_id?: string | null
-          enumerator: string
-          exposure_id: string
-          first_organised_market_id: string
-          guidance_received_id: string
           id?: string
-          int_date: string
-          made_sales_id: string
-          markets_count: number
-          mode_id: string
+          increased_opportunities: boolean
+          made_sales: boolean
+          market_id: string
           municipality_id?: string
-          nationality_id: string
-          neighbourhood_id?: string | null
-          new_customers_id: string
-          notes?: string | null
-          overall_opportunity_id: string
-          participate_again_id: string
-          production_change_id: string
-          quote?: string | null
-          recontact_id: string
-          recontact_other?: string | null
-          repeat_orders_id: string
-          respondent_is_vendor_id: string
-          sales_last_market_id: string
-          sex_id: string
-          still_active_id: string
-          stop_reason_id: string
-          stop_reason_other?: string | null
+          new_customers: boolean
+          person_id: string
+          received_orders?: boolean | null
+          sales_value_jod?: number | null
+          suggestions?: string | null
+          survey_date: string
           updated_at?: string
-          vendor_id: string
         }
         Update: {
-          age_group_id?: string
           client_uuid?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
-          disability_id?: string | null
-          enumerator?: string
-          exposure_id?: string
-          first_organised_market_id?: string
-          guidance_received_id?: string
           id?: string
-          int_date?: string
-          made_sales_id?: string
-          markets_count?: number
-          mode_id?: string
+          increased_opportunities?: boolean
+          made_sales?: boolean
+          market_id?: string
           municipality_id?: string
-          nationality_id?: string
-          neighbourhood_id?: string | null
-          new_customers_id?: string
-          notes?: string | null
-          overall_opportunity_id?: string
-          participate_again_id?: string
-          production_change_id?: string
-          quote?: string | null
-          recontact_id?: string
-          recontact_other?: string | null
-          repeat_orders_id?: string
-          respondent_is_vendor_id?: string
-          sales_last_market_id?: string
-          sex_id?: string
-          still_active_id?: string
-          stop_reason_id?: string
-          stop_reason_other?: string | null
+          new_customers?: boolean
+          person_id?: string
+          received_orders?: boolean | null
+          sales_value_jod?: number | null
+          suggestions?: string | null
+          survey_date?: string
           updated_at?: string
-          vendor_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "khld_producer_survey_age_group_id_fkey"
-            columns: ["age_group_id"]
+            foreignKeyName: "khld_producer_survey_market_id_fkey"
+            columns: ["market_id", "municipality_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_age_group"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_producer_survey_disability_id_fkey"
-            columns: ["disability_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_disability"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_producer_survey_exposure_id_fkey"
-            columns: ["exposure_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so40_exposure"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_producer_survey_first_organised_market_id_fkey"
-            columns: ["first_organised_market_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so40_first_organised_market"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_producer_survey_guidance_received_id_fkey"
-            columns: ["guidance_received_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so40_guidance_received"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_producer_survey_made_sales_id_fkey"
-            columns: ["made_sales_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so40_made_sales"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_producer_survey_mode_id_fkey"
-            columns: ["mode_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so40_mode"
-            referencedColumns: ["id"]
+            referencedRelation: "khld_market"
+            referencedColumns: ["id", "municipality_id"]
           },
           {
             foreignKeyName: "khld_producer_survey_municipality_id_fkey"
@@ -5194,137 +3444,11 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "khld_producer_survey_nationality_id_fkey"
-            columns: ["nationality_id"]
+            foreignKeyName: "khld_producer_survey_person_id_fkey"
+            columns: ["person_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_nationality"
+            referencedRelation: "person"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_producer_survey_neighbourhood_id_fkey"
-            columns: ["neighbourhood_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_neighbourhood"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_producer_survey_new_customers_id_fkey"
-            columns: ["new_customers_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so40_new_customers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_producer_survey_overall_opportunity_id_fkey"
-            columns: ["overall_opportunity_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so40_overall_opportunity"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_producer_survey_participate_again_id_fkey"
-            columns: ["participate_again_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so40_participate_again"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_producer_survey_production_change_id_fkey"
-            columns: ["production_change_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so40_production_change"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_producer_survey_recontact_id_fkey"
-            columns: ["recontact_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_recontact"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_producer_survey_repeat_orders_id_fkey"
-            columns: ["repeat_orders_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so40_repeat_orders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_producer_survey_respondent_is_vendor_id_fkey"
-            columns: ["respondent_is_vendor_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so40_respondent_is_vendor"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_producer_survey_sales_last_market_id_fkey"
-            columns: ["sales_last_market_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_sales_band"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_producer_survey_sex_id_fkey"
-            columns: ["sex_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_sex"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_producer_survey_still_active_id_fkey"
-            columns: ["still_active_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so40_still_active"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_producer_survey_stop_reason_id_fkey"
-            columns: ["stop_reason_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so40_stop_reason"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_producer_survey_vendor_id_fkey"
-            columns: ["vendor_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_vendor"
-            referencedColumns: ["id", "municipality_id"]
-          }
-        ]
-      }
-      khld_producer_survey_option: {
-        Row: {
-          created_at: string
-          municipality_id: string
-          option_id: string
-          option_other: string | null
-          question_code: string
-          survey_id: string
-        }
-        Insert: {
-          created_at?: string
-          municipality_id?: string
-          option_id: string
-          option_other?: string | null
-          question_code: string
-          survey_id: string
-        }
-        Update: {
-          created_at?: string
-          municipality_id?: string
-          option_id?: string
-          option_other?: string | null
-          question_code?: string
-          survey_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_producer_survey_option_survey_id_fkey"
-            columns: ["survey_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_producer_survey"
-            referencedColumns: ["id", "municipality_id"]
           }
         ]
       }
@@ -5378,299 +3502,114 @@ export type Database = {
           }
         ]
       }
-      khld_user_feedback: {
+      khld_rehab_report: {
         Row: {
-          activity_id: string
-          activity_suitable_id: string
-          activity_suitable_other: string | null
-          age_group_id: string
+          accomplished: string
+          agreed_total: number
           client_uuid: string | null
-          collected_by: string | null
-          collection_mode_id: string
+          completed_count: number
+          completion_pct: number
           created_at: string
           created_by: string | null
           deleted_at: string | null
-          disability_id: string | null
-          feedback_date: string
-          feel_safe_id: string
-          feel_welcome_id: string
-          first_visit: boolean
           id: string
-          improve_most: string
-          liked_most: string | null
           municipality_id: string
-          nationality_id: string
-          overall_satisfaction_id: string
-          participate_freely_id: string
-          sex_id: string
-          suitable_women_children_id: string
-          suitable_women_children_other: string | null
-          timing_convenient_id: string
-          timing_convenient_other: string | null
+          reference: string | null
+          report_date: string
           updated_at: string
-          would_return_id: string
         }
         Insert: {
-          activity_id: string
-          activity_suitable_id: string
-          activity_suitable_other?: string | null
-          age_group_id: string
+          accomplished: string
+          agreed_total: number
           client_uuid?: string | null
-          collected_by?: string | null
-          collection_mode_id: string
+          completed_count: number
+          completion_pct: number
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
-          disability_id?: string | null
-          feedback_date: string
-          feel_safe_id: string
-          feel_welcome_id: string
-          first_visit: boolean
           id?: string
-          improve_most: string
-          liked_most?: string | null
           municipality_id?: string
-          nationality_id: string
-          overall_satisfaction_id: string
-          participate_freely_id: string
-          sex_id: string
-          suitable_women_children_id: string
-          suitable_women_children_other?: string | null
-          timing_convenient_id: string
-          timing_convenient_other?: string | null
+          reference?: string | null
+          report_date: string
           updated_at?: string
-          would_return_id: string
         }
         Update: {
-          activity_id?: string
-          activity_suitable_id?: string
-          activity_suitable_other?: string | null
-          age_group_id?: string
+          accomplished?: string
+          agreed_total?: number
           client_uuid?: string | null
-          collected_by?: string | null
-          collection_mode_id?: string
+          completed_count?: number
+          completion_pct?: number
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
-          disability_id?: string | null
-          feedback_date?: string
-          feel_safe_id?: string
-          feel_welcome_id?: string
-          first_visit?: boolean
           id?: string
-          improve_most?: string
-          liked_most?: string | null
           municipality_id?: string
-          nationality_id?: string
-          overall_satisfaction_id?: string
-          participate_freely_id?: string
-          sex_id?: string
-          suitable_women_children_id?: string
-          suitable_women_children_other?: string | null
-          timing_convenient_id?: string
-          timing_convenient_other?: string | null
+          reference?: string | null
+          report_date?: string
           updated_at?: string
-          would_return_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "khld_user_feedback_activity_id_fkey"
-            columns: ["activity_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_activity"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "khld_user_feedback_activity_suitable_id_fkey"
-            columns: ["activity_suitable_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so20_activity_suitable"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_user_feedback_age_group_id_fkey"
-            columns: ["age_group_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_age_group"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_user_feedback_collection_mode_id_fkey"
-            columns: ["collection_mode_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so20_collection_mode"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_user_feedback_disability_id_fkey"
-            columns: ["disability_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_disability"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_user_feedback_feel_safe_id_fkey"
-            columns: ["feel_safe_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so20_feel_safe"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_user_feedback_feel_welcome_id_fkey"
-            columns: ["feel_welcome_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_yes_fully_partly_no"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_user_feedback_municipality_id_fkey"
+            foreignKeyName: "khld_rehab_report_municipality_id_fkey"
             columns: ["municipality_id"]
             isOneToOne: false
             referencedRelation: "municipality"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_user_feedback_nationality_id_fkey"
-            columns: ["nationality_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_nationality"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_user_feedback_overall_satisfaction_id_fkey"
-            columns: ["overall_satisfaction_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so20_overall_satisfaction"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_user_feedback_participate_freely_id_fkey"
-            columns: ["participate_freely_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so20_participate_freely"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_user_feedback_sex_id_fkey"
-            columns: ["sex_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_sex"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_user_feedback_suitable_women_children_id_fkey"
-            columns: ["suitable_women_children_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so20_suitable_women_children"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_user_feedback_timing_convenient_id_fkey"
-            columns: ["timing_convenient_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so20_timing_convenient"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_user_feedback_would_return_id_fkey"
-            columns: ["would_return_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so20_would_return"
-            referencedColumns: ["id"]
           }
         ]
       }
-      khld_user_feedback_option: {
+      khld_rehab_report_option: {
         Row: {
           created_at: string
-          feedback_id: string
           municipality_id: string
           option_id: string
           option_other: string | null
           question_code: string
+          report_id: string
         }
         Insert: {
           created_at?: string
-          feedback_id: string
           municipality_id?: string
           option_id: string
           option_other?: string | null
           question_code: string
+          report_id: string
         }
         Update: {
           created_at?: string
-          feedback_id?: string
           municipality_id?: string
           option_id?: string
           option_other?: string | null
           question_code?: string
+          report_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "khld_user_feedback_option_feedback_id_fkey"
-            columns: ["feedback_id", "municipality_id"]
+            foreignKeyName: "khld_rehab_report_option_report_id_fkey"
+            columns: ["report_id", "municipality_id"]
             isOneToOne: false
-            referencedRelation: "khld_user_feedback"
+            referencedRelation: "khld_rehab_report"
             referencedColumns: ["id", "municipality_id"]
           }
         ]
       }
-      khld_user_feedback_rating: {
-        Row: {
-          created_at: string
-          feedback_id: string
-          item_id: string
-          municipality_id: string
-          rating_id: string
-        }
-        Insert: {
-          created_at?: string
-          feedback_id: string
-          item_id: string
-          municipality_id?: string
-          rating_id: string
-        }
-        Update: {
-          created_at?: string
-          feedback_id?: string
-          item_id?: string
-          municipality_id?: string
-          rating_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_user_feedback_rating_feedback_id_fkey"
-            columns: ["feedback_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_user_feedback"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "khld_user_feedback_rating_item_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so20_facility_item"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_user_feedback_rating_rating_id_fkey"
-            columns: ["rating_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so20_facility_rating"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      khld_vendor: {
+      khld_vendor_application: {
         Row: {
           client_uuid: string | null
           created_at: string
           created_by: string | null
           deleted_at: string | null
+          disability_id: string
           id: string
+          id_type_id: string
+          is_resident: boolean
+          market_id: string
           municipality_id: string
+          nationality_id: string
+          nationality_other: string | null
           person_id: string
-          reference: string | null
+          product_type_id: string
+          product_type_other: string | null
           updated_at: string
         }
         Insert: {
@@ -5678,444 +3617,163 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
+          disability_id: string
           id?: string
+          id_type_id: string
+          is_resident: boolean
+          market_id: string
           municipality_id?: string
+          nationality_id: string
+          nationality_other?: string | null
           person_id: string
-          reference?: string | null
+          product_type_id: string
+          product_type_other?: string | null
           updated_at?: string
         }
         Update: {
           client_uuid?: string | null
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          municipality_id?: string
-          person_id?: string
-          reference?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_vendor_municipality_id_fkey"
-            columns: ["municipality_id"]
-            isOneToOne: false
-            referencedRelation: "municipality"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_vendor_person_id_fkey"
-            columns: ["person_id"]
-            isOneToOne: false
-            referencedRelation: "person"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      khld_vendor_registration: {
-        Row: {
-          attended_id: string
-          attended_other: string | null
-          client_uuid: string | null
-          commitment_signed_id: string
-          consent_id: string
-          consent_recorded_by: string | null
-          consent_recorded_on: string | null
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          disability_id: string
-          enterprise_id: string | null
-          first_organised_market: boolean
-          health_certificate_id: string
-          health_certificate_other: string | null
-          id: string
-          licensed_id: string
-          licensed_other: string | null
-          market_id: string
-          municipality_id: string
-          nationality_id: string
-          neighbourhood_id: string
-          nominated_by_id: string
-          notes: string | null
-          registered_by_name: string | null
-          registered_by_organisation: string | null
-          registered_on: string | null
-          sales_band_id: string | null
-          signed_by: string | null
-          signed_on: string | null
-          stall_fee_jod: number | null
-          stall_free: boolean
-          stall_number: string
-          updated_at: string
-          vendor_id: string
-          vendor_type_id: string
-          vendor_type_other: string | null
-        }
-        Insert: {
-          attended_id: string
-          attended_other?: string | null
-          client_uuid?: string | null
-          commitment_signed_id: string
-          consent_id: string
-          consent_recorded_by?: string | null
-          consent_recorded_on?: string | null
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          disability_id: string
-          enterprise_id?: string | null
-          first_organised_market: boolean
-          health_certificate_id: string
-          health_certificate_other?: string | null
-          id?: string
-          licensed_id: string
-          licensed_other?: string | null
-          market_id: string
-          municipality_id?: string
-          nationality_id: string
-          neighbourhood_id: string
-          nominated_by_id: string
-          notes?: string | null
-          registered_by_name?: string | null
-          registered_by_organisation?: string | null
-          registered_on?: string | null
-          sales_band_id?: string | null
-          signed_by?: string | null
-          signed_on?: string | null
-          stall_fee_jod?: number | null
-          stall_free: boolean
-          stall_number: string
-          updated_at?: string
-          vendor_id: string
-          vendor_type_id: string
-          vendor_type_other?: string | null
-        }
-        Update: {
-          attended_id?: string
-          attended_other?: string | null
-          client_uuid?: string | null
-          commitment_signed_id?: string
-          consent_id?: string
-          consent_recorded_by?: string | null
-          consent_recorded_on?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
           disability_id?: string
-          enterprise_id?: string | null
-          first_organised_market?: boolean
-          health_certificate_id?: string
-          health_certificate_other?: string | null
           id?: string
-          licensed_id?: string
-          licensed_other?: string | null
+          id_type_id?: string
+          is_resident?: boolean
           market_id?: string
           municipality_id?: string
           nationality_id?: string
-          neighbourhood_id?: string
-          nominated_by_id?: string
-          notes?: string | null
-          registered_by_name?: string | null
-          registered_by_organisation?: string | null
-          registered_on?: string | null
-          sales_band_id?: string | null
-          signed_by?: string | null
-          signed_on?: string | null
-          stall_fee_jod?: number | null
-          stall_free?: boolean
-          stall_number?: string
+          nationality_other?: string | null
+          person_id?: string
+          product_type_id?: string
+          product_type_other?: string | null
           updated_at?: string
-          vendor_id?: string
-          vendor_type_id?: string
-          vendor_type_other?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "khld_vendor_registration_attended_id_fkey"
-            columns: ["attended_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_h2_attended"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_vendor_registration_commitment_signed_id_fkey"
-            columns: ["commitment_signed_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_h2_commitment_signed"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_vendor_registration_consent_id_fkey"
-            columns: ["consent_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_h2_consent"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_vendor_registration_disability_id_fkey"
+            foreignKeyName: "khld_vendor_application_disability_id_fkey"
             columns: ["disability_id"]
             isOneToOne: false
             referencedRelation: "ref_khld_disability"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "khld_vendor_registration_enterprise_id_fkey"
-            columns: ["enterprise_id", "municipality_id"]
+            foreignKeyName: "khld_vendor_application_id_type_id_fkey"
+            columns: ["id_type_id"]
             isOneToOne: false
-            referencedRelation: "khld_enterprise"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "khld_vendor_registration_health_certificate_id_fkey"
-            columns: ["health_certificate_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_h2_health_certificate"
+            referencedRelation: "ref_khld_id_type"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "khld_vendor_registration_licensed_id_fkey"
-            columns: ["licensed_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_h2_licensed"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_vendor_registration_market_id_fkey"
+            foreignKeyName: "khld_vendor_application_market_id_fkey"
             columns: ["market_id", "municipality_id"]
             isOneToOne: false
             referencedRelation: "khld_market"
             referencedColumns: ["id", "municipality_id"]
           },
           {
-            foreignKeyName: "khld_vendor_registration_municipality_id_fkey"
+            foreignKeyName: "khld_vendor_application_municipality_id_fkey"
             columns: ["municipality_id"]
             isOneToOne: false
             referencedRelation: "municipality"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "khld_vendor_registration_nationality_id_fkey"
+            foreignKeyName: "khld_vendor_application_nationality_id_fkey"
             columns: ["nationality_id"]
             isOneToOne: false
             referencedRelation: "ref_khld_nationality"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "khld_vendor_registration_neighbourhood_id_fkey"
-            columns: ["neighbourhood_id"]
+            foreignKeyName: "khld_vendor_application_person_id_fkey"
+            columns: ["person_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_neighbourhood"
+            referencedRelation: "person"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "khld_vendor_registration_nominated_by_id_fkey"
-            columns: ["nominated_by_id"]
+            foreignKeyName: "khld_vendor_application_product_type_id_fkey"
+            columns: ["product_type_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_h2_nominated_by"
+            referencedRelation: "ref_khld_product_type"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_vendor_registration_sales_band_id_fkey"
-            columns: ["sales_band_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_sales_band"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_vendor_registration_vendor_id_fkey"
-            columns: ["vendor_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_vendor"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "khld_vendor_registration_vendor_type_id_fkey"
-            columns: ["vendor_type_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_h2_vendor_type"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      khld_vendor_registration_option: {
-        Row: {
-          created_at: string
-          municipality_id: string
-          option_id: string
-          option_other: string | null
-          question_code: string
-          registration_id: string
-        }
-        Insert: {
-          created_at?: string
-          municipality_id?: string
-          option_id: string
-          option_other?: string | null
-          question_code: string
-          registration_id: string
-        }
-        Update: {
-          created_at?: string
-          municipality_id?: string
-          option_id?: string
-          option_other?: string | null
-          question_code?: string
-          registration_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_vendor_registration_option_registration_id_fkey"
-            columns: ["registration_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_vendor_registration"
-            referencedColumns: ["id", "municipality_id"]
           }
         ]
       }
       khld_volunteer: {
         Row: {
           affiliation_id: string
+          affiliation_name: string | null
           affiliation_other: string | null
+          application_status: string
           client_uuid: string | null
-          consent_data: boolean
-          consent_data_recorded_by: string | null
-          consent_data_recorded_on: string | null
-          consent_photo: boolean
-          consent_photo_recorded_by: string | null
-          consent_photo_recorded_on: string | null
           created_at: string
           created_by: string | null
           deleted_at: string | null
           disability_id: string
-          entered_by_name: string | null
-          entered_on: string | null
-          guardian_consent_date: string | null
-          guardian_consent_given: boolean | null
-          guardian_name: string | null
-          guardian_phone: string | null
-          guardian_relationship: string | null
-          hours_per_month: number | null
-          how_heard_id: string | null
-          how_heard_other: string | null
           id: string
+          id_type_id: string
+          is_resident: boolean
           municipality_id: string
           nationality_id: string
-          neighbourhood_id: string
-          occupation_status_id: string | null
+          nationality_other: string | null
           person_id: string
-          phone_alternative: string | null
-          prior_experience_id: string | null
-          prior_experience_other: string | null
+          photo_consent: boolean
           reference: string | null
-          reg_channel_id: string
-          reg_date: string
-          registered_by_name: string | null
-          registered_by_organisation: string | null
-          registered_by_position: string | null
-          registered_on: string | null
-          safety_commitment: boolean
-          safety_commitment_recorded_by: string | null
-          safety_commitment_recorded_on: string | null
-          signed_by: string | null
-          signed_on: string | null
-          transport_id: string
+          reviewed_by: string | null
+          reviewed_on: string | null
+          situation_id: string
+          submitted_publicly: boolean
           updated_at: string
         }
         Insert: {
           affiliation_id: string
+          affiliation_name?: string | null
           affiliation_other?: string | null
+          application_status?: string
           client_uuid?: string | null
-          consent_data: boolean
-          consent_data_recorded_by?: string | null
-          consent_data_recorded_on?: string | null
-          consent_photo: boolean
-          consent_photo_recorded_by?: string | null
-          consent_photo_recorded_on?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
           disability_id: string
-          entered_by_name?: string | null
-          entered_on?: string | null
-          guardian_consent_date?: string | null
-          guardian_consent_given?: boolean | null
-          guardian_name?: string | null
-          guardian_phone?: string | null
-          guardian_relationship?: string | null
-          hours_per_month?: number | null
-          how_heard_id?: string | null
-          how_heard_other?: string | null
           id?: string
+          id_type_id: string
+          is_resident: boolean
           municipality_id?: string
           nationality_id: string
-          neighbourhood_id: string
-          occupation_status_id?: string | null
+          nationality_other?: string | null
           person_id: string
-          phone_alternative?: string | null
-          prior_experience_id?: string | null
-          prior_experience_other?: string | null
+          photo_consent: boolean
           reference?: string | null
-          reg_channel_id: string
-          reg_date: string
-          registered_by_name?: string | null
-          registered_by_organisation?: string | null
-          registered_by_position?: string | null
-          registered_on?: string | null
-          safety_commitment: boolean
-          safety_commitment_recorded_by?: string | null
-          safety_commitment_recorded_on?: string | null
-          signed_by?: string | null
-          signed_on?: string | null
-          transport_id: string
+          reviewed_by?: string | null
+          reviewed_on?: string | null
+          situation_id: string
+          submitted_publicly?: boolean
           updated_at?: string
         }
         Update: {
           affiliation_id?: string
+          affiliation_name?: string | null
           affiliation_other?: string | null
+          application_status?: string
           client_uuid?: string | null
-          consent_data?: boolean
-          consent_data_recorded_by?: string | null
-          consent_data_recorded_on?: string | null
-          consent_photo?: boolean
-          consent_photo_recorded_by?: string | null
-          consent_photo_recorded_on?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
           disability_id?: string
-          entered_by_name?: string | null
-          entered_on?: string | null
-          guardian_consent_date?: string | null
-          guardian_consent_given?: boolean | null
-          guardian_name?: string | null
-          guardian_phone?: string | null
-          guardian_relationship?: string | null
-          hours_per_month?: number | null
-          how_heard_id?: string | null
-          how_heard_other?: string | null
           id?: string
+          id_type_id?: string
+          is_resident?: boolean
           municipality_id?: string
           nationality_id?: string
-          neighbourhood_id?: string
-          occupation_status_id?: string | null
+          nationality_other?: string | null
           person_id?: string
-          phone_alternative?: string | null
-          prior_experience_id?: string | null
-          prior_experience_other?: string | null
+          photo_consent?: boolean
           reference?: string | null
-          reg_channel_id?: string
-          reg_date?: string
-          registered_by_name?: string | null
-          registered_by_organisation?: string | null
-          registered_by_position?: string | null
-          registered_on?: string | null
-          safety_commitment?: boolean
-          safety_commitment_recorded_by?: string | null
-          safety_commitment_recorded_on?: string | null
-          signed_by?: string | null
-          signed_on?: string | null
-          transport_id?: string
+          reviewed_by?: string | null
+          reviewed_on?: string | null
+          situation_id?: string
+          submitted_publicly?: boolean
           updated_at?: string
         }
         Relationships: [
@@ -6123,7 +3781,7 @@ export type Database = {
             foreignKeyName: "khld_volunteer_affiliation_id_fkey"
             columns: ["affiliation_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_f2_affiliation"
+            referencedRelation: "ref_khld_affiliation"
             referencedColumns: ["id"]
           },
           {
@@ -6134,10 +3792,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "khld_volunteer_how_heard_id_fkey"
-            columns: ["how_heard_id"]
+            foreignKeyName: "khld_volunteer_id_type_id_fkey"
+            columns: ["id_type_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_f2_how_heard"
+            referencedRelation: "ref_khld_id_type"
             referencedColumns: ["id"]
           },
           {
@@ -6155,20 +3813,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "khld_volunteer_neighbourhood_id_fkey"
-            columns: ["neighbourhood_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_neighbourhood"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_volunteer_occupation_status_id_fkey"
-            columns: ["occupation_status_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_f2_occupation_status"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "khld_volunteer_person_id_fkey"
             columns: ["person_id"]
             isOneToOne: false
@@ -6176,25 +3820,101 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "khld_volunteer_prior_experience_id_fkey"
-            columns: ["prior_experience_id"]
+            foreignKeyName: "khld_volunteer_situation_id_fkey"
+            columns: ["situation_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_f2_prior_experience"
+            referencedRelation: "ref_khld_situation"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      khld_volunteer_attendance: {
+        Row: {
+          activity_id: string | null
+          assessment: number
+          campaign_id: string | null
+          client_uuid: string | null
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          municipality_id: string
+          notes: string | null
+          report_date: string
+          role_id: string | null
+          role_other: string | null
+          updated_at: string
+          volunteer_id: string
+        }
+        Insert: {
+          activity_id?: string | null
+          assessment: number
+          campaign_id?: string | null
+          client_uuid?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          municipality_id?: string
+          notes?: string | null
+          report_date: string
+          role_id?: string | null
+          role_other?: string | null
+          updated_at?: string
+          volunteer_id: string
+        }
+        Update: {
+          activity_id?: string | null
+          assessment?: number
+          campaign_id?: string | null
+          client_uuid?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          municipality_id?: string
+          notes?: string | null
+          report_date?: string
+          role_id?: string | null
+          role_other?: string | null
+          updated_at?: string
+          volunteer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "khld_volunteer_attendance_activity_id_fkey"
+            columns: ["activity_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "khld_activity"
+            referencedColumns: ["id", "municipality_id"]
+          },
+          {
+            foreignKeyName: "khld_volunteer_attendance_campaign_id_fkey"
+            columns: ["campaign_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "khld_campaign"
+            referencedColumns: ["id", "municipality_id"]
+          },
+          {
+            foreignKeyName: "khld_volunteer_attendance_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "khld_volunteer_reg_channel_id_fkey"
-            columns: ["reg_channel_id"]
+            foreignKeyName: "khld_volunteer_attendance_role_id_fkey"
+            columns: ["role_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_f2_reg_channel"
+            referencedRelation: "ref_khld_volunteer_interest"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "khld_volunteer_transport_id_fkey"
-            columns: ["transport_id"]
+            foreignKeyName: "khld_volunteer_attendance_volunteer_id_fkey"
+            columns: ["volunteer_id", "municipality_id"]
             isOneToOne: false
-            referencedRelation: "ref_khld_f2_transport"
-            referencedColumns: ["id"]
+            referencedRelation: "khld_volunteer"
+            referencedColumns: ["id", "municipality_id"]
           }
         ]
       }
@@ -6229,485 +3949,6 @@ export type Database = {
             columns: ["volunteer_id", "municipality_id"]
             isOneToOne: false
             referencedRelation: "khld_volunteer"
-            referencedColumns: ["id", "municipality_id"]
-          }
-        ]
-      }
-      khld_volunteer_participation: {
-        Row: {
-          action_day_id: string | null
-          activity_id: string | null
-          campaign_id: string | null
-          client_uuid: string | null
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          hours: number | null
-          id: string
-          kind: string
-          market_id: string | null
-          municipality_id: string
-          notes: string | null
-          participated_on: string
-          reference_text: string | null
-          updated_at: string
-          verified: boolean
-          volunteer_id: string
-        }
-        Insert: {
-          action_day_id?: string | null
-          activity_id?: string | null
-          campaign_id?: string | null
-          client_uuid?: string | null
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          hours?: number | null
-          id?: string
-          kind: string
-          market_id?: string | null
-          municipality_id?: string
-          notes?: string | null
-          participated_on: string
-          reference_text?: string | null
-          updated_at?: string
-          verified?: boolean
-          volunteer_id: string
-        }
-        Update: {
-          action_day_id?: string | null
-          activity_id?: string | null
-          campaign_id?: string | null
-          client_uuid?: string | null
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          hours?: number | null
-          id?: string
-          kind?: string
-          market_id?: string | null
-          municipality_id?: string
-          notes?: string | null
-          participated_on?: string
-          reference_text?: string | null
-          updated_at?: string
-          verified?: boolean
-          volunteer_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_volunteer_participation_action_day_id_fkey"
-            columns: ["action_day_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_action_day"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "khld_volunteer_participation_activity_id_fkey"
-            columns: ["activity_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_activity"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "khld_volunteer_participation_campaign_id_fkey"
-            columns: ["campaign_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_campaign"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "khld_volunteer_participation_market_id_fkey"
-            columns: ["market_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_market"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "khld_volunteer_participation_municipality_id_fkey"
-            columns: ["municipality_id"]
-            isOneToOne: false
-            referencedRelation: "municipality"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_volunteer_participation_volunteer_id_fkey"
-            columns: ["volunteer_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_volunteer"
-            referencedColumns: ["id", "municipality_id"]
-          }
-        ]
-      }
-      khld_volunteer_tracking: {
-        Row: {
-          client_uuid: string | null
-          continue_intent_id: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          inactive_reason_id: string | null
-          inactive_reason_other: string | null
-          leadership_role_id: string | null
-          leadership_role_other: string | null
-          municipality_id: string
-          notes: string | null
-          period_from: string
-          period_to: string | null
-          recognition_given_id: string
-          recognition_given_other: string | null
-          status_end_period_id: string
-          updated_at: string
-          verified_by_name: string | null
-          verified_on: string | null
-          volunteer_id: string
-        }
-        Insert: {
-          client_uuid?: string | null
-          continue_intent_id: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          inactive_reason_id?: string | null
-          inactive_reason_other?: string | null
-          leadership_role_id?: string | null
-          leadership_role_other?: string | null
-          municipality_id?: string
-          notes?: string | null
-          period_from: string
-          period_to?: string | null
-          recognition_given_id: string
-          recognition_given_other?: string | null
-          status_end_period_id: string
-          updated_at?: string
-          verified_by_name?: string | null
-          verified_on?: string | null
-          volunteer_id: string
-        }
-        Update: {
-          client_uuid?: string | null
-          continue_intent_id?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          inactive_reason_id?: string | null
-          inactive_reason_other?: string | null
-          leadership_role_id?: string | null
-          leadership_role_other?: string | null
-          municipality_id?: string
-          notes?: string | null
-          period_from?: string
-          period_to?: string | null
-          recognition_given_id?: string
-          recognition_given_other?: string | null
-          status_end_period_id?: string
-          updated_at?: string
-          verified_by_name?: string | null
-          verified_on?: string | null
-          volunteer_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_volunteer_tracking_continue_intent_id_fkey"
-            columns: ["continue_intent_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so30_continue_intent"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_volunteer_tracking_inactive_reason_id_fkey"
-            columns: ["inactive_reason_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so30_inactive_reason"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_volunteer_tracking_leadership_role_id_fkey"
-            columns: ["leadership_role_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so30_leadership_role"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_volunteer_tracking_municipality_id_fkey"
-            columns: ["municipality_id"]
-            isOneToOne: false
-            referencedRelation: "municipality"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_volunteer_tracking_recognition_given_id_fkey"
-            columns: ["recognition_given_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so30_recognition_given"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_volunteer_tracking_status_end_period_id_fkey"
-            columns: ["status_end_period_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_so30_status_end_period"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_volunteer_tracking_volunteer_id_fkey"
-            columns: ["volunteer_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_volunteer"
-            referencedColumns: ["id", "municipality_id"]
-          }
-        ]
-      }
-      khld_volunteer_tracking_option: {
-        Row: {
-          created_at: string
-          municipality_id: string
-          option_id: string
-          option_other: string | null
-          question_code: string
-          tracking_id: string
-        }
-        Insert: {
-          created_at?: string
-          municipality_id?: string
-          option_id: string
-          option_other?: string | null
-          question_code: string
-          tracking_id: string
-        }
-        Update: {
-          created_at?: string
-          municipality_id?: string
-          option_id?: string
-          option_other?: string | null
-          question_code?: string
-          tracking_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_volunteer_tracking_option_tracking_id_fkey"
-            columns: ["tracking_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_volunteer_tracking"
-            referencedColumns: ["id", "municipality_id"]
-          }
-        ]
-      }
-      khld_works_item: {
-        Row: {
-          accessibility_met_id: string
-          accessibility_met_other: string | null
-          actual_start: string | null
-          addition_justification: string | null
-          client_uuid: string | null
-          completed_on: string | null
-          cost_jod: number
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          description: string
-          facility_type_id: string
-          facility_type_other: string | null
-          handover_id: string
-          handover_other: string | null
-          id: string
-          maintenance_owner_id: string
-          maintenance_owner_other: string | null
-          modality_id: string
-          municipality_id: string
-          on_priority_list_id: string
-          planned_start: string
-          priority_rank: number | null
-          quantity: string | null
-          quantity_unit: string | null
-          reference: string | null
-          remarks: string | null
-          report_date: string
-          safety_by_name: string | null
-          safety_check_id: string
-          safety_on: string | null
-          status_id: string
-          status_other: string | null
-          updated_at: string
-          verified_by_name: string | null
-          verified_on: string | null
-        }
-        Insert: {
-          accessibility_met_id: string
-          accessibility_met_other?: string | null
-          actual_start?: string | null
-          addition_justification?: string | null
-          client_uuid?: string | null
-          completed_on?: string | null
-          cost_jod: number
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          description: string
-          facility_type_id: string
-          facility_type_other?: string | null
-          handover_id: string
-          handover_other?: string | null
-          id?: string
-          maintenance_owner_id: string
-          maintenance_owner_other?: string | null
-          modality_id: string
-          municipality_id?: string
-          on_priority_list_id: string
-          planned_start: string
-          priority_rank?: number | null
-          quantity?: string | null
-          quantity_unit?: string | null
-          reference?: string | null
-          remarks?: string | null
-          report_date: string
-          safety_by_name?: string | null
-          safety_check_id: string
-          safety_on?: string | null
-          status_id: string
-          status_other?: string | null
-          updated_at?: string
-          verified_by_name?: string | null
-          verified_on?: string | null
-        }
-        Update: {
-          accessibility_met_id?: string
-          accessibility_met_other?: string | null
-          actual_start?: string | null
-          addition_justification?: string | null
-          client_uuid?: string | null
-          completed_on?: string | null
-          cost_jod?: number
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          description?: string
-          facility_type_id?: string
-          facility_type_other?: string | null
-          handover_id?: string
-          handover_other?: string | null
-          id?: string
-          maintenance_owner_id?: string
-          maintenance_owner_other?: string | null
-          modality_id?: string
-          municipality_id?: string
-          on_priority_list_id?: string
-          planned_start?: string
-          priority_rank?: number | null
-          quantity?: string | null
-          quantity_unit?: string | null
-          reference?: string | null
-          remarks?: string | null
-          report_date?: string
-          safety_by_name?: string | null
-          safety_check_id?: string
-          safety_on?: string | null
-          status_id?: string
-          status_other?: string | null
-          updated_at?: string
-          verified_by_name?: string | null
-          verified_on?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_works_item_accessibility_met_id_fkey"
-            columns: ["accessibility_met_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_c1_accessibility_met"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_works_item_facility_type_id_fkey"
-            columns: ["facility_type_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_c1_facility_type"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_works_item_handover_id_fkey"
-            columns: ["handover_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_c1_handover"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_works_item_maintenance_owner_id_fkey"
-            columns: ["maintenance_owner_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_c1_maintenance_owner"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_works_item_modality_id_fkey"
-            columns: ["modality_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_c1_modality"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_works_item_municipality_id_fkey"
-            columns: ["municipality_id"]
-            isOneToOne: false
-            referencedRelation: "municipality"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_works_item_on_priority_list_id_fkey"
-            columns: ["on_priority_list_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_c1_on_priority_list"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_works_item_safety_check_id_fkey"
-            columns: ["safety_check_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_c1_safety_check"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "khld_works_item_status_id_fkey"
-            columns: ["status_id"]
-            isOneToOne: false
-            referencedRelation: "ref_khld_c1_status"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      khld_works_item_option: {
-        Row: {
-          created_at: string
-          municipality_id: string
-          option_id: string
-          option_other: string | null
-          question_code: string
-          works_item_id: string
-        }
-        Insert: {
-          created_at?: string
-          municipality_id?: string
-          option_id: string
-          option_other?: string | null
-          question_code: string
-          works_item_id: string
-        }
-        Update: {
-          created_at?: string
-          municipality_id?: string
-          option_id?: string
-          option_other?: string | null
-          question_code?: string
-          works_item_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "khld_works_item_option_works_item_id_fkey"
-            columns: ["works_item_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "khld_works_item"
             referencedColumns: ["id", "municipality_id"]
           }
         ]
@@ -7445,6 +4686,7 @@ export type Database = {
           national_id: string | null
           nationality_id: string | null
           notes: string | null
+          other_id_number: string | null
           phone: string | null
           sex: Database["public"]["Enums"]["sex_t"] | null
           unhcr_number: string | null
@@ -7468,6 +4710,7 @@ export type Database = {
           national_id?: string | null
           nationality_id?: string | null
           notes?: string | null
+          other_id_number?: string | null
           phone?: string | null
           sex?: Database["public"]["Enums"]["sex_t"] | null
           unhcr_number?: string | null
@@ -7491,6 +4734,7 @@ export type Database = {
           national_id?: string | null
           nationality_id?: string | null
           notes?: string | null
+          other_id_number?: string | null
           phone?: string | null
           sex?: Database["public"]["Enums"]["sex_t"] | null
           unhcr_number?: string | null
@@ -7942,7 +5186,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_a1_coordinator_assigned: {
+      ref_khld_activity_supported: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -7984,7 +5228,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_a1_council_decision: {
+      ref_khld_activity_type: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -8026,7 +5270,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_a1_evidence_attached: {
+      ref_khld_affiliation: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -8068,7 +5312,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_a1_partnerships_concluded: {
+      ref_khld_attempt_case: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -8110,7 +5354,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_a1_periodic_updates: {
+      ref_khld_attempt_evaluation: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -8152,7 +5396,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_a1_stakeholder_count: {
+      ref_khld_campaign_activity_type: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -8194,7 +5438,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_a1_tracking_format: {
+      ref_khld_committee_role: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -8236,7 +5480,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_a1_verif_round: {
+      ref_khld_components_a1: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -8278,7 +5522,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_a1_zaha_coordination: {
+      ref_khld_components_b1: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -8320,7 +5564,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_a2_attendees_breakdown: {
+      ref_khld_components_e1: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -8362,7 +5606,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_a2_contributions_pledged: {
+      ref_khld_components_f1: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -8404,7 +5648,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_a2_convened_by: {
+      ref_khld_contribution_type: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -8446,2821 +5690,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_a2_meeting_type: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_a2_minutes_prepared: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_a2_new_partners: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_a2_orgs_by_type: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_a2_pillars_discussed: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_a2_prev_followup: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_a2_venue: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_a3_acknowledged: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_a3_conditions: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_a3_contribution_type: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_a3_contributor_type: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_a3_csr_linked: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_a3_evidence_attached: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_a3_first_contribution: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_a3_municipal_acceptance: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_a3_source_meeting: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_a3_status: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_a3_supports_objective: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_a3_valuation_basis: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_age_group: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_agree_scale: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_b1_activity_calendar: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_b1_calendar_horizon: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_b1_communicated: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_b1_evidence_attached: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_b1_protocol_exists: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_c1_accessibility_met: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_c1_evidence_attached: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_c1_facility_type: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_c1_handover: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_c1_identified_how: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_c1_maintenance_owner: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_c1_modality: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_c1_on_priority_list: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_c1_resource_source: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_c1_safety_check: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_c1_status: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_c2_evidence_attached: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_c2_focus: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_c2_is_first_campaign: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_c2_lead_organiser: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_c2_linked_item: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_c2_municipal_supervision: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_c2_recognition: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_c2_safety_briefing: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_c2_school_linked: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_c2_volunteers_breakdown: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_checklist_status: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_d1_activity_type: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_d1_announcement: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_d1_calendar_status: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_d1_content_provider: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_d1_evidence_attached: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_d1_feedback_collected: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_d1_frequency_type: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_d1_inclusion_measures: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_d1_issues: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_d1_location: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_d1_organiser: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_d1_target_group: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_d2_by_age_sex: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_d2_by_nationality: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_d2_by_sex: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_d2_consent_informed: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_d2_count_method: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_d2_duplicate_check: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_d2_photo_consent: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_d2_register_attached: {
+      ref_khld_counting_method: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -11344,7 +5774,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_e1_coordinator_elected: {
+      ref_khld_event_status: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -11386,7 +5816,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_e1_duplication_avoided: {
+      ref_khld_facility_type: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -11428,7 +5858,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_e1_evidence_attached: {
+      ref_khld_id_type: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -11470,7 +5900,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_e1_formal_recognition: {
+      ref_khld_market_occasion: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -11512,7 +5942,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_e1_inclusive_representation: {
+      ref_khld_meeting_type: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -11554,7 +5984,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_e1_meeting_cycle: {
+      ref_khld_milestone: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -11596,4039 +6026,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_e1_members_by_sex: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_e1_members_by_type: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_e1_municipal_focal: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_e1_outputs_delivered: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_e1_tasks_covered: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_e1_written_tasks: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f1_database_established: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f1_database_format: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f1_evidence_attached: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f1_focal_point: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f1_minors_arrangements: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f1_procedures_approved: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f1_recognition_scheme: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f1_recruitment_channels: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f1_safety_arrangements: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f2_affiliation: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f2_availability_days: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f2_availability_times: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f2_how_heard: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f2_interests: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f2_occupation_status: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f2_prior_experience: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f2_reg_channel: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f2_skills: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f2_support_needs: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f2_transport: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f3_called_by: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f3_evidence_attached: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f3_linked_records: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f3_location: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f3_recognition: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f3_refreshments: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f3_roles_used: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f3_safety: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f3_theme: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f3_volunteer_feedback: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_f3_volunteers_breakdown: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_g1_certificate: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_g1_cycle_year: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_g1_enterprise_status: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_g1_evidence_attached: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_g1_further_needs: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_g1_most_useful: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_g1_non_completion_reason: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_g1_peer_network: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_g1_provider: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_g1_referral_made: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_g1_s3_hygiene: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_g1_venue: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_g2_evidence_attached: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_g2_licensing_progress: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_g2_priority_group: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_g2_providers: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_g2_status_last_contact: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_g2_sup_hygiene: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_g2_sup_referral_outcome: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h1_accessibility: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h1_announcement: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h1_cost_source: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h1_evidence_attached: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h1_feedback_collected: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h1_hygiene_check: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h1_issues: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h1_location: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h1_occasion: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h1_organisers: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h1_parallel_activities: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h1_phase: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h1_priority_share: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h1_refreshment_point: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h1_selection_method: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h1_services_provided: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h1_total_sales_method: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h1_visitors_method: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h2_attended: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h2_commitment_signed: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h2_consent: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h2_equipment_provided: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h2_health_certificate: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h2_licensed: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h2_nominated_by: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h2_priority_flags: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_h2_vendor_type: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_imp0_accompanied_by: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_imp0_activities_taken: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_imp0_barriers: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_imp0_comfort_level: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_imp0_consent: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_imp0_has_children: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_imp0_int_place: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_imp0_joint_activity: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_imp0_mixed_presence: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_imp0_new_contact: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_imp0_relations_change: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_imp0_survey_round: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_imp0_visit_freq: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_incident: {
+      ref_khld_milestone_status: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -15712,7 +6110,133 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_neighbourhood: {
+      ref_khld_observed_interaction: {
+        Row: {
+          allows_free_text: boolean
+          code: string
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          is_active: boolean
+          label_ar: string
+          label_en: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          allows_free_text?: boolean
+          code: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          label_ar: string
+          label_en: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          allows_free_text?: boolean
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          label_ar?: string
+          label_en?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ref_khld_organisation_type: {
+        Row: {
+          allows_free_text: boolean
+          code: string
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          is_active: boolean
+          label_ar: string
+          label_en: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          allows_free_text?: boolean
+          code: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          label_ar: string
+          label_en: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          allows_free_text?: boolean
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          label_ar?: string
+          label_en?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ref_khld_organiser: {
+        Row: {
+          allows_free_text: boolean
+          code: string
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          is_active: boolean
+          label_ar: string
+          label_en: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          allows_free_text?: boolean
+          code: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          label_ar: string
+          label_en: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          allows_free_text?: boolean
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          label_ar?: string
+          label_en?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ref_khld_partner_category: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -15838,91 +6362,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_recontact: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_sales_band: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_session_attendance: {
+      ref_khld_session_topic: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -16006,7 +6446,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_so10_areas_involved: {
+      ref_khld_situation: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -16048,7 +6488,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_so10_continue_intent: {
+      ref_khld_support_provider: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -16090,7 +6530,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_so10_duplication: {
+      ref_khld_support_type: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -16132,7 +6572,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_so10_evidence_ref: {
+      ref_khld_survey_age_group: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -16174,7 +6614,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_so10_focal_point: {
+      ref_khld_target_audience: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -16216,7 +6656,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_so10_obstacles: {
+      ref_khld_time_of_day: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -16258,7 +6698,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_so10_overall_rating: {
+      ref_khld_volunteer_interest: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -16300,7 +6740,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_so10_survey_round: {
+      ref_khld_weekday: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -16342,1561 +6782,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_khld_so20_activity_suitable: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so20_collection_mode: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so20_facility_item: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so20_facility_rating: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so20_feel_safe: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so20_how_heard: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so20_overall_satisfaction: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so20_participate_freely: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so20_suitable_women_children: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so20_timing_convenient: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so20_would_return: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so30_activity_types: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so30_continue_intent: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so30_inactive_reason: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so30_leadership_role: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so30_recognition_given: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so30_status_end_period: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so30_verified_against: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so30_what_would_help: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so40_additional_support: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so40_exposure: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so40_first_organised_market: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so40_guidance_received: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so40_improvements_wanted: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so40_made_sales: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so40_market_constraints: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so40_mode: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so40_new_channels: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so40_new_customers: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so40_overall_opportunity: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so40_participate_again: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so40_production_change: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so40_repeat_orders: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so40_respondent_is_vendor: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so40_sold_before_market: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so40_still_active: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_so40_stop_reason: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_khld_yes_fully_partly_no: {
+      ref_khld_working_status: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -26450,6 +15336,29 @@ export type Database = {
           }
         ]
       }
+      v_khld_guidance_completed: {
+        Row: {
+          completed_on: string | null
+          municipality_id: string | null
+          person_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "khld_enterprise_support_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "khld_enterprise_support_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "person"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       v_khld_indicator_status: {
         Row: {
           code: string | null
@@ -26478,13 +15387,37 @@ export type Database = {
         }
         Relationships: []
       }
-      v_khld_milestone_quarter: {
+      v_khld_milestone_established: {
         Row: {
           established_on: string | null
-          milestone_code: string | null
+          milestone: string | null
           municipality_id: string | null
         }
         Relationships: []
+      }
+      v_khld_volunteer_occasion: {
+        Row: {
+          municipality_id: string | null
+          occasion_id: string | null
+          report_date: string | null
+          volunteer_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "khld_volunteer_attendance_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "khld_volunteer_attendance_volunteer_id_fkey"
+            columns: ["volunteer_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "khld_volunteer"
+            referencedColumns: ["id", "municipality_id"]
+          }
+        ]
       }
       v_opportunity: {
         Row: {
@@ -26589,6 +15522,18 @@ export type Database = {
           id?: string | null
           label_ar?: string | null
           label_en?: string | null
+        }
+        Relationships: []
+      }
+      v_public_khld_volunteer_option: {
+        Row: {
+          allows_free_text: boolean | null
+          code: string | null
+          id: string | null
+          label_ar: string | null
+          label_en: string | null
+          list: string | null
+          sort_order: number | null
         }
         Relationships: []
       }
@@ -26912,25 +15857,11 @@ export type Database = {
         Args: { p: Database["public"]["Tables"]["person"]["Row"]; p_on: string }
         Returns: number
       }
-      khld_attendance_figures: {
-        Args: { p_attendance_id: string }
-        Returns: Json
+      khld_child_rules: {
+        Args: { p_id: string; p_table: string }
+        Returns: undefined
       }
-      khld_checklist_status: {
-        Args: { p_list: string; p_status_id: string }
-        Returns: string
-      }
-      khld_ensure_enterprise: {
-        Args: { p: Json; p_owner: string }
-        Returns: string
-      }
-      khld_ensure_partner: { Args: { p: Json }; Returns: string }
       khld_ensure_person: { Args: { p: Json }; Returns: string }
-      khld_ensure_vendor: { Args: { p_person: string }; Returns: string }
-      khld_milestone_status: {
-        Args: { p_verification_id: string }
-        Returns: Json
-      }
       khld_next_reference: {
         Args: {
           p_municipality_id: string
@@ -26950,10 +15881,16 @@ export type Database = {
           full_name: string
           id: string
           national_id: string
+          other_id_number: string
           phone: string
           sex: Database["public"]["Enums"]["sex_t"]
           unhcr_number: string
         }[]
+      }
+      khld_register_volunteer: { Args: { p: Json }; Returns: Json }
+      khld_rule_on: {
+        Args: { p_conditions: Json; p_row: Json }
+        Returns: boolean
       }
       match_linkage_request: {
         Args: {

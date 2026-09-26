@@ -85,23 +85,35 @@ const CONSTRAINT_MESSAGES: Record<string, string> = {
   // The function refuses a blank reason first and names the field; this only
   // surfaces for a write that did not go through it.
   rejected_has_a_reason: 'errors:db.rejectionNeedsReason',
-  // Khalidiyah (0145-0147). The names a form can hit through
+  // Khalidiyah (0159-0160). The names a form can hit through
   // save_khld_record, which answers {ok:false, constraint} rather than
   // throwing; KhldFormScreen's RefusalBand reads them through
   // constraintMessageKey below. Each read from `supabase/.constraint_names`.
+  // The rules between fields (khld_<field>_required / _not_applicable,
+  // khld_field_rule) are worded by the RefusalBand from the field's label.
   khld_volunteer_person_key: 'errors:db.khldVolunteerRegistered',
-  khld_attendance_activity_live: 'errors:db.khldAttendanceExists',
-  khld_enterprise_support_enterprise_live: 'errors:db.khldSupportLogExists',
-  khld_guidance_completion_enterprise_year_live: 'errors:db.khldCompletionExists',
+  khld_volunteer_is_resident_yes: 'errors:db.khldResidentsOnly',
   khld_partner_name_key: 'errors:db.khldPartnerExists',
-  khld_partner_survey_partner_round_live: 'errors:db.khldPartnerSurveyed',
-  khld_vendor_registration_market_vendor_live: 'errors:db.khldVendorRegistered',
-  khld_volunteer_consent_data_given: 'errors:db.khldConsentData',
-  khld_volunteer_safety_commitment_given: 'errors:db.khldSafetyCommitment',
-  khld_volunteer_participation_campaign_live: 'errors:db.khldParticipationExists',
-  khld_volunteer_participation_action_day_live: 'errors:db.khldParticipationExists',
-  khld_volunteer_participation_activity_live: 'errors:db.khldParticipationExists',
-  khld_volunteer_participation_market_live: 'errors:db.khldParticipationExists',
+  khld_enterprise_request_person_session_live: 'errors:db.khldRequestExists',
+  khld_vendor_application_person_market_live: 'errors:db.khldVendorRegistered',
+  khld_market_attendance_once_a_day_live: 'errors:db.khldMarketAttendanceExists',
+  khld_volunteer_attendance_once_a_day_live: 'errors:db.khldParticipationExists',
+  khld_volunteer_attendance_one_occasion: 'errors:db.khldOneOccasion',
+  khld_activity_attendance_age_split_is_100: 'errors:db.khldAgeSplit',
+  khld_activity_attendance_sex_split_is_100: 'errors:db.khldSexSplit',
+  khld_activity_attendance_nationality_within_100: 'errors:db.khldNationalitySplit',
+  khld_rehab_report_completed_within_agreed: 'errors:db.khldCompletedWithinAgreed',
+  khld_campaign_action_days_within_dates: 'errors:db.khldActionDaysWithinDates',
+  khld_campaign_dates_in_order: 'errors:db.khldDatesInOrder',
+  khld_activity_dates_in_order: 'errors:db.khldDatesInOrder',
+  khld_guidance_session_dates_in_order: 'errors:db.khldDatesInOrder',
+  khld_market_dates_in_order: 'errors:db.khldDatesInOrder',
+  khld_campaign_window_in_order: 'errors:db.khldWindowInOrder',
+  khld_guidance_session_window_in_order: 'errors:db.khldWindowInOrder',
+  khld_market_window_in_order: 'errors:db.khldWindowInOrder',
+  khld_contribution_one_contributor: 'errors:db.khldOneContributor',
+  khld_park_survey_visit_is_one_thing: 'errors:db.khldVisitIsOneThing',
+  khld_park_survey_visit_needs_consent: 'errors:db.khldVisitNeedsConsent',
 }
 
 /** The message key for a constraint a save function REPORTED (rather than threw), or null. */

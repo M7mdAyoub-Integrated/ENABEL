@@ -14,7 +14,8 @@
 //
 //   presign_upload  can the caller see the record and write? is the file
 //                   within the per-file limit? would it take the total past
-//                   the quota? then a PUT URL, ten minutes
+//                   the quota? for a Khalidiyah file field, is the field
+//                   full? then a PUT URL, ten minutes
 //   confirm         ask the store for the object's size (exists? the declared
 //                   size?), insert the row as the user; if the row is
 //                   refused, DELETE the object so the bucket never holds a
@@ -62,10 +63,13 @@ function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json" } });
 }
 
-// The same list as attachment_entity_type_known (0128, 0151). Checked here
-// so the query below is over a known table name and never over a string
-// from the request. The two lists are kept identical by hand; 0151's
-// verification reads the database's, this one is read by opening the file.
+// The tables that exist today among those attachment_entity_type_known names
+// (0128, 0151, 0158). Checked here so the query below is over a known table
+// name and never over a string from the request. The database's list is the
+// longer one: it keeps the names of the Khalidiyah tables 0153 retired, for
+// the attachment row that still names one, and a retired table cannot take a
+// new file. Kept by hand; 0158's verification reads the database's list,
+// this one is read by opening the file.
 const ENTITY_TABLES = new Set([
   "training_session", "training_enrolment", "exhibition", "exhibition_registration",
   "partnership", "production_initiative", "followup_survey", "coordination_meeting",
@@ -74,17 +78,27 @@ const ENTITY_TABLES = new Set([
   "rmth_event", "rmth_proposal", "rmth_training_programme", "rmth_training_cycle",
   "rmth_training_enrolment", "rmth_project_implementer", "rmth_incubator",
   "rmth_enterprise", "rmth_incubation_service", "rmth_outcome_survey",
-  "khld_partner", "khld_enterprise", "khld_vendor",
-  "khld_works_item", "khld_coordination_meeting", "khld_contribution",
-  "khld_campaign", "khld_activity", "khld_market", "khld_action_day",
-  "khld_volunteer", "khld_attendance",
-  "khld_guidance_completion", "khld_enterprise_support", "khld_vendor_registration",
-  "khld_interaction_survey", "khld_partner_survey", "khld_user_feedback",
-  "khld_volunteer_tracking", "khld_producer_survey",
-  "khld_milestone_verification",
+  "khld_focal_point", "khld_partner", "khld_partner_contact", "khld_meeting",
+  "khld_rehab_report", "khld_campaign", "khld_activity", "khld_activity_attendance",
+  "khld_committee_member", "khld_committee_meeting", "khld_volunteer",
+  "khld_volunteer_attendance", "khld_guidance_session", "khld_enterprise_request",
+  "khld_market", "khld_vendor_application", "khld_market_attendance",
+  "khld_park_survey", "khld_partner_survey", "khld_contribution",
+  "khld_milestone_record", "khld_enterprise_support", "khld_producer_survey",
 ]);
 const KINDS = new Set(["photo", "document", "other"]);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+// A Khalidiyah file-upload field (F017 minutes, F120 attendance sheet ...):
+// optional, and when given, khld_file_field (0158) says whether the record's
+// table has that field and how many files it takes.
+const FIELD_CODE = /^F[0-9]{3}$/;
+
+/** The optional field_code of a request: null when absent, undefined when malformed. */
+function fieldCodeOf(body: Record<string, unknown>): string | null | undefined {
+  if (body.field_code === undefined || body.field_code === null || body.field_code === "") return null;
+  const s = String(body.field_code);
+  return FIELD_CODE.test(s) ? s : undefined;
+}
 const UPLOAD_URL_SECONDS = 600;
 const DOWNLOAD_URL_SECONDS = 60;
 
@@ -208,7 +222,10 @@ Deno.serve(async (req: Request) => {
     const entityId = String(body.entity_id ?? "");
     const fileName = safeName(String(body.file_name ?? ""));
     const sizeBytes = Number(body.size_bytes);
-    if (!ENTITY_TABLES.has(entityType) || !UUID.test(entityId)) return json({ ok: false, result: "bad_request" }, 400);
+    const fieldCode = fieldCodeOf(body);
+    if (!ENTITY_TABLES.has(entityType) || !UUID.test(entityId) || fieldCode === undefined) {
+      return json({ ok: false, result: "bad_request" }, 400);
+    }
     if (!Number.isInteger(sizeBytes) || sizeBytes <= 0) return json({ ok: false, result: "bad_request" }, 400);
 
     // The record, as the user. Invisible means either not there or not
@@ -237,6 +254,20 @@ Deno.serve(async (req: Request) => {
       return json({ ok: false, result: "quota_exceeded", used_bytes: u.used_bytes, quota_bytes: u.quota_bytes, size_bytes: sizeBytes }, 507);
     }
 
+    // A file field's own limit ("5 max"), early for the same reason; the
+    // stop is guard_khld_attachment_field (0158). The attachments counted
+    // are the ones the caller can see, which on a record they can see is all.
+    if (fieldCode) {
+      const { data: ff } = await asUser.from("khld_file_field").select("max_files")
+        .eq("table_name", entityType).eq("field_code", fieldCode).maybeSingle();
+      if (!ff) return json({ ok: false, result: "bad_request", detail: `${fieldCode} is not a file field of ${entityType}` }, 400);
+      const maxFiles = (ff as { max_files: number }).max_files;
+      const { count, error: countErr } = await asUser.from("attachment").select("id", { count: "exact", head: true })
+        .eq("entity_type", entityType).eq("entity_id", entityId).eq("field_code", fieldCode).is("deleted_at", null);
+      if (countErr) return json({ ok: false, result: "not_permitted", detail: countErr.message }, 403);
+      if ((count ?? 0) >= maxFiles) return json({ ok: false, result: "field_full", max_files: maxFiles }, 409);
+    }
+
     const key = `${municipalityId}/${entityType}/${entityId}/${crypto.randomUUID()}-${fileName}`;
     const put = await objectUrl(r2, "PUT", key, UPLOAD_URL_SECONDS);
     return json({ ok: true, key, bucket: r2.bucket, url: put, expires_in: UPLOAD_URL_SECONDS });
@@ -252,7 +283,8 @@ Deno.serve(async (req: Request) => {
     const sizeBytes = Number(body.size_bytes);
     const originalSizeBytes = Number(body.original_size_bytes);
     const contentKind = String(body.content_kind ?? "");
-    if (!ENTITY_TABLES.has(entityType) || !UUID.test(entityId) || !KINDS.has(contentKind) || !fileName) {
+    const fieldCode = fieldCodeOf(body);
+    if (!ENTITY_TABLES.has(entityType) || !UUID.test(entityId) || !KINDS.has(contentKind) || !fileName || fieldCode === undefined) {
       return json({ ok: false, result: "bad_request" }, 400);
     }
     // The key must be one this function would have issued for this record.
@@ -283,6 +315,7 @@ Deno.serve(async (req: Request) => {
         size_bytes: actual,
         original_size_bytes: Number.isInteger(originalSizeBytes) && originalSizeBytes > 0 ? originalSizeBytes : actual,
         content_kind: contentKind,
+        field_code: fieldCode,
       })
       .select("id")
       .maybeSingle();
@@ -293,6 +326,7 @@ Deno.serve(async (req: Request) => {
       const result =
         code === "53100" ? "quota_exceeded"
         : /attachment_size_within_limit/.test(msg) ? "file_too_large"
+        : /takes at most \d+ files/.test(msg) ? "field_full"
         : code === "42501" || /row-level security/i.test(msg) ? "not_permitted"
         : !error ? "not_permitted" // RLS filtered the insert: zero rows, no error
         : "insert_refused";

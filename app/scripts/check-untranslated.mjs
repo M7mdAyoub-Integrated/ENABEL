@@ -55,8 +55,8 @@ const BASELINE = {
   'portal.json': 0,
   'public.json': 0,
   'rmth.json': 0,
-  // Both locales of khld.json are the sheets' own words (gen_forms.py); the
-  // only identical values are the 21 `KHLD-…` codes, which CODE_ONLY allows.
+  // Both locales of khld.json are the sheet's own words (gen_forms.py); the
+  // Form IDs are codes and live in the definition, not the locale.
   'khld.json': 0,
   'survey.json': 108,
 }

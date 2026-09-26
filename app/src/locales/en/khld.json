@@ -1,2825 +1,953 @@
 {
   "forms": {
-    "imp0": {
-      "title": "Annual Community Interaction and Shared Participation Survey (park users and residents)",
-      "short": "Interaction survey",
-      "code": "KHLD-IMP-0",
-      "indicator": "% of surveyed participants reporting that the park provides increased opportunities for interaction and shared community participation between Syrian refugees and the host community",
-      "who": "Enumerator appointed by the Municipality, or a focal point from a local association, supervised by the municipal community coordinator",
-      "when": "Annually (one round per year, 2027 / 2028 / 2029), after the main activity season",
-      "calc": "(No. of respondents answering 'Strongly agree' or 'Agree' to Q15 ÷ total respondents who visited the park at least once in the last 12 months) × 100. Report alongside Q13, Q14, Q16 and Q19 as supporting evidence.",
-      "disaggregation": "Sex; age group; nationality / status; disability; neighbourhood",
-      "definition": "Evidence from participant feedback, activity records and municipal observations showing that park activities create opportunities for members of both communities to participate together.",
-      "measures": "Whether residents from the host community and the Syrian refugee community are actually present together in the park, interact there, take part in joint activities, and perceive the park as having increased opportunities for shared participation.",
-      "unit": "one surveyed resident or park user",
-      "source": "Activity feedback forms, attendance records, municipal reports, annual resident survey",
-      "evidence": "Completed questionnaires; sampling note; event attendance records for the period; annual survey summary signed by the community coordinator",
-      "sections": {
-        "s0": "Section A — Interview and respondent details",
-        "s1": "Section B — Use of Al Khalidiyah Public Park",
-        "s2": "Section C — Interaction and shared participation (core of the indicator)",
-        "s3": "Section D — Barriers, narrative and closing"
-      },
+    "form01": {
+      "title": "Responsible Officer",
+      "short": "Focal point",
       "fields": {
-        "int_date": {
-          "label": "Date of interview",
-          "sub": "dd/mm/yyyy"
+        "F001": {
+          "label": "Focal point name"
         },
-        "survey_round": {
-          "label": "Which annual survey round is this?"
+        "F002": {
+          "label": "phone number"
         },
-        "enum_name": {
-          "label": "Enumerator name"
-        },
-        "int_place": {
-          "label": "Where was the respondent interviewed?",
-          "help": "Record so that park-based and household-based samples can be reported separately."
-        },
-        "consent": {
-          "label": "Consent read and respondent agrees to take part",
-          "help": "Do not proceed without consent."
-        },
-        "sex": {
-          "label": "Sex of respondent"
-        },
-        "age_group": {
-          "label": "Age group"
-        },
-        "nationality": {
-          "label": "Nationality / status",
-          "help": "Core disaggregation for this indicator — both communities must be represented in the sample."
-        },
-        "disability": {
-          "label": "Do you have difficulty doing any of the following: seeing, hearing, walking or climbing steps, remembering or concentrating, self-care, communicating?"
-        },
-        "neighbourhood": {
-          "label": "Neighbourhood of residence"
-        },
-        "has_children": {
-          "label": "Do you have children under 15 living with you?",
-          "help": "Mothers and children are the Plan's priority group.",
-          "parts": {
-            "has_children_id": "Yes — number / No",
-            "children_count": "number"
-          }
-        },
-        "visit_freq": {
-          "label": "In the last 12 months, how often have you visited Al Khalidiyah Public Park?",
-          "help": "Respondents answering 'Never' skip to Q20; they are excluded from the indicator denominator."
-        },
-        "activities_taken": {
-          "label": "Which park activities have you taken part in during the last 12 months?"
-        },
-        "accompanied_by": {
-          "label": "Who do you usually come to the park with?"
-        },
-        "mixed_presence": {
-          "label": "During your visits, were people from both the host community and the Syrian refugee community present?"
-        },
-        "new_contact": {
-          "label": "During park activities, did you talk to or spend time with people from the other community whom you did not know before?"
-        },
-        "opportunity_increase": {
-          "label": "The park gives residents more opportunities to meet and take part in shared community activities than they had before. Do you agree?",
-          "help": "INDICATOR QUESTION — 'Strongly agree' + 'Agree' form the numerator."
-        },
-        "joint_activity": {
-          "label": "Have you taken part in any activity in the park where residents from both communities organised or worked on something together (volunteer day, market, children's event)?"
-        },
-        "comfort_level": {
-          "label": "How comfortable do you feel taking part in park activities alongside people from the other community?"
-        },
-        "suitable_women_children": {
-          "label": "Do you consider the park a suitable place for women and children from both communities to spend time?"
-        },
-        "relations_change": {
-          "label": "Compared with before the park was rehabilitated and activated, have relations between the host community and Syrian refugees in your area changed?",
-          "help": "Attribution is indicative only; triangulate with Q21."
-        },
-        "barriers": {
-          "label": "What still limits your participation in park activities?"
-        },
-        "change_narrative": {
-          "label": "In your own words, what has changed for you or your family because of the park and its activities?",
-          "help": "Two to four sentences. Source of case-study quotes for annual reporting."
-        },
-        "suggestions": {
-          "label": "What would make the park more welcoming for both communities?"
-        },
-        "recontact": {
-          "label": "May we contact you again for next year's survey?"
-        },
-        "enum_notes": {
-          "label": "Enumerator notes and observations"
+        "F003": {
+          "label": "Date of assign"
         }
       }
     },
-    "so10": {
-      "title": "Annual Partner Coordination and Collaboration Survey",
+    "form02": {
+      "title": "List of potential partners",
+      "short": "Partners",
+      "fields": {
+        "F004": {
+          "label": "Partner name"
+        },
+        "F005": {
+          "label": "Phone Number"
+        },
+        "F006": {
+          "label": "Type of potential partner"
+        },
+        "F007": {
+          "label": "Expected support/contribution"
+        },
+        "F008": {
+          "label": "Contact position"
+        },
+        "F009": {
+          "label": "Email if available"
+        },
+        "F115": {
+          "label": "Partner category"
+        }
+      }
+    },
+    "form04": {
+      "title": "Reach out to partners",
+      "short": "Partner outreach",
+      "fields": {
+        "F010": {
+          "label": "Try ID"
+        },
+        "F011": {
+          "label": "Choose a partner"
+        },
+        "F012": {
+          "label": "Attempt Date"
+        },
+        "F013": {
+          "label": "Attempt Case"
+        },
+        "F014": {
+          "label": "Notes (if applicable)"
+        },
+        "F015": {
+          "label": "Evaluation of the attempt:"
+        },
+        "F116": {
+          "label": "Did the partner confirm the partnership?",
+          "opts": {
+            "true": "Yes",
+            "false": "No"
+          }
+        }
+      }
+    },
+    "form05": {
+      "title": "Stakeholder Meetings",
+      "short": "Stakeholder meetings",
+      "fields": {
+        "F016": {
+          "label": "Meeting Date"
+        },
+        "F017": {
+          "label": "Meeting Minutes"
+        },
+        "F018": {
+          "label": "Meeting Summary (if applicable)"
+        },
+        "F019": {
+          "label": "Have the priorities of the rehabilitation of the park or activities been identified?",
+          "opts": {
+            "true": "Yes",
+            "false": "No"
+          }
+        },
+        "F117": {
+          "label": "Meeting type"
+        },
+        "F118": {
+          "label": "Partners who attended"
+        },
+        "F119": {
+          "label": "Number of attendees"
+        },
+        "F120": {
+          "label": "Attendance sheet"
+        }
+      }
+    },
+    "form20": {
+      "title": "Partner Coordination Survey",
       "short": "Partner survey",
-      "code": "KHLD-SO1-0",
-      "indicator": "% of partner organisations reporting effective coordination and collaboration with the Municipality in implementing park activities",
-      "who": "Municipal community coordinator / liaison officer (self-administered by the partner where possible)",
-      "when": "Annually — all partners on the stakeholder map with at least one documented interaction during the year",
-      "calc": "(No. of partner organisations selecting 'Strongly agree' or 'Agree' on Q14 ÷ total partner organisations surveyed) × 100. Target ≥ 70%. Q9–Q13 reported as a sub-index.",
-      "disaggregation": "Partner type; sex of respondent where applicable",
-      "definition": "Share of surveyed partner organisations reporting that coordination, communication and joint planning with the Municipality improved during implementation of the Action Plan.",
-      "measures": "Partner-side experience of the partnership mechanism: clarity of roles, timeliness of communication, involvement in joint planning, follow-up on decisions, transparency in recording contributions, and whether coordination improved over the year.",
-      "unit": "one partner organisation (one response per organisation per year)",
-      "source": "Short annual partner survey or structured interviews; stakeholder map as the sampling frame",
-      "evidence": "Completed partner questionnaires; stakeholder map used as the sampling frame; interview notes; annual coordination summary",
-      "sections": {
-        "s0": "Section A — Partner identification",
-        "s1": "Section B — Nature and intensity of the partnership",
-        "s2": "Section C — Quality of coordination (rate each statement)",
-        "s3": "Section D — Obstacles and forward look"
-      },
       "fields": {
-        "resp_date": {
-          "label": "Date completed",
-          "sub": "dd/mm/yyyy"
+        "F173": {
+          "label": "Survey date"
         },
-        "survey_round": {
-          "label": "Survey round"
+        "F174": {
+          "label": "Partner"
         },
-        "partner_name": {
-          "label": "Name of partner organisation"
+        "F175": {
+          "label": "Respondent position"
         },
-        "partner_type": {
-          "label": "Partner type",
-          "help": "Required disaggregation.",
-          "sub": "Local charitable or development association | Women's organisation | Youth initiative or volunteer group | Cultural institution (e.g. Zaha Cultural Centre) | School | University | Private sector business or trader | Government entity | Donor or development partner | Other"
+        "F176": {
+          "label": "Respondent gender"
         },
-        "resp_name": {
-          "label": "Name and position of the person responding"
-        },
-        "resp_sex": {
-          "label": "Sex of respondent"
-        },
-        "resp_contact": {
-          "label": "Phone and email"
-        },
-        "engagement_since": {
-          "label": "Since when has your organisation been engaged in the Action Plan?",
-          "sub": "Month and year"
-        },
-        "areas_involved": {
-          "label": "Which areas of the Action Plan has your organisation been involved in?"
-        },
-        "meetings_attended": {
-          "label": "How many coordination meetings with the Municipality did your organisation attend in the last 12 months?",
-          "help": "Cross-check against the meeting records (KHLD-SO1-A2).",
-          "sub": "Number"
-        },
-        "focal_point": {
-          "label": "Do you have a designated focal point in the Municipality you can reach when needed?"
-        },
-        "q_communication": {
-          "label": "Communication from the Municipality about park activities is timely and clear."
-        },
-        "q_roles": {
-          "label": "Roles and responsibilities between our organisation and the Municipality are clearly defined."
-        },
-        "q_joint_planning": {
-          "label": "We are involved in planning park activities, not only informed after decisions are taken."
-        },
-        "q_followup": {
-          "label": "The Municipality follows up on the decisions taken in coordination meetings."
-        },
-        "q_transparency": {
-          "label": "Our contributions are documented and acknowledged transparently."
-        },
-        "q_improved": {
-          "label": "Coordination and collaboration with the Municipality have improved compared with 12 months ago.",
-          "help": "INDICATOR QUESTION — 'Strongly agree' + 'Agree' form the numerator."
-        },
-        "overall_rating": {
-          "label": "Overall, how effective is coordination with the Municipality on the Action Plan?"
-        },
-        "duplication": {
-          "label": "Has the coordination mechanism helped avoid duplication of effort between organisations working in the municipality?"
-        },
-        "obstacles": {
-          "label": "What are the main obstacles to coordination with the Municipality?"
-        },
-        "improve_suggestion": {
-          "label": "What one change would most improve coordination in the coming year?"
-        },
-        "continue_intent": {
-          "label": "Does your organisation intend to continue contributing to the Action Plan next year?"
-        },
-        "evidence_ref": {
-          "label": "Supporting documents attached to this response"
-        },
-        "coord_notes": {
-          "label": "Notes by the community coordinator (for interviewer-administered responses)"
-        }
-      }
-    },
-    "a1": {
-      "title": "Milestone Verification Checklist — Municipal Partnership Mechanism Established",
-      "short": "Partnership mechanism",
-      "code": "KHLD-SO1-A1",
-      "indicator": "Municipal partnership mechanisms established",
-      "who": "Municipal community coordinator, countersigned by the Executive Director or the Mayor",
-      "when": "First verification within six months of Plan adoption; reviewed annually thereafter",
-      "calc": "Simple count — one mechanism established. Status = 'Established' only when items 4, 7, 10 and 11 are all recorded 'In place'; otherwise 'Partly established' or 'Not established'.",
-      "disaggregation": "Not applicable (institutional indicator)",
-      "definition": "A functioning coordination arrangement including a designated municipal focal point, stakeholder list, partner communication arrangements, and contribution tracking.",
-      "measures": "Whether each of the four constituent components of the mechanism exists in documented form and is in use, plus the supporting steps set out in the Action Plan (requirements list, introductory meetings, periodic updates, Council endorsement).",
-      "unit": "one verification exercise (within six months of Plan adoption, then reviewed annually)",
-      "source": "Municipal records: appointment decision, stakeholder map, requirements list, contribution register, meeting minutes, Council decisions",
-      "evidence": "Copies of the appointment decision and terms of reference; stakeholder map file; rehabilitation requirements list; contribution register extract; minutes of introductory meetings; Council decision; signed checklist",
-      "sections": {
-        "s0": "Section A — Verification details",
-        "s1": "Section B — Core components of the mechanism (all four required)",
-        "s2": "Section C — Supporting steps set out in the Action Plan",
-        "s3": "Section D — Overall status and follow-up"
-      },
-      "fields": {
-        "verif_date": {
-          "label": "Date of verification",
-          "sub": "dd/mm/yyyy"
-        },
-        "verif_round": {
-          "label": "Which verification is this?"
-        },
-        "verif_by": {
-          "label": "Verified by (name and position)"
-        },
-        "period_covered": {
-          "label": "Reporting period covered",
-          "parts": {
-            "period_covered_from": "From",
-            "period_covered_to": "to"
+        "F177": {
+          "label": "Coordination and communication with the Municipality improved during implementation of the Action Plan",
+          "opts": {
+            "1": "1 Strongly disagree",
+            "2": "2 Disagree",
+            "3": "3 Neutral",
+            "4": "4 Agree",
+            "5": "5 Strongly agree"
           }
         },
-        "coordinator_assigned": {
-          "label": "Has a community coordinator / municipal liaison officer been designated in writing?",
-          "help": "Record decision number and date in the notes. Required for 'Established'."
-        },
-        "coordinator_ref": {
-          "label": "Decision number, date, and name of the designated officer",
-          "parts": {
-            "coordinator_decision_no": "Decision number",
-            "coordinator_decision_date": "date",
-            "coordinator_officer_name": "name of the designated officer"
+        "F178": {
+          "label": "Your organisation was involved in joint planning of park activities",
+          "opts": {
+            "1": "1 Strongly disagree",
+            "2": "2 Disagree",
+            "3": "3 Neutral",
+            "4": "4 Agree",
+            "5": "5 Strongly agree"
           }
         },
-        "coordinator_tor": {
-          "label": "Does a written task description / terms of reference for the coordinator exist?"
-        },
-        "stakeholder_map": {
-          "label": "Has a stakeholder map / list been prepared covering local associations, youth initiatives, educational institutions, local businesses, government entities and donors?",
-          "help": "Required for 'Established'."
-        },
-        "stakeholder_count": {
-          "label": "Number of stakeholders listed, by type"
-        },
-        "stakeholder_updated": {
-          "label": "Date the stakeholder list was last updated",
-          "sub": "dd/mm/yyyy"
-        },
-        "comms_arrangements": {
-          "label": "Are partner communication arrangements defined (contact list, who convenes, meeting cycle, channel used)?",
-          "help": "Required for 'Established'."
-        },
-        "contribution_tracking": {
-          "label": "Is a contribution tracking system in place (register of in-kind, technical, financial and volunteer contributions)?",
-          "help": "Required for 'Established'. See form KHLD-SO1-A3."
-        },
-        "tracking_format": {
-          "label": "Format of the contribution register"
-        },
-        "requirements_list": {
-          "label": "Has a list of requirements for park rehabilitation and operation been prepared (structural maintenance, landscaping, lighting, seating, playground equipment, market logistics)?",
-          "help": "This list is the reference for form KHLD-SO2-C1."
-        },
-        "intro_meetings": {
-          "label": "Number of introductory meetings held with potential partners during the period",
-          "sub": "Number"
-        },
-        "partnerships_concluded": {
-          "label": "Number of documented partnerships or cooperation arrangements concluded, by partner type"
-        },
-        "zaha_coordination": {
-          "label": "Has coordination with the Zaha Cultural Centre or a similar specialised entity produced a programming calendar?"
-        },
-        "periodic_updates": {
-          "label": "Are concise periodic updates on support received, resource allocation and milestones produced and shared with partners?"
-        },
-        "council_decision": {
-          "label": "Has the Municipal Council issued a decision adopting the partnership mechanism?"
-        },
-        "overall_status": {
-          "label": "Overall milestone status",
-          "help": "Derived from the core components; do not override without a written justification.",
-          "sub": "Established (items 4, 7, 10 and 11 all in place) | Partly established | Not established"
-        },
-        "evidence_attached": {
-          "label": "Evidence attached to this verification"
-        },
-        "gaps": {
-          "label": "Gaps identified and follow-up actions agreed (what, who, by when)"
-        },
-        "countersign": {
-          "label": "Countersigned by (Executive Director / Mayor) — name, signature, date",
-          "parts": {
-            "countersign_name": "name",
-            "countersign_date": "date"
-          }
-        }
-      }
-    },
-    "a2": {
-      "title": "Partner Coordination Meeting Record",
-      "short": "Coordination meetings",
-      "code": "KHLD-SO1-A2",
-      "indicator": "Number of coordination meetings held with partners",
-      "who": "Municipal community coordinator / liaison officer (rapporteur of the meeting)",
-      "when": "Completed after every meeting, throughout the implementation period",
-      "calc": "Cumulative count of documented meetings. Target ≥ 4 per year (≥ 12 over the Plan period). Count only meetings where Q18 = 'Yes, prepared and filed'.",
-      "disaggregation": "By partner type (association / cultural / private sector / educational / government / donor)",
-      "definition": "Meetings conducted with community organisations, cultural institutions, schools, businesses and other relevant partners, documented through minutes or attendance records.",
-      "measures": "Each countable meeting and its documentation quality: who convened it, which partner types attended, what was decided, what was assigned, and whether minutes and an attendance sheet exist. A meeting without minutes or an attendance sheet is not counted.",
-      "unit": "one meeting",
-      "source": "Meeting minutes and signed attendance sheets held by the community coordinator",
-      "evidence": "Signed minutes; signed attendance sheet with organisation names; agenda; photographs where appropriate; follow-up action table",
-      "sections": {
-        "s0": "Section A — Meeting identification",
-        "s1": "Section B — Participation",
-        "s2": "Section C — Outcomes of the meeting",
-        "s3": "Section D — Documentation and next steps"
-      },
-      "fields": {
-        "meeting_id": {
-          "label": "Meeting reference number",
-          "sub": "Format: KHLD-CM-YYYY-NN"
-        },
-        "meeting_date": {
-          "label": "Date of meeting",
-          "sub": "dd/mm/yyyy"
-        },
-        "meeting_time": {
-          "label": "Start and end time",
-          "parts": {
-            "meeting_time_from": "From",
-            "meeting_time_to": "to"
-          }
-        },
-        "venue": {
-          "label": "Venue"
-        },
-        "meeting_type": {
-          "label": "Type of meeting"
-        },
-        "convened_by": {
-          "label": "Convened by"
-        },
-        "chaired_by": {
-          "label": "Chaired by (name and position)"
-        },
-        "pillars_discussed": {
-          "label": "Which Action Plan objectives were on the agenda?"
-        },
-        "agenda": {
-          "label": "Main agenda items"
-        },
-        "orgs_invited": {
-          "label": "Number of organisations invited",
-          "sub": "Number"
-        },
-        "orgs_present": {
-          "label": "Number of organisations represented at the meeting",
-          "help": "A meeting attended by the Municipality alone is not counted as a coordination meeting.",
-          "sub": "Number"
-        },
-        "orgs_by_type": {
-          "label": "Number of organisations present, by partner type",
-          "help": "Required disaggregation for this indicator."
-        },
-        "attendees_total": {
-          "label": "Total number of attendees",
-          "sub": "Number"
-        },
-        "attendees_breakdown": {
-          "label": "Of the attendees, how many were women, Syrian refugees, persons with disabilities, and youth (15–24)?"
-        },
-        "new_partners": {
-          "label": "Were any organisations attending for the first time?",
-          "help": "New partners must be added to the stakeholder map."
-        },
-        "decisions": {
-          "label": "Key decisions taken"
-        },
-        "actions_assigned": {
-          "label": "Responsibilities assigned — repeat for each action: what / who / by when",
-          "sub": "Action Responsible Deadline (repeat up to 6)"
-        },
-        "prev_followup": {
-          "label": "Status of actions agreed at the previous meeting"
-        },
-        "contributions_pledged": {
-          "label": "Were any contributions pledged or confirmed at this meeting?",
-          "help": "Link the contribution reference numbers in the notes column."
-        },
-        "issues_raised": {
-          "label": "Challenges or risks raised by partners, and how they were addressed",
-          "help": "Feeds the risk management matrix review."
-        },
-        "minutes_prepared": {
-          "label": "Have minutes been prepared, signed and filed?",
-          "help": "Counting condition — only 'Yes, prepared and filed' counts towards the indicator."
-        },
-        "attendance_sheet": {
-          "label": "Is a signed attendance sheet attached, showing name, organisation and position?",
+        "F179": {
+          "label": "Overall, was coordination and collaboration with the Municipality effective in implementing park activities?",
           "opts": {
             "true": "Yes",
             "false": "No"
           }
         },
-        "next_meeting": {
-          "label": "Date agreed for the next meeting",
-          "sub": "dd/mm/yyyy | Not set"
-        },
-        "recorded_by": {
-          "label": "Record completed by (name, position, date)",
-          "parts": {
-            "recorded_by_name": "name",
-            "recorded_by_position": "position",
-            "recorded_on": "date"
-          }
-        },
-        "notes": {
-          "label": "Additional notes"
+        "F180": {
+          "label": "Suggestions to improve coordination"
         }
       }
     },
-    "a3": {
-      "title": "Partner Contribution Record (financial, in-kind, technical and volunteer support)",
+    "form21": {
+      "title": "Partner Contributions Log",
       "short": "Contributions",
-      "code": "KHLD-SO1-A3",
-      "indicator": "Value and type of contributions mobilised from partners",
-      "who": "Municipal community coordinator, with the Directorate of Financial Affairs for received goods and cash",
-      "when": "Completed at the time of each pledge or receipt; reviewed and totalled annually",
-      "calc": "Simple record of contributions received. Report the annual total value in JOD by contribution type and by source type. Count only records with status 'Received' or 'Partly received' in the value total; report pledges separately.",
-      "disaggregation": "Type of contribution; source (partner type)",
-      "definition": "Financial, in-kind, technical or volunteer contributions supporting park rehabilitation and activities.",
-      "measures": "Each contribution separately: who gave it, what exactly was given, its estimated value and how that value was derived, which Plan activity and which item on the rehabilitation requirements list it covers, and whether it was formally received and acknowledged.",
-      "unit": "one contribution from one contributor",
-      "source": "Contribution register maintained by the Municipality; receipts, delivery notes, letters, MoUs and volunteer attendance sheets",
-      "evidence": "Delivery note or receipt; photographs of delivered items; contributor letter or MoU; volunteer attendance sheet for labour contributions; municipal acceptance decision",
-      "sections": {
-        "s0": "Section A — Record identification",
-        "s1": "Section B — Contributor",
-        "s2": "Section C — What was contributed",
-        "s3": "Section D — Allocation and acceptance"
-      },
       "fields": {
-        "contribution_id": {
-          "label": "Contribution reference number",
-          "sub": "Format: KHLD-CON-YYYY-NN"
+        "F181": {
+          "label": "Contributing partner",
+          "extra": "Other"
         },
-        "date_pledged": {
-          "label": "Date pledged",
-          "sub": "dd/mm/yyyy"
+        "F182": {
+          "label": "Contributor name (if not in list)"
         },
-        "date_received": {
-          "label": "Date received",
-          "sub": "dd/mm/yyyy"
+        "F183": {
+          "label": "Date received"
         },
-        "status": {
-          "label": "Status of the contribution",
-          "help": "Only 'Received' and 'Partly received' enter the value total."
+        "F184": {
+          "label": "Contribution type"
         },
-        "source_meeting": {
-          "label": "Was the contribution agreed at a coordination meeting?"
+        "F185": {
+          "label": "Description of contribution"
         },
-        "contributor_name": {
-          "label": "Name of contributor (organisation, business or individual)"
+        "F186": {
+          "label": "Estimated value (JOD)"
         },
-        "contributor_type": {
-          "label": "Contributor type",
-          "help": "Required disaggregation."
+        "F187": {
+          "label": "Activity supported"
         },
-        "contributor_contact": {
-          "label": "Contact person, phone and email"
-        },
-        "csr_linked": {
-          "label": "Is the contribution part of a corporate social responsibility programme?"
-        },
-        "first_contribution": {
-          "label": "Is this the contributor's first contribution under the Action Plan?",
-          "help": "Allows reporting of the number of distinct contributing partners."
-        },
-        "contribution_type": {
-          "label": "Type of contribution",
-          "help": "Required disaggregation. Use one record per type."
-        },
-        "description": {
-          "label": "Detailed description of the items or services contributed"
-        },
-        "quantity": {
-          "label": "Quantity and unit",
-          "parts": {
-            "quantity": "Quantity",
-            "quantity_unit": "Unit (e.g. benches, m², litres, days)"
-          }
-        },
-        "value_jod": {
-          "label": "Estimated value in Jordanian Dinars",
-          "help": "Enter 0 only if no reasonable estimate is possible, and explain in the notes.",
-          "sub": "JOD"
-        },
-        "valuation_basis": {
-          "label": "Basis used to value the contribution"
-        },
-        "volunteer_labour": {
-          "label": "For volunteer labour contributions: number of volunteers and total person-hours",
-          "help": "Cross-check with the volunteer action day record (KHLD-SO3-F3).",
-          "parts": {
-            "volunteer_labour_volunteers": "Volunteers",
-            "volunteer_labour_person_hours": "Person-hours"
-          }
-        },
-        "supports_objective": {
-          "label": "Which Action Plan objective and activity does this contribution support?"
-        },
-        "requirement_item": {
-          "label": "Which item on the park rehabilitation requirements list does it cover?",
-          "help": "Links this record to form KHLD-SO2-C1.",
-          "sub": "Item reference and description | Not linked to the requirements list"
-        },
-        "municipal_acceptance": {
-          "label": "Has the Municipality formally accepted the contribution?"
-        },
-        "conditions": {
-          "label": "Were any conditions attached by the contributor?",
-          "help": "Flag any condition implying commercial or exclusive use of the park; the Plan prohibits this."
-        },
-        "acknowledged": {
-          "label": "Has the contribution been acknowledged to the contributor and recorded in a periodic update to partners?"
-        },
-        "evidence_attached": {
-          "label": "Evidence attached to this record"
-        },
-        "recorded_by": {
-          "label": "Entered in the contribution register by (name, position, date)",
-          "parts": {
-            "recorded_by_name": "name",
-            "recorded_by_position": "position",
-            "recorded_on": "date"
-          }
-        },
-        "notes": {
-          "label": "Notes"
+        "F188": {
+          "label": "Supporting document"
         }
       }
     },
-    "b1": {
-      "title": "Milestone Verification Checklist — Park Use and Activity Arrangements Established",
-      "short": "Park arrangements",
-      "code": "KHLD-SO1-B1",
-      "indicator": "Park use and activity arrangements established",
-      "who": "Municipal community coordinator, countersigned by the Executive Director",
-      "when": "First verification within the first year of implementation; reviewed annually",
-      "calc": "Simple count — one operational arrangement established and updated as needed. Status = 'Established' when items 3, 4, 6, 7 and 8 are all 'In place'.",
-      "disaggregation": "Not applicable (institutional indicator)",
-      "definition": "Basic arrangements developed for park use, including activity scheduling, use of spaces, coordination procedures, and communication with partners.",
-      "measures": "Whether the operational protocol foreseen by the Plan exists and is applied: a written arrangement approved by the Municipality, a published activity calendar, a request procedure for community organisations, defined spaces and permitted uses, the non-commercial rule, equitable access and accessibility provisions, maintenance and supervision responsibilities, and a feedback channel.",
-      "unit": "one verification exercise (within the first year, then reviewed annually)",
-      "source": "Municipal records and the activity calendar; approved operational protocol; Council decisions",
-      "evidence": "Approved operational protocol and its Council decision; activity calendar; blank request form; site layout plan; copies of public notices; feedback log; signed checklist",
-      "sections": {
-        "s0": "Section A — Verification details",
-        "s1": "Section B — The written arrangement",
-        "s2": "Section C — Scheduling, access and responsibilities",
-        "s3": "Section D — Communication, status and follow-up"
-      },
+    "form22": {
+      "title": "Milestones Register",
+      "short": "Milestones",
       "fields": {
-        "verif_date": {
-          "label": "Date of verification",
-          "sub": "dd/mm/yyyy"
+        "F189": {
+          "label": "Milestone"
         },
-        "verif_by": {
-          "label": "Verified by (name and position)"
+        "F190": {
+          "label": "Components in place (Partnership mechanism)"
         },
-        "protocol_exists": {
-          "label": "Does a written arrangement / operational protocol for the use of the park exist?",
-          "help": "Required for 'Established'. Record the decision number and date."
+        "F191": {
+          "label": "Components in place (Park arrangements)"
         },
-        "protocol_ref": {
-          "label": "Approval reference (Council or executive decision number and date)"
+        "F192": {
+          "label": "Components in place (Committee)"
         },
-        "spaces_defined": {
-          "label": "Does the arrangement define the designated spaces and their permitted uses (children's play area, family seating, temporary kiosks, community market area, sports field)?",
-          "help": "Required for 'Established'."
+        "F193": {
+          "label": "Components in place (Volunteer programme)"
         },
-        "layout_plan": {
-          "label": "Is a simple site layout plan for the rehabilitated section available?"
+        "F194": {
+          "label": "Status"
         },
-        "noncommercial_rule": {
-          "label": "Does the arrangement state in writing that the park is a public, non-commercial space and prohibit private revenue generation and appropriation?",
-          "help": "Required for 'Established' — this is the mitigation measure for a high-impact risk in the Plan's risk matrix."
+        "F195": {
+          "label": "Date established / updated"
         },
-        "activity_calendar": {
-          "label": "Is an activity calendar prepared and published?",
-          "help": "Required for 'Established'."
-        },
-        "calendar_horizon": {
-          "label": "Period covered by the current calendar"
-        },
-        "request_procedure": {
-          "label": "Is there a defined procedure for a community organisation to request use of the space?",
-          "help": "Required for 'Established'. Attach the blank request form."
-        },
-        "requests_received": {
-          "label": "Number of use requests received and approved during the period",
-          "parts": {
-            "requests_received": "Received",
-            "requests_approved": "Approved",
-            "requests_declined": "Declined"
-          }
-        },
-        "equitable_access": {
-          "label": "Does the arrangement state that activities are open to both the host and Syrian refugee communities, to women and to persons with disabilities, without discrimination?"
-        },
-        "accessibility": {
-          "label": "Are accessibility arrangements for persons with disabilities documented (ramps, accessible pathways, accessible toilet, assistance at activities)?"
-        },
-        "maintenance_split": {
-          "label": "Are maintenance responsibilities divided in writing between the Municipality and community organisations or volunteers?"
-        },
-        "supervision": {
-          "label": "Are supervision and safety arrangements for activities defined (who supervises, what happens in case of an incident, arrangements for activities involving children)?"
-        },
-        "feedback_channel": {
-          "label": "Is a channel defined for residents to give feedback or raise a complaint about the park and its activities?",
-          "help": "Feeds the community feedback and accountability level in Annex 2 of the Plan."
-        },
-        "communicated": {
-          "label": "How have the arrangements been communicated to residents and partners?"
-        },
-        "last_updated": {
-          "label": "Date the arrangements were last reviewed or updated",
-          "sub": "dd/mm/yyyy | Not yet updated"
-        },
-        "overall_status": {
-          "label": "Overall milestone status",
-          "sub": "Established (items 3, 4, 6, 7 and 8 all in place) | Partly established | Not established"
-        },
-        "evidence_attached": {
-          "label": "Evidence attached"
-        },
-        "gaps": {
-          "label": "Gaps identified and follow-up actions agreed (what, who, by when)"
-        },
-        "countersign": {
-          "label": "Countersigned by (Executive Director / Mayor) — name, signature, date",
-          "parts": {
-            "countersign_name": "name",
-            "countersign_date": "date"
-          }
+        "F196": {
+          "label": "Evidence document"
         }
       }
     },
-    "so20": {
-      "title": "Park User Satisfaction and Activity Feedback Form (short exit form)",
-      "short": "User satisfaction",
-      "code": "KHLD-SO2-0",
-      "indicator": "% of surveyed park users satisfied with the park as a safe and welcoming shared community space",
-      "who": "Activity organiser or a volunteer assigned to feedback collection, supervised by the community coordinator",
-      "when": "At each activity on a sample of participants; aggregated and reported annually",
-      "calc": "(No. of respondents selecting 'Very satisfied' or 'Satisfied' on Q9 ÷ total respondents surveyed) × 100. Target ≥ 60%. Q10–Q13 reported as the supporting dimension scores.",
-      "disaggregation": "Sex; age group; nationality / status; disability",
-      "definition": "Participants providing positive feedback on the suitability of activities and on the park as a shared community space.",
-      "measures": "Satisfaction with the park as a shared space, broken into the dimensions that make it one: sense of safety, feeling welcome regardless of origin, suitability for women and children, condition of the facilities including accessibility, and suitability of the activity attended.",
-      "unit": "one participant at one activity or visit",
-      "source": "Short feedback forms or verbal feedback records collected at activities",
-      "evidence": "Completed feedback forms or the verbal feedback log; the activity record they relate to; the aggregation sheet used for annual reporting",
-      "sections": {
-        "s0": "Section A — Activity and respondent",
-        "s1": "Section B — Satisfaction with the park as a shared space (core of the indicator)",
-        "s2": "Section C — Condition of the space and of the activity",
-        "s3": "Section D — Open feedback"
-      },
+    "form06": {
+      "title": "Checklist",
+      "short": "Rehabilitation progress",
       "fields": {
-        "event_id": {
-          "label": "Activity reference number and name",
-          "help": "Must match the activity record (KHLD-SO2-D1).",
-          "sub": "Reference Name"
+        "F020": {
+          "label": "Percentage of Park Rehabilitation Completion"
         },
-        "feedback_date": {
-          "label": "Date",
-          "sub": "dd/mm/yyyy"
+        "F021": {
+          "label": "Report Date"
         },
-        "collection_mode": {
-          "label": "How was this feedback collected?"
+        "F022": {
+          "label": "Please list what has been accomplished so far"
         },
-        "sex": {
-          "label": "Sex"
+        "F121": {
+          "label": "Total number of agreed priority improvements"
         },
-        "age_group": {
-          "label": "Age group",
-          "help": "For children under 12, the accompanying adult answers."
+        "F122": {
+          "label": "Number of priority improvements completed to date"
         },
-        "nationality": {
-          "label": "Nationality / status"
+        "F123": {
+          "label": "Facility types completed"
         },
-        "disability": {
-          "label": "Do you have difficulty doing any of the following: seeing, hearing, walking or climbing steps, remembering or concentrating, self-care, communicating?"
-        },
-        "first_visit": {
-          "label": "Is this your first time attending an activity in Al Khalidiyah Public Park?",
-          "opts": {
-            "true": "Yes",
-            "false": "No"
-          }
-        },
-        "overall_satisfaction": {
-          "label": "Overall, how satisfied are you with Al Khalidiyah Public Park as a place for community activities?",
-          "help": "INDICATOR QUESTION — 'Very satisfied' + 'Satisfied' form the numerator."
-        },
-        "feel_safe": {
-          "label": "Do you feel safe in the park during activities?"
-        },
-        "feel_welcome": {
-          "label": "Is the park welcoming to you and your family regardless of where you are from?",
-          "help": "Key shared-space dimension; report by nationality."
-        },
-        "suitable_women_children": {
-          "label": "Is the park a suitable place for women and children to spend time?"
-        },
-        "participate_freely": {
-          "label": "Did you feel able to take part freely alongside other members of the community?"
-        },
-        "rate_facilities": {
-          "label": "How would you rate each of the following in the park?",
-          "help": "Poor or 'not available' answers feed the rehabilitation priority list (KHLD-SO2-C1)."
-        },
-        "activity_suitable": {
-          "label": "Was the activity suitable for your needs and those of your children?"
-        },
-        "timing_convenient": {
-          "label": "Was the timing of the activity convenient for you?",
-          "help": "Timing feedback is the main mitigation for low participation by women and mothers."
-        },
-        "how_heard": {
-          "label": "How did you hear about this activity?"
-        },
-        "liked_most": {
-          "label": "What did you like most about the park or the activity?"
-        },
-        "improve_most": {
-          "label": "What should be improved first?"
-        },
-        "would_return": {
-          "label": "Would you come again and encourage others to come?"
-        },
-        "collected_by": {
-          "label": "Collected by (name) and notes"
+        "F124": {
+          "label": "Site inspection photos / completion record"
         }
       }
     },
-    "c1": {
-      "title": "Park Rehabilitation Works Completion Record",
-      "short": "Works completion",
-      "code": "KHLD-SO2-C1",
-      "indicator": "Priority park improvements completed",
-      "who": "Engineering Services Department with the community coordinator; volunteer-delivered items verified by the municipal supervisor",
-      "when": "Completed for each item during the rehabilitation phase (first six months: June–November 2026), and for any later improvement",
-      "calc": "Simple count against the agreed rehabilitation list: number of items with status 'Completed' ÷ number of items on the priority list. Report the count of completed items by facility type.",
-      "disaggregation": "Facility type",
-      "definition": "Rehabilitation or improvement works completed in the designated park section, including seating, play areas, landscaping, sports facilities, lighting, accessibility features and other agreed improvements.",
-      "measures": "Completion of each item on the agreed rehabilitation priority list: what was done, where, quantity, how it was delivered and resourced, whether it meets accessibility requirements, whether it passed a safety check, and whether it was handed over for public use.",
-      "unit": "one improvement item on the agreed rehabilitation list",
-      "source": "Site inspection and completion records; the rehabilitation requirements list prepared under KHLD-SO1-A1",
-      "evidence": "Before and after photographs; completion note or engineer's report; delivery notes for materials; safety inspection note; handover record",
-      "sections": {
-        "s0": "Section A — Item identification",
-        "s1": "Section B — Execution",
-        "s2": "Section C — Quality, safety and accessibility",
-        "s3": "Section D — Verification"
-      },
-      "fields": {
-        "item_id": {
-          "label": "Item reference number",
-          "sub": "Format: KHLD-REH-NN"
-        },
-        "report_date": {
-          "label": "Date of this record",
-          "sub": "dd/mm/yyyy"
-        },
-        "facility_type": {
-          "label": "Type of improvement or facility",
-          "help": "Required disaggregation."
-        },
-        "description": {
-          "label": "Description of the work and its exact location within the park"
-        },
-        "on_priority_list": {
-          "label": "Is this item on the agreed rehabilitation priority list?",
-          "help": "The denominator of this indicator is the priority list; additions must be justified.",
-          "parts": {
-            "on_priority_list_id": "Yes — priority rank / No — added later",
-            "priority_rank": "priority rank",
-            "addition_justification": "justification"
-          }
-        },
-        "identified_how": {
-          "label": "How was the need identified?"
-        },
-        "status": {
-          "label": "Status of the item",
-          "help": "Only 'Completed' counts towards the indicator."
-        },
-        "dates": {
-          "label": "Planned start, actual start and completion dates",
-          "parts": {
-            "planned_start": "Planned start",
-            "actual_start": "Actual start",
-            "completed_on": "Completed"
-          }
-        },
-        "quantity": {
-          "label": "Quantity delivered and unit",
-          "parts": {
-            "quantity": "Quantity",
-            "quantity_unit": "Unit (e.g. 10 benches, 200 m² planted, 6 lamp posts)"
-          }
-        },
-        "modality": {
-          "label": "How was the work delivered?"
-        },
-        "resource_source": {
-          "label": "Source of the resources used",
-          "help": "Cross-reference the contribution record (KHLD-SO1-A3)."
-        },
-        "cost_jod": {
-          "label": "Cost or estimated value of the item in Jordanian Dinars",
-          "sub": "JOD"
-        },
-        "accessibility_met": {
-          "label": "Does the completed item meet accessibility requirements for persons with disabilities?",
-          "help": "The Plan requires particular focus on disability-inclusive infrastructure."
-        },
-        "safety_check": {
-          "label": "Has a safety inspection been carried out on the completed item?",
-          "help": "Play equipment and the sports field must always be inspected before handover."
-        },
-        "safety_by": {
-          "label": "Safety inspection carried out by (name, position) and date",
-          "parts": {
-            "safety_by_name": "name, position",
-            "safety_on": "date"
-          }
-        },
-        "handover": {
-          "label": "Has the item been handed over for public use?"
-        },
-        "maintenance_owner": {
-          "label": "Who is responsible for maintaining this item?"
-        },
-        "remarks": {
-          "label": "Remarks, defects and outstanding works"
-        },
-        "evidence_attached": {
-          "label": "Evidence attached to this record",
-          "help": "Before-and-after photographs are mandatory for every completed item."
-        },
-        "verified_by": {
-          "label": "Verified by (name, position, date and signature)",
-          "parts": {
-            "verified_by_name": "name, position",
-            "verified_on": "date"
-          }
-        }
-      }
-    },
-    "c2": {
-      "title": "Volunteer Rehabilitation Campaign Record",
+    "form07": {
+      "title": "Volunteer Campaigns",
       "short": "Volunteer campaigns",
-      "code": "KHLD-SO2-C2",
-      "indicator": "Volunteer rehabilitation activities conducted",
-      "who": "Campaign organiser (municipality, association, school or youth initiative) with the municipal supervisor",
-      "when": "Completed after each campaign, throughout implementation",
-      "calc": "Number of campaigns conducted. Target at least 4 campaigns annually during active implementation. Count only campaigns with a signed attendance sheet.",
-      "disaggregation": "Type of activity",
-      "definition": "Volunteer campaigns supporting cleaning, planting, minor improvements and preparation of the park for community use.",
-      "measures": "Each campaign as a countable event, together with what it physically achieved, who took part, the volume of volunteer effort, the in-kind materials used, and whether safety arrangements and municipal supervision were in place.",
-      "unit": "one volunteer campaign",
-      "source": "Activity reports and signed attendance sheets",
-      "evidence": "Signed volunteer attendance sheet; before and after photographs; short campaign report; delivery notes for materials and tools",
-      "sections": {
-        "s0": "Section A — Campaign identification",
-        "s1": "Section B — Organisers and volunteers",
-        "s2": "Section C — Resources, safety and results",
-        "s3": "Section D — Documentation and follow-up"
-      },
       "fields": {
-        "campaign_id": {
-          "label": "Campaign reference number",
-          "sub": "Format: KHLD-VC-YYYY-NN"
+        "F023": {
+          "label": "Campaign Name"
         },
-        "campaign_date": {
-          "label": "Date",
-          "sub": "dd/mm/yyyy"
+        "F024": {
+          "label": "Start Date"
         },
-        "campaign_time": {
-          "label": "Start and end time",
-          "parts": {
-            "campaign_time_from": "From",
-            "campaign_time_to": "to"
+        "F025": {
+          "label": "End Date"
+        },
+        "F026": {
+          "label": "Start of receiving applications"
+        },
+        "F027": {
+          "label": "End of Receiving Applications"
+        },
+        "F028": {
+          "label": "Campaign Description"
+        },
+        "F029": {
+          "label": "Is there official sponsorship of the campaign by any entity?",
+          "opts": {
+            "true": "Yes",
+            "false": "No"
           }
         },
-        "is_first_campaign": {
-          "label": "Is this the first volunteer campaign for the designated park section?"
+        "F030": {
+          "label": "Please mention the name of the sponsor"
         },
-        "focus": {
-          "label": "Focus of the campaign",
-          "help": "Required disaggregation."
+        "F125": {
+          "label": "Campaign activity type"
         },
-        "area_covered": {
-          "label": "Section of the park covered and approximate area",
-          "parts": {
-            "area_section": "Section",
-            "area_m2": "Approximate area (m²)"
-          }
+        "F126": {
+          "label": "Campaign status"
         },
-        "linked_item": {
-          "label": "Does the campaign deliver an item on the rehabilitation list?",
-          "help": "Links to form KHLD-SO2-C1.",
-          "parts": {
-            "linked_item_id": "Yes — item reference / No — general upkeep",
-            "works_item_id": "Item reference"
-          }
+        "F127": {
+          "label": "Number of actual volunteer action days"
         },
-        "lead_organiser": {
-          "label": "Lead organiser"
-        },
-        "partners_involved": {
-          "label": "Other partners taking part"
-        },
-        "volunteers_total": {
-          "label": "Total number of volunteers present",
-          "help": "Must equal the number of signatures on the attendance sheet.",
-          "sub": "Number"
-        },
-        "_participants": {
-          "label": "Volunteers present (from the attendance sheet)"
-        },
-        "volunteers_breakdown": {
-          "label": "Volunteers by sex, age, nationality and disability",
-          "help": "Feeds the volunteer indicators KHLD-SO3-0 and KHLD-SO3-F2."
-        },
-        "new_volunteers": {
-          "label": "How many of them were registering as volunteers for the first time?",
-          "help": "Register each one on form KHLD-SO3-F2.",
-          "sub": "Number"
-        },
-        "person_hours": {
-          "label": "Total volunteer person-hours (volunteers × hours worked)",
-          "sub": "Person-hours"
-        },
-        "school_linked": {
-          "label": "Was the campaign linked to a school or university community service programme?"
-        },
-        "materials": {
-          "label": "Materials and tools used, and who provided them",
-          "sub": "Item / quantity / provider (repeat as needed)"
-        },
-        "inkind_value": {
-          "label": "Estimated value of in-kind materials and services used (JOD)",
-          "help": "Record separately on form KHLD-SO1-A3 where a partner provided it.",
-          "sub": "JOD"
-        },
-        "outputs": {
-          "label": "What was physically achieved? Give quantities",
-          "help": "Quantified outputs are what distinguish a campaign from an attendance event.",
-          "sub": "For example: m² cleaned trees or shrubs planted benches painted bags of waste removed play items repaired"
-        },
-        "safety_briefing": {
-          "label": "Was a safety briefing given and protective equipment (gloves, vests) provided?",
-          "help": "Mandatory where volunteers under 18 take part."
-        },
-        "incident": {
-          "label": "Did any injury or incident occur?"
-        },
-        "municipal_supervision": {
-          "label": "Was a municipal supervisor present throughout?"
-        },
-        "evidence_attached": {
-          "label": "Evidence attached",
-          "help": "A signed attendance sheet is the counting condition for this indicator."
-        },
-        "recognition": {
-          "label": "Was any recognition given to volunteers (certificates, symbolic incentive)?"
-        },
-        "remaining_work": {
-          "label": "Work remaining in this section and what is needed to complete it"
-        },
-        "recorded_by": {
-          "label": "Record completed by (name, position, date)",
-          "parts": {
-            "recorded_by_name": "name",
-            "recorded_by_position": "position",
-            "recorded_on": "date"
-          }
+        "F128": {
+          "label": "Campaign report / attendance sheet"
         }
       }
     },
-    "d1": {
-      "title": "Community Activity and Event Record (cultural, recreational, educational, sports)",
-      "short": "Activities and events",
-      "code": "KHLD-SO2-D1",
-      "indicator": "Number of community activities organised in the park",
-      "who": "Activity organiser, verified by the municipal community coordinator",
-      "when": "Completed after each activity, from December 2026 (after rehabilitation) to September 2029",
-      "calc": "Cumulative count of events held. Target ≥ 12 during the Plan period (≥ 4 annually from December 2026). Count only events with an activity report and either an attendance sheet or a documented count.",
-      "disaggregation": "Activity type",
-      "definition": "Cultural, recreational, educational, sports and community events organised in cooperation with partners.",
-      "measures": "Each activity as a countable event, with the information needed to show it was organised rather than incidental: its type, who delivered the content, the target group, whether it was announced, which inclusion measures were applied, and its documentation.",
-      "unit": "one activity or event",
-      "source": "Event reports and activity calendar records",
-      "evidence": "Activity report; attendance sheet or count sheet; photographs; copy of the public announcement; participant feedback forms; partner's content outline",
-      "sections": {
-        "s0": "Section A — Activity identification",
-        "s1": "Section B — Organisers and content",
-        "s2": "Section C — Reach, inclusion and resources",
-        "s3": "Section D — Feedback, issues and documentation"
-      },
+    "form08": {
+      "title": "Community Activities",
+      "short": "Community activities",
       "fields": {
-        "event_id": {
-          "label": "Activity reference number",
-          "sub": "Format: KHLD-EV-YYYY-NN"
+        "F031": {
+          "label": "Start Date"
         },
-        "event_title": {
-          "label": "Title of the activity"
+        "F032": {
+          "label": "End Date"
         },
-        "event_date": {
-          "label": "Date or dates",
-          "sub": "dd/mm/yyyy"
+        "F033": {
+          "label": "Activity Description"
         },
-        "event_time": {
-          "label": "Start and end time",
-          "parts": {
-            "event_time_from": "From",
-            "event_time_to": "to"
-          }
+        "F034": {
+          "label": "Type of Activity"
         },
-        "location": {
-          "label": "Location within the park"
+        "F035": {
+          "label": "Main Target Audience"
         },
-        "activity_type": {
-          "label": "Type of activity",
-          "help": "Required disaggregation. A market day is counted here and on form 21 without double-counting the indicators."
+        "F036": {
+          "label": "Organizer"
         },
-        "calendar_status": {
-          "label": "Was the activity part of the published activity calendar?"
+        "F129": {
+          "label": "Activity name"
         },
-        "frequency_type": {
-          "label": "Is this a monthly, seasonal or one-off activity?"
+        "F130": {
+          "label": "Activity status"
         },
-        "organiser": {
-          "label": "Organised by"
-        },
-        "content_provider": {
-          "label": "Who delivered the activity content?",
-          "help": "The Plan foresees structured programming delivered with specialised entities."
-        },
-        "partner_count": {
-          "label": "Number of partner organisations involved in delivery",
-          "sub": "Number"
-        },
-        "content_summary": {
-          "label": "Brief description of the programme delivered"
-        },
-        "target_group": {
-          "label": "Primary target group"
-        },
-        "participants_planned": {
-          "label": "Planned number of participants",
-          "sub": "Number"
-        },
-        "participants_actual": {
-          "label": "Actual number of participants",
-          "help": "Complete the full breakdown on form KHLD-SO2-D2.",
-          "sub": "Number"
-        },
-        "announcement": {
-          "label": "How was the activity announced, and how many days in advance?",
-          "help": "Public announcement is the Plan's guarantee of equitable access.",
-          "parts": {
-            "announcement": "Channels",
-            "announcement_days_advance": "Days in advance"
-          }
-        },
-        "inclusion_measures": {
-          "label": "Which inclusion measures were applied?",
-          "help": "Directly supports the mitigation of the 'limited participation by women and children' risk."
-        },
-        "cost_and_inkind": {
-          "label": "Cost of the activity and value of in-kind support received",
-          "parts": {
-            "cash_cost_jod": "Cash cost (JOD)",
-            "inkind_value_jod": "In-kind value (JOD)",
-            "inkind_source": "Source"
-          }
-        },
-        "volunteers_supporting": {
-          "label": "Number of volunteers who supported the activity",
-          "help": "Also record on form KHLD-SO3-F3 if it was run as an action day.",
-          "sub": "Number"
-        },
-        "feedback_collected": {
-          "label": "Was participant feedback collected?",
-          "help": "Feedback feeds indicator KHLD-SO2-0. Form 08 is the instrument."
-        },
-        "issues": {
-          "label": "Problems encountered"
-        },
-        "lessons": {
-          "label": "Lessons learned to apply at the next activity"
-        },
-        "evidence_attached": {
-          "label": "Evidence attached"
-        },
-        "recorded_verified": {
-          "label": "Recorded by and verified by (names, positions, dates)",
-          "parts": {
-            "recorded_by_name": "Recorded by (name, position)",
-            "recorded_on": "date",
-            "verified_by_name": "Verified by (name, position)",
-            "verified_on": "date"
-          }
+        "F131": {
+          "label": "Partner(s) involved"
         }
       }
     },
-    "d2": {
-      "title": "Event Participation Count Sheet (with individual attendance register)",
-      "short": "Attendance counts",
-      "code": "KHLD-SO2-D2",
-      "indicator": "Number of participants attending events and open days (disaggregated by age and sex)",
-      "who": "Two designated counters at the activity (one at the entrance, one roving), supervised by the activity organiser",
-      "when": "At every event, December 2026 – September 2029",
-      "calc": "Total recorded participants, summed across events and reported by sex and age band. Report attendance (total participations) and, where the register allows, the number of distinct individuals reached.",
-      "disaggregation": "Sex; age group; nationality where available; disability",
-      "definition": "Number of residents participating in organised park activities.",
-      "measures": "The number of participants at each event and their composition by sex, age band, nationality and disability, together with the counting method used, so that the figure can be interpreted and audited. Volunteers and staff working at the event are recorded separately from participants.",
-      "unit": "one event (with an individual register annexed)",
-      "source": "Attendance records and estimated counts",
-      "evidence": "Individual attendance register (name, sex, age, nationality, signature or thumbprint); entrance tally sheets; photographs of the gathering; the count reconciliation note",
-      "sections": {
-        "s0": "Section A — Event and counting method",
-        "s1": "Section B — Participant counts (participants only, excluding staff and volunteers on duty)",
-        "s2": "Section C — Register, consent and data quality"
-      },
+    "form09": {
+      "title": "Register your participation in garden activities",
+      "short": "Activity participation",
       "fields": {
-        "event_id": {
-          "label": "Activity reference number (must match form KHLD-SO2-D1)"
+        "F037": {
+          "label": "Report Date"
         },
-        "event_name_date": {
-          "label": "Activity name and date"
+        "F038": {
+          "label": "Activity Name"
         },
-        "count_method": {
-          "label": "Which counting method was used?",
-          "help": "The method determines how the figure may be used; state it in every report."
+        "F039": {
+          "label": "Total number of participants estimated"
         },
-        "estimate_basis": {
-          "label": "If an estimate was used, who made it and on what basis?",
-          "help": "An undocumented estimate cannot be reported as an attendance figure.",
-          "parts": {
-            "estimate_by": "Name and position",
-            "estimate_basis": "Basis (e.g. count of seating areas, photographs, average per station)"
-          }
+        "F040": {
+          "label": "Estimated percentage of children"
         },
-        "counters": {
-          "label": "Names of the persons who carried out the count"
+        "F041": {
+          "label": "Estimated Percentage of Adults"
         },
-        "total_participants": {
-          "label": "Total number of participants",
-          "help": "Must equal the sum of the sex breakdown below.",
-          "sub": "Number"
+        "F042": {
+          "label": "Estimated Percentage of Males"
         },
-        "by_sex": {
-          "label": "Participants by sex",
-          "help": "Mandatory disaggregation in the framework."
+        "F043": {
+          "label": "Estimated Percentage of Females"
         },
-        "by_age_sex": {
-          "label": "Participants by age band and sex",
-          "help": "Mandatory disaggregation in the framework."
+        "F044": {
+          "label": "Percentage of people with disabilities"
         },
-        "by_nationality": {
-          "label": "Participants by nationality or status, where this could be recorded",
-          "help": "Do not ask intrusively at open events; record 'not recorded' rather than guessing."
+        "F045": {
+          "label": "Nationalities of the participants"
         },
-        "pwd_count": {
-          "label": "Number of participants with a disability",
-          "sub": "Number Not recorded"
+        "F046": {
+          "label": "If any content about the activity is shared via social media, please add the content link"
         },
-        "mothers_children": {
-          "label": "Number of mothers attending with children",
-          "help": "The Plan's priority group; useful for reporting even though not a framework disaggregation.",
-          "sub": "Number"
+        "F047": {
+          "label": "Pictures of the activity"
         },
-        "first_time": {
-          "label": "Number of participants attending a park activity for the first time",
-          "sub": "Number Not recorded"
+        "F132": {
+          "label": "Counting method"
         },
-        "staff_volunteers": {
-          "label": "Number of volunteers and staff working at the event (recorded separately, not counted as participants)",
-          "help": "Prevents inflation of the participation figure.",
-          "parts": {
-            "staff_volunteers": "Volunteers",
-            "staff_municipal": "Municipal staff",
-            "staff_partner": "Partner staff"
-          }
+        "F133": {
+          "label": "Estimated percentage of youth (15-24)"
         },
-        "register_attached": {
-          "label": "Is an individual attendance register attached (name, sex, age, nationality, signature)?",
-          "help": "Required for any event where the figure will be used in unique-reach reporting."
+        "F134": {
+          "label": "Estimated percentage of Jordanian participants"
         },
-        "consent_informed": {
-          "label": "Were participants told how their data would be used?",
-          "help": "See the data protection section of the guidance sheet."
+        "F135": {
+          "label": "Estimated percentage of Syrian participants"
         },
-        "photo_consent": {
-          "label": "Was consent obtained for photography, including guardian consent for children?"
+        "F136": {
+          "label": "Observed level of interaction between Jordanian and Syrian participants",
+          "help": "Mixed groups, teams or joint tasks between the two communities"
         },
-        "duplicate_check": {
-          "label": "Has the register been checked against previous events to identify repeat participants?",
-          "parts": {
-            "duplicate_check_id": "Yes / No — not yet done / Not possible with this counting method",
-            "repeat_participants": "number of repeat participants identified"
-          }
-        },
-        "reconciliation": {
-          "label": "Do the entrance tally, the register and the section B totals agree? If not, explain",
-          "sub": "Yes, they agree | No — explanation"
-        },
-        "entered_in_db": {
-          "label": "Entered into the cumulative participation database by (name and date)",
-          "parts": {
-            "entered_by_name": "name",
-            "entered_on": "date"
-          }
-        },
-        "notes": {
-          "label": "Notes"
+        "F137": {
+          "label": "Attendance sheet (if available)"
         }
       }
     },
-    "so30": {
-      "title": "Volunteer Participation Tracking Sheet (one per registered volunteer, cumulative)",
-      "short": "Volunteer tracking",
-      "code": "KHLD-SO3-0",
-      "indicator": "% of volunteers participating in two or more volunteer activities during the implementation period",
-      "who": "Municipal community coordinator, with local associations and youth initiatives that maintain the volunteer database",
-      "when": "Updated after each activity; reviewed and reported annually",
-      "calc": "(No. of volunteers with 2 or more verified participations ÷ total registered volunteers) × 100. Target ≥ 40%. Use Q12 as the numerator test.",
-      "disaggregation": "Sex; age group; nationality; disability",
-      "definition": "Share of registered volunteers who participate in at least two organised volunteer activities during implementation, demonstrating continued community engagement.",
-      "measures": "Retention, not recruitment: how many separate activities each registered volunteer actually attended, verified against attendance sheets, plus whether the volunteer is still active and, if not, why they stopped.",
-      "unit": "one registered volunteer",
-      "source": "Volunteer register and attendance records of campaigns, action days and events",
-      "evidence": "Volunteer register entry (form 16); signed attendance sheets for each participation; annual reconciliation sheet showing the participation count per volunteer",
-      "sections": {
-        "s0": "Section A — Volunteer identification (taken from the registration form)",
-        "s1": "Section B — Participation log (one line per activity attended)",
-        "s2": "Section C — Retention status",
-        "s3": "Section D — Verification"
-      },
+    "form19": {
+      "title": "Park User Feedback Survey",
+      "short": "Park user survey",
       "fields": {
-        "volunteer_id": {
-          "label": "Volunteer ID (as assigned on the registration form)",
-          "help": "The same ID must be used on every attendance sheet.",
-          "sub": "Format: KHLD-VOL-NNNN"
+        "F158": {
+          "label": "Consent to participate",
+          "help": "if no then end survey",
+          "opts": {
+            "true": "Yes",
+            "false": "No"
+          }
         },
-        "name": {
-          "label": "Full name"
+        "F159": {
+          "label": "Survey date"
         },
-        "sex": {
-          "label": "Sex",
-          "sub": "Female | Male"
+        "F160": {
+          "label": "Activity attended",
+          "extra": "General park visit"
         },
-        "age_group": {
+        "F161": {
+          "label": "Gender"
+        },
+        "F162": {
           "label": "Age group",
-          "sub": "Under 12 | 12–14 | 15–24 (youth) | 25–34 | 35–49 | 50–64 | 65 and above"
+          "help": "Respondents under 15 are not surveyed"
         },
-        "nationality": {
-          "label": "Nationality / status",
-          "sub": "Jordanian (host community) | Syrian refugee registered with UNHCR | Syrian, not registered | Other nationality | Prefer not to say"
+        "F163": {
+          "label": "Nationality"
         },
-        "disability": {
-          "label": "Disability status as recorded at registration",
-          "sub": "No difficulty | Some difficulty | A lot of difficulty | Cannot do at all | Prefer not to say"
+        "F164": {
+          "label": "Are you having trouble with any of the following: sight, hearing, walking or climbing stairs, remembering or concentrating, self-care, communication?"
         },
-        "affiliation": {
-          "label": "Affiliation",
-          "sub": "School | University | Local association | Women's organisation | Youth initiative | None — individual volunteer"
-        },
-        "date_registered": {
-          "label": "Date of registration in the volunteer programme",
-          "sub": "dd/mm/yyyy"
-        },
-        "period_reviewed": {
-          "label": "Period covered by this review",
-          "parts": {
-            "period_from": "From",
-            "period_to": "to"
-          }
-        },
-        "participation_log": {
-          "label": "Record each activity the volunteer attended during the period",
-          "help": "Only participations verified from a signed attendance sheet may be counted.",
-          "sub": "Repeat for each: Date | Activity type: rehabilitation campaign / action day / event support / market day support / committee task / outreach | Reference number | Hours | Verified from a signed attendance sheet: Yes / No"
-        },
-        "activities_count": {
-          "label": "Total number of separate activities attended during the period",
-          "help": "INDICATOR TEST — a volunteer with 2 or more is in the numerator.",
-          "sub": "Number"
-        },
-        "hours_total": {
-          "label": "Total volunteer hours contributed during the period",
-          "sub": "Hours"
-        },
-        "activity_types": {
-          "label": "Which types of volunteer work has this volunteer taken part in?"
-        },
-        "status_end_period": {
-          "label": "Status of the volunteer at the end of the period"
-        },
-        "inactive_reason": {
-          "label": "If inactive or withdrawn, what is the main reason?",
-          "help": "This is the analytical value of the indicator; it tells the Municipality what to change."
-        },
-        "leadership_role": {
-          "label": "Has the volunteer taken on a coordinating or team-leader role?"
-        },
-        "recognition_given": {
-          "label": "Has the volunteer received a certificate of appreciation or a symbolic incentive?"
-        },
-        "continue_intent": {
-          "label": "Does the volunteer intend to continue in the coming year?"
-        },
-        "what_would_help": {
-          "label": "What would make it easier for you to keep volunteering?"
-        },
-        "verified_against": {
-          "label": "Participation count verified against which records?"
-        },
-        "verified_by": {
-          "label": "Verified by (name, position, date)",
-          "parts": {
-            "verified_by_name": "name, position",
-            "verified_on": "date"
-          }
-        },
-        "notes": {
-          "label": "Notes"
-        }
-      }
-    },
-    "e1": {
-      "title": "Milestone Verification and Composition Record — Community Coordination Committee",
-      "short": "Community committee",
-      "code": "KHLD-SO3-E1",
-      "indicator": "Community coordination committees established",
-      "who": "Municipal community coordinator with the elected committee coordinator",
-      "when": "First verification by December 2026; reviewed annually thereafter",
-      "calc": "Simple count — established / not established. Status = 'Established' when items 5, 6, 8 and 10 are all in place.",
-      "disaggregation": "Composition by sex and organisation type",
-      "definition": "Voluntary coordination mechanism involving local associations and community organisations supporting park activities.",
-      "measures": "Whether the committee exists in the form the Plan describes — founded at a documented meeting, formally recognised, with written tasks, an elected coordinator from among member organisations, a municipal focal point, a two-monthly meeting cycle and minutes — and who sits on it.",
-      "unit": "one verification exercise (by December 2026, then reviewed annually)",
-      "source": "Review of founding meeting records, formation decision, terms of reference, membership list and meeting minutes",
-      "evidence": "Invitation letters; founding meeting minutes and attendance sheet; formation decision; terms of reference; membership list; minutes of subsequent meetings",
-      "sections": {
-        "s0": "Section A — Verification and founding",
-        "s1": "Section B — Leadership and membership",
-        "s2": "Section C — Functioning of the committee",
-        "s3": "Section D — Status and follow-up"
-      },
-      "fields": {
-        "verif_date": {
-          "label": "Date of verification",
-          "sub": "dd/mm/yyyy"
-        },
-        "verif_by": {
-          "label": "Verified by (name and position)"
-        },
-        "founding_meeting": {
-          "label": "Date and venue of the founding meeting",
-          "parts": {
-            "founding_meeting_date": "Date",
-            "founding_meeting_venue": "Venue"
-          }
-        },
-        "invitations": {
-          "label": "Number of organisations invited to the founding meeting and number that attended",
-          "help": "The Plan notes 26 charitable and social development organisations operating in the municipality; state the share reached.",
-          "parts": {
-            "invited_count": "Invited",
-            "attended_count": "Attended"
-          }
-        },
-        "formal_recognition": {
-          "label": "Is the committee formally recognised by the Municipality?",
-          "help": "Required for 'Established'."
-        },
-        "written_tasks": {
-          "label": "Are the committee's tasks agreed in writing (terms of reference)?",
-          "help": "Required for 'Established'."
-        },
-        "tasks_covered": {
-          "label": "Which of the tasks set out in the Action Plan are included in the terms of reference?"
-        },
-        "coordinator_elected": {
-          "label": "Has a coordinator been elected from among the member organisations?",
-          "help": "Required for 'Established'."
-        },
-        "municipal_focal": {
-          "label": "Has the Municipality designated a contact point for the committee?"
-        },
-        "membership_list": {
-          "label": "Is a membership list available, showing each organisation and its representative?",
-          "help": "Required for 'Established'."
-        },
-        "members_by_type": {
-          "label": "Number of member organisations by type",
-          "help": "Required disaggregation."
-        },
-        "members_by_sex": {
-          "label": "Committee members by sex",
-          "help": "Required disaggregation."
-        },
-        "inclusive_representation": {
-          "label": "Does the committee include representation of the following?",
-          "help": "Inclusiveness of the committee is what makes it a channel for both communities."
-        },
-        "membership_changes": {
-          "label": "Changes in membership since the last verification",
-          "parts": {
-            "orgs_joined": "Organisations joined",
-            "orgs_withdrew": "Organisations withdrew"
-          }
-        },
-        "meeting_cycle": {
-          "label": "What meeting cycle has been agreed?"
-        },
-        "meetings_held": {
-          "label": "Number of meetings held since establishment, and number with written minutes",
-          "help": "Compare with the agreed cycle to judge whether the committee is functioning.",
-          "parts": {
-            "meetings_held": "Meetings held",
-            "meetings_with_minutes": "With minutes"
-          }
-        },
-        "minutes_template": {
-          "label": "Is a standard minutes template in use, recording decisions, recommendations and assigned responsibilities?"
-        },
-        "outputs_delivered": {
-          "label": "What has the committee actually produced during the period?",
-          "help": "Distinguishes a committee that exists on paper from one that functions."
-        },
-        "duplication_avoided": {
-          "label": "Has the committee helped unify efforts and avoid duplication between organisations?"
-        },
-        "overall_status": {
-          "label": "Overall milestone status",
-          "sub": "Established (items 5, 6, 8 and 10 all in place) | In process | Not established"
-        },
-        "evidence_attached": {
-          "label": "Evidence attached"
-        },
-        "gaps": {
-          "label": "Gaps identified and follow-up actions agreed (what, who, by when)"
-        },
-        "signatures": {
-          "label": "Signed by the committee coordinator and the municipal community coordinator",
-          "parts": {
-            "committee_coordinator_name": "committee coordinator",
-            "community_coordinator_name": "municipal community coordinator",
-            "signed_on": "date"
-          }
-        }
-      }
-    },
-    "f1": {
-      "title": "Milestone Verification Checklist — Volunteer Programme Established",
-      "short": "Volunteer programme",
-      "code": "KHLD-SO3-F1",
-      "indicator": "Volunteer programme established",
-      "who": "Municipal community coordinator with the lead association or youth initiative managing the volunteer database",
-      "when": "First verification at launch (by April 2027); reviewed annually until September 2029",
-      "calc": "Simple count — one programme launched. Status = 'Established' when items 3, 5, 7 and 9 are all in place.",
-      "disaggregation": "Not applicable (institutional indicator)",
-      "definition": "Volunteer arrangements including volunteer registration, activity roles, and coordination procedures.",
-      "measures": "Whether the three constituent elements — a registration system, defined roles, and coordination procedures — exist and operate, together with the safeguards the Plan implies for volunteers (safety briefing, protective equipment, supervision, arrangements for under-18s) and the recognition scheme it foresees.",
-      "unit": "one verification exercise (launch by April 2027, then reviewed annually)",
-      "source": "Volunteer records: approval decision, registration form, volunteer database, role descriptions, safety arrangements, recognition records",
-      "evidence": "Approved programme procedures and the decision adopting them; blank registration form; extract from the volunteer database; role descriptions; safety and consent templates; recognition records",
-      "sections": {
-        "s0": "Section A — Verification details",
-        "s1": "Section B — Core elements of the programme",
-        "s2": "Section C — Inclusion, safeguarding and recognition",
-        "s3": "Section D — Operation, status and follow-up"
-      },
-      "fields": {
-        "verif_date": {
-          "label": "Date of verification",
-          "sub": "dd/mm/yyyy"
-        },
-        "verif_by": {
-          "label": "Verified by (name and position)"
-        },
-        "procedures_approved": {
-          "label": "Has a written volunteer programme concept or set of procedures been approved?",
-          "help": "Required for 'Established'."
-        },
-        "launch_date": {
-          "label": "Date the programme was launched",
-          "help": "Plan target: launch by April 2027.",
-          "sub": "dd/mm/yyyy | Not yet launched"
-        },
-        "database_established": {
-          "label": "Is a volunteer database or register established?",
-          "help": "Required for 'Established'."
-        },
-        "database_format": {
-          "label": "Format of the volunteer database and number registered at the date of verification",
-          "help": "Cross-check with form 16 entries.",
-          "parts": {
-            "database_format_id": "Format",
-            "registered_count": "Number registered",
-            "registered_women": "Of whom women",
-            "registered_youth": "Youth 15–24",
-            "registered_refugees": "Syrian refugees",
-            "registered_pwd": "Persons with disabilities"
-          }
-        },
-        "registration_form": {
-          "label": "Is a standard volunteer registration form in use, capturing skills and availability?"
-        },
-        "roles_defined": {
-          "label": "Are volunteer roles defined across the functions the Plan names?",
-          "help": "Required for 'Established'."
-        },
-        "assignment_procedure": {
-          "label": "Is there a procedure for assigning volunteers to tasks and calling them for action days?"
-        },
-        "coordination_procedure": {
-          "label": "Are coordination procedures documented (who calls an action day, who supervises, how attendance is recorded, how it is reported)?",
-          "help": "Required for 'Established'."
-        },
-        "inclusive_roles": {
-          "label": "Are volunteering roles tailored to match the abilities and interests of women, youth, refugees and persons with disabilities, and is this documented?",
-          "help": "Explicitly required by the Action Plan."
-        },
-        "safety_arrangements": {
-          "label": "Which safety arrangements are in place for volunteer work?",
-          "help": "Volunteers must not be assigned works requiring a contractor or technical qualification."
-        },
-        "minors_arrangements": {
-          "label": "Are there arrangements for volunteers under 18 (guardian consent, age-appropriate tasks, supervision ratio)?",
-          "help": "Necessary because the Plan engages schools in community service."
-        },
-        "data_consent": {
-          "label": "Does the registration form include a data protection and consent statement?"
-        },
-        "recognition_scheme": {
-          "label": "Is a recognition scheme defined (certificates of appreciation or symbolic incentives), and which partner provides it?"
-        },
-        "recognition_delivered": {
-          "label": "Number of volunteers who have received recognition to date",
-          "sub": "Number"
-        },
-        "recruitment_channels": {
-          "label": "Through which channels are volunteers recruited?"
-        },
-        "focal_point": {
-          "label": "Has a municipal focal point for volunteers been designated?"
-        },
-        "action_days_since_launch": {
-          "label": "Number of volunteer action days organised since launch",
-          "help": "Detail on form 17 (KHLD-SO3-F3).",
-          "sub": "Number"
-        },
-        "overall_status": {
-          "label": "Overall milestone status",
-          "sub": "Established (items 3, 5, 7 and 9 all in place) | Partly established | Not established"
-        },
-        "evidence_attached": {
-          "label": "Evidence attached"
-        },
-        "gaps": {
-          "label": "Gaps identified and follow-up actions agreed (what, who, by when)"
-        }
-      }
-    },
-    "f2": {
-      "title": "Volunteer Registration Form (individual)",
-      "short": "Volunteer registration",
-      "code": "KHLD-SO3-F2",
-      "indicator": "Number of volunteers recruited",
-      "who": "Registering body (Municipality, local association, school or youth initiative); entered in the central register by the community coordinator",
-      "when": "At the point of registration, from the launch (by April 2027) until September 2029",
-      "calc": "Unique count of registered volunteers with at least one recorded participation. Target ≥ 100 over the Plan period, of whom ≥ 40% women, ≥ 30% youth (15–24) and ≥ 15% refugees, including persons with disabilities.",
-      "disaggregation": "Sex; age group including youth 15–24; nationality (Jordanian / Syrian refugee); disability; affiliation (school / university / CSO / community)",
-      "definition": "Individuals participating in volunteer activities supporting park rehabilitation, maintenance and events.",
-      "measures": "Each individual volunteer once, with the identifiers needed for a unique count and the full disaggregation the framework requires, plus interests, skills and availability so that the volunteer can actually be deployed.",
-      "unit": "one individual volunteer (registered once, not per activity)",
-      "source": "Volunteer register and attendance records",
-      "evidence": "Signed registration form; guardian consent form for volunteers under 18; the volunteer register entry; the first attendance sheet on which the volunteer appears",
-      "sections": {
-        "s0": "Section A — Registration details",
-        "s1": "Section B — Personal details and disaggregation",
-        "s2": "Section C — Interests, skills and availability",
-        "s3": "Section D — Consent and confirmation"
-      },
-      "fields": {
-        "reg_date": {
-          "label": "Date of registration",
-          "sub": "dd/mm/yyyy"
-        },
-        "reg_channel": {
-          "label": "Where was the volunteer registered?"
-        },
-        "duplicate_check": {
-          "label": "Has this person registered before?",
-          "help": "The indicator is a unique count; this check protects it.",
-          "sub": "No — new registration, assign a new volunteer ID | Yes — existing volunteer ID (do not create a new record)"
-        },
-        "volunteer_id": {
-          "label": "Volunteer ID assigned",
-          "sub": "Format: KHLD-VOL-NNNN"
-        },
-        "full_name": {
-          "label": "Full name (four parts)"
-        },
-        "id_number": {
-          "label": "National ID number, or UNHCR registration number for Syrian refugees",
-          "help": "Collected only to prevent duplicate counting; stored in a restricted file. See the guidance sheet.",
-          "sub": "Number"
-        },
-        "sex": {
-          "label": "Sex",
-          "help": "Target: at least 40% of volunteers are women.",
-          "sub": "Female | Male"
-        },
-        "dob_age": {
-          "label": "Date of birth and age",
-          "help": "Used to derive the age band; target at least 30% youth aged 15–24.",
-          "sub": "Date of birth Age"
-        },
-        "guardian_consent": {
-          "label": "If the volunteer is under 18: guardian's name, relationship, phone, and written consent obtained",
-          "help": "No volunteer under 18 may be deployed without recorded guardian consent.",
-          "parts": {
-            "guardian_name": "Guardian name",
-            "guardian_relationship": "Relationship",
-            "guardian_phone": "Phone",
-            "guardian_consent_given": "Written consent obtained",
-            "guardian_consent_date": "date of consent"
-          },
-          "partOpts": {
-            "guardian_consent_given": {
-              "true": "Yes",
-              "false": "No"
-            }
-          }
-        },
-        "nationality": {
-          "label": "Nationality / status",
-          "help": "Target: at least 15% of volunteers are refugees."
-        },
-        "disability": {
-          "label": "Do you have difficulty doing any of the following: seeing, hearing, walking or climbing steps, remembering or concentrating, self-care, communicating?",
-          "help": "If any difficulty is reported, complete the support-needs question below."
-        },
-        "support_needs": {
-          "label": "Is any adjustment or support needed so that you can volunteer comfortably?"
-        },
-        "phone": {
-          "label": "Phone number and an alternative contact number",
-          "parts": {
-            "phone": "Phone",
-            "phone_alternative": "Alternative"
-          }
-        },
-        "neighbourhood": {
-          "label": "Neighbourhood of residence"
-        },
-        "occupation_status": {
-          "label": "Current status"
-        },
-        "affiliation": {
-          "label": "Is the volunteer registering through an institution or group?",
-          "help": "Required disaggregation."
-        },
-        "interests": {
-          "label": "Which volunteer activities are you interested in?"
-        },
-        "skills": {
-          "label": "Do you have any relevant skills or a trade?"
-        },
-        "availability": {
-          "label": "When are you usually available?",
-          "parts": {
-            "availability_days": "Days",
-            "availability_times": "Times",
-            "hours_per_month": "Approximate hours per month"
-          }
-        },
-        "transport": {
-          "label": "Can you reach the park on your own?"
-        },
-        "prior_experience": {
-          "label": "Have you volunteered before?"
-        },
-        "how_heard": {
-          "label": "How did you hear about the volunteer programme?"
-        },
-        "consent_data": {
-          "label": "Do you agree that your details may be kept in the municipal volunteer register and used to contact you about volunteer activities?",
-          "help": "Registration cannot proceed without this consent.",
+        "F165": {
+          "label": "Are you a resident of Khalidiyah?",
           "opts": {
             "true": "Yes",
             "false": "No"
           }
         },
-        "consent_photo": {
-          "label": "Do you agree that photographs taken during volunteer activities may be used in municipal documentation and reports?",
+        "F166": {
+          "label": "The park gives me more opportunities to meet and interact with people from the other community (Jordanian / Syrian)",
+          "opts": {
+            "1": "1 Strongly disagree",
+            "2": "2 Disagree",
+            "3": "3 Neutral",
+            "4": "4 Agree",
+            "5": "5 Strongly agree"
+          }
+        },
+        "F167": {
+          "label": "During this activity / visit, did you take part together with members of the other community?",
           "opts": {
             "true": "Yes",
             "false": "No"
           }
         },
-        "safety_commitment": {
-          "label": "Do you agree to follow the safety instructions given before each task and the arrangements for use of the park?",
+        "F168": {
+          "label": "I feel safe in the park",
           "opts": {
-            "true": "Yes"
+            "1": "1 Strongly disagree",
+            "2": "2 Disagree",
+            "3": "3 Neutral",
+            "4": "4 Agree",
+            "5": "5 Strongly agree"
           }
         },
-        "signature": {
-          "label": "Volunteer signature (or guardian signature for volunteers under 18) and date",
-          "parts": {
-            "signed_by": "Volunteer (or guardian for volunteers under 18)",
-            "signed_on": "date"
+        "F169": {
+          "label": "The park is a welcoming space for everyone in the community",
+          "opts": {
+            "1": "1 Strongly disagree",
+            "2": "2 Disagree",
+            "3": "3 Neutral",
+            "4": "4 Agree",
+            "5": "5 Strongly agree"
           }
         },
-        "registered_by": {
-          "label": "Registered by (name, position, organisation, date)",
-          "parts": {
-            "registered_by_name": "name",
-            "registered_by_position": "position",
-            "registered_by_organisation": "organisation",
-            "registered_on": "date"
+        "F170": {
+          "label": "Overall, how satisfied are you with the park as a shared community space?",
+          "opts": {
+            "1": "1 Very dissatisfied",
+            "2": "2 Dissatisfied",
+            "3": "3 Neutral",
+            "4": "4 Satisfied",
+            "5": "5 Very satisfied"
           }
         },
-        "entered_register": {
-          "label": "Entered in the central volunteer register by (name and date)",
-          "parts": {
-            "entered_by_name": "name",
-            "entered_on": "date"
+        "F171": {
+          "label": "How suitable was the activity for you / your family?",
+          "opts": {
+            "1": "1 Not suitable",
+            "2": "2",
+            "3": "3",
+            "4": "4",
+            "5": "5 Very suitable"
+          }
+        },
+        "F172": {
+          "label": "Suggestions to improve the park or its activities"
+        }
+      }
+    },
+    "form10": {
+      "title": "Volunteer Management Committee",
+      "short": "Committee members",
+      "fields": {
+        "F048": {
+          "label": "Member Name"
+        },
+        "F049": {
+          "label": "Phone Number"
+        },
+        "F050": {
+          "label": "Date of Appointment"
+        },
+        "F138": {
+          "label": "Gender"
+        },
+        "F139": {
+          "label": "Organisation represented"
+        },
+        "F140": {
+          "label": "Organisation type"
+        },
+        "F141": {
+          "label": "Role in committee"
+        }
+      }
+    },
+    "form11": {
+      "title": "Volunteer Management Committee Meeting Record",
+      "short": "Committee meetings",
+      "fields": {
+        "F051": {
+          "label": "Meeting Date"
+        },
+        "F052": {
+          "label": "Meeting Minutes"
+        },
+        "F053": {
+          "label": "Meeting Summary (if applicable)"
+        },
+        "F054": {
+          "label": "Has the work plan and volunteer tasks been discussed?",
+          "opts": {
+            "true": "Yes",
+            "false": "No"
+          }
+        },
+        "F142": {
+          "label": "Is this the founding meeting?",
+          "opts": {
+            "true": "Yes",
+            "false": "No"
+          }
+        },
+        "F143": {
+          "label": "Number of members present"
+        }
+      }
+    },
+    "form12": {
+      "title": "Volunteer Database",
+      "short": "Volunteers",
+      "fields": {
+        "F144": {
+          "label": "ID type"
+        },
+        "F058": {
+          "label": "National Number/UNHCR Registration Number"
+        },
+        "F055": {
+          "label": "Name of the Quad Volunteer"
+        },
+        "F056": {
+          "label": "Gender"
+        },
+        "F057": {
+          "label": "Date of Birth"
+        },
+        "F059": {
+          "label": "Phone Number"
+        },
+        "F060": {
+          "label": "Are you a resident of Khalidiyah?",
+          "opts": {
+            "true": "Yes",
+            "false": "No"
+          }
+        },
+        "F061": {
+          "label": "Nationality"
+        },
+        "F062": {
+          "label": "Are you having trouble with any of the following: sight, hearing, walking or climbing stairs, remembering or concentrating, self-care, communication?"
+        },
+        "F063": {
+          "label": "Current Situation"
+        },
+        "F064": {
+          "label": "What volunteer activities would you like to participate in?"
+        },
+        "F065": {
+          "label": "Which of the following days is right for you to volunteer with?"
+        },
+        "F066": {
+          "label": "Which of the following is right for you to volunteer?"
+        },
+        "F067": {
+          "label": "Do you agree to the use of photographs taken during volunteer activities in municipal documents and reports?",
+          "opts": {
+            "true": "Yes",
+            "false": "No"
+          }
+        },
+        "F145": {
+          "label": "Affiliation"
+        },
+        "F146": {
+          "label": "Name of school / university / organisation"
+        }
+      }
+    },
+    "form13": {
+      "title": "Volunteer attendance record",
+      "short": "Volunteer attendance",
+      "fields": {
+        "F068": {
+          "label": "Report Date"
+        },
+        "F070": {
+          "label": "National Number/UNHCR Registration Number"
+        },
+        "F069": {
+          "label": "Name of the Quad Volunteer"
+        },
+        "F071": {
+          "label": "General Volunteer Assessment",
+          "opts": {
+            "1": "1",
+            "2": "2",
+            "3": "3",
+            "4": "4",
+            "5": "5"
+          }
+        },
+        "F072": {
+          "label": "Notes (if applicable)"
+        },
+        "F147": {
+          "label": "Volunteer activity / campaign attended"
+        },
+        "F148": {
+          "label": "Task / role performed"
+        }
+      }
+    },
+    "form14": {
+      "title": "Counseling Sessions",
+      "short": "Counselling sessions",
+      "fields": {
+        "F073": {
+          "label": "Session Title"
+        },
+        "F074": {
+          "label": "Start Date"
+        },
+        "F075": {
+          "label": "End Date"
+        },
+        "F076": {
+          "label": "Start of receiving applications"
+        },
+        "F077": {
+          "label": "End of Receiving Applications"
+        },
+        "F078": {
+          "label": "Session Description"
+        },
+        "F079": {
+          "label": "Executing Entity"
+        },
+        "F149": {
+          "label": "Session topic"
+        },
+        "F150": {
+          "label": "Is this a core session (counts toward completion)?",
+          "opts": {
+            "true": "Yes",
+            "false": "No"
           }
         }
       }
     },
-    "f3": {
-      "title": "Volunteer Action Day Record",
-      "short": "Action days",
-      "code": "KHLD-SO3-F3",
-      "indicator": "Number of volunteer action days conducted",
-      "who": "Volunteer team leader with the municipal focal point for volunteers",
-      "when": "Completed after each action day, throughout implementation",
-      "calc": "Cumulative count of action days conducted. Target ≥ 12 during the Plan period. Count only days with a signed attendance sheet and documented tasks.",
-      "disaggregation": "Activity type",
-      "definition": "Organised volunteer action days supporting park maintenance, rehabilitation, community events or environmental activities.",
-      "measures": "Each action day as a countable, organised occasion: called in advance, with assigned roles, a signed attendance sheet, and documented tasks completed — as distinct from individuals turning up informally.",
-      "unit": "one action day",
-      "source": "Volunteer activity reports and attendance sheets",
-      "evidence": "Signed attendance sheet with volunteer IDs; photographs; task completion note; safety briefing record",
-      "sections": {
-        "s0": "Section A — Action day identification",
-        "s1": "Section B — Volunteers",
-        "s2": "Section C — Work done, resources and safety",
-        "s3": "Section D — Documentation, recognition and follow-up"
-      },
+    "form15": {
+      "title": "Attendance Requests",
+      "short": "Attendance requests",
       "fields": {
-        "action_day_id": {
-          "label": "Action day reference number",
-          "sub": "Format: KHLD-AD-YYYY-NN"
+        "F151": {
+          "label": "ID type"
         },
-        "date": {
-          "label": "Date",
-          "sub": "dd/mm/yyyy"
+        "F083": {
+          "label": "National Number/UNHCR Registration Number"
         },
-        "times": {
-          "label": "Start and end time",
-          "parts": {
-            "times_from": "From",
-            "times_to": "to"
+        "F080": {
+          "label": "Quadruple employer name"
+        },
+        "F081": {
+          "label": "Gender"
+        },
+        "F082": {
+          "label": "Date of Birth"
+        },
+        "F084": {
+          "label": "Phone Number"
+        },
+        "F085": {
+          "label": "Are you a resident of Khalidiyah?",
+          "opts": {
+            "true": "Yes",
+            "false": "No"
           }
         },
-        "location": {
-          "label": "Location"
+        "F086": {
+          "label": "Nationality"
         },
-        "theme": {
-          "label": "Theme of the action day",
-          "help": "Required disaggregation."
+        "F087": {
+          "label": "Are you having trouble with any of the following: sight, hearing, walking or climbing stairs, remembering or concentrating, self-care, communication?"
         },
-        "linked_records": {
-          "label": "Is the action day linked to another record?",
-          "help": "Prevents double counting between KHLD-SO2-C2 and KHLD-SO3-F3; a rehabilitation campaign is counted under both indicators only when it was called as an action day.",
-          "parts": {
-            "linked_kind_id": "Linked to",
-            "campaign_id": "Rehabilitation campaign",
-            "activity_id": "Community activity",
-            "market_id": "Market day"
+        "F088": {
+          "label": "Session to attend"
+        },
+        "F089": {
+          "label": "Do you have an existing business?",
+          "opts": {
+            "true": "Yes",
+            "false": "No"
           }
         },
-        "called_by": {
-          "label": "Who called the action day and how far in advance?",
-          "parts": {
-            "called_by_id": "Called by",
-            "notice_days": "Days' notice given"
-          }
+        "F090": {
+          "label": "Working Status"
         },
-        "volunteers_total": {
-          "label": "Total number of volunteers present",
-          "help": "Must equal the number of signatures on the attendance sheet.",
-          "sub": "Number"
-        },
-        "volunteers_breakdown": {
-          "label": "Volunteers by sex, age, nationality and disability"
-        },
-        "volunteer_ids": {
-          "label": "Volunteer ID numbers of all those present (from the attendance sheet)",
-          "help": "Essential for the retention indicator KHLD-SO3-0; without IDs a participation cannot be attributed.",
-          "sub": "List of IDs"
-        },
-        "new_registrations": {
-          "label": "Number of volunteers who registered for the first time on the day",
-          "help": "Complete form 16 for each of them.",
-          "sub": "Number"
-        },
-        "person_hours": {
-          "label": "Total volunteer person-hours",
-          "sub": "Person-hours"
-        },
-        "roles_assigned": {
-          "label": "Were volunteers assigned to defined roles?",
-          "parts": {
-            "roles_assigned": "Yes — roles used / No — general tasks only",
-            "roles_used": "roles used"
-          },
-          "partOpts": {
-            "roles_assigned": {
-              "true": "Yes — roles used: event hosting / site safety / maintenance / planting / documentation / children's activities / outreach",
-              "false": "No — general tasks only"
-            }
-          }
-        },
-        "team_leaders": {
-          "label": "Names of volunteer team leaders on the day"
-        },
-        "tasks_completed": {
-          "label": "Tasks completed and quantities achieved",
-          "sub": "For example: m² cleaned trees or shrubs planted benches painted waste bags removed play items repaired event area prepared"
-        },
-        "materials": {
-          "label": "Tools and materials provided, and by whom",
-          "sub": "Item / quantity / provider (repeat as needed)"
-        },
-        "refreshments": {
-          "label": "Were water and refreshments provided to volunteers, and by whom?"
-        },
-        "safety": {
-          "label": "Safety arrangements on the day"
-        },
-        "incident": {
-          "label": "Did any injury or incident occur?"
-        },
-        "supervisor": {
-          "label": "Municipal supervisor present (name and position)"
-        },
-        "evidence_attached": {
-          "label": "Evidence attached",
-          "help": "Counting condition for this indicator."
-        },
-        "recognition": {
-          "label": "Was recognition given on the day?"
-        },
-        "volunteer_feedback": {
-          "label": "Was feedback collected from volunteers?"
-        },
-        "remaining_tasks": {
-          "label": "Tasks remaining and what is needed for the next action day"
-        },
-        "recorded_by": {
-          "label": "Record completed by (name, position, date)",
-          "parts": {
-            "recorded_by_name": "name",
-            "recorded_by_position": "position",
-            "recorded_on": "date"
-          }
+        "F152": {
+          "label": "Product / business type"
         }
       }
     },
-    "so40": {
-      "title": "Post-Market Follow-up Survey for Household Producers",
-      "short": "Producer follow-up",
-      "code": "KHLD-SO4-0",
-      "indicator": "% of participating household producers reporting that community markets increased their opportunities to promote or sell their products",
-      "who": "Municipal community coordinator or a focal point from a local or women's organisation",
-      "when": "Annual review; administered two to six weeks after a market day to all vendors registered that year",
-      "calc": "(No. of producers answering 'Yes, significantly' or 'Yes, to some extent' to Q20 ÷ total producers surveyed) × 100. Target ≥ 40%. Q14, Q17 and Q19 reported as the component dimensions.",
-      "disaggregation": "Sex; nationality; disability; product type",
-      "definition": "Share of participating household producers reporting that participation in community markets increased opportunities to promote products, reach customers or generate sales.",
-      "measures": "The three distinct opportunity dimensions the indicator names — exposure of the product, reaching new customers, and actual sales — plus whether any new selling channel persisted after the market, and what limited the producer.",
-      "unit": "one household producer who participated in at least one market day",
-      "source": "Short follow-up survey after market participation, using the vendor registration sheets as the sampling frame",
-      "evidence": "Completed questionnaires; vendor registration sheets used as the sampling frame; call log for telephone interviews; annual summary table",
-      "sections": {
-        "s0": "Section A — Interview and producer details",
-        "s1": "Section B — Market participation",
-        "s2": "Section C — Opportunities created (core of the indicator)",
-        "s3": "Section D — Production, support and constraints",
-        "s4": "Section E — Closing"
-      },
+    "form23": {
+      "title": "Enterprise Support Log",
+      "short": "Enterprise support",
       "fields": {
-        "int_date": {
-          "label": "Date of interview",
-          "sub": "dd/mm/yyyy"
+        "F197": {
+          "label": "Enterprise owner (National Number / UNHCR number)"
         },
-        "mode": {
-          "label": "Mode of interview"
+        "F198": {
+          "label": "Date of support"
         },
-        "enumerator": {
-          "label": "Interviewer name"
+        "F199": {
+          "label": "Type of support"
         },
-        "respondent_is_vendor": {
-          "label": "Is the respondent the registered producer?",
-          "help": "Only responses from the producer themselves count towards the indicator."
+        "F200": {
+          "label": "Guidance session"
         },
-        "vendor_id": {
-          "label": "Vendor or producer ID (from the vendor registration sheet)"
+        "F201": {
+          "label": "Attendance",
+          "opts": {
+            "true": "Attended",
+            "false": "Absent"
+          }
         },
-        "name": {
+        "F202": {
+          "label": "Referred to (partner / institution)"
+        },
+        "F203": {
+          "label": "Support provided by"
+        },
+        "F204": {
+          "label": "Notes (if applicable)"
+        }
+      }
+    },
+    "form16": {
+      "title": "Markets",
+      "short": "Markets",
+      "fields": {
+        "F091": {
+          "label": "Bazaar Name"
+        },
+        "F092": {
+          "label": "Start Date"
+        },
+        "F093": {
+          "label": "End Date"
+        },
+        "F094": {
+          "label": "Number of days of the actual bazaar"
+        },
+        "F095": {
+          "label": "Start of receiving applications"
+        },
+        "F096": {
+          "label": "End of Receiving Applications"
+        },
+        "F097": {
+          "label": "Bazaar Description"
+        },
+        "F098": {
+          "label": "Is there an official sponsorship of the bazaar by any entity?",
+          "opts": {
+            "true": "Yes",
+            "false": "No"
+          }
+        },
+        "F099": {
+          "label": "Please mention the name of the sponsor"
+        },
+        "F100": {
+          "label": "Number of kiosks available"
+        },
+        "F153": {
+          "label": "Market occasion type"
+        },
+        "F154": {
+          "label": "Market status"
+        }
+      }
+    },
+    "form17": {
+      "title": "Bazaar beneficiaries",
+      "short": "Bazaar beneficiaries",
+      "fields": {
+        "F156": {
+          "label": "ID type"
+        },
+        "F104": {
+          "label": "National Number/UNHCR Registration Number"
+        },
+        "F101": {
+          "label": "Quadruple Name"
+        },
+        "F102": {
+          "label": "Gender"
+        },
+        "F103": {
+          "label": "Date of Birth"
+        },
+        "F105": {
+          "label": "Phone Number"
+        },
+        "F106": {
+          "label": "Are you a resident of Khalidiyah?",
+          "opts": {
+            "true": "Yes",
+            "false": "No"
+          }
+        },
+        "F107": {
+          "label": "Nationality"
+        },
+        "F108": {
+          "label": "Are you having trouble with any of the following: sight, hearing, walking or climbing stairs, remembering or concentrating, self-care, communication?"
+        },
+        "F109": {
+          "label": "What kind of products are involved?"
+        },
+        "F155": {
+          "label": "Bazaar applied for"
+        }
+      }
+    },
+    "form18": {
+      "title": "Bazaar attendance record",
+      "short": "Bazaar attendance",
+      "fields": {
+        "F110": {
+          "label": "Report Date"
+        },
+        "F157": {
+          "label": "Bazaar"
+        },
+        "F112": {
+          "label": "National Number/UNHCR Registration Number"
+        },
+        "F111": {
           "label": "Name"
         },
-        "sex": {
-          "label": "Sex"
+        "F113": {
+          "label": "Public Kiosk Evaluation",
+          "opts": {
+            "1": "1",
+            "2": "2",
+            "3": "3",
+            "4": "4",
+            "5": "5"
+          }
         },
-        "age_group": {
-          "label": "Age group"
-        },
-        "nationality": {
-          "label": "Nationality / status"
-        },
-        "disability": {
-          "label": "Disability status"
-        },
-        "neighbourhood": {
-          "label": "Neighbourhood"
-        },
-        "product_type": {
-          "label": "Main products",
-          "help": "Required disaggregation."
-        },
-        "markets_count": {
-          "label": "In how many community market days or fairs in the park have you taken part?",
-          "help": "Cross-check against the vendor registration sheets.",
-          "sub": "Number"
-        },
-        "first_organised_market": {
-          "label": "Was this your first time selling at an organised market or exhibition?"
-        },
-        "sold_before_market": {
-          "label": "Before taking part, where were you selling your products?",
-          "help": "Baseline for judging whether the market added an opportunity."
-        },
-        "exposure": {
-          "label": "Did taking part in the market give you more opportunity to show your products to people?",
-          "help": "Dimension 1 — product exposure."
-        },
-        "made_sales": {
-          "label": "Did you make any sales at the market days you attended?"
-        },
-        "sales_last_market": {
-          "label": "Approximately what were your total sales at the most recent market day?",
-          "help": "Dimension 3 — sales. Bands are used so the producer need not disclose exact income."
-        },
-        "new_customers": {
-          "label": "How many new customers or buyers did you make contact with at the market?",
-          "help": "Dimension 2 — customer reach."
-        },
-        "repeat_orders": {
-          "label": "Did any customer contact you again after the market to buy from you?"
-        },
-        "new_channels": {
-          "label": "Did you gain any new way of selling as a result of the market?",
-          "help": "A persisting channel is the strongest evidence of an increased opportunity."
-        },
-        "overall_opportunity": {
-          "label": "Overall, did participation in the community markets increase your opportunities to promote or sell your products?",
-          "help": "INDICATOR QUESTION — the first two options form the numerator."
-        },
-        "production_change": {
-          "label": "Has your production volume changed since you started taking part in the markets?"
-        },
-        "still_active": {
-          "label": "Are you still producing and selling?"
-        },
-        "stop_reason": {
-          "label": "If you stopped or reduced, what was the main reason?"
-        },
-        "guidance_received": {
-          "label": "Have you received guidance sessions on licensing, hygiene, pricing or packaging?",
-          "help": "Links to indicators KHLD-SO4-G1 and KHLD-SO4-G2."
-        },
-        "market_constraints": {
-          "label": "What limited your sales at the market days?"
-        },
-        "improvements_wanted": {
-          "label": "What would make the community markets more useful for you?"
-        },
-        "additional_support": {
-          "label": "What additional support would help you most in the coming year?",
-          "help": "Referrals arising from this answer are recorded on form 20."
-        },
-        "participate_again": {
-          "label": "Would you take part in the next market day?"
-        },
-        "recontact": {
-          "label": "May we contact you again for the next follow-up round?"
-        },
-        "quote": {
-          "label": "In your own words, what difference did the market make for you?",
-          "help": "Source of case-study material for annual reporting."
-        },
-        "notes": {
-          "label": "Interviewer notes"
+        "F114": {
+          "label": "Notes (if applicable)"
         }
       }
     },
-    "g1": {
-      "title": "Guidance Session Attendance and Completion Form (per home-based enterprise)",
-      "short": "Guidance completion",
-      "code": "KHLD-SO4-G1",
-      "indicator": "Number of home-based enterprises completing mentoring / guidance sessions",
-      "who": "Training or guidance provider with the municipal community coordinator",
-      "when": "2027–2028, with enterprise support visits through 2029; completed at the end of each guidance cycle",
-      "calc": "Count of enterprises meeting the completion threshold — attendance at all core sessions. Target 20–30 enterprises. Report attendance at each session separately.",
-      "disaggregation": "Sex, age group, nationality and disability of the owner; product type",
-      "definition": "Home-based enterprises (snacks, refreshments, handicrafts, artisanal goods) whose owners attended the full cycle of brief guidance sessions on small business basics, licensing requirements, hygiene and health and safety standards, marketing and pricing.",
-      "measures": "Attendance at each of the five core session topics named in the Action Plan, and whether the owner met the completion threshold of attending all of them — with reasons recorded for those who did not, so that the Municipality can adjust delivery.",
-      "unit": "one home-based enterprise (its owner)",
-      "source": "Session attendance records maintained by the training provider and the Municipality",
-      "evidence": "Signed attendance sheets for each session; session agendas; certificate issued; trainer's completion list; referral notes",
-      "sections": {
-        "s0": "Section A — Enterprise and owner",
-        "s1": "Section B — Attendance at the core guidance sessions",
-        "s2": "Section C — Delivery, learning and follow-up"
-      },
+    "form24": {
+      "title": "Producer Market Follow-up Survey",
+      "short": "Producer follow-up",
       "fields": {
-        "enterprise_id": {
-          "label": "Enterprise ID",
-          "help": "Use the same ID on forms 20 and 22 for this enterprise.",
-          "sub": "Format: KHLD-ENT-NNN"
+        "F205": {
+          "label": "Survey date"
         },
-        "cycle": {
-          "label": "Guidance cycle",
-          "parts": {
-            "cycle_reference": "Cycle reference",
-            "cycle_year": "Year"
-          }
+        "F206": {
+          "label": "Producer (National Number / UNHCR number)"
         },
-        "owner_name": {
-          "label": "Name of the owner"
+        "F207": {
+          "label": "Market participated in"
         },
-        "id_number": {
-          "label": "National ID number, or UNHCR registration number for Syrian refugees",
-          "help": "Collected only for unique counting; see the guidance sheet.",
-          "sub": "Number"
-        },
-        "sex": {
-          "label": "Sex",
-          "sub": "Female | Male"
-        },
-        "age_group": {
-          "label": "Age group"
-        },
-        "nationality": {
-          "label": "Nationality / status"
-        },
-        "disability": {
-          "label": "Disability status"
-        },
-        "phone": {
-          "label": "Phone number"
-        },
-        "neighbourhood": {
-          "label": "Neighbourhood"
-        },
-        "enterprise_name": {
-          "label": "Trade or product name, if the enterprise has one"
-        },
-        "product_type": {
-          "label": "Products",
-          "help": "Required disaggregation."
-        },
-        "enterprise_status": {
-          "label": "Status of the enterprise at the start of the guidance cycle"
-        },
-        "workers": {
-          "label": "How many people work in the enterprise, including the owner and unpaid family members?",
-          "parts": {
-            "workers_total": "Total",
-            "workers_women": "Of whom women",
-            "workers_under_30": "Of whom under 30"
-          }
-        },
-        "s1_business_basics": {
-          "label": "Session 1 — Small business basics: costing, pricing and simple record keeping"
-        },
-        "s2_licensing": {
-          "label": "Session 2 — Licensing and registration requirements for a home-based business"
-        },
-        "s3_hygiene": {
-          "label": "Session 3 — Hygiene, food safety and health and safety standards",
-          "help": "Mandatory for all food producers."
-        },
-        "s4_packaging": {
-          "label": "Session 4 — Packaging, labelling and product presentation"
-        },
-        "s5_marketing": {
-          "label": "Session 5 — Marketing, selling channels and market days"
-        },
-        "extra_sessions": {
-          "label": "Any additional or optional sessions attended",
-          "sub": "Topic and date (repeat as needed) | None"
-        },
-        "sessions_attended_count": {
-          "label": "Total number of core sessions attended (out of 5)",
-          "sub": "Number"
-        },
-        "completion": {
-          "label": "Did the owner meet the completion criteria (attendance at all applicable core sessions)?",
-          "help": "INDICATOR TEST — only 'Yes' counts towards KHLD-SO4-G1.",
-          "sub": "Yes — completed | No — number of core sessions missed"
-        },
-        "non_completion_reason": {
-          "label": "If the cycle was not completed, what was the main reason?",
-          "help": "Used to adjust scheduling and outreach for the next cycle."
-        },
-        "provider": {
-          "label": "Who delivered the guidance sessions?"
-        },
-        "venue": {
-          "label": "Where were the sessions held?"
-        },
-        "most_useful": {
-          "label": "Which topic did the owner find most useful?"
-        },
-        "knowledge_check": {
-          "label": "Was a short knowledge check applied at the end of the cycle?",
-          "parts": {
-            "knowledge_check_done": "Yes / No",
-            "knowledge_score": "score",
-            "knowledge_score_of": "out of"
-          },
-          "partOpts": {
-            "knowledge_check_done": {
-              "true": "Yes",
-              "false": "No"
-            }
-          }
-        },
-        "peer_network": {
-          "label": "Was the owner enrolled in the peer-to-peer exchange network among producers?"
-        },
-        "further_needs": {
-          "label": "What additional training or technical support does the owner still need?",
-          "help": "Each need identified should generate a referral recorded on form 20."
-        },
-        "referral_made": {
-          "label": "Was the owner referred to another organisation or programme?"
-        },
-        "certificate": {
-          "label": "Was a certificate of completion issued?"
-        },
-        "evidence_attached": {
-          "label": "Evidence attached"
-        },
-        "recorded_by": {
-          "label": "Record completed by (name, position, date)",
-          "parts": {
-            "recorded_by_name": "name",
-            "recorded_by_position": "position",
-            "recorded_on": "date"
-          }
-        }
-      }
-    },
-    "g2": {
-      "title": "Home-Based Enterprise Support Log (beneficiary record, any form of support)",
-      "short": "Enterprise support",
-      "code": "KHLD-SO4-G2",
-      "indicator": "Number of home-based enterprises receiving business support",
-      "who": "Municipal community coordinator, consolidating entries from local and women's organisations",
-      "when": "Ongoing starting in 2027; each record updated whenever further support is given",
-      "calc": "Unique count of supported enterprises. Target 20–30 enterprises. Report by type of support and by sex, age, nationality and disability of the owner.",
-      "disaggregation": "Sex, age group, nationality and disability of the owner; type of support",
-      "definition": "Unique enterprises receiving any form of support under the Plan: guidance sessions, simplified licensing information, referral to training or technical partners, or participation in peer-to-peer exchange networks among entrepreneurs.",
-      "measures": "Each enterprise once, with every distinct type of support it received recorded against a date and a provider — a broader count than form 19, which requires completion of the full guidance cycle. The duplicate check protects the unique count.",
-      "unit": "one home-based enterprise (cumulative record, updated at each support event)",
-      "source": "Beneficiary log maintained by local associations and the community coordinator",
-      "evidence": "Attendance sheets; referral notes; delivery notes for in-kind support; site visit reports; the consolidated beneficiary log",
-      "sections": {
-        "s0": "Section A — Enterprise identification and duplicate check",
-        "s1": "Section B — Types of support received (record each with date and provider)",
-        "s2": "Section C — Current status and next steps"
-      },
-      "fields": {
-        "enterprise_id": {
-          "label": "Enterprise ID",
-          "sub": "Format: KHLD-ENT-NNN"
-        },
-        "duplicate_check": {
-          "label": "Is this owner or enterprise already recorded in the beneficiary log?",
-          "help": "The indicator is a unique count; this is the control that protects it.",
-          "sub": "No — new enterprise, create a record | Yes — existing enterprise ID (update that record, do not create a new one)"
-        },
-        "first_support_date": {
-          "label": "Date of the first support received under the Plan",
-          "sub": "dd/mm/yyyy"
-        },
-        "last_updated": {
-          "label": "Date this record was last updated",
-          "sub": "dd/mm/yyyy"
-        },
-        "owner_name_contact": {
-          "label": "Owner's name and phone number"
-        },
-        "sex": {
-          "label": "Sex"
-        },
-        "age_group": {
-          "label": "Age group"
-        },
-        "nationality": {
-          "label": "Nationality / status"
-        },
-        "disability": {
-          "label": "Disability status"
-        },
-        "product_type": {
-          "label": "Products",
-          "help": "Required disaggregation."
-        },
-        "priority_group": {
-          "label": "Does the owner belong to any of the Plan's priority groups?",
-          "help": "The Plan requires priority for under-represented groups."
-        },
-        "sup_guidance": {
-          "label": "Guidance or mentoring sessions attended",
-          "help": "If the full cycle was completed, also complete form 19.",
-          "parts": {
-            "sup_guidance": "Yes / No",
-            "sup_guidance_sessions": "number of sessions",
-            "sup_guidance_dates": "Dates",
-            "sup_guidance_provider": "Provider"
-          },
-          "partOpts": {
-            "sup_guidance": {
-              "true": "Yes",
-              "false": "No"
-            }
-          }
-        },
-        "sup_licensing_info": {
-          "label": "Simplified information on home-based business licensing requirements provided",
-          "parts": {
-            "sup_licensing_info": "Yes / No",
-            "sup_licensing_info_date": "date",
-            "sup_licensing_info_provider": "Provider"
-          },
-          "partOpts": {
-            "sup_licensing_info": {
-              "true": "Yes",
-              "false": "No"
-            }
-          }
-        },
-        "sup_hygiene": {
-          "label": "Guidance on hygiene, food safety or health certification provided",
-          "parts": {
-            "sup_hygiene_id": "Yes / No / Not applicable — non-food products",
-            "sup_hygiene_date": "date",
-            "sup_hygiene_provider": "Provider"
-          }
-        },
-        "sup_referral": {
-          "label": "Referral to a training, technical or financing partner",
-          "help": "Record the outcome, not only the referral.",
-          "parts": {
-            "sup_referral": "Yes / No",
-            "sup_referral_entity": "entity",
-            "sup_referral_purpose": "Purpose",
-            "sup_referral_date": "Date",
-            "sup_referral_outcome_id": "Outcome"
-          },
-          "partOpts": {
-            "sup_referral": {
-              "true": "Yes",
-              "false": "No"
-            }
-          }
-        },
-        "sup_peer_network": {
-          "label": "Enrolment in the peer-to-peer exchange network among producers",
-          "parts": {
-            "sup_peer_network": "Yes / No",
-            "sup_peer_network_date": "date",
-            "sup_peer_network_meetings": "Number of exchange meetings attended"
-          },
-          "partOpts": {
-            "sup_peer_network": {
-              "true": "Yes",
-              "false": "No"
-            }
-          }
-        },
-        "sup_market_access": {
-          "label": "Support to take part in a community market day (stall allocation, materials, logistics)",
-          "help": "Cross-reference the vendor registration sheets (form 22).",
-          "parts": {
-            "sup_market_access": "Yes / No",
-            "sup_market_access_refs": "market day references",
-            "sup_market_access_count": "Number of markets"
-          },
-          "partOpts": {
-            "sup_market_access": {
-              "true": "Yes",
-              "false": "No"
-            }
-          }
-        },
-        "sup_inkind": {
-          "label": "In-kind support received (display table, canopy, packaging materials, equipment)",
-          "help": "Also record on form 06 where a partner provided it.",
-          "parts": {
-            "sup_inkind": "Yes / No",
-            "sup_inkind_description": "describe, with estimated value in JOD and provider"
-          },
-          "partOpts": {
-            "sup_inkind": {
-              "true": "Yes",
-              "false": "No"
-            }
-          }
-        },
-        "sup_marketing": {
-          "label": "Marketing support (product photographs, social media, inclusion in a municipal product list)",
-          "parts": {
-            "sup_marketing": "Yes / No",
-            "sup_marketing_description": "describe"
-          },
-          "partOpts": {
-            "sup_marketing": {
-              "true": "Yes",
-              "false": "No"
-            }
-          }
-        },
-        "sup_site_visit": {
-          "label": "Individual follow-up or production site visit",
-          "parts": {
-            "sup_site_visit": "Yes / No",
-            "sup_site_visit_count": "number of visits",
-            "sup_site_visit_dates": "Dates"
-          },
-          "partOpts": {
-            "sup_site_visit": {
-              "true": "Yes",
-              "false": "No"
-            }
-          }
-        },
-        "sup_other": {
-          "label": "Any other support provided"
-        },
-        "support_types_count": {
-          "label": "Total number of distinct types of support received",
-          "help": "An enterprise with at least one type counts towards the indicator.",
-          "sub": "Number"
-        },
-        "providers": {
-          "label": "Which bodies provided the support?",
-          "help": "Required for reporting the partnership contribution to SO4."
-        },
-        "status_last_contact": {
-          "label": "Status of the enterprise at the last contact"
-        },
-        "licensing_progress": {
-          "label": "Progress on licensing and certification since support began",
-          "help": "The main practical result the guidance is meant to produce."
-        },
-        "outstanding_needs": {
-          "label": "Outstanding needs and the support planned next"
-        },
-        "evidence_attached": {
-          "label": "Evidence attached to this record"
-        },
-        "entered_by": {
-          "label": "Entered in the beneficiary log by (name, organisation, date)",
-          "parts": {
-            "entered_by_name": "name",
-            "entered_by_organisation": "organisation",
-            "entered_on": "date"
-          }
-        },
-        "consolidated_by": {
-          "label": "Consolidated and duplicate-checked by the community coordinator (name and date)",
-          "parts": {
-            "consolidated_by_name": "name",
-            "consolidated_on": "date"
-          }
-        }
-      }
-    },
-    "h1": {
-      "title": "Community Fair and Seasonal Market Day Record",
-      "short": "Market days",
-      "code": "KHLD-SO4-H1",
-      "indicator": "Number of community fairs and seasonal market days organised",
-      "who": "Municipal community coordinator with the local association co-organising the market",
-      "when": "Completed after each market day, April–December 2027 (pilot phase) and seasonally until September 2029",
-      "calc": "Cumulative count of market days held. Target 10 markets per Annex 1 of the Plan (JOD 2,000 × 10); pilot phase April–December 2027, continuing seasonally to 2029. Count only markets with an event record and a vendor registration sheet.",
-      "disaggregation": "By type / occasion (Friday / holiday / seasonal)",
-      "definition": "Market days organised inside Al Khalidiyah Public Park on Fridays, holidays and public occasions, leveraging foot traffic from the adjacent weekly Friday market, with spaces or kiosks for local food, handicrafts and artisanal goods.",
-      "measures": "Each market day as an organised, countable event: the occasion, the number of stalls offered and occupied, how the opportunity was announced and vendors selected, the services and accessibility provided, visitor volume, the hygiene check, and — because the Plan defines the park as non-commercial — whether any fee was charged.",
-      "unit": "one market day or fair",
-      "source": "Event records and activity reports prepared after each market",
-      "evidence": "Event report; vendor registration sheet; copy of the public announcement; municipal permit or decision; photographs; hygiene inspection note; vendor and visitor feedback forms",
-      "sections": {
-        "s0": "Section A — Market identification",
-        "s1": "Section B — Stalls, announcement and vendor selection",
-        "s2": "Section C — Services, visitors and compliance",
-        "s3": "Section D — Cost, issues and documentation"
-      },
-      "fields": {
-        "market_id": {
-          "label": "Market reference number",
-          "sub": "Format: KHLD-MKT-YYYY-NN"
-        },
-        "market_name": {
-          "label": "Name of the market or fair"
-        },
-        "market_date": {
-          "label": "Date and day of the week",
-          "sub": "Date Day"
-        },
-        "occasion": {
-          "label": "Type of occasion",
-          "help": "Required disaggregation."
-        },
-        "phase": {
-          "label": "Which implementation phase does this market belong to?"
-        },
-        "times": {
-          "label": "Start and end time",
-          "parts": {
-            "times_from": "From",
-            "times_to": "to"
-          }
-        },
-        "location": {
-          "label": "Location within the park"
-        },
-        "organisers": {
-          "label": "Organised by and co-organisers"
-        },
-        "permit": {
-          "label": "Municipal approval or permit reference and date",
-          "parts": {
-            "permit_reference": "Reference",
-            "permit_date": "Date"
-          }
-        },
-        "stalls_offered": {
-          "label": "Number of stalls or spaces made available",
-          "sub": "Number"
-        },
-        "stalls_occupied": {
-          "label": "Number of stalls actually occupied",
-          "help": "Must equal the number of vendors present on form 22.",
-          "sub": "Number"
-        },
-        "announcement": {
-          "label": "How and when was the opportunity to participate announced?",
-          "help": "The Plan requires that opportunities be announced publicly and transparently.",
-          "parts": {
-            "announcement": "Channels",
-            "announcement_days_before": "Days before the market"
-          }
-        },
-        "applications": {
-          "label": "Number of applications received and number accepted",
-          "parts": {
-            "applications_received": "Received",
-            "applications_accepted": "Accepted",
-            "applications_declined": "Declined",
-            "decline_reason": "Reason for declining"
-          }
-        },
-        "selection_method": {
-          "label": "How were vendors selected?",
-          "help": "Mitigation for the risk of perceived inequitable access."
-        },
-        "priority_share": {
-          "label": "Number of accepted vendors from priority groups",
-          "help": "Summed from form 22."
-        },
-        "fee_charged": {
-          "label": "Was any fee charged to vendors for a stall?",
-          "help": "The Plan defines the park as non-commercial; any fee must be justified, authorised and reported to the Municipality.",
-          "parts": {
-            "fee_charged": "No — free of charge / Yes — fee",
-            "fee_per_stall_jod": "amount per stall (JOD)",
-            "fee_basis": "Basis and authorisation"
-          },
-          "partOpts": {
-            "fee_charged": {
-              "true": "Yes",
-              "false": "No — stalls provided free of charge"
-            }
-          }
-        },
-        "refreshment_point": {
-          "label": "Did a community organisation operate a snack or refreshment point?",
-          "help": "Permitted under the Plan where applicable procedures allow."
-        },
-        "services_provided": {
-          "label": "Which services were provided to vendors?",
-          "help": "Vendor feedback on facilities is collected on form 18."
-        },
-        "accessibility": {
-          "label": "Was the market area accessible to persons with disabilities and to mothers with prams?"
-        },
-        "visitors": {
-          "label": "Estimated number of visitors and how it was estimated",
-          "help": "Also record on form 12 if the market was counted as a community activity.",
-          "parts": {
-            "visitors_estimated": "Estimated visitors",
-            "visitors_method_id": "Method"
-          }
-        },
-        "hygiene_check": {
-          "label": "Was a hygiene and food safety check carried out on food stalls?",
-          "help": "Vendors commit to hygiene and fair pricing standards under the Plan."
-        },
-        "parallel_activities": {
-          "label": "Which activities were held alongside the market?",
-          "help": "Record each separately on form 11 where it is a distinct activity."
-        },
-        "total_sales": {
-          "label": "Estimated total sales reported by vendors (JOD) and how the figure was obtained",
-          "help": "Report as vendor-reported, never as verified income.",
-          "parts": {
-            "total_sales_jod": "Total (JOD)",
-            "total_sales_method_id": "Method"
-          }
-        },
-        "cost": {
-          "label": "Cost of organising the market and source of funds",
-          "help": "Annex 1 of the Plan indicates about JOD 2,000 per market.",
-          "parts": {
-            "cash_cost_jod": "Cash cost (JOD)",
-            "cash_source_id": "Source",
-            "inkind_value_jod": "In-kind support received (JOD)",
-            "inkind_provider": "Provider"
-          }
-        },
-        "issues": {
-          "label": "Problems encountered"
-        },
-        "feedback_collected": {
-          "label": "Was feedback collected from vendors and visitors?",
-          "help": "Vendor follow-up is conducted on form 18 (KHLD-SO4-0).",
-          "parts": {
-            "feedback_collected_id": "Yes / Verbal feedback only / No",
-            "vendor_forms": "vendor forms",
-            "visitor_forms": "visitor forms"
-          }
-        },
-        "lessons": {
-          "label": "Lessons learned to apply at the next market day"
-        },
-        "evidence_attached": {
-          "label": "Evidence attached"
-        },
-        "recorded_by": {
-          "label": "Record completed by and verified by (names, positions, dates)",
-          "parts": {
-            "recorded_by_name": "Recorded by (name, position)",
-            "recorded_on": "date",
-            "verified_by_name": "Verified by (name, position)",
-            "verified_on": "date"
-          }
-        }
-      }
-    },
-    "h2": {
-      "title": "Market Day Vendor Registration Sheet (one entry per vendor per market day)",
-      "short": "Vendor registration",
-      "code": "KHLD-SO4-H2",
-      "indicator": "Number of home-based enterprises and vendors participating in park hosted seasonal markets",
-      "who": "Registration desk staffed by the Municipality and the co-organising local association",
-      "when": "On every market day, starting from April 2027",
-      "calc": "Count of registered vendors per market (participations), and a unique count of vendor IDs across all markets. Target 100–150 vendor participations.",
-      "disaggregation": "Sex; age group including youth 15–24; nationality (Jordanian / Syrian refugee); disability; product type",
-      "definition": "Household producers and home-based businesses occupying a stall or space in at least one market day. Both total participations and unique vendors are tracked, with priority for under-represented groups per the Plan (women, low-income families, youth, refugees, persons with disabilities).",
-      "measures": "Each vendor at each market day, with a stable vendor ID so that total participations and unique vendors can both be reported, the full disaggregation the framework requires, the priority-group flags, and the licensing and hygiene status of the activity.",
-      "unit": "one vendor at one market day",
-      "source": "Vendor registration sheets completed at each market day",
-      "evidence": "Signed registration sheet; stall allocation plan; hygiene and fair-pricing commitment signed by food vendors; copies of licences or health certificates where held",
-      "sections": {
-        "s0": "Section A — Market and vendor identification",
-        "s1": "Section B — Vendor details and disaggregation",
-        "s2": "Section C — The enterprise and its products",
-        "s3": "Section D — Stall, participation and consent"
-      },
-      "fields": {
-        "market_id": {
-          "label": "Market reference number and date (must match form 21)"
-        },
-        "returning_vendor": {
-          "label": "Has this vendor participated in a previous market day under the Plan?",
-          "help": "This is what separates total participations from the unique vendor count.",
-          "sub": "No — new vendor, assign a new vendor ID | Yes — existing vendor ID"
-        },
-        "vendor_id": {
-          "label": "Vendor ID",
-          "sub": "Format: KHLD-VEN-NNN"
-        },
-        "enterprise_id": {
-          "label": "Enterprise ID, if the vendor is already in the enterprise support log",
-          "help": "Links this sheet to forms 19 and 20.",
-          "sub": "KHLD-ENT- | Not in the support log"
-        },
-        "full_name": {
-          "label": "Full name"
-        },
-        "id_number": {
-          "label": "National ID number, or UNHCR registration number for Syrian refugees",
-          "help": "Collected only for unique counting; see the guidance sheet.",
-          "sub": "Number"
-        },
-        "sex": {
-          "label": "Sex",
-          "sub": "Female | Male"
-        },
-        "dob_age": {
-          "label": "Date of birth and age (used to derive the age band)",
-          "help": "Required disaggregation.",
-          "sub": "Date of birth Age Youth 15–24: Yes / No"
-        },
-        "nationality": {
-          "label": "Nationality / status",
-          "help": "Required disaggregation."
-        },
-        "disability": {
-          "label": "Do you have difficulty doing any of the following: seeing, hearing, walking or climbing steps, remembering or concentrating, self-care, communicating?",
-          "help": "If a difficulty is reported, note any adjustment needed at the stall."
-        },
-        "phone": {
-          "label": "Phone number"
-        },
-        "neighbourhood": {
-          "label": "Neighbourhood of residence"
-        },
-        "priority_flags": {
-          "label": "Priority group flags under the Plan's participation criteria",
-          "help": "Basis for reporting that priority was given to under-represented groups."
-        },
-        "vendor_type": {
-          "label": "Type of vendor",
-          "help": "Required for reporting home-based enterprises separately from other vendors."
-        },
-        "product_categories": {
-          "label": "Product categories offered at this market day",
-          "help": "Required disaggregation."
-        },
-        "licensed": {
-          "label": "Is the activity licensed or registered?",
-          "help": "Unlicensed vendors are referred to the guidance sessions (form 19)."
-        },
-        "health_certificate": {
-          "label": "For food products: does the vendor hold a health certificate or food safety approval?",
-          "help": "Record the status; do not exclude a vendor solely on this basis without a municipal decision."
-        },
-        "first_organised_market": {
-          "label": "Is this the vendor's first time participating in an organised market or exhibition?",
+        "F208": {
+          "label": "Did participating in the community market increase your opportunities to promote or sell your products?",
           "opts": {
             "true": "Yes",
             "false": "No"
           }
         },
-        "nominated_by": {
-          "label": "How did the vendor come to participate?"
-        },
-        "stall_number": {
-          "label": "Stall or space number allocated",
-          "sub": "Number"
-        },
-        "stall_free": {
-          "label": "Was the stall provided free of charge?",
-          "help": "Must be consistent with the fee question on form 21.",
-          "parts": {
-            "stall_free": "Yes — free of charge / No — fee paid",
-            "stall_fee_jod": "fee paid (JOD)"
-          },
-          "partOpts": {
-            "stall_free": {
-              "true": "Yes — free of charge",
-              "false": "No"
-            }
+        "F209": {
+          "label": "Did you reach new customers?",
+          "opts": {
+            "true": "Yes",
+            "false": "No"
           }
         },
-        "equipment_provided": {
-          "label": "Equipment provided by the organisers to this vendor"
-        },
-        "commitment_signed": {
-          "label": "Has the vendor signed the commitment to hygiene, safety and fair pricing standards?",
-          "help": "Required of participating producers under the Plan."
-        },
-        "attended": {
-          "label": "Did the vendor actually attend on the day?",
-          "help": "Only vendors who attended count towards the indicator."
-        },
-        "sales_band": {
-          "label": "Approximate sales on the day (optional, asked at the end of the market)",
-          "help": "Voluntary; feeds the total sales figure on form 21 and the follow-up survey on form 18."
-        },
-        "consent": {
-          "label": "Does the vendor consent to their details being kept in the municipal producer register and to being contacted for a follow-up survey, and to photographs being used in municipal reports?",
-          "help": "Consent to recontact is what makes indicator KHLD-SO4-0 possible."
-        },
-        "signature": {
-          "label": "Vendor signature and date",
-          "parts": {
-            "signed_by": "Vendor",
-            "signed_on": "date"
+        "F210": {
+          "label": "Did you make sales during the market?",
+          "opts": {
+            "true": "Yes",
+            "false": "No"
           }
         },
-        "registered_by": {
-          "label": "Registered by (name, organisation, date)",
-          "parts": {
-            "registered_by_name": "name",
-            "registered_by_organisation": "organisation",
-            "registered_on": "date"
+        "F211": {
+          "label": "Approximate sales value (JOD)"
+        },
+        "F212": {
+          "label": "Did you receive orders or contacts after the market?",
+          "opts": {
+            "true": "Yes",
+            "false": "No"
           }
         },
-        "notes": {
-          "label": "Notes"
+        "F213": {
+          "label": "Suggestions"
         }
       }
     }
   },
   "nav": {
     "group": {
-      "impact": "Impact",
-      "so1": "Objective 1 · Partnerships",
-      "so2": "Objective 2 · The park",
-      "so3": "Objective 3 · Volunteering",
-      "so4": "Objective 4 · Home-based enterprises and markets",
-      "definitions": "Definitions"
-    },
-    "rules": "Milestone rules"
+      "partnerships": "Partnerships and Institutional Sustainability",
+      "park": "Rehabilitation and activation of the park",
+      "volunteer": "Volunteer Program",
+      "business": "Small Business Support"
+    }
   },
   "list": {
     "new": "New record",
     "empty": "No records yet.",
     "emptyBody": "Records entered through this form appear here, newest first.",
-    "loadFailed": "The list could not be loaded.",
-    "search": "Search",
     "deleted": "Deleted",
     "showDeleted": "Show deleted",
     "count": "{count, plural, =0 {No records} one {# record} other {# records}}",
-    "columns": {
-      "reference": "Reference",
-      "title": "Title",
-      "person": "Person",
-      "partner": "Partner",
-      "enterprise": "Enterprise",
-      "linked": "Record",
-      "date": "Date",
-      "counts": "Counts",
-      "status": "Status"
-    }
+    "reference": "Reference",
+    "status": "Status",
+    "onlySubmitted": "Waiting for review only"
   },
   "form": {
     "newTitle": "New: {title}",
@@ -2831,121 +959,47 @@
     "cancel": "Cancel",
     "back": "Back to the list",
     "required": "This field is required.",
-    "assignedOnSave": "Assigned when the record is saved.",
-    "derivedOnSave": "Worked out from the answers when the record is saved.",
-    "notYet": "Not yet",
     "specify": "Please specify",
-    "noneSelected": "Nothing selected",
     "choose": "Choose…",
-    "calcTitle": "Calculation",
-    "who": "Responsible for completing",
-    "when": "Frequency / timing",
-    "indicator": "Indicator",
-    "definition": "Definition (framework)",
-    "measures": "What this form measures",
-    "unit": "One record per",
-    "disaggregation": "Disaggregation",
-    "source": "Data source",
-    "evidenceToFile": "Evidence to be filed",
-    "countingField": "This field decides whether the record counts",
-    "lookup": "Look up",
+    "assignedOnSave": "Assigned when the record is saved.",
+    "stampedOnSave": "The date and time of saving.",
+    "filesAfterSave": "Files are attached once the record is saved, on its page.",
+    "shownFrom": "Shown from the record chosen above.",
+    "notApplicable": "Not asked with the answer given above.",
     "lookingUp": "Looking up…",
-    "onFile": "On file — name is locked; empty details can be added.",
+    "onFile": "On file — the name is locked; empty details can be added.",
     "newPerson": "Not on file — a new person will be created.",
+    "idTypeFirst": "Choose the ID type first.",
     "nidInvalid": "A national ID is exactly nine digits.",
-    "unhcrEmpty": "Enter the UNHCR registration number as written on the certificate.",
-    "idType": {
-      "label": "Identifier",
-      "national_id": "National ID number",
-      "unhcr_number": "UNHCR registration number"
-    },
-    "idNumber": "Number",
-    "dob": "Date of birth",
-    "age": "Age (years)",
-    "dobOrAge": "A date of birth or an age in years.",
+    "idEmpty": "Enter the number as written on the document.",
     "phoneOnFile": "On file. A number already recorded is never overwritten.",
+    "personLocked": "The person is fixed once the record is saved.",
+    "min": "At least {min}.",
+    "range": "Between {min} and {max}.",
     "invalid": "Not saved. {message}",
+    "notSaved": "Not saved",
+    "ruleRequired": "\"{label}\" is required with the answers given.",
+    "ruleNotApplicable": "\"{label}\" is not asked with the answers given, so it must be left empty.",
     "notFound": "This record no longer exists or is not yours to edit.",
     "unknownColumn": "Not saved: the form sent a field the database does not know ({column}). This is a defect in the form.",
     "unknownBlock": "Not saved: the form sent a block this table does not take ({block}). This is a defect in the form.",
-    "consentRefused": "Not saved. The respondent did not consent, so the questionnaire is not recorded (field 4).",
     "yes": "Yes",
     "no": "No",
-    "undecided": "Not decided",
-    "recordedOn": "Recorded {when}",
-    "recordPicker": {
+    "picker": {
       "none": "None",
-      "loadFailed": "The list could not be loaded."
+      "loadFailed": "The list could not be loaded.",
+      "window": "Only those open today are listed.",
+      "confirmed": "Only partners whose outreach confirmed the partnership are listed.",
+      "held": "Only markets marked held are listed.",
+      "fromSource": "Only people registered on {form} are listed.",
+      "noneToChoose": "Nothing to choose yet."
     },
-    "enterprise": {
-      "fromOwner": "Leave empty for a new enterprise: it is created from the owner when the record is saved, and its KHLD-ENT number is assigned then.",
-      "open": "New enterprise",
-      "name": "Enterprise name",
-      "owner": "Owner's name",
-      "phone": "Owner's phone",
-      "add": "Add enterprise",
-      "cancel": "Cancel"
-    },
-    "partner": {
-      "open": "New partner",
-      "name": "Organisation name",
-      "type": "Partner type",
-      "contact": "Contact",
-      "add": "Add partner",
-      "cancel": "Cancel",
-      "note": "A partner is one row however many surveys and contributions name it. If the name is already on file, pick it from the list."
-    },
-    "checklist": {
-      "status": "Status",
-      "detail": "Detail",
-      "date": "Date",
-      "evidence": "Evidence reference"
-    },
-    "session": {
-      "status": "Attendance",
-      "date": "Date attended"
-    },
-    "rating": {
-      "item": "Item",
-      "rating": "Rating"
-    },
-    "counts": {
-      "cell": "Category",
-      "count": "Count",
-      "sum": "Sum of the cells"
-    },
-    "participants": {
-      "volunteer": "Volunteer",
-      "hours": "Hours",
-      "verified": "Verified from a signed attendance sheet",
-      "unverified": "Not verified",
-      "add": "Add volunteer",
-      "remove": "Remove",
-      "none": "No volunteers listed yet.",
-      "kept": "A volunteer already recorded on this occasion is kept; only hours and verification are updated.",
-      "loadFailed": "The volunteer register could not be loaded."
-    },
-    "log": {
-      "date": "Date",
-      "kind": "Activity type",
-      "reference": "Reference",
-      "hours": "Hours",
-      "verified": "Verified",
-      "none": "No participation is recorded for this volunteer.",
-      "inPeriod": "Only participations dated within the period reviewed are counted below.",
-      "chooseVolunteer": "Choose the volunteer first.",
-      "kind_campaign": "Rehabilitation campaign",
-      "kind_action_day": "Action day",
-      "kind_activity": "Event support",
-      "kind_market": "Market day support",
-      "kind_committee": "Committee task",
-      "kind_outreach": "Outreach"
+    "occasion": {
+      "campaign": "Volunteer campaign",
+      "activity": "Community activity"
     },
     "deleted": {
       "person": "This identifier belongs to a person who was deleted.",
-      "partner": "This partner was deleted.",
-      "enterprise": "This enterprise was deleted.",
-      "vendor": "This vendor was deleted.",
       "who": "Deleted {when} by {by}",
       "whoUnknown": "Deleted {when}",
       "restoreNote": "Restoring puts their records back into every Khalidiyah figure that counts them, including quarters already reported.",
@@ -2963,45 +1017,31 @@
     "created": "Created",
     "updated": "Updated",
     "notSet": "Not set",
-    "counts": "Counts towards the indicator",
-    "notCounts": "Does not count",
-    "milestone": {
-      "title": "Milestone status",
-      "established": "Established",
-      "partly_established": "Partly established",
-      "not_established": "Not established",
-      "not_computable": "Not computable",
-      "reason_no_rule": "No rule is recorded for this milestone.",
-      "reason_rule_not_evaluable": "The sheet's rule names items that are not checklist rows: {broken}. Until the M&E lead names the critical items, the status is not computable (OQ-56).",
-      "reason_items_missing": "Critical items not yet recorded on this verification: {missing}.",
-      "tally": "{in_place} in place · {partly} partly · {not_in_place} not in place, of {n} critical items"
+    "feeds": "Feeds",
+    "files": {
+      "requiredMissing": "The form asks for at least one file here; none is attached yet.",
+      "max": "Up to {max} files."
     },
-    "attendance": {
-      "title": "Reconciliation",
-      "total": "Total participants",
-      "bySex": "Sum by sex",
-      "byAgeSex": "Sum by age and sex",
-      "agrees": "The totals agree",
-      "disagrees": "The totals do not agree",
-      "distinct": "Distinct individuals",
-      "reason_not_checked": "No duplicate check was recorded.",
-      "reason_not_yet": "The duplicate check has not been done yet.",
-      "reason_not_possible": "Not possible with this counting method.",
-      "reason_repeat_count_missing": "The duplicate check says yes but the number of repeat participants is missing."
-    },
-    "participations": "Participations",
-    "sessionsOf": "{count} of 5",
     "publish": {
       "title": "Public page",
       "on": "Published",
       "off": "Not published",
       "publish": "Publish on the public page",
       "unpublish": "Take off the public page",
-      "note": "The public page at /khalidiyah lists published activities and market days whose date has not passed: the title, kind, date, time and place, and nothing else."
+      "note": "The public page at /khalidiyah lists published activities and markets that have not ended: the title, the type, the dates and the description, and nothing else."
     },
-    "completion": {
-      "true": "Completed",
-      "false": "Not completed"
+    "review": {
+      "title": "Registration",
+      "submitted": "Waiting for review",
+      "approved": "Approved",
+      "rejected": "Not accepted",
+      "approve": "Approve",
+      "reject": "Do not accept",
+      "reopen": "Back to waiting",
+      "public": "Registered by the volunteer on the public page.",
+      "staff": "Entered by staff.",
+      "note": "A registration counts towards the volunteer figures only once approved.",
+      "reviewedOn": "Reviewed {when}"
     }
   },
   "gate": {
@@ -3016,41 +1056,28 @@
     "so4": "SO4 · Home-based enterprises and markets"
   },
   "dashboard": {
-    "title": "Khalidiyah dashboard",
-    "intro": "Twenty-one indicators from the Al Khalidiyah results framework, computed from the twenty-one forms. Every figure is read from the database; nothing is typed or worked out here.",
-    "noValue": "—",
-    "percent": "{value}%",
-    "jod": "{value} JOD",
-    "ofTarget": "of {target}",
-    "targetNotSet": "not set",
     "planTarget": "Plan target",
     "planTargetNote": "The Plan states targets for the whole period, by year or as a percentage; none is split into quarters. The quarterly column therefore reads \"not set\", never zero.",
     "unique": {
-      "D2": "{count, plural, one {# distinct individual} other {# distinct individuals}}",
+      "A3": "{count, plural, one {# contribution} other {# contributions}}",
+      "H1": "{count, plural, one {# market held} other {# markets held}}",
       "H2": "{count, plural, one {# unique vendor} other {# unique vendors}}"
-    },
-    "denominator": "of {count}",
-    "notComputable": "Not computable: {detail}",
-    "noForm": "No form",
-    "rules": "Milestone rules",
-    "blockedNotice": "{count, plural, one {# milestone cannot be computed} other {# milestones cannot be computed}} until the M&E lead names its critical items (OQ-56)."
+    }
   },
-  "rules": {
-    "title": "Milestone rules",
-    "intro": "Each milestone form carries a rule naming the checklist items that must be \"In place\" for the milestone to count as established. Two of the four name items that are not checklist rows, so their status cannot be computed until a coordinator writes the critical items here. The sheet's own rule is shown verbatim; the decision is data, and the indicator views read it on the next query.",
-    "sourceRule": "The sheet's rule",
-    "sourceItems": "Items the rule names",
-    "critical": "Critical items applied",
-    "notDecided": "Not decided — status not computable",
-    "decidedOn": "decided {date}",
-    "items": "Checklist items of this milestone",
-    "decide": "Decide",
-    "save": "Save decision",
-    "cancel": "Cancel",
-    "chooseItems": "Tick the checklist items that must all be \"In place\".",
-    "clear": "Clear the decision",
-    "blocks": "Waiting on this",
-    "boundary": "Established when every critical item is In place; Not established when none is In place or Partly in place; Partly established otherwise (plan §7.3, a default for the M&E lead to confirm).",
-    "note": "Note"
+  "volunteer": {
+    "title": "Volunteer with the Municipality",
+    "intro": "Register as a volunteer in Al Khalidiyah. The Municipality reviews every registration and will contact you.",
+    "submit": "Register",
+    "submitting": "Sending…",
+    "registered": "Thank you. Your registration is received as {reference}. The Municipality will review it and contact you.",
+    "already_registered": "You are already registered as a volunteer. The Municipality will contact you.",
+    "withdrawn": "A registration under this ID was withdrawn. Please contact the Municipality office.",
+    "not_eligible": "This registration is for residents of Al Khalidiyah.",
+    "not_open": "Volunteer registration is not open on this page.",
+    "cannot_verify": "We could not register you with these details. If you registered before, check the date of birth, or try again later.",
+    "invalid": "Some answers are missing or not accepted. Check the form and try again.",
+    "failed": "The registration could not be sent. Check your connection and try again.",
+    "again": "Register someone else",
+    "privacy": "Your details are used by the Municipality for the volunteer programme only."
   }
 }

@@ -66,15 +66,28 @@ export function hasLinkageJourney(code: string): boolean {
 /**
  * Whether the page lists things to APPLY for, or only what is on.
  *
- * Khalidiyah has no public forms at all (KHALIDIYAH_IMPLEMENTATION_PLAN.md
- * §0.2): its activities are open, and its volunteers and vendors are
- * registered by staff. Its page therefore shows the published activities and
- * market days from v_public_khld_whats_on (0152) and never mentions applying,
+ * Khalidiyah's activities and markets are open to all: nothing on its page
+ * is applied for. Its page therefore shows the published activities and
+ * markets from v_public_khld_whats_on (0163) and never mentions
  * applications or accounts. The other two, and any fourth municipality until
  * someone says otherwise, list opportunities.
  */
 export function publicJourney(code: string): 'apply' | 'whats_on' {
   return code === 'KHLD' ? 'whats_on' : 'apply'
+}
+
+/**
+ * Whether residents register as volunteers on the page themselves.
+ *
+ * Khalidiyah's FORM-12 is a public form: the municipality's owner decided on
+ * 26 September 2026 that volunteers register themselves (0159, 0161), and a
+ * registration counts once staff approve it. Nobody else's forms have a
+ * public volunteer register; khld_register_volunteer answers `not_open` on
+ * any other municipality's slug regardless, and this decides whether the page
+ * is offered.
+ */
+export function hasVolunteerJourney(code: string): boolean {
+  return code === 'KHLD'
 }
 
 /**

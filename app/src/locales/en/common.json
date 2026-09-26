@@ -172,6 +172,7 @@
       "insert_refused": "The database refused the record: {message}",
       "bucket_mismatch": "This file is in a different store from the one configured. Tell the platform administrator.",
       "bad_request": "The request was not understood. This is a defect in the screen.",
+      "field_full": "This field already holds {max_files} files, the most the form takes. Remove one first.",
       "unknown": "The file could not be added."
     },
     "storage": {

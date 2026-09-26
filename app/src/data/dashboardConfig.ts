@@ -1,5 +1,5 @@
 import { RMTH_FORMS, RMTH_FORM_IDS, type RmthFormId } from '../rmth/forms.generated'
-import { KHLD_FORMS, KHLD_FORM_IDS, type KhldFormId } from '../khld/forms.generated'
+import { KHLD_INDICATOR_FORM } from '../khld/forms.generated'
 import type { Translate } from '../i18n/tx'
 import type { Dimension } from './disaggregation'
 import type { IndicatorRow, IndicatorSource } from './indicators'
@@ -222,42 +222,35 @@ const RMTH: DashboardConfig = {
 
 /* ── Khalidiyah ──────────────────────────────────────────────────────────── */
 
-/** The form that feeds an indicator, from the catalogue's own `code`, matched on the FULL code. */
-function khldFormFor(fullCode: string | undefined): KhldFormId | undefined {
-  if (!fullCode) return undefined
-  return KHLD_FORM_IDS.find((fid) => (KHLD_FORMS[fid] as { code: string }).code === fullCode)
-}
-
 const KHLD: DashboardConfig = {
-  // Four rows with a form each and a rule that computes -- coordination
-  // meetings, community activities, volunteers recruited, market days. One
-  // per objective; the milestones are left out because two of the four wait
-  // on a decision (OQ-56).
+  // Four rows with a form each, one per page of the workbook -- coordination
+  // meetings, community activities, volunteers recruited, market days.
   kpi: ['A2', 'D1', 'F2', 'H1'],
   kpiTone: { A2: 'teal', D1: 'green', F2: 'amber', H1: 'raised' },
-  // The form's short name, as in the sidebar. Found by the full code
-  // (`KHLD-SO1-A2`), so `A2` here can only ever be Khalidiyah's.
-  indicatorName: (row, { t, exists, ar, source }) => {
-    const fid = khldFormFor(source?.full_code)
-    const key = fid ? `khld:forms.${fid}.short` : ''
-    return fid && exists(key) ? t(key) : statement(row, ar)
-  },
+  // The framework's own statement, in the reader's language. The forms of
+  // Khaldia_2_reviewed.xlsx are operational, not one per indicator: FORM-22
+  // feeds A1, B1 and F1 alike, so a form's name would name three rows the
+  // same way.
+  indicatorName: (row, { ar }) => statement(row, ar),
   objectiveTitle: (code, row, { t, exists, ar }) => {
     const key = `khld:objective.${code.toLowerCase()}`
     return exists(key) ? t(key) : objectiveStatement(row, ar)
   },
-  sourceLinks: (_row, source) => {
-    const fid = khldFormFor(source?.full_code)
+  // The form carrying the indicator's main source, from the Calculation
+  // formulas sheet (catalogue.INDICATOR_FORM). The bare code is safe here:
+  // this entry is reached only for Khalidiyah's rows.
+  sourceLinks: (row) => {
+    const fid = KHLD_INDICATOR_FORM[row.code]
     return fid ? [{ to: `/khld/${fid}`, labelKey: `khld:forms.${fid}.short` }] : []
   },
-  // The person-level forms collect sex, the seven age bands, nationality and
-  // status, the Washington Group disability question and the neighbourhood
-  // (0141). Nothing is uncollected by design; what is missing is a breakdown
-  // VIEW, which the panel states from `is_disaggregable`.
+  // FORM-12, -15 and -17 collect sex, date of birth, the ID type (refugee
+  // status) and the Washington Group disability question; FORM-09 collects
+  // percentages. Nothing is uncollected by design; what is missing is a
+  // breakdown VIEW, which the panel states from `is_disaggregable`.
   uncollectedDimensions: [],
-  openItemsRoute: '/khld/rules',
-  openItemsLabelKey: 'khld:nav.rules',
   noTargetsNoteKey: 'khld:dashboard.planTargetNote',
+  // A3's number of contributions beside its value, H1's markets beside its
+  // days, H2's unique vendors beside its participations (v_khld_indicator_unique).
   uniqueText: (code, count, { t, exists }) => (exists(`khld:dashboard.unique.${code}`) ? t(`khld:dashboard.unique.${code}`, { count }) : ''),
 }
 

@@ -5,21 +5,21 @@ import { PublicShell } from './PublicShell'
 import { PrimaryButton } from '../../ui/primitives'
 import { formatDate } from '../../lib/format'
 import { SEP, RANGE } from '../../ui/glyphs'
-import { usePublicSite } from './PublicSite'
+import { hasVolunteerJourney, usePublicSite } from './PublicSite'
 
 /**
- * The public page of a municipality with no public forms: what's on.
+ * The public page of a municipality whose activities are open: what's on.
  *
  * Khalidiyah's residents are not asked to apply for anything through this
- * site -- its activities are open and its volunteers and vendors are
- * registered by staff on paper. So the page says what is coming up in the
- * park and where, and nothing else: no apply button, no application check,
- * no mention of accounts or signing in (KHALIDIYAH_IMPLEMENTATION_PLAN.md
- * Part 9).
+ * site -- its activities and markets are open to all. The one thing a
+ * resident does here is register as a volunteer (FORM-12, a public form
+ * since 26 September 2026, see hasVolunteerJourney). So the page says what
+ * is coming up in the park, offers the volunteer register, and nothing else:
+ * no application check, no mention of accounts or signing in.
  *
  * Reading order, for someone who arrived from a poster: what this is in one
- * sentence; then the coming activities and market days, soonest first; then
- * the way to another municipality's page.
+ * sentence; then the coming activities and markets, soonest first; then the
+ * volunteer register; then the way to another municipality's page.
  */
 export function WhatsOn() {
   const { t } = useTranslation('public')
@@ -73,10 +73,29 @@ export function WhatsOn() {
         )}
       </section>
 
+      {hasVolunteerJourney(site.municipality.code) ? <VolunteerPanel to={site.path('/volunteer')} /> : null}
+
       <p className="mt-8 text-[13px] text-muted">
         <Link to="/" className="text-muted underline hover:text-ink">{t('home.otherMunicipality')}</Link>
       </p>
     </PublicShell>
+  )
+}
+
+/** The volunteer register, offered under what is on. The words are the form's (khld:volunteer). */
+function VolunteerPanel({ to }: { to: string }) {
+  const { t } = useTranslation('khld')
+  return (
+    <section className="mt-8 border-[1.5px] border-ink p-5 sm:mt-10 sm:p-6">
+      <h2 className="m-0 text-[19px] font-extrabold tracking-[-0.02em] sm:text-[22px]">{t('volunteer.title')}</h2>
+      <p className="mt-2 max-w-[52ch] text-[15px] leading-[1.55] text-body">{t('volunteer.intro')}</p>
+      <Link
+        to={to}
+        className="mt-4 inline-flex min-h-11 items-center bg-ink px-5 font-narrow text-[12.5px] font-bold uppercase tracking-[0.12em] text-bg no-underline hover:text-bg"
+      >
+        {t('volunteer.submit')}
+      </Link>
+    </section>
   )
 }
 

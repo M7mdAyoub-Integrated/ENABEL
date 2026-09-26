@@ -12,34 +12,30 @@
  *
  * ── THE SUBSTANCE THIS VERIFIES ──
  *
- * It walks the generated form definitions, which are the structure the
- * screens actually render, and asserts that every key those screens will ask
- * for exists in BOTH locales:
+ * It walks the generated form definitions (Khaldia_2_reviewed.xlsx, 23
+ * forms), which are the structure the screens actually render, and asserts
+ * that every key those screens will ask for exists in BOTH locales:
  *
- *   - the thirteen header keys of each form (title, short, code, indicator,
- *     who, when, calc, disaggregation, definition, measures, unit, source,
- *     evidence -- the form screen shows five of them and the list two)
- *   - every section heading
- *   - every field label
- *   - both answers of every bool field, as its `options` list them
- *   - every part heading of a `parts` field -- ALL of them: unlike Ramtha's
- *     generator, Khalidiyah's writes a heading for the first part too
- *   - both answers of every bool part
- *   - the static keys the screens build from a code: the identifier types,
- *     the participation kinds, the milestone statuses and reasons, the
- *     attendance reasons, the unique-count wordings, the nav groups, the
- *     objective headings, the deleted-entity bands, the completion words
+ *   - the title and short name of each form
+ *   - every field label, by Field ID
+ *   - both answers of every bool field ('true', 'false')
+ *   - the five answers of every likert field ('1'..'5')
+ *   - the label of a record picker's added option (F160, F181)
+ *   - the static keys the screens build from a code: the page groups, the
+ *     objective headings, a volunteer registration's three statuses, the
+ *     seven answers of the public registration, the two occasions, the
+ *     second figures of the dashboard
  *
  * Options that come from a `ref_khld_*` table are NOT checked here: those
  * labels are rows in the database (label_en / label_ar, seeded verbatim from
- * the sheets by 0141), not locale keys.
+ * the sheet by 0156-0157), not locale keys.
  *
  * ── CONFIRMED BY MAKING IT FAIL ──
  *
- * Not by reading it. Deleting `forms.f2.fields.id_number.label` from en,
- * deleting `partOpts.stall_free.false` from ar, and adding a field to a form
- * definition without regenerating the locales each produce a non-zero exit
- * naming the key. Restoring each returns it to zero.
+ * Not by reading it. Deleting `forms.form12.fields.F058.label` from en,
+ * deleting `forms.form19.fields.F166.opts.3` from ar, and deleting
+ * `volunteer.withdrawn` from en each produce a non-zero exit naming the key.
+ * Restoring each returns it to zero.
  */
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -115,46 +111,30 @@ let optionCount = 0
 
 for (const [fid, def] of Object.entries(FORMS)) {
   const base = `forms.${fid}`
-  for (const k of ['title', 'short', 'code', 'indicator', 'who', 'when', 'calc', 'disaggregation', 'definition', 'measures', 'unit', 'source', 'evidence']) {
-    need(locales, `${base}.${k}`, `form ${fid} header`)
-  }
-  for (const section of def.sections ?? []) {
-    need(locales, `${base}.sections.${section.key}`, `section heading of ${fid}`)
-    for (const f of section.fields ?? []) {
-      fieldCount++
-      need(locales, `${base}.fields.${f.key}.label`, `field label (${fid}.${f.key}, ${f.type})`)
-      if (f.type === 'bool') {
-        for (const opt of f.options ?? []) {
-          optionCount++
-          need(locales, `${base}.fields.${f.key}.opts.${opt}`, `answer "${opt}" of ${fid}.${f.key}`)
-        }
-      }
-      for (const part of f.parts ?? []) {
-        need(locales, `${base}.fields.${f.key}.parts.${part.column}`, `heading of part ${part.column} in ${fid}.${f.key}`)
-        if (part.type === 'bool') {
-          for (const opt of part.options ?? []) {
-            optionCount++
-            need(locales, `${base}.fields.${f.key}.partOpts.${part.column}.${opt}`, `answer "${opt}" of part ${part.column} in ${fid}.${f.key}`)
-          }
-        }
-      }
+  for (const k of ['title', 'short']) need(locales, `${base}.${k}`, `form ${fid} header`)
+  for (const f of def.fields ?? []) {
+    fieldCount++
+    need(locales, `${base}.fields.${f.id}.label`, `field label (${fid}.${f.id}, ${f.kind})`)
+    const answers = f.kind === 'bool' ? ['true', 'false'] : f.kind === 'likert' ? ['1', '2', '3', '4', '5'] : []
+    for (const opt of answers) {
+      optionCount++
+      need(locales, `${base}.fields.${f.id}.opts.${opt}`, `answer "${opt}" of ${fid}.${f.id}`)
     }
+    if (f.extra) need(locales, `${base}.fields.${f.id}.extra`, `the added option of ${fid}.${f.id}`)
   }
 }
 
 // The keys the screens build from a code. Each list is the closed set the
-// screen can produce, taken from the database's own values (0147, 0150) or
-// the definition's codes -- so a value added on one side fails here on the other.
+// screen can produce, taken from the database's own values (0159, 0161) or
+// the definition's -- so a value added on one side fails here on the other.
+const groups = [...new Set(Object.values(FORMS).map((d) => d.group))]
 const STATIC = {
-  'form.idType': ['label', 'national_id', 'unhcr_number'],
-  'form.log': ['kind_campaign', 'kind_action_day', 'kind_activity', 'kind_market', 'kind_committee', 'kind_outreach'],
-  'form.deleted': ['person', 'partner', 'enterprise', 'vendor'],
-  'detail.milestone': ['established', 'partly_established', 'not_established', 'not_computable', 'reason_no_rule', 'reason_rule_not_evaluable', 'reason_items_missing', 'tally'],
-  'detail.attendance': ['reason_not_checked', 'reason_not_yet', 'reason_not_possible', 'reason_repeat_count_missing'],
-  'detail.completion': ['true', 'false'],
-  'dashboard.unique': ['D2', 'H2'],
-  'nav.group': ['impact', 'so1', 'so2', 'so3', 'so4', 'definitions'],
+  'nav.group': groups,
   objective: ['impact', 'so1', 'so2', 'so3', 'so4'],
+  'detail.review': ['submitted', 'approved', 'rejected'],
+  volunteer: ['registered', 'already_registered', 'withdrawn', 'not_eligible', 'not_open', 'cannot_verify', 'invalid'],
+  'form.occasion': ['campaign', 'activity'],
+  'dashboard.unique': ['A3', 'H1', 'H2'],
 }
 for (const [prefix, keys] of Object.entries(STATIC)) {
   for (const k of keys) need(locales, `${prefix}.${k}`, `a key a screen builds from a code`)

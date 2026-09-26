@@ -26,7 +26,6 @@ import { RequireKhalidiyah } from './khld/RequireKhalidiyah'
 import { KhldListScreen } from './khld/KhldListScreen'
 import { KhldFormScreen } from './khld/KhldFormScreen'
 import { KhldDetailScreen } from './khld/KhldDetailScreen'
-import { KhldRules } from './khld/KhldRules'
 import { KHLD_FORM_IDS } from './khld/forms.generated'
 import Dashboard from './routes/Dashboard'
 import NotFound from './routes/NotFound'
@@ -36,6 +35,7 @@ import { LegacyPublicRedirect } from './routes/public/LegacyPublicRedirect'
 import ApplyForm from './routes/public/ApplyForm'
 import LinkageRequest from './routes/public/LinkageRequest'
 import MyApplications from './routes/public/MyApplications'
+import VolunteerRegister from './routes/public/VolunteerRegister'
 import LinkageQueue from './routes/LinkageQueue'
 import LinkageDirect from './routes/LinkageDirect'
 import FollowupList from './routes/FollowupList'
@@ -156,6 +156,9 @@ const router = createBrowserRouter([
       // has no account to sign in to. Identity is the same national ID plus
       // date of birth check as everywhere else, in its own RPC. See 0070.
       { path: 'my-applications', element: <MyApplications /> },
+      // Khalidiyah's FORM-12, filled in by the volunteer (0161). Only where
+      // the journey exists; see hasVolunteerJourney.
+      { path: 'volunteer', element: <VolunteerRegister /> },
       { path: '*', element: <PublicNotFound /> },
     ],
   },
@@ -476,22 +479,13 @@ const router = createBrowserRouter([
         )),
       },
 
-      // ── Khalidiyah's twenty-one forms ─────────────────────────────────────
+      // ── Khalidiyah's twenty-three forms ───────────────────────────────────
       //
       // The same shape as Ramtha's: `:form` is the form id, the screens read
-      // their structure from KHLD_FORMS, and RequireKhalidiyah refuses an id
-      // that is not one of the twenty-one and an account whose municipality
-      // is not Khalidiyah. `/khld/rules` is the milestone rules screen, a
-      // static segment ahead of `/khld/:form` for the reason given above.
+      // their structure from KHLD_FORMS (Khaldia_2_reviewed.xlsx), and
+      // RequireKhalidiyah refuses an id that is not one of the twenty-three
+      // and an account whose municipality is not Khalidiyah.
       { path: '/khld', element: <Navigate to={`/khld/${KHLD_FORM_IDS[0]}`} replace /> },
-      {
-        path: '/khld/rules',
-        element: guard(<KhldRules />, (n) => (
-          <RequireCapability capability="dashboard.view">
-            <RequireKhalidiyah>{n}</RequireKhalidiyah>
-          </RequireCapability>
-        )),
-      },
       {
         path: '/khld/:form',
         element: guard(<KhldListScreen />, (n) => (

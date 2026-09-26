@@ -6,13 +6,13 @@ import { unwrapList } from './errors'
  * ─────────────────────────────────────────────────────────────────────────────
  *  The Khalidiyah public read: what's on.
  *
- *  Khalidiyah has no public forms (KHALIDIYAH_IMPLEMENTATION_PLAN.md §0.2),
- *  so its page lists what the Municipality has PUBLISHED and nothing else --
- *  the coming community activities and market days, from
- *  `v_public_khld_whats_on` (0152), the sixth and only other object `anon`
- *  is granted. Like `v_public_opportunity` it is security definer over base
+ *  Nothing on Khalidiyah's page is applied for, so it lists what the
+ *  Municipality has PUBLISHED -- the community activities (FORM-08) and
+ *  markets (FORM-16) that have not ended, from `v_public_khld_whats_on`
+ *  (0163). Like `v_public_opportunity` it is security definer over base
  *  tables, and its own WHERE clauses are the entire boundary: published, not
- *  deleted, the municipality active, today or later.
+ *  deleted, the municipality active, not yet ended. (The volunteer register
+ *  is the page's one write; see data/publicVolunteer.ts.)
  *
  *  NOTHING HERE FILTERS FOR SECURITY. The slug is the page's choice. No
  *  counts, no names, no partners, no participants arrive here, because the

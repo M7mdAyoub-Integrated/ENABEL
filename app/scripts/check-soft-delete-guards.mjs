@@ -155,8 +155,27 @@ for (const file of readdirSync(migrationsDir)
   // This is rare and should stay rare: CLAUDE.md forbids dropping anything
   // holding data. The one real case is ref_event_type, created by 0027 and
   // removed by 0029 when the OQ-12 form work was reverted.
-  const dropRe = /drop\s+table\s+(?:if\s+exists\s+)?(?:public\.)?"?([a-z0-9_]+)"?/gi
-  while ((m = dropRe.exec(sql)) !== null) declared.delete(m[1])
+  //
+  // The second case is the user's decision of 26 September 2026 (CLAUDE.md,
+  // hard rule 5): the first Khalidiyah forms were retired when the reviewed
+  // workbook replaced them. 0153 drops fifty tables in ONE statement --
+  // `drop table a, b, c;` -- so every name of the list is read, not the first.
+  const dropRe = /drop\s+table\s+(?:if\s+exists\s+)?((?:(?:public\.)?"?[a-z0-9_]+"?\s*,\s*)*(?:public\.)?"?[a-z0-9_]+"?)/gi
+  while ((m = dropRe.exec(sql)) !== null) {
+    for (const name of m[1].split(',')) declared.delete(name.trim().replace(/^public\./, '').replace(/"/g, ''))
+  }
+  // And 0154-0155 drop the 238 option lists by a LIKE over the catalogue
+  // (`relname like 'ref\_khld\_%'` driving `execute format('drop table
+  // public.%I')`), because the names were only ever the loop's. Read the
+  // pattern and remove every name declared SO FAR that it matches -- a table
+  // created by a later file (0156's lists) is added back when that file is
+  // read. Only a block that both filters on the pattern and drops by %I
+  // counts; a LIKE anywhere else is not a drop.
+  const likeDropRe = /relname\s+like\s+'([a-z0-9_\\%]+)'([\s\S]{0,600}?)drop\s+table\s+public\.%I/gi
+  while ((m = likeDropRe.exec(sql)) !== null) {
+    const pattern = new RegExp('^' + m[1].replace(/\\_/g, '_').replace(/%/g, '.*') + '$')
+    for (const t of [...declared]) if (pattern.test(t)) declared.delete(t)
+  }
 }
 
 const missingFromSnapshot = [...declared].filter((t) => !listed.has(t)).sort()

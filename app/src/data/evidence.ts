@@ -39,6 +39,8 @@ export type Attachment = {
   content_kind: EvidenceKind
   uploaded_at: string
   deleted_at: string | null
+  /** The Khalidiyah Field ID a file answers (0158); null everywhere else. */
+  field_code: string | null
 }
 
 export type EvidenceUsage = {
@@ -57,7 +59,7 @@ export type EvidenceUsage = {
 export type FunctionRefusalResult =
   | 'r2_not_configured' | 'not_signed_in' | 'not_permitted' | 'not_found' | 'record_deleted' | 'file_too_large'
   | 'quota_exceeded' | 'object_missing' | 'size_mismatch' | 'store_unreachable' | 'insert_refused'
-  | 'coordinator_only' | 'bucket_mismatch' | 'upload_failed' | 'bad_request' | 'unknown'
+  | 'coordinator_only' | 'bucket_mismatch' | 'upload_failed' | 'bad_request' | 'field_full' | 'unknown'
 
 export class EvidenceFunctionRefusal extends Error {
   readonly result: FunctionRefusalResult
@@ -93,7 +95,7 @@ async function invokeEvidence(body: Record<string, unknown>): Promise<FnResult> 
 function refusalOf(r: FnResult): EvidenceFunctionRefusal {
   const result = (r.result ?? 'unknown') as FunctionRefusalResult
   const values: Record<string, string | number> = {}
-  for (const k of ['used_bytes', 'quota_bytes', 'size_bytes', 'file_limit_bytes', 'declared', 'stored', 'message', 'code']) {
+  for (const k of ['used_bytes', 'quota_bytes', 'size_bytes', 'file_limit_bytes', 'declared', 'stored', 'message', 'code', 'max_files']) {
     const v = r[k]
     if (typeof v === 'number' || typeof v === 'string') values[k] = v
   }
@@ -102,22 +104,25 @@ function refusalOf(r: FnResult): EvidenceFunctionRefusal {
 }
 
 export const evidenceKeys = {
-  list: (entityType: string, entityId: string) => ['evidence', 'list', entityType, entityId] as const,
+  /** A record's files; with a field code, the files of that one field (a longer key under the same prefix). */
+  list: (entityType: string, entityId: string, fieldCode?: string) =>
+    (fieldCode ? ['evidence', 'list', entityType, entityId, fieldCode] : ['evidence', 'list', entityType, entityId]) as readonly string[],
   usage: ['evidence', 'usage'] as const,
 }
 
-export function useAttachments(entityType: string, entityId: string | undefined) {
+export function useAttachments(entityType: string, entityId: string | undefined, fieldCode?: string) {
   return useQuery({
-    queryKey: evidenceKeys.list(entityType, entityId ?? ''),
+    queryKey: evidenceKeys.list(entityType, entityId ?? '', fieldCode),
     enabled: !!entityId,
     queryFn: async (): Promise<Attachment[]> => {
-      const res = await (supabase
+      let q = supabase
         .from('attachment')
-        .select('id, entity_type, entity_id, bucket, object_key, file_name, mime_type, size_bytes, original_size_bytes, content_kind, uploaded_at, deleted_at')
+        .select('id, entity_type, entity_id, bucket, object_key, file_name, mime_type, size_bytes, original_size_bytes, content_kind, uploaded_at, deleted_at, field_code')
         .eq('entity_type', entityType)
         .eq('entity_id', entityId!)
         .is('deleted_at', null)
-        .order('uploaded_at', { ascending: false }) as unknown as Promise<{ data: Attachment[] | null; error: unknown }>)
+      if (fieldCode) q = q.eq('field_code', fieldCode)
+      const res = await (q.order('uploaded_at', { ascending: false }) as unknown as Promise<{ data: Attachment[] | null; error: unknown }>)
       return unwrapList(res)
     },
   })
@@ -137,7 +142,7 @@ export function useEvidenceUsage() {
 
 export type UploadInput = { file: File; kind: EvidenceKind }
 
-export function useUploadEvidence(entityType: string, entityId: string) {
+export function useUploadEvidence(entityType: string, entityId: string, fieldCode?: string) {
   const qc = useQueryClient()
   return useMutation({
     mutationKey: ['evidence', 'upload', entityType, entityId],
@@ -161,6 +166,7 @@ export function useUploadEvidence(entityType: string, entityId: string) {
         entity_id: entityId,
         file_name: prepared.fileName,
         size_bytes: prepared.blob.size,
+        ...(fieldCode ? { field_code: fieldCode } : {}),
       })
       if (!presigned.ok) throw refusalOf(presigned)
 
@@ -186,6 +192,7 @@ export function useUploadEvidence(entityType: string, entityId: string) {
         size_bytes: prepared.blob.size,
         original_size_bytes: prepared.originalSize,
         content_kind: prepared.kind,
+        ...(fieldCode ? { field_code: fieldCode } : {}),
       })
       if (!confirmed.ok) throw refusalOf(confirmed)
       return String(confirmed['id'])

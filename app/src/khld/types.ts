@@ -3,139 +3,106 @@
  * forms.generated.ts by supabase/khalidiyah/gen_forms.py from the catalogue.
  *
  * Labels are NOT here: they live in locales/{en,ar}/khld.json under
- * forms.<id>.fields.<key>, verbatim from the sheets in both languages, and
- * option labels are ref_khld_* rows in the database. A definition is
- * structure only: which column, junction question, count list, checklist
- * item or child block a control writes, in the terms save_khld_record (0148)
- * accepts.
+ * forms.<id>.fields.<Field ID>, verbatim from Khaldia_2_reviewed.xlsx in both
+ * languages, and option labels are ref_khld_* rows in the database. A
+ * definition is structure only: which column, question or junction a control
+ * writes, in the terms save_khld_record (0161) accepts.
  */
-export type KhldPartType =
-  | 'text' | 'number' | 'money' | 'date' | 'phone' | 'select' | 'multi' | 'bool' | 'record' | 'person_phone'
 
-/**
- * A control that belongs to one answer of another control on the same form:
- * the fee to "No — fee paid", the score to "Yes", IMP-0's park-use block to
- * any visit but "Never". `codes` for a select column, `value` for a boolean
- * one. The screens dim and blank a control whose answer is not chosen; the
- * rules that REFUSE a missing one live in the database (guard_khld_rules).
- */
-export type KhldWhen = { column: string; codes?: readonly string[]; value?: boolean }
-
-export type KhldPartDef = {
-  column: string
-  type: KhldPartType
-  required?: boolean
-  when?: KhldWhen
-  /** A select or multi part: the ref_khld_ list it reads. */
-  ref?: string
-  /** A select part whose list has a free-text option: the `_other` column. */
-  other?: string
-  /** A multi part: the question_code its option rows carry. */
-  question?: string
-  /** A record part: the table it points at. */
-  table?: string
-  /** A bool part: 'true' and 'false', labelled by partOpts in the locale. */
-  options?: readonly string[]
-}
-
-export type KhldFieldType =
-  /** The person spine (plan §2): the identifier is national ID or UNHCR number, chosen explicitly. */
-  | 'ident' | 'person_name' | 'person_sex' | 'person_phone' | 'dob' | 'dob_age'
+/** What a field is (supabase/khalidiyah/catalogue.py says the same, at more length). */
+export type KhldKind =
   /** One column. */
-  | 'text' | 'area' | 'number' | 'money' | 'date' | 'month' | 'bool' | 'select'
-  /** An option junction row per tick. */
+  | 'text' | 'area' | 'int' | 'money' | 'percent' | 'date' | 'bool' | 'select' | 'likert'
+  /** Set by the database: F012 and F159's moment of saving, a KHLD-XXX reference. */
+  | 'stamp' | 'reference'
+  /** A khld_<table>_option row per tick; the question is the Field ID in lower case. */
   | 'multi'
+  /** Evidence on the record under this Field ID (attachment.field_code, 0158). */
+  | 'file'
   /** A picker over another Khalidiyah table (a foreign key). */
   | 'record'
-  /** Derived by the database or shown from a linked record: never accepted. */
-  | 'readonly'
-  /** Several columns under one sheet row. */
-  | 'parts'
-  /** A count row per cell of a "by ..." field. */
-  | 'counts'
-  /** One row of a milestone's checklist (status, detail, date, evidence reference). */
-  | 'checklist'
-  /** SO2-0's facility matrix: a rating row per item. */
-  | 'rating'
-  /** One of SO4-G1's five core sessions: attendance status and date. */
-  | 'session'
-  /** The volunteers present at an occasion: khld_volunteer_participation rows, merged by volunteer. */
-  | 'participants'
-  /** SO3-0's read-only log of one volunteer's participations. */
-  | 'participation_log'
+  /** Several partners: a junction (F118, F131). */
+  | 'records'
+  /** FORM-13 F147: one campaign (FORM-07) or one activity (FORM-08), two columns. */
+  | 'occasion'
+  /** A person picked from another form's registrations (F112, F197, F206). */
+  | 'person_ref'
+  /** The identifier block of FORM-12, -15 and -17: `person`, one row per person. */
+  | 'id_type' | 'ident' | 'person_name' | 'person_sex' | 'dob' | 'person_phone'
+  /** The name of the person another field picked, never typed (F069, F111). */
+  | 'shown'
+
+/**
+ * A control that belongs to answers of another control on the same form. A
+ * select's values are option CODES; a bool's are 'true' / 'false'; a
+ * record's are '__extra__' (the added option: "Other", "General park visit")
+ * or '__record__' (a real row). Every condition of the list must hold. The
+ * screens dim and blank a control whose answer is not chosen; the rules that
+ * REFUSE are khld_field_rule rows in the database (0158).
+ */
+export type KhldCond = { readonly field: string; readonly values: readonly string[] }
 
 export type KhldFieldDef = {
-  key: string
-  type: KhldFieldType
-  required?: boolean
-  when?: KhldWhen
-  /** The sheet's count gate: this field decides whether the record counts (plan §5.3). */
-  counting?: boolean
-  /** A readonly field: what the database assigns or works out, or which linked record's column is shown. */
-  derived?: string
-  /** The column a single-column field writes (`<key>` or `<key>_id`), or a record picker's foreign key. */
-  column?: string
-  /** The ref_khld_ list a select / multi / checklist / counts / session field reads. */
-  ref?: string
+  readonly id: string
+  readonly kind: KhldKind
+  /** The column a one-column field writes. */
+  readonly column?: string
+  readonly required?: boolean
+  readonly when?: readonly KhldCond[]
+  /** The ref_khld_ list a select, multi, ID type or sex reads. */
+  readonly list?: string
   /** A select whose list has a free-text option: the `_other` column. */
-  other?: string
-  /** A multi field: the question_code its option rows carry (form-prefixed on the shared milestone table). */
-  question?: string
-  /** A counts field: the field_code its count rows carry. */
-  fieldCode?: string
-  /** A record picker: the table it lists. */
-  table?: string
-  /** A record picker that may also create the entity (partner, enterprise). */
-  create?: boolean
-  /** A bool field: the options the sheet offers ('true' and 'false', or 'true' alone). */
-  options?: readonly string[]
-  /** A bool or select the database stamps with who recorded it and when (consent). */
-  stamp?: boolean
-  /** A consent that must be true for the record to be saved (a constraint, not a screen rule). */
-  mustBeTrue?: boolean
-  /** A checklist row: its item number on the milestone and the option codes that take a detail text. */
-  itemNo?: number
-  detail?: readonly string[]
-  /** A rating field: the item list and the rating list. */
-  items?: string
-  ratings?: string
-  /** A session field: its number, its date column, and whether "not applicable" is one of its answers. */
-  n?: number
-  dateColumn?: string
-  na?: boolean
-  parts?: readonly KhldPartDef[]
+  readonly other?: string
+  /** A multi: the question_code its option rows carry. */
+  readonly question?: string
+  /** A likert: which 1-5 wording (the labels are the field's `opts` in the locale). */
+  readonly scale?: string
+  /** A record or records picker: the table it lists. A person_ref: the table whose people it lists. */
+  readonly table?: string
+  /** A record picker: the two date columns of the target between which it is open today. */
+  readonly window?: readonly string[]
+  /** A record picker's added option; `column` is the boolean it sets, when it has one. */
+  readonly extra?: { readonly code: string; readonly column?: string }
+  /** F174: partners whose outreach confirmed the partnership (F116). */
+  readonly confirmed?: boolean
+  /** F207: markets whose status is Held. */
+  readonly held?: boolean
+  readonly maxFiles?: number
+  /** A shown field: the field whose record it names. */
+  readonly of?: string
+  readonly ltr?: boolean
+  readonly min?: number
+  readonly max?: number
+  /** F060 "if no then disqualified": a CHECK in the database. */
+  readonly mustBeTrue?: boolean
 }
-
-export type KhldSectionDef = { key: string; fields: readonly KhldFieldDef[] }
-
-/** The five identity classes of plan §5.1. */
-export type KhldClass = 'anonymous' | 'organisation' | 'record' | 'aggregate' | 'linked' | 'person'
 
 export type KhldFormDef = {
-  id: string
-  /** The framework code, `KHLD-SO1-A2`. */
-  code: string
-  /** The indicator's short code as `indicator.code` carries it, `SO1-A2`. */
-  indicator: string
-  sheet: string
-  table: KhldTable
-  cls: KhldClass
-  /** The four milestone forms share one table; this says which milestone. */
-  milestone?: string
-  /** The reference prefix the database issues on save (`KHLD-CM`), when the table has one. */
-  reference?: string
-  /** Columns set on every new record (the milestone code). */
-  fixed: Readonly<Record<string, string>>
-  /** Columns the list filters on (the same). */
-  filter: Readonly<Record<string, string>>
-  sections: readonly KhldSectionDef[]
+  readonly id: string
+  /** The Form ID(s) of the sheet: FORM-03 and FORM-04 are one form. */
+  readonly sheets: readonly string[]
+  readonly table: KhldTable
+  readonly group: string
+  /** The RLS helper that may write: can_write, or is_staff for the three questionnaires. */
+  readonly writer: 'can_write' | 'is_staff'
+  /** The reference prefix the database issues on save (`KHLD-MTG`), when the table has one. */
+  readonly reference?: string
+  /** Activities and markets: published on the public page by a coordinator. */
+  readonly published?: boolean
+  /** FORM-12: also filled in by the public, and reviewed. */
+  readonly public?: boolean
+  /** The indicators the sheet says this form feeds (full codes). */
+  readonly indicators: readonly string[]
+  /** The fields the list screen shows as columns. */
+  readonly list: readonly string[]
+  readonly fields: readonly KhldFieldDef[]
 }
 
-/** The 22 tables save_khld_record accepts (0148), entities included. */
+/** The 23 tables save_khld_record accepts (0161). */
 export type KhldTable =
-  | 'khld_partner' | 'khld_enterprise' | 'khld_vendor'
-  | 'khld_works_item' | 'khld_coordination_meeting' | 'khld_contribution' | 'khld_campaign' | 'khld_activity'
-  | 'khld_market' | 'khld_action_day' | 'khld_volunteer' | 'khld_attendance' | 'khld_guidance_completion'
-  | 'khld_enterprise_support' | 'khld_vendor_registration' | 'khld_interaction_survey' | 'khld_partner_survey'
-  | 'khld_user_feedback' | 'khld_volunteer_tracking' | 'khld_producer_survey' | 'khld_milestone_verification'
-  | 'khld_volunteer_participation'
+  | 'khld_focal_point' | 'khld_partner' | 'khld_partner_contact' | 'khld_meeting' | 'khld_rehab_report'
+  | 'khld_campaign' | 'khld_activity' | 'khld_activity_attendance' | 'khld_committee_member'
+  | 'khld_committee_meeting' | 'khld_volunteer' | 'khld_volunteer_attendance' | 'khld_guidance_session'
+  | 'khld_enterprise_request' | 'khld_market' | 'khld_vendor_application' | 'khld_market_attendance'
+  | 'khld_park_survey' | 'khld_partner_survey' | 'khld_contribution' | 'khld_milestone_record'
+  | 'khld_enterprise_support' | 'khld_producer_survey'

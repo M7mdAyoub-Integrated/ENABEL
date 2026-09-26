@@ -63,6 +63,7 @@ function RefusalNote({ error, onDismiss, t, locale }: { error: unknown; onDismis
     // on the bucket looks like from here. The wording names {code}; it read
     // "({code})" literally on the first upload ever attempted.
     code: String(v['code'] ?? v['message'] ?? ''),
+    max_files: String(v['max_files'] ?? ''),
   }
   return (
     <div role="alert" className="mt-[14px] flex flex-wrap items-baseline gap-x-[14px] gap-y-2 bg-error px-[18px] py-[14px] text-bg">
@@ -80,25 +81,42 @@ function RefusalNote({ error, onDismiss, t, locale }: { error: unknown; onDismis
  * milestones on /manual-entries -- where four copies of the explanatory
  * paragraph would drown four short cards. The list, the add button and the
  * refusals are the same; only the margin and the paragraph go.
+ *
+ * `fieldCode` is a Khalidiyah file-upload field (F017 minutes, F120
+ * attendance sheet ...): the panel lists and adds the files of that field
+ * alone, under the field's own label, and stops offering "Add" at the
+ * field's `maxFiles` (the sheet's "5 max"). The database holds the same limit
+ * (guard_khld_attachment_field, 0158) and the function refuses early.
  */
 export function EvidencePanel({
   entityType,
   entityId,
   compact = false,
   deleted = false,
+  fieldCode,
+  title,
+  maxFiles,
+  note,
 }: {
   entityType: string
   entityId: string
   compact?: boolean
   /** The record is soft-deleted: its files stay listed, nothing can be added. */
   deleted?: boolean
+  fieldCode?: string | undefined
+  /** The heading, when not "Evidence files": a file field's label. */
+  title?: string | undefined
+  maxFiles?: number | undefined
+  /** A line under the heading in place of the compression rule. */
+  note?: string | undefined
 }) {
   const { t, i18n } = useTranslation(['common'])
   const locale = i18n.resolvedLanguage ?? 'en'
   const { role } = useAuth()
-  const files = useAttachments(entityType, entityId)
-  const upload = useUploadEvidence(entityType, entityId)
+  const files = useAttachments(entityType, entityId, fieldCode)
+  const upload = useUploadEvidence(entityType, entityId, fieldCode)
   const remove = useRemoveEvidence(entityType, entityId)
+  const full = maxFiles != null && (files.data?.length ?? 0) >= maxFiles
   const input = useRef<HTMLInputElement>(null)
   const [pending, setPending] = useState<{ file: File; kind: EvidenceKind } | null>(null)
   const [openError, setOpenError] = useState<unknown>(null)
@@ -126,8 +144,8 @@ export function EvidencePanel({
   return (
     <section className={compact ? 'mt-4' : 'mt-[26px]'}>
       <SectionRule
-        title={t('common:evidence.title')}
-        right={can(role, 'record.edit') && !deleted ? (
+        title={title ?? t('common:evidence.title')}
+        right={can(role, 'record.edit') && !deleted && !full ? (
           <>
             <input
               ref={input}
@@ -145,7 +163,9 @@ export function EvidencePanel({
           </>
         ) : undefined}
       />
-      {compact ? null : (
+      {note ? (
+        <p className="mt-2 text-[13.5px] text-muted" style={{ textWrap: 'pretty' }}>{note}</p>
+      ) : compact ? null : (
         <p className="mt-2 text-[13.5px] text-muted" style={{ textWrap: 'pretty' }}>{t('common:evidence.rule')}</p>
       )}
 
