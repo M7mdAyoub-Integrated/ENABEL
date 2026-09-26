@@ -246,7 +246,8 @@ municipal account's parameter is removed. A switch remounts the screen
 the URL happens on whatever screen is open and a mounted query answered
 under the old municipality would otherwise stay. The header carries a super
 admin's eyebrow — "super admin · acting on" — above the name, and the account
-chip at the foot of the rail names the municipality too. *Until 16 September
+chip at the foot of the rail names the municipality too (since 26 September,
+the account icon's panel — Part 13). *Until 16 September
 2026 a super admin also got one public-site link per municipality, listed
 together, and the sidebar mixed the platform's administration into the
 programme's forms; Part 10 has what replaced both.* `/admin` is
@@ -968,6 +969,11 @@ because `setActingMunicipality` clears the query cache and the Outlet is
 keyed on the acting municipality.
 
 ### The account menu (`AccountMenu.tsx`)
+
+*Superseded on 26 September 2026 (Part 13, last section). The account is
+now one icon at the end of the header, and the language, the super admin's
+chooser and the public-site link are inside it. The paragraph below
+describes the chip as it was.*
 
 The account chip is a button now, in all three places it appears — the foot
 of the rail, the tablet header (compact: the role and a chevron), the foot
@@ -1749,4 +1755,53 @@ case-insensitively, and in aria-labels. That sweep found one: the lists'
 "Open" action had no key in either locale (Ramtha's too), and the Arabic
 screen said "Open". The enumerator's path to the three questionnaires is
 untested at that role: there is no enumerator account (OQ-59).
+
+### Later the same day: FORM-20 off the app, and the account in the header
+
+Two changes the owner asked for after the build. Neither has a migration.
+
+**FORM-20 removed** (*"remove the partner coordination survey"*). The
+catalogue marks the form `retired`. `gen_forms.py` skips it, so it has no
+screen, no sidebar entry and no labels, and `/khld/form20` reads "not
+found". The Partnerships group lists six forms now.
+
+The table `khld_partner_survey` and the view `v_ind_khld_so1_0` stay. They
+were empty on the live project (0 rows, SO1-0 null in all 13 quarters), so
+no figure moved. Keeping them lets `0156`–`0163` still reproduce. SO1-0 now
+has no entry path and reads *not measured*. Whether it is dropped, sourced
+elsewhere or its form restored is OQ-71. The app has **22 forms**; the
+database still has the 23 tables.
+
+**The account moved to the header.** In Arabic the rail mirrors to the
+right. That put the account chip in the bottom-right corner, under the
+badge the hosting provider pins there. The account is now one icon at the
+header's end: top right in English, top left in Arabic, at every width.
+Pressing it opens a panel with:
+
+- who is signed in;
+- for a super admin, the municipality chooser;
+- the language;
+- the public site of the municipality on screen;
+- Settings or Platform administration;
+- Sign out.
+
+The header's separate chips are gone, and so are the copies at the foot of
+the rail, the drawer and the phone's More sheet. The header still names the
+municipality, and still tells a super admin it is the one they chose. The
+rail's list ends with room to scroll clear of the corner.
+
+The panel is a disclosure, not a `role="menu"`, because it holds a select
+and a button group. Checked in a browser against the stub, in both
+languages:
+
+- where the icon sits at 1280, 900 and 360 px;
+- that the panel stays inside the viewport;
+- that changing the language keeps the panel open and moves it with the
+  icon;
+- that Escape closes it and focus returns to the icon, and that a click
+  outside closes it;
+- that Settings opens the dialog;
+- that the drawer and the More sheet no longer carry the account;
+- that a super admin's switch calls `set_acting_municipality`, lands on
+  `/dashboard?m=ramtha` and closes the panel.
 

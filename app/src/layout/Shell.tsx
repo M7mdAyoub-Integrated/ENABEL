@@ -3,12 +3,9 @@ import { NavLink, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { type ModuleId } from '../modules'
 import { useNavCounts } from '../data/moduleCounts'
-import { LocaleSwitcher } from '../components/LocaleSwitcher'
 import { OfflineBar } from '../components/OfflineBar'
 import { useAuth } from '../auth/AuthProvider'
 import { can, modulesFor } from '../auth/permissions'
-import { EXTERNAL } from '../ui/glyphs'
-import { MunicipalitySwitcher } from '../components/MunicipalitySwitcher'
 import { useCurrentMunicipality, useMunicipalityName, useProgrammeLine } from '../data/municipalities'
 import { RMTH_FORMS, RMTH_FORM_IDS, type RmthFormId } from '../rmth/forms.generated'
 import { KHLD_FORM_IDS, KHLD_GROUPS } from '../khld/forms.generated'
@@ -390,94 +387,6 @@ function Brand() {
   )
 }
 
-/**
- * Visit the public site.
- *
- * ── WHAT THIS REPLACED, AND WHY IT HAD TO CHANGE ──
- *
- * This was a Municipality / Participant segmented control. It routed to
- * `/portal`, and the participant portal was retired when `/` became the public
- * home page -- so the second segment led to "Page not found", in the header of
- * every municipal screen. A dead control in permanent chrome is worse than no
- * control: it is on screen constantly, and the only way to find out it is
- * broken is to press it.
- *
- * ── AND WHY IT IS NOT A SWITCHER AT ALL ANY MORE ──
- *
- * It used to imply two sides of one app that a person could move between. There
- * are no longer two sides: there is the Municipality's app, and there is a
- * public website that anyone can read without an account. Going to the second
- * is not switching who you are -- it is a coordinator looking at what a farmer
- * sees.
- *
- * That is a PREVIEW, and the honest treatment is the one a CMS uses: a way out
- * to the public view, and a bar on the far side saying you are previewing and
- * how to come back. Not an account switcher, which promises a change of
- * identity that never happens. The return half lives in PublicShell.
- *
- * ── NO LONGER TIED TO DEMO_MODE ──
- *
- * The old control was demo-only, and collapsed to a dead "Municipality" label
- * with the flag off, because switching between roles is a thing Phase 3 had to
- * stop. Previewing a public page is not a role change and has nothing to do
- * with identity, so it works the same either way. The public pages read
- * `v_public_opportunity`, which `anon` is granted, so a coordinator sees
- * exactly what a visitor sees.
- *
- * ── ONE LINK, THE ACTING MUNICIPALITY'S ──
- *
- * Since 0120 the public site is one page per municipality, and this is a
- * property of the municipality on screen, not a navigation menu. A super
- * admin used to get one link per municipality, listed together, which is the
- * wrong shape: acting on Ramtha there is nothing about Sahel Horan anywhere
- * else on the screen, and the links were the one place the other programme
- * bled in. So: acting on a municipality, one link naming it; a municipal
- * account, the same link for its own; no municipality chosen, no link at
- * all — there is no site to visit until one is. The chooser screen does not
- * offer both on purpose: its one job is the choice, and a super admin who
- * wants to see a public site chooses the municipality first, which is also
- * how they see everything else about it.
- *
- * Opens in a new tab for everyone. The municipal preview used to navigate the
- * same tab; the two behaviours were the two components, and one component
- * has one behaviour.
- */
-function usePublicSite(): { to: string; label: string } | null {
-  const { t } = useTranslation('nav')
-  const municipality = useCurrentMunicipality()
-  const name = useMunicipalityName()
-  if (!municipality) return null
-  return { to: `/${municipality.slug}`, label: t('publicSiteOf', { name: name(municipality) }) }
-}
-
-const PUBLIC_LINK_CLASS =
-  'flex min-h-11 flex-none items-center gap-2 border-[1.5px] border-ink bg-bg px-[11px] py-[5px] font-narrow text-[11.5px] font-bold uppercase tracking-[0.1em] text-ink no-underline hover:bg-ink hover:text-bg'
-
-/**
- * The one public-site control, wherever it is placed: the header from `sm`
- * up, the phone's More sheet below it. Renders nothing when no municipality
- * is acting.
- */
-function PublicSiteLink({ stacked = false, onNavigate }: { stacked?: boolean; onNavigate?: () => void }) {
-  const site = usePublicSite()
-  if (!site) return null
-  return (
-    <a
-      href={site.to}
-      target="_blank"
-      rel="noopener"
-      onClick={onNavigate}
-      // Stacked in the sheet, the label may wrap: at 320px a municipality's
-      // name does not fit on one line beside the verb. In the header it is
-      // one line, like the chips beside it.
-      className={stacked ? `${PUBLIC_LINK_CLASS} py-2` : `${PUBLIC_LINK_CLASS} whitespace-nowrap sm:min-h-0`}
-    >
-      <span aria-hidden="true" className="inline-block mirror-rtl">{EXTERNAL}</span>
-      {site.label}
-    </a>
-  )
-}
-
 export function Shell({ children }: { children: ReactNode }) {
   // The platform dialog's state is the URL — `?platform=<section>` on
   // whatever route is underneath (platformDialogContext.ts) — read here,
@@ -533,16 +442,17 @@ function ShellFrame({ children }: { children: ReactNode }) {
       {/* ── Rail, 1024+ ── 238px, 2px rule down the inline edge ── */}
       <aside className="sticky top-0 hidden h-dvh w-[238px] flex-none flex-col border-e-2 border-ink bg-bg lg:flex">
         <Brand />
-        <nav aria-label={t('nav:landmark')} className="flex-1 overflow-auto pb-2">
+        {/* The account is in the header (AccountMenu). The bottom corners
+            are left to whatever the host pins there — in Arabic this rail is
+            on the right, under the hosting provider's badge — so the list
+            ends with room to scroll its last entry clear of it. */}
+        <nav aria-label={t('nav:landmark')} className="flex-1 overflow-auto pb-16">
           <NavGroups groups={groups} />
         </nav>
-        <div className="mt-auto">
-          <AccountMenu placement="up" />
-        </div>
       </aside>
 
       <div className="min-w-0 flex-1">
-        {/* ── Header ── sticky, 2px rule under, brand left, chips right ── */}
+        {/* ── Header ── sticky, 2px rule under, name at the start, account at the end ── */}
         <header
           className="sticky top-0 z-[6] flex items-end justify-between gap-4 border-b-2 border-ink bg-bg px-4 py-3 sm:gap-7 sm:px-[34px]"
           style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 0.75rem)' }}
@@ -561,9 +471,10 @@ function ShellFrame({ children }: { children: ReactNode }) {
             <div className="min-w-0">
               {/* A super admin is told, on every screen and at every width,
                   that the name below is the municipality they CHOSE. The
-                  switcher is a control, not a statement. These two, and the
-                  Accounts tab in the platform dialog, are the only marks of a super
-                  admin on a municipal screen. */}
+                  switcher, in the account menu, is a control, not a
+                  statement. These two, and the Accounts tab in the platform
+                  dialog, are the only marks of a super admin on a municipal
+                  screen. */}
               {isSuperAdmin ? (
                 <div className="truncate font-narrow text-[10px] font-bold uppercase tracking-[0.16em] text-amber">
                   {municipality ? t('nav:superAdminActingOn') : t('nav:superAdminNotActing')}
@@ -577,20 +488,11 @@ function ShellFrame({ children }: { children: ReactNode }) {
               </div>
             </div>
           </div>
-          <div className="flex flex-initial flex-wrap items-stretch justify-end gap-[10px]">
-            <MunicipalitySwitcher />
-            {/* From sm up. On a phone the More sheet carries it. */}
-            <div className="hidden sm:flex">
-              <PublicSiteLink />
-            </div>
-            {/* The header's copy of the account, for the tablet widths where
-                the rail is a drawer and the foot of it is out of sight.
-                Hidden on a desktop (the rail's foot has it) and on a phone
-                (the More sheet does, and the header has no room). */}
-            <div className="hidden md:flex lg:hidden">
-              <AccountMenu placement="down" compact />
-            </div>
-            <LocaleSwitcher />
+          {/* The account, the language, a super admin's municipality and
+              the public site, behind one icon at the header's end: top
+              right in English, top left in Arabic, at every width. */}
+          <div className="flex-none self-center">
+            <AccountMenu />
           </div>
         </header>
         <OfflineBar />
@@ -609,10 +511,9 @@ function ShellFrame({ children }: { children: ReactNode }) {
               className="absolute inset-y-0 start-0 flex w-[238px] max-w-[85vw] flex-col border-e-2 border-ink bg-bg"
             >
               <Brand />
-              <div className="flex-1 overflow-auto pb-2">
+              <div className="flex-1 overflow-auto pb-16">
                 <NavGroups groups={groups} onNavigate={() => setDrawerOpen(false)} />
               </div>
-              <AccountMenu placement="up" onAction={() => setDrawerOpen(false)} />
             </nav>
           </div>
         ) : null}
@@ -660,15 +561,6 @@ function ShellFrame({ children }: { children: ReactNode }) {
             style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)' }}
           >
             <NavGroups groups={groups} onNavigate={() => setMoreOpen(false)} />
-            {/* The header's copy sits in a `hidden sm:flex` wrapper, so on a
-                phone it does not exist. Checking how the public site looks
-                on a phone is the single most likely reason to press it. */}
-            {municipality ? (
-              <div className="border-t border-border-default px-[18px] py-3">
-                <PublicSiteLink stacked onNavigate={() => setMoreOpen(false)} />
-              </div>
-            ) : null}
-            <AccountMenu placement="inline" onAction={() => setMoreOpen(false)} />
           </nav>
         </div>
       ) : null}
