@@ -9,8 +9,10 @@ generators are kept in `supabase/khalidiyah/v1/`.
 
 What exists now: migrations `0153`–`0164` (twelve, every one
 byte-identical to the ledger), the `evidence` Edge Function at version 6,
-**23 forms** as screens with one save path (FORM-03 and FORM-04 are one,
-as the reviewer asked), **21 indicators, all computing**, the same
+**22 forms** as screens with one save path (FORM-03 and FORM-04 are one,
+as the reviewer asked; FORM-20 was taken off the app afterwards at the
+owner's request — OQ-71), **20 indicators computing and SO1-0 waiting on
+a decision**, the same
 dashboard as the other two municipalities, and a public page that lists
 what is on and lets residents **register as volunteers**. Sahel Horan's and
 Ramtha's figures read exactly as they did before any Khalidiyah work
@@ -31,10 +33,14 @@ Ramtha's figures read exactly as they did before any Khalidiyah work
 
 | page (sidebar group) | forms |
 |---|---|
-| Partnerships and Institutional Sustainability | FORM-01 focal point · FORM-02 partners · FORM-03+04 partner outreach · FORM-05 stakeholder meetings · FORM-20 partner survey · FORM-21 contributions · FORM-22 milestones register |
+| Partnerships and Institutional Sustainability | FORM-01 focal point · FORM-02 partners · FORM-03+04 partner outreach · FORM-05 stakeholder meetings · FORM-21 contributions · FORM-22 milestones register |
 | Rehabilitation and activation of the park | FORM-06 rehabilitation checklist · FORM-07 volunteer campaigns · FORM-08 community activities · FORM-09 activity participation · FORM-19 park user survey |
 | Volunteer Program | FORM-10 committee members · FORM-11 committee meetings · FORM-12 volunteers (also public) · FORM-13 volunteer attendance |
 | Small Business Support | FORM-14 counselling sessions · FORM-15 attendance requests · FORM-23 enterprise support · FORM-16 markets · FORM-17 bazaar beneficiaries · FORM-18 bazaar attendance · FORM-24 producer follow-up |
+
+FORM-20 (partner coordination survey) was removed from the app on 26
+September at the owner's request. Its table and view are kept, both empty
+(OQ-71).
 
 Every label and option is the sheet's, in both languages. Five strings the
 sheet has in English only were drafted in Arabic (OQ-68). The Dependency
@@ -45,7 +51,9 @@ file-upload fields attach evidence under their Field ID, up to the sheet's
 
 ## 3. Which indicators produce a number
 
-**All 21**, from the Calculation formulas sheet, each in its own view. No
+**20 of 21**, from the Calculation formulas sheet, each in its own view.
+**SO1-0 has no source now**: FORM-20 was its only one. It reads *not
+measured* in every quarter, never 0, until OQ-71 is decided. No
 quarterly target exists, so every figure reads against *not set*; the
 Plan's 27 targets are held as written (unchanged from the first build: 273
 quarterly rows null, none split into quarters).
@@ -77,6 +85,7 @@ Worth knowing when reading them:
 | | question | who |
 |---|---|---|
 | 🔴 OQ-62 | a minimum age or a guardian block, **before the public link is printed** | the Municipality with Enabel's safeguarding focal point |
+| 🟠 OQ-71 | SO1-0 without FORM-20: drop it from the return, source it elsewhere, or bring the form back | the owner with the M&E lead |
 | 🟠 OQ-61 | whether `cannot_verify` needs two wordings; the review workflow | community coordinator, M&E lead |
 | 🟠 OQ-64 | F089 "if no then disqualified" conflicts with F090 "Not started yet" — not enforced | M&E lead |
 | 🟠 OQ-65–67 | increments per quarter for the cumulative figures; SO3-0's denominator; G1's cycles | M&E lead |
@@ -127,18 +136,18 @@ indicator matrix `c9d7dedc923819cf9a0b5164d47a38c1` and all seven
 per-municipality view hashes — **identical**. `0153` and `0163` each assert
 every Sahel Horan and Ramtha row of `v_indicator_actual` unchanged.
 
-## 7. Until this branch is merged
+## 7. Deployment
 
-The database is live; the production front end is built from the default
-branch, which still has the first build's Khalidiyah screens. **Until
-`claude/khaldieh-forms-replacement-g7gvpk` is merged and deployed,
-Khalidiyah's screens in production do not work** (they read tables that no
-longer exist). Sahel Horan's and Ramtha's are unaffected.
+The database is live. On 26 September `main` was fast-forwarded to this
+branch, at the owner's request, because the production front end is built
+from `main`. Before that, Khalidiyah's production screens read tables that
+no longer existed. Sahel Horan's and Ramtha's were unaffected throughout.
 
 ## What to do next, in order
 
-1. Merge and deploy this branch (section 7).
+1. Check the deployed site shows the 22 forms (section 7).
 2. Decide OQ-62 before printing the volunteer link anywhere.
 3. Answer F089 (OQ-64) and confirm the windows (OQ-65).
 4. Give the drafted Arabic to the reviewer (OQ-68).
-5. Create an enumerator account and try FORM-19, -20, -24 as it (OQ-59).
+5. Create an enumerator account and try FORM-19 and -24 as it (OQ-59).
+6. Decide SO1-0 now that FORM-20 is off the app (OQ-71).

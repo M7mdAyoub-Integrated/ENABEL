@@ -263,77 +263,6 @@ export const KHLD_FORMS = {
       }
     ]
   },
-  "form20": {
-    "id": "form20",
-    "sheets": [
-      "FORM-20"
-    ],
-    "table": "khld_partner_survey",
-    "group": "partnerships",
-    "writer": "is_staff",
-    "indicators": [
-      "KHLD-SO1-0"
-    ],
-    "list": [
-      "F173",
-      "F174",
-      "F179"
-    ],
-    "fields": [
-      {
-        "id": "F173",
-        "kind": "date",
-        "column": "survey_date",
-        "required": true
-      },
-      {
-        "id": "F174",
-        "kind": "record",
-        "column": "partner_id",
-        "required": true,
-        "table": "khld_partner",
-        "confirmed": true
-      },
-      {
-        "id": "F175",
-        "kind": "text",
-        "column": "respondent_position",
-        "required": true
-      },
-      {
-        "id": "F176",
-        "kind": "select",
-        "column": "respondent_sex_id",
-        "required": true,
-        "list": "sex"
-      },
-      {
-        "id": "F177",
-        "kind": "likert",
-        "column": "coordination_score",
-        "required": true,
-        "scale": "agree"
-      },
-      {
-        "id": "F178",
-        "kind": "likert",
-        "column": "joint_planning_score",
-        "required": true,
-        "scale": "agree"
-      },
-      {
-        "id": "F179",
-        "kind": "bool",
-        "column": "overall_effective",
-        "required": true
-      },
-      {
-        "id": "F180",
-        "kind": "area",
-        "column": "suggestions"
-      }
-    ]
-  },
   "form21": {
     "id": "form21",
     "sheets": [
@@ -2159,10 +2088,9 @@ export const KHLD_FORM_IDS = Object.keys(KHLD_FORMS) as KhldFormId[]
 /** The sidebar's groups, in the sheet's order (Page En / Page Ar). */
 export const KHLD_GROUPS = ["partnerships", "park", "volunteer", "business"] as const
 
-/** The form carrying each indicator's main source (the Calculation formulas sheet). */
+/** The form carrying each indicator's main source (the Calculation formulas sheet); SO1-0's, FORM-20, is off the app (OQ-71). */
 export const KHLD_INDICATOR_FORM: Readonly<Record<string, KhldFormId>> = {
   "IMP-0": "form19",
-  "SO1-0": "form20",
   "A1": "form22",
   "A2": "form05",
   "A3": "form21",

@@ -63,8 +63,6 @@ export type KhldFieldDef = {
   readonly window?: readonly string[]
   /** A record picker's added option; `column` is the boolean it sets, when it has one. */
   readonly extra?: { readonly code: string; readonly column?: string }
-  /** F174: partners whose outreach confirmed the partnership (F116). */
-  readonly confirmed?: boolean
   /** F207: markets whose status is Held. */
   readonly held?: boolean
   readonly maxFiles?: number

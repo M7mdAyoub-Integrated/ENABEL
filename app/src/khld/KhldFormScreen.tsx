@@ -12,7 +12,7 @@ import { useAuth } from '../auth/AuthProvider'
 import { can } from '../auth/permissions'
 import { EvidencePanel } from '../components/EvidencePanel'
 import {
-  identifierOf, isCompleteId, normaliseIdNumber, useConfirmedPartners, useKhldPersonLookup, useKhldPicker, useKhldRecord,
+  identifierOf, isCompleteId, normaliseIdNumber, useKhldPersonLookup, useKhldPicker, useKhldRecord,
   useKhldRefs, usePersonPicker, useRestoreKhldPerson, useSaveKhld,
   type KhldIdType, type KhldOption, type KhldPick, type KhldRecord, type PersonLookup, type SavePayload, type SaveResult,
 } from '../data/khld'
@@ -601,7 +601,6 @@ function pickLabel(r: KhldPick, locale: string): string {
 /** The picks a record field offers: the table's live rows, narrowed as the field says; the saved choice always stays. */
 function usePicks(f: KhldFieldDef, current: string, refs: Record<string, RefRow[]>) {
   const picks = useKhldPicker(f.table as KhldTable | undefined)
-  const confirmed = useConfirmedPartners(!!f.confirmed)
   const heldId = (refs['event_status'] ?? []).find((r) => r.code === 'held')?.id
   const now = today()
   const rows = (picks.data ?? []).filter((r) => {
@@ -611,12 +610,11 @@ function usePicks(f: KhldFieldDef, current: string, refs: Record<string, RefRow[
       const to = r.raw[f.window[1]!]
       if (typeof from !== 'string' || typeof to !== 'string' || now < from || now > to) return false
     }
-    if (f.confirmed && !confirmed.data?.has(r.id)) return false
     if (f.held && r.raw['status_id'] !== heldId) return false
     if (f.table === 'khld_volunteer' && r.raw['application_status'] === 'rejected') return false
     return true
   })
-  return { rows, isError: picks.isError || confirmed.isError, isLoading: picks.isLoading }
+  return { rows, isError: picks.isError, isLoading: picks.isLoading }
 }
 
 function RecordPicker({ base, f, p }: { base: Base; f: KhldFieldDef; p: FieldViewProps }) {
@@ -630,7 +628,7 @@ function RecordPicker({ base, f, p }: { base: Base; f: KhldFieldDef; p: FieldVie
   const extraLabel = f.extra ? L.extra(f) : undefined
   if (f.extra && extraLabel) options.push({ value: '__extra__', label: extraLabel })
   const value = p.answers.extras[f.id] ? '__extra__' : current
-  const note = f.window ? t('form.picker.window') : f.confirmed ? t('form.picker.confirmed') : f.held ? t('form.picker.held') : undefined
+  const note = f.window ? t('form.picker.window') : f.held ? t('form.picker.held') : undefined
   return (
     <Field
       spec={{ ...base, type: 'select', span: 6, options, placeholder: t('form.picker.none'),

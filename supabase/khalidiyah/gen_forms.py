@@ -73,7 +73,6 @@ LIST = {
     'form02': ['F004', 'F006', 'F115'],
     'form04': ['F010', 'F011', 'F013', 'F015'],
     'form05': ['F016', 'F117', 'F119'],
-    'form20': ['F173', 'F174', 'F179'],
     'form21': ['F181', 'F183', 'F184', 'F186'],
     'form22': ['F189', 'F194', 'F195'],
     'form06': ['F021', 'F020', 'F122'],
@@ -124,8 +123,6 @@ def field_def(f):
         d['extra'] = O(code=code)
         if col:
             d['extra']['column'] = col
-    if s.get('confirmed'):
-        d['confirmed'] = True
     if s.get('held'):
         d['held'] = True
     if f.kind == 'file':
@@ -177,6 +174,8 @@ defs = O()
 
 for fid, fm in m.forms.items():
     meta = C.FORMS[fid]
+    if meta.get('retired'):
+        continue
     short_en, short_ar = meta['short']
     if not fm.title_en or not fm.title_ar:
         err('%s: the sub-page title is missing in %s' % (fid, 'en' if not fm.title_en else 'ar'))
@@ -214,7 +213,7 @@ for fid, fm in m.forms.items():
 
 # the indicator -> form map the dashboard's source chips read (catalogue.INDICATOR_FORM)
 for code, fid in C.INDICATOR_FORM.items():
-    if fid not in defs:
+    if fid is not None and fid not in defs:
         err('INDICATOR_FORM %s names %s, which is not a form' % (code, fid))
 
 # ── the screens' own words ──────────────────────────────────────────────────
@@ -257,7 +256,6 @@ S_EN = O([
         ('picker', O([
             ('none', 'None'), ('loadFailed', 'The list could not be loaded.'),
             ('window', 'Only those open today are listed.'),
-            ('confirmed', 'Only partners whose outreach confirmed the partnership are listed.'),
             ('held', 'Only markets marked held are listed.'),
             ('fromSource', 'Only people registered on {form} are listed.'),
             ('noneToChoose', 'Nothing to choose yet.'),
@@ -370,7 +368,6 @@ S_AR = O([
         ('picker', O([
             ('none', 'لا شيء'), ('loadFailed', 'تعذّر تحميل القائمة.'),
             ('window', 'لا يُدرج إلا ما هو مفتوح اليوم.'),
-            ('confirmed', 'لا يُدرج إلا الشركاء الذين أكّد التواصل معهم الشراكة.'),
             ('held', 'لا تُدرج إلا البازارات المسجّلة على أنها نُفّذت.'),
             ('fromSource', 'لا يُدرج إلا المسجّلون في {form}.'),
             ('noneToChoose', 'لا يوجد ما يُختار بعد.'),
@@ -498,8 +495,8 @@ ts = [
     "/** The sidebar's groups, in the sheet's order (Page En / Page Ar). */",
     "export const KHLD_GROUPS = " + json.dumps(list(C.GROUPS.keys())) + " as const",
     "",
-    "/** The form carrying each indicator's main source (the Calculation formulas sheet). */",
-    "export const KHLD_INDICATOR_FORM: Readonly<Record<string, KhldFormId>> = " + json.dumps(C.INDICATOR_FORM, indent=2),
+    "/** The form carrying each indicator's main source (the Calculation formulas sheet); SO1-0's, FORM-20, is off the app (OQ-71). */",
+    "export const KHLD_INDICATOR_FORM: Readonly<Record<string, KhldFormId>> = " + json.dumps(O((k, v) for k, v in C.INDICATOR_FORM.items() if v), indent=2),
     "",
 ]
 write(os.path.join(ROOT, 'app', 'src', 'khld', 'forms.generated.ts'), '\n'.join(ts))

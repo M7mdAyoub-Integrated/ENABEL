@@ -2494,9 +2494,9 @@ today <= end": F088 (the session to attend), F155 (the bazaar applied for),
 F157 (the bazaar attended). The screens list only those open today (and
 keep a record's saved choice). The database does **not** refuse an entry
 outside the window, because a record typed up a week later from a paper
-form is legitimate. Likewise the screens list only confirmed partners for
-F174 (a rule the database does enforce, 0158) and only markets held for
-F207 (also enforced).
+form is legitimate. Likewise the screens list only markets held for F207
+(a rule the database does enforce, 0158). F174's confirmed-partner rule is
+enforced too, but no screen asks F174 now: FORM-20 is off the app (OQ-71).
 
 The file-upload fields the sheet marks required (F017, F120, F124, F052,
 F196 when established) cannot be required at save — a file is attached to a
@@ -2526,3 +2526,38 @@ founding meeting, not members.
 
 **Decides.** M&E lead, if committee membership is ever to be counted by
 person: FORM-10 would need an ID type and number like FORM-12.
+
+---
+
+## 🟠 OQ-71 · FORM-20 is off the app, so SO1-0 has no way in
+
+**Added 26 September 2026**, at the owner's request (*"remove the partner
+coordination survey"*). No migration.
+
+**What was done.** FORM-20 (Partner coordination survey) has no screen, no
+sidebar entry and no labels. The catalogue marks it `retired`, and
+`gen_forms.py` writes nothing for it, so the generated app cannot bring it
+back by accident. `/khld/form20` reads "not found".
+
+**What was kept.** The table `khld_partner_survey` and the view
+`v_ind_khld_so1_0`. Checked on the live project that day: 0 rows, and SO1-0
+null in all 13 quarters. So removing the screen changed no figure. Keeping
+them means `0156`–`0163` still reproduce byte for byte and nothing is
+dropped. `save_khld_record` still accepts the table, but only for a staff
+account and only through the API; the app never sends it.
+
+**What it means for reporting.** SO1-0 (*partners who rate coordination
+effective*) is the only source the Calculation formulas sheet gives. With
+FORM-20 gone it reads **not measured** in every quarter, never 0 (hard
+rule 1). The dashboard shows it with no link to a form.
+
+**Decides.** The Municipality's owner with the M&E lead, one of:
+
+1. SO1-0 is dropped from Khalidiyah's return. The table and view can then
+   be dropped by a migration, which is a data-dropping change and asks
+   first (hard rule 5).
+2. SO1-0 is measured another way. Name the source, and a form or view
+   follows.
+3. FORM-20 comes back. Remove `retired=True` in `catalogue.py` and
+   regenerate.
+

@@ -47,7 +47,7 @@ docs/07_BUILD_CHECKLIST.md     ← the 17 migrations, in order, with verificatio
 RAMTHA_IMPLEMENTATION_PLAN.md  ← the brief that work followed
 RAMTHA_REPORT.md               ← where Ramtha stands: what computes, what waits on a decision
 KHALIDIYAH_IMPLEMENTATION_PLAN.md ← the brief the third municipality followed
-KHALIDIYAH_REPORT.md           ← where Khalidiyah stands: 23 forms from Khaldia_2_reviewed.xlsx, all 21 indicators compute, what waits on a decision
+KHALIDIYAH_REPORT.md           ← where Khalidiyah stands: 22 forms from Khaldia_2_reviewed.xlsx (FORM-20 off the app, OQ-71), 20 of 21 indicators compute, what waits on a decision
 supabase/khalidiyah/           ← one reading of Khaldia_2_reviewed.xlsx and the generators for 0156–0160, 0162–0163 and app/src/khld (gen_schema, gen_views, gen_forms); v1/ is the retired first build's, still reproducing 0141–0149; edit the catalogue, never the output
 supabase/migrations/           ← the SQL you write
 ```

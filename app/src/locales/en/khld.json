@@ -107,54 +107,6 @@
         }
       }
     },
-    "form20": {
-      "title": "Partner Coordination Survey",
-      "short": "Partner survey",
-      "fields": {
-        "F173": {
-          "label": "Survey date"
-        },
-        "F174": {
-          "label": "Partner"
-        },
-        "F175": {
-          "label": "Respondent position"
-        },
-        "F176": {
-          "label": "Respondent gender"
-        },
-        "F177": {
-          "label": "Coordination and communication with the Municipality improved during implementation of the Action Plan",
-          "opts": {
-            "1": "1 Strongly disagree",
-            "2": "2 Disagree",
-            "3": "3 Neutral",
-            "4": "4 Agree",
-            "5": "5 Strongly agree"
-          }
-        },
-        "F178": {
-          "label": "Your organisation was involved in joint planning of park activities",
-          "opts": {
-            "1": "1 Strongly disagree",
-            "2": "2 Disagree",
-            "3": "3 Neutral",
-            "4": "4 Agree",
-            "5": "5 Strongly agree"
-          }
-        },
-        "F179": {
-          "label": "Overall, was coordination and collaboration with the Municipality effective in implementing park activities?",
-          "opts": {
-            "true": "Yes",
-            "false": "No"
-          }
-        },
-        "F180": {
-          "label": "Suggestions to improve coordination"
-        }
-      }
-    },
     "form21": {
       "title": "Partner Contributions Log",
       "short": "Contributions",
@@ -989,7 +941,6 @@
       "none": "None",
       "loadFailed": "The list could not be loaded.",
       "window": "Only those open today are listed.",
-      "confirmed": "Only partners whose outreach confirmed the partnership are listed.",
       "held": "Only markets marked held are listed.",
       "fromSource": "Only people registered on {form} are listed.",
       "noneToChoose": "Nothing to choose yet."

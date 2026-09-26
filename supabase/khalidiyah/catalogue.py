@@ -70,7 +70,10 @@ GROUPS = O([
 # RLS helper that may insert/update (can_write: coordinator, data entry;
 # is_staff adds the enumerator, for the three questionnaires); ref: the
 # reference the database issues (prefix, width, the date column that gives
-# the year or None); short: the sidebar name, the app's words.
+# the year or None); short: the sidebar name, the app's words; retired: the
+# form is off the app at the owner's request (26 September 2026, FORM-20,
+# OQ-71) -- its table and view stay, so 0156-0163 still reproduce, and
+# gen_forms.py writes no screen, no sidebar entry and no labels for it.
 FORMS = O([
     ('form01', dict(sheets=['FORM-01'], table='khld_focal_point', group='partnerships', writer='can_write',
                     short=('Focal point', 'ضابط الارتباط'))),
@@ -80,7 +83,7 @@ FORMS = O([
                     ref=('ATT', 2, None), short=('Partner outreach', 'التواصل مع الشركاء'))),
     ('form05', dict(sheets=['FORM-05'], table='khld_meeting', group='partnerships', writer='can_write',
                     ref=('MTG', 2, 'meeting_date'), short=('Stakeholder meetings', 'اجتماعات أصحاب المصلحة'))),
-    ('form20', dict(sheets=['FORM-20'], table='khld_partner_survey', group='partnerships', writer='is_staff',
+    ('form20', dict(sheets=['FORM-20'], table='khld_partner_survey', group='partnerships', writer='is_staff', retired=True,
                     short=('Partner survey', 'استبيان الشركاء'))),
     ('form21', dict(sheets=['FORM-21'], table='khld_contribution', group='partnerships', writer='can_write',
                     ref=('CON', 2, 'date_received'), short=('Contributions', 'المساهمات'))),
@@ -693,7 +696,7 @@ UNIQUES = [
 # Which form carries each indicator's main source (the Calculation formulas
 # sheet's "Source form(s)", its first or "(main)" form), for the dashboard.
 INDICATOR_FORM = O([
-    ('IMP-0', 'form19'), ('SO1-0', 'form20'), ('A1', 'form22'), ('A2', 'form05'), ('A3', 'form21'),
+    ('IMP-0', 'form19'), ('SO1-0', None), ('A1', 'form22'), ('A2', 'form05'), ('A3', 'form21'),
     ('B1', 'form22'), ('SO2-0', 'form19'), ('C1', 'form06'), ('C2', 'form07'), ('D1', 'form08'),
     ('D2', 'form09'), ('SO3-0', 'form13'), ('E1', 'form11'), ('F1', 'form22'), ('F2', 'form12'),
     ('F3', 'form07'), ('SO4-0', 'form24'), ('G1', 'form23'), ('G2', 'form23'), ('H1', 'form16'),

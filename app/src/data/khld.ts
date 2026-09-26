@@ -110,7 +110,6 @@ export const khldKeys = {
   record: (table: KhldTable, id: string) => ['khld', table, 'record', id] as const,
   picker: (table: KhldTable) => ['khld', table, 'picker'] as const,
   people: (table: KhldTable) => ['khld', table, 'people'] as const,
-  confirmed: ['khld', 'khld_partner_contact', 'confirmed'] as const,
   ref: (list: string) => ['ref', `ref_khld_${list}`] as const,
   person: (idType: string, idNumber: string) => ['khld', 'person', idType, idNumber] as const,
 }
@@ -314,21 +313,6 @@ export function useKhldPicker(table: KhldTable | undefined) {
   })
 }
 
-/** F174: the partners whose outreach (FORM-04) confirmed the partnership (F116) -- the rule 0158 enforces. */
-export function useConfirmedPartners(enabled: boolean) {
-  return useQuery({
-    queryKey: khldKeys.confirmed,
-    enabled,
-    staleTime: 30_000,
-    queryFn: async (): Promise<Set<string>> => {
-      const rows = await rowsOf<{ partner_id: string }>(
-        db.from('khld_partner_contact').select('partner_id').eq('partnership_confirmed', true).is('deleted_at', null),
-      )
-      return new Set(rows.map((r) => r.partner_id))
-    },
-  })
-}
-
 /** A person picked from another form's registrations: one entry per live person of that table. */
 export type KhldPersonPick = { id: string; label: string; identifier: string }
 
@@ -390,10 +374,8 @@ export function useSaveKhld(table: KhldTable) {
         void qc.invalidateQueries({ queryKey: khldKeys.all(table) })
         void qc.invalidateQueries({ queryKey: ['indicators'] })
         void qc.invalidateQueries({ queryKey: ['overview'] })
-        // a person-level save may have created a person, and a partner
-        // outreach changes who F174 lists
+        // a person-level save may have created a person
         void qc.invalidateQueries({ queryKey: ['people'] })
-        if (table === 'khld_partner_contact') void qc.invalidateQueries({ queryKey: khldKeys.confirmed })
       }
     },
   })
