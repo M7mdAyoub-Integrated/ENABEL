@@ -12,7 +12,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from workbook import load_forms, load_framework, load_index, split_bilingual
 from catalogue import FORMS
 
-ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
+ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..'))
+# v1 is history: it writes into v1/out/, never over the live migrations or app files
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'out')
+os.makedirs(OUT, exist_ok=True)
 KHLD = '00000000-0000-4000-8000-0000000000b2'
 
 
@@ -459,7 +462,7 @@ end $verify$;
 """ % dict(khld=q(KHLD), n_rows=n_rows, n_children=n_children, n_narr=n_narr, n_ar=n_ar))
 
 text = ''.join(out)
-path = os.path.join(ROOT, 'supabase', 'migrations', 'PENDING_0149_khalidiyah_framework.sql')
+path = os.path.join(OUT, '0149_khalidiyah_framework.sql')
 with io.open(path, 'w', encoding='utf-8', newline='') as fh:
     fh.write(text)
 print('wrote', path, len(text.encode('utf-8')), 'bytes;', len(indicators), 'indicators,', n_rows, 'plan target rows; typos:', TYPOS)

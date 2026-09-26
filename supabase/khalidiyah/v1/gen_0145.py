@@ -14,7 +14,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from model import build
 from catalogue import FORMS, TABLES, REFERENCES, LIST_FIXES, LISTS_ADDED_LATER, spec_for
 
-ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
+ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..'))
+# v1 is history: it writes into v1/out/, never over the live migrations or app files
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'out')
+os.makedirs(OUT, exist_ok=True)
 KHLD = '00000000-0000-4000-8000-0000000000b2'
 
 
@@ -1345,7 +1348,7 @@ parts[2] = """-- ═════════════════════
 for nnnn, name, text in (('0145', 'khalidiyah_domain_tables', parts[0]),
                          ('0146', 'khalidiyah_domain_tables_2', parts[1]),
                          ('0147', 'khalidiyah_domain_tables_3', parts[2])):
-    path = os.path.join(ROOT, 'supabase', 'migrations', 'PENDING_%s_%s.sql' % (nnnn, name))
+    path = os.path.join(OUT, '%s_%s.sql' % (nnnn, name))
     with io.open(path, 'w', encoding='utf-8', newline='') as fh:
         fh.write(text)
     print('wrote', path, len(text.encode('utf-8')), 'bytes')

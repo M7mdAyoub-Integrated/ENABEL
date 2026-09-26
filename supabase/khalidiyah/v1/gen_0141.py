@@ -14,7 +14,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from model import build
 from catalogue import LISTS_ADDED_LATER
 
-ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
+ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..'))
+# v1 is history: it writes into v1/out/, never over the live migrations or app files
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'out')
+os.makedirs(OUT, exist_ok=True)
 
 
 def q(s):
@@ -251,7 +254,7 @@ part3 = """-- ══════════════════════
 for nnnn, name, text in (('0141', 'khalidiyah_option_lists', part1),
                          ('0142', 'khalidiyah_option_lists_2', part2),
                          ('0143', 'khalidiyah_option_lists_3', part3)):
-    path = os.path.join(ROOT, 'supabase', 'migrations', 'PENDING_%s_%s.sql' % (nnnn, name))
+    path = os.path.join(OUT, '%s_%s.sql' % (nnnn, name))
     with io.open(path, 'w', encoding='utf-8', newline='') as fh:
         fh.write(text)
     print('wrote', path, len(text.encode('utf-8')), 'bytes')

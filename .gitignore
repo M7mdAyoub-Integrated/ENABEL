@@ -84,3 +84,8 @@ supabase/.ledger_manifest
 # Python bytecode from the Ramtha generators (supabase/ramtha/*.py)
 __pycache__/
 *.pyc
+
+# What the retired Khalidiyah generators (supabase/khalidiyah/v1) write when
+# they are re-run to prove they still reproduce 0141-0149. Never committed:
+# the migrations themselves are the record.
+supabase/khalidiyah/v1/out/

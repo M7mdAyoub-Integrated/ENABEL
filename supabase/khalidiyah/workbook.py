@@ -1,195 +1,154 @@
 # -*- coding: utf-8 -*-
 """
-One reading of Khalidiyah_Indicator_Data_Collection_Forms.xlsx.
+One reading of Khaldia_2_reviewed.xlsx -- the reviewed Khalidiyah workbook of
+26 September 2026 that replaced the 21 indicator forms (v1/, 0141-0152) with
+24 operational forms.
 
 Every generator under supabase/khalidiyah/ imports this and nothing else reads
-the workbook, so the ref lists (0141), the tables (0143), the framework rows
-(0144), the form definitions and both locale files come from the SAME cells.
+the workbook, so the option lists, the tables, the form definitions and both
+locale files come from the SAME cells.
 
-A sheet has a header block (indicator, definition, what the form measures,
-unit of analysis, calculation, disaggregation, data source, frequency,
-responsible, evidence) and a field table with the columns
+The workbook has four sheets:
 
-    No. | Section | Field name | Question (EN) | Question (AR) |
-    Options (EN) | Options (AR) | Field type | Req. | Notes / evidence
+  Forms needed          one row per field: Form ID | sub-page En | sub-page Ar |
+                        Field ID | Field Label En | Field Label Ar | Field Type |
+                        read-only | Required | Options En | Options Ar |
+                        Validation | Help Text | Dependency | Page En | Page Ar |
+                        Indicator ID | Mapping role | Review status |
+                        Reviewer note / rationale
+  Calculation formulas  one row per indicator: inclusion filter, numerator,
+                        denominator, formula, disaggregation, notes -- in
+                        terms of the Field IDs above
+  Indicator coverage    one row per indicator: which forms and fields feed it
+  English_form          the framework (Khaldia.xlsx with one column added)
 
-Section rows ("Section A — …") carry no No. and are kept as headings.
 Every string is kept VERBATIM (whitespace-normalised only); nothing here
-translates, drafts or corrects.
+translates, drafts or corrects. The corrections the reviewer asks for are the
+catalogue's (catalogue.REVIEW_FIXES), each one named, so the sheet's own text
+stays readable next to what the app shows.
 """
 import os, re
 import openpyxl
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
-FORMS_XLSX = os.path.join(ROOT, 'Khalidiyah_Indicator_Data_Collection_Forms.xlsx')
-FRAMEWORK_XLSX = os.path.join(ROOT, 'Khaldia.xlsx')
-
-FORM_SHEETS = [
-    ('imp0',  '02_IMP-0_Interaction_Survey'),
-    ('so10',  '03_SO1-0_Partner_Survey'),
-    ('a1',    '04_SO1-A1_Partnership_Mech'),
-    ('a2',    '05_SO1-A2_Coord_Meeting'),
-    ('a3',    '06_SO1-A3_Contributions'),
-    ('b1',    '07_SO1-B1_Park_Arrangements'),
-    ('so20',  '08_SO2-0_User_Satisfaction'),
-    ('c1',    '09_SO2-C1_Works_Completion'),
-    ('c2',    '10_SO2-C2_Volunteer_Campaign'),
-    ('d1',    '11_SO2-D1_Activity_Record'),
-    ('d2',    '12_SO2-D2_Attendance'),
-    ('so30',  '13_SO3-0_Volunteer_Tracking'),
-    ('e1',    '14_SO3-E1_Committee'),
-    ('f1',    '15_SO3-F1_Vol_Programme'),
-    ('f2',    '16_SO3-F2_Vol_Registration'),
-    ('f3',    '17_SO3-F3_Action_Day'),
-    ('so40',  '18_SO4-0_Producer_Followup'),
-    ('g1',    '19_SO4-G1_Guidance_Completion'),
-    ('g2',    '20_SO4-G2_Enterprise_Support'),
-    ('h1',    '21_SO4-H1_Market_Day_Record'),
-    ('h2',    '22_SO4-H2_Vendor_Registration'),
-]
-
-HEADER_KEYS = {
-    'Indicator code': 'code',
-    'Indicator': 'indicator',
-    'Indicator type': 'type',
-    'Definition (framework)': 'definition',
-    'What this form measures': 'measures',
-    'Unit of analysis — one record per': 'unit',
-    'Calculation': 'calculation',
-    'Disaggregation': 'disaggregation',
-    'Data source': 'source',
-    'Frequency / timing': 'frequency',
-    'Responsible for completing': 'responsible',
-    'Evidence to be filed': 'evidence',
-}
+XLSX = os.path.join(ROOT, 'Khaldia_2_reviewed.xlsx')
 
 
 def norm(s):
     if s is None:
         return ''
-    return re.sub(r'[ \t]+', ' ', str(s)).strip()
+    return re.sub(r'[ \t\xa0]+', ' ', str(s)).strip()
 
 
-def split_bilingual(cell):
-    """A header cell is 'English\\nArabic'; returns (en, ar)."""
-    parts = [norm(p) for p in str(cell).split('\n') if norm(p)]
-    if len(parts) >= 2:
-        return parts[0], parts[-1]
-    return (parts[0] if parts else ''), ''
-
-
-def options(cell):
-    """The response-option cell split into its lines, verbatim."""
-    return [norm(p) for p in str(cell or '').split('\n') if norm(p)]
+def lines(s):
+    """A multi-line cell as its non-empty lines, each normalised."""
+    return [norm(x) for x in str(s or '').split('\n') if norm(x)]
 
 
 class Field:
-    __slots__ = ('no', 'section', 'section_ar', 'key', 'q_en', 'q_ar', 'opts_en', 'opts_ar',
-                 'ftype', 'required', 'note_en', 'note_ar')
-
-    def __init__(self, no, section, key, q_en, q_ar, opts_en, opts_ar, ftype, required, note):
-        self.no = int(no)
-        sec_en, sec_ar = split_bilingual(section)
-        self.section, self.section_ar = sec_en, sec_ar
-        self.key = norm(key)
-        self.q_en, self.q_ar = norm(q_en), norm(q_ar)
-        self.opts_en, self.opts_ar = options(opts_en), options(opts_ar)
-        self.ftype = norm(ftype)
-        self.required = norm(required) == 'Yes'
-        n_en, n_ar = split_bilingual(note) if note else ('', '')
-        self.note_en, self.note_ar = n_en, n_ar
+    __slots__ = ('form', 'fid', 'sub_en', 'sub_ar', 'label_en', 'label_ar', 'ftype', 'readonly',
+                 'required', 'opts_en', 'opts_ar', 'validation', 'help', 'dependency', 'page_en',
+                 'page_ar', 'indicators', 'role', 'review', 'note', 'row')
 
     def __repr__(self):
-        return 'Field(%d %s %s)' % (self.no, self.key, self.ftype)
+        return 'Field(%s %s %s)' % (self.form, self.fid, self.ftype)
 
 
 class Form:
-    __slots__ = ('fid', 'sheet', 'code', 'title_en', 'title_ar', 'head', 'headings', 'fields')
+    __slots__ = ('form', 'fields')
 
-    def __init__(self, fid, sheet):
-        self.fid, self.sheet = fid, sheet
-        self.head = {}       # key -> (en, ar)
-        self.headings = []   # (before_field_no, en, ar)
+    def __init__(self, form):
+        self.form = form
         self.fields = []
 
-    def field(self, key):
+    def field(self, fid):
         for f in self.fields:
-            if f.key == key:
+            if f.fid == fid:
                 return f
-        raise KeyError('%s has no field %s' % (self.fid, key))
-
-    def by_no(self, no):
-        for f in self.fields:
-            if f.no == no:
-                return f
-        raise KeyError('%s has no item %d' % (self.fid, no))
+        raise KeyError('%s has no field %s' % (self.form, fid))
 
 
 def load_forms():
-    wb = openpyxl.load_workbook(FORMS_XLSX, read_only=True, data_only=True)
+    """{ 'FORM-01': Form, ... } in the sheet's order, fields in the sheet's order."""
+    wb = openpyxl.load_workbook(XLSX, read_only=True, data_only=True)
+    ws = wb['Forms needed']
     forms = {}
-    for fid, sheet in FORM_SHEETS:
-        ws = wb[sheet]
-        form = Form(fid, sheet)
-        rows = list(ws.iter_rows(values_only=True))
-        # row 2: "KHLD-IMP-0   |   Title\nKHLD-IMP-0   |   العنوان"
-        title_cell = str(rows[1][0])
-        en, ar = split_bilingual(title_cell)
-        form.code = en.split('|')[0].strip()
-        form.title_en = en.split('|', 1)[1].strip()
-        form.title_ar = ar.split('|', 1)[1].strip()
-        in_table = False
-        for r in rows:
-            c0 = norm(r[0]) if r and r[0] is not None else ''
-            if not in_table:
-                key = c0.split('\n')[0] if c0 else ''
-                for k, name in HEADER_KEYS.items():
-                    if c0.startswith(k) and len(r) > 2 and r[2] is not None:
-                        form.head[name] = split_bilingual(r[2])
-                if c0.startswith('No.'):
-                    in_table = True
-                continue
-            if not c0:
-                continue
-            if c0.startswith('Section '):
-                sen, sar = [norm(x) for x in c0.split('|', 1)] if '|' in c0 else (c0, '')
-                form.headings.append((len(form.fields) + 1, sen, sar))
-                continue
-            if c0.isdigit():
-                form.fields.append(Field(*(list(r[:10]) + [None] * (10 - len(r[:10])))))
-        forms[fid] = form
+    for i, r in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
+        if not r or not r[0]:
+            continue
+        r = list(r) + [None] * (20 - len(r))
+        f = Field()
+        f.row = i
+        f.form = norm(r[0])
+        f.sub_en, f.sub_ar = norm(r[1]), norm(r[2])
+        f.fid = norm(r[3])
+        f.label_en, f.label_ar = norm(r[4]), norm(r[5])
+        f.ftype = norm(r[6])
+        f.readonly = norm(r[7]).lower() == 'yes'
+        f.required = norm(r[8]).lower() == 'yes'
+        # the option cells keep their raw text: the catalogue types each list
+        # out and model.py holds every typed option to these cells
+        f.opts_en, f.opts_ar = str(r[9] or ''), str(r[10] or '')
+        f.validation, f.help, f.dependency = norm(r[11]), norm(r[12]), norm(r[13])
+        f.page_en, f.page_ar = norm(r[14]), norm(r[15])
+        f.indicators = [x.strip() for x in norm(r[16]).split(';') if x.strip()]
+        f.role, f.review, f.note = norm(r[17]), norm(r[18]), norm(r[19])
+        forms.setdefault(f.form, Form(f.form)).fields.append(f)
     return forms
 
 
+CALC_COLUMNS = ('code', 'indicator', 'type', 'unit', 'frequency', 'source', 'filter',
+                'numerator', 'denominator', 'formula', 'disaggregation', 'notes')
+
+
+def load_calculations():
+    """{ 'KHLD-IMP-0': {code, indicator, type, unit, ...} } from 'Calculation formulas'."""
+    wb = openpyxl.load_workbook(XLSX, read_only=True, data_only=True)
+    ws = wb['Calculation formulas']
+    out = {}
+    for r in ws.iter_rows(min_row=5, values_only=True):
+        if not r or not r[0] or not str(r[0]).startswith('KHLD-'):
+            continue
+        out[norm(r[0])] = dict(zip(CALC_COLUMNS, [norm(x) for x in r[:12]]))
+    return out
+
+
+def load_shared_definitions():
+    """The 'Shared definitions' block under the formulas: [(name, text)]."""
+    wb = openpyxl.load_workbook(XLSX, read_only=True, data_only=True)
+    ws = wb['Calculation formulas']
+    out, on = [], False
+    for r in ws.iter_rows(values_only=True):
+        if r and r[0] == 'Shared definitions':
+            on = True
+            continue
+        if on and r and r[0]:
+            out.append((norm(r[0]), norm(r[1])))
+    return out
+
+
+def load_coverage():
+    wb = openpyxl.load_workbook(XLSX, read_only=True, data_only=True)
+    ws = wb['Indicator coverage']
+    rows = list(ws.iter_rows(values_only=True))
+    head = [norm(x) for x in rows[0]]
+    return {norm(r[0]): dict(zip(head, [norm(x) for x in r])) for r in rows[1:] if r and r[0] and str(r[0]).startswith('KHLD-')}
+
+
 def load_framework():
-    wb = openpyxl.load_workbook(FRAMEWORK_XLSX, read_only=True, data_only=True)
-    ws = wb.worksheets[0]
+    """The English_form sheet: header, rows (each a list of normalised cells)."""
+    wb = openpyxl.load_workbook(XLSX, read_only=True, data_only=True)
+    ws = wb['English_form']
     rows = [[norm(c) for c in r] for r in ws.iter_rows(values_only=True)]
     header, body = rows[0], [r for r in rows[1:] if any(r)]
     return header, body
 
 
-def load_guidance():
-    wb = openpyxl.load_workbook(FORMS_XLSX, read_only=True, data_only=True)
-    ws = wb['01_GUIDANCE']
-    return [[norm(c) for c in r] for r in ws.iter_rows(values_only=True)]
-
-
-def load_index():
-    wb = openpyxl.load_workbook(FORMS_XLSX, read_only=True, data_only=True)
-    ws = wb['00_INDEX']
-    out = []
-    for r in ws.iter_rows(values_only=True):
-        if r and r[0] is not None and str(r[0]).strip().isdigit():
-            out.append([norm(c) for c in r])
-    return out
-
-
 if __name__ == '__main__':
     forms = load_forms()
     n = 0
-    for fid, f in forms.items():
+    for k, f in forms.items():
         n += len(f.fields)
-        print(fid, f.code, len(f.fields), 'fields', len(f.headings), 'sections')
-    print('total fields', n)
+        print(k, len(f.fields), 'fields', f.fields[0].sub_en)
+    print('total fields', n, '| indicators with a formula', len(load_calculations()))

@@ -1,313 +1,248 @@
 # -*- coding: utf-8 -*-
 """
-The resolved model: workbook + catalogue -> lists, columns, junctions, children.
+The resolved model: workbook + catalogue -> forms, fields, columns, lists,
+junctions, file fields and the rules between fields.
 
-Every generator (gen_0141 lists, gen_0143 tables, gen_forms definitions and
-locales) calls build() and reads the same objects, so the three cannot
-disagree about which list a field reads or which column it writes.
+Every generator (gen_schema.py for the migrations, gen_forms.py for the app)
+calls build() and reads the same objects, so they cannot disagree about which
+list a field reads or which column it writes.
 
-Verbatim is enforced here: an option typed in catalogue.py (the sub-items of
-a "Days: Friday / Saturday / ..." cell) must appear, English and Arabic, in
-the sheet's option cell, or build() fails.
+Verbatim is enforced here, both ways: every option typed in catalogue.LISTS
+must appear, English and Arabic, in the option cell of every field that
+reads the list, AND once every option is taken out of the cell nothing but
+delimiters may remain -- so a list can neither invent an option nor drop
+one. The fields whose cell is empty or wrong are the reviewer's corrections
+(catalogue.REVIEW_FIXES) and are named where they are skipped.
 """
-import re, sys, os
+import os, re, sys
+from collections import OrderedDict
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from workbook import load_forms
-from catalogue import (FORMS, TABLES, SHARED_LISTS, OPTION_CODES, OVERRIDES, REFERENCES,
-                       CHECKLIST_PREFIXES, LIST_FIXES, LISTS_ADDED_LATER, effective_free, spec_for, list_name, has_blank)
+from workbook import load_forms, norm
+import catalogue as C
 
-FREE_TEXT_WORDS = ('specify', 'describe', 'names:', 'name:', 'reason:', 'why:', 'phone:', 'date:',
-                   'number:', 'reference:', 'example:', 'explanation:', 'provider:', 'missing:', 'no.:',
-                   'authority:', 'partner:', 'organisation:', 'entity:', 'licence number:', 'score:',
-                   'institution:', 'rank:', 'justification:', 'complete:', 'where and in what:')
+# fields whose option cell is empty or not theirs, by the reviewer's own note
+NO_OPTION_CELL = {'F060', 'F061', 'F148'}
+# a gate every other answer of the form belongs to: FORM-19 "if no then end survey"
+FORM_GATES = {'form19': ('F158', ['true'])}
+# fields a gate does not govern (the gate itself, and what the database stamps)
+UNGATED = {'F158', 'F159'}
 
-
-def slug(s, maxlen=48):
-    s = s.lower()
-    s = s.replace('—', ' ').replace('–', '_').replace('&', 'and').replace('’', '').replace("'", '')
-    s = re.sub(r'\(.*?\)', ' ', s)          # drop parentheticals
-    s = re.sub(r':\s*_+.*$', '', s)          # drop ": ____ ..." tails
-    s = re.sub(r'_+', '_', s)
-    s = re.sub(r'[^a-z0-9]+', '_', s).strip('_')
-    s = re.sub(r'_+', '_', s)
-    if s and s[0].isdigit():
-        s = 'n_' + s
-    return s[:maxlen].strip('_') or 'option'
+SQLTYPE = {'text': 'text', 'area': 'text', 'int': 'int', 'money': 'numeric(12,3)', 'percent': 'numeric(5,2)',
+           'date': 'date', 'bool': 'boolean', 'likert': 'smallint'}
 
 
-def option_is_free_text(label):
-    l = label.lower()
-    if has_blank(label):
-        return True
-    if l.strip() == 'other':
-        return True
-    return any(w in l for w in ('(specify', 'specify)', '(specify)', 'describe'))
+def squash(s):
+    return re.sub(r'\s+', ' ', s).strip()
 
 
-def checklist_code(label, i):
-    l = label.lower()
-    if l.startswith('in place'):
-        prefix = 'in_place'
-    elif l.startswith('partly in place'):
-        prefix = 'partly'
-    elif l.startswith('not in place'):
-        prefix = 'not_in_place'
-    elif l.startswith('no volunteers under 18'):
-        return 'not_accepted'
-    else:
-        raise ValueError('checklist option without a status prefix: %r' % label)
-    rest = re.sub(r'^(in place|partly in place|not in place)', '', l).strip(' —-')
-    rest = slug(rest, 30) if rest else ''
-    return prefix + ('_' + rest if rest else '')
+class FieldM:
+    def __init__(self, sheet_field, spec, form):
+        f = sheet_field
+        self.sheet = f
+        self.fid = f.fid
+        self.key = f.fid.lower()
+        self.form = form
+        self.kind = spec['kind']
+        self.col = spec.get('col')
+        self.spec = spec
+        self.label_en = f.label_en
+        self.label_ar = f.label_ar
+        fix = C.REVIEW_FIXES.get((f.fid, 'label_en'))
+        if fix:
+            self.label_en = fix[0]
+        req = f.required if 'req' not in spec else spec['req']
+        if self.kind in ('stamp', 'reference', 'shown'):
+            req = False
+        self.required = req
+        self.when = []
+        if spec.get('when'):
+            self.when.append(spec['when'])
+        self.list = spec.get('list')
+        self.help_en = f.help if f.fid in ('F136', 'F158', 'F162') else ''
+
+    @property
+    def conditional(self):
+        return bool(self.when)
+
+    def __repr__(self):
+        return 'FieldM(%s %s %s)' % (self.fid, self.kind, self.col)
 
 
-class Lst:
-    def __init__(self, name):
-        self.name = name
-        self.options = []      # (code, en, ar, free)
-        self.used_by = []
-        self.is_checklist = False
-        self.is_cells = False
+class FormM:
+    def __init__(self, fid, meta):
+        self.id = fid
+        self.meta = meta
+        self.table = meta['table']
+        self.sheets = meta['sheets']
+        self.fields = []
+        self.group = meta['group']
+        self.title_en = self.title_ar = ''
 
 
 class Model:
     def __init__(self):
-        self.forms = load_forms()
-        self.lists = {}        # name -> Lst
-        self.specs = {}        # fid -> {key: spec}
-        self.columns = {}      # table -> [(name, sqltype, nullable, ref_list|None, comment)]
-        self.questions = {}    # table -> [(question_code, list_name, milestone_code|None)]
-        self.count_fields = {} # table -> [(field_code, list_name, milestone_code|None)]
-        self.checklist_items = {}  # milestone_code -> [(item_no, field_code, list_name, has_detail)]
-        self.milestone_columns = {}  # milestone_code -> [column names specific to it]
+        self.sheet = load_forms()
+        self.forms = OrderedDict()
+        self.lists_used = OrderedDict()     # list -> [field ids]
+        self.columns = OrderedDict((t, []) for t in C.TABLES)
+        self.questions = OrderedDict((t, []) for t in C.TABLES)   # multi: (question, list)
+        self.junctions = []                 # records: (junction, parent table, parent fk, target table, field)
+        self.files = []                     # (table, field id, max, required, when)
+        self.errors = []
 
-    # ── lists ────────────────────────────────────────────────────────────
-    def add_list(self, name, en_opts, ar_opts, used_by, codes=None, no_other=False, checklist=False, cells=False):
-        if len(en_opts) != len(ar_opts):
-            raise ValueError('%s: %d English options, %d Arabic (%s)' % (name, len(en_opts), len(ar_opts), used_by))
-        opts = []
-        seen = set()
-        for i, (en, ar) in enumerate(zip(en_opts, ar_opts)):
-            if codes:
-                code = codes[i]
-            elif name in OPTION_CODES:
-                code = OPTION_CODES[name][i]
-            elif checklist:
-                code = checklist_code(en, i)
-            else:
-                code = slug(en)
-            if code in seen:
-                code = '%s_%d' % (code, i + 1)
-            seen.add(code)
-            free = (not no_other) and (not cells) and (not checklist) and option_is_free_text(en)
-            opts.append((code, en, ar, free))
-        if name in OPTION_CODES and len(OPTION_CODES[name]) != len(en_opts):
-            raise ValueError('%s: OPTION_CODES has %d codes for %d options' % (name, len(OPTION_CODES[name]), len(en_opts)))
-        if name in self.lists:
-            ex = self.lists[name]
-            if [o[1] for o in ex.options] != en_opts:
-                raise ValueError('%s: used with different options by %s and %s' % (name, ex.used_by, used_by))
-            if [o[2] for o in ex.options] != ar_opts:
-                raise ValueError('%s: Arabic differs between %s and %s' % (name, ex.used_by, used_by))
-            ex.used_by.append(used_by)
-            return ex
-        l = Lst(name)
-        l.options = opts
-        l.used_by = [used_by]
-        l.is_checklist = checklist
-        l.is_cells = cells
-        self.lists[name] = l
-        return l
+    def err(self, s):
+        self.errors.append(s)
 
-    def _verbatim(self, f, en_opts, ar_opts, where):
-        """Every typed sub-option must be a substring of the sheet's cell."""
-        cell_en = ' '.join(f.opts_en)
-        cell_ar = ' '.join(f.opts_ar)
-        for o in en_opts:
-            if o not in cell_en:
-                raise ValueError('%s: English option %r is not in the sheet cell %r' % (where, o, cell_en[:80]))
-        for o in ar_opts:
-            if o not in cell_ar:
-                raise ValueError('%s: Arabic option %r is not in the sheet cell' % (where, o))
+    # ── verbatim ──────────────────────────────────────────────────────────
+    def check_cell(self, where, cell_en, cell_ar, opts):
+        ce, ca = squash(cell_en), squash(cell_ar)
+        rest_e, rest_a = ce, ca
+        for _code, en, ar in sorted(opts, key=lambda o: -len(o[1])):
+            if squash(en) not in ce:
+                self.err('%s: English option %r is not in the sheet cell %r' % (where, en, ce[:90]))
+            rest_e = rest_e.replace(squash(en), ' ', 1)
+        for _code, en, ar in sorted(opts, key=lambda o: -len(o[2])):
+            if squash(ar) not in ca:
+                self.err('%s: Arabic option %r is not in the sheet cell %r' % (where, ar, ca[:90]))
+            rest_a = rest_a.replace(squash(ar), ' ', 1)
+        for side, rest in (('English', rest_e), ('Arabic', rest_a)):
+            if re.sub(r'[\s\-–]+', '', rest):
+                self.err('%s: the %s cell has text no option accounts for: %r' % (where, side, rest.strip()))
 
-    # The code a multi-select question or a count field is stored under in
-    # its junction. Four milestone forms share khld_milestone_verification,
-    # and khld_question_list is keyed on (table, code), so on that table the
-    # code carries the form id: a1_evidence_attached, b1_evidence_attached,
-    # e1_evidence_attached and f1_evidence_attached are four questions
-    # reading four lists. guard_khld_milestone_child (0147) then requires
-    # the prefix to be the parent's milestone. Everywhere else the code is
-    # the sheet's field key.
-    @staticmethod
-    def qcode(fid, key, mcode):
-        return '%s_%s' % (fid, key) if mcode else key
+    def check_bool(self, fm):
+        f = fm.sheet
+        if f.fid in NO_OPTION_CELL:
+            return
+        (te, ta), (fe, fa) = fm.spec.get('labels', C.YES_NO)
+        self.check_cell('%s bool' % f.fid, f.opts_en, f.opts_ar, [('t', te, ta), ('f', fe, fa)])
 
-    def _list_for_part(self, fid, f, col, cfg, where):
-        en, ar = cfg['options'], cfg['options_ar']
-        self._verbatim(f, en, ar, where)
-        return self.add_list(cfg['list'], en, ar, cfg.get('used_by', where), codes=cfg.get('codes'), no_other=cfg.get('no_other', False))
-
-    # ── build ────────────────────────────────────────────────────────────
+    # ── build ─────────────────────────────────────────────────────────────
     def build(self):
-        for fid, form in self.forms.items():
-            meta = FORMS[fid]
-            table = meta['table']
-            self.specs[fid] = {}
-            self.columns.setdefault(table, [])
-            self.questions.setdefault(table, [])
-            self.count_fields.setdefault(table, [])
-            mcode = meta.get('milestone')
-            if mcode:
-                self.checklist_items[mcode] = []
-                self.milestone_columns[mcode] = []
-            seen_keys = set()
+        by_sheet = {}
+        for sid, form in self.sheet.items():
             for f in form.fields:
-                spec = spec_for(fid, f)
-                self.specs[fid][f.key] = spec
-                seen_keys.add(f.key)
-                self._plan_field(fid, form, f, spec, table, mcode)
-            # overrides that name a field the sheet does not have (e.g. c2._participants)
-            for key, spec in OVERRIDES.get(fid, {}).items():
-                if key not in seen_keys:
-                    if not key.startswith('_'):
-                        raise ValueError('%s: override for unknown field %s' % (fid, key))
-                    self.specs[fid][key] = spec
+                by_sheet[f.fid] = f
+        seen = set()
+        for fid, meta in C.FORMS.items():
+            fm = FormM(fid, meta)
+            sheet_fields = [f for s in meta['sheets'] for f in self.sheet[s].fields]
+            order = C.ORDER.get(fid, [])
+            ordered = [by_sheet[x] for x in order] + [f for f in sheet_fields if f.fid not in order]
+            if sorted(f.fid for f in ordered) != sorted(f.fid for f in sheet_fields):
+                self.err('%s: ORDER names a field that is not on the form' % fid)
+            # the title: the sub-page of the form's fields (F004's is the reviewer's fix)
+            subs = {(f.sub_en, f.sub_ar) for f in sheet_fields if f.fid != 'F004' and f.fid != 'F010'}
+            if len(subs) != 1:
+                self.err('%s: the sub-page is not one title: %r' % (fid, subs))
+            fm.title_en, fm.title_ar = sorted(subs)[0]
+            for f in ordered:
+                if f.fid not in C.FIELDS:
+                    self.err('%s: no catalogue entry' % f.fid)
+                    continue
+                seen.add(f.fid)
+                field = FieldM(f, C.FIELDS[f.fid], fm)
+                gate = FORM_GATES.get(fid)
+                if gate and f.fid not in UNGATED:
+                    field.when.insert(0, gate)
+                fm.fields.append(field)
+            self.forms[fid] = fm
+        missing = set(C.FIELDS) - seen
+        if missing:
+            self.err('catalogue fields not on any form: %s' % sorted(missing))
+        for fm in self.forms.values():
+            for field in fm.fields:
+                self.plan(fm, field)
+        self.check_whens()
+        if self.errors:
+            raise SystemExit('model: %d problems\n  ' % len(self.errors) + '\n  '.join(self.errors))
         return self
 
-    def _col(self, table, name, sqltype, nullable=True, ref=None, comment='', mcode=None):
-        cols = self.columns[table]
-        names = [c[0] for c in cols]
-        if name in names:
-            if mcode:
-                # the same column on two milestone forms is one column
-                self.milestone_columns[mcode].append(name)
-                return
-            raise ValueError('%s: column %s defined twice' % (table, name))
-        cols.append((name, sqltype, nullable, ref, comment))
-        if mcode:
-            self.milestone_columns[mcode].append(name)
+    def use_list(self, name, field):
+        if name not in C.LISTS:
+            self.err('%s: unknown list %s' % (field.fid, name))
+            return
+        self.lists_used.setdefault(name, []).append(field.fid)
+        f = field.sheet
+        if f.fid in NO_OPTION_CELL:
+            return
+        opts = [(C.code_of(c), e, a) for c, e, a in C.LISTS[name]]
+        self.check_cell('%s (%s)' % (f.fid, name), f.opts_en, f.opts_ar, opts)
 
-    def _plan_field(self, fid, form, f, spec, table, mcode):
-        kind = spec['kind']
-        where = '%s.%s' % (fid, f.key)
-        req = spec.get('required', False)
-        if kind in ('text', 'area'):
-            self._col(table, f.key, 'text', not req, comment=f.q_en, mcode=mcode)
-        elif kind == 'number':
-            self._col(table, f.key, 'int', not req, comment=f.q_en, mcode=mcode)
-        elif kind == 'money':
-            self._col(table, f.key, 'numeric(12,3)', not req, comment=f.q_en, mcode=mcode)
-        elif kind == 'date':
-            self._col(table, f.key, 'date', not req, comment=f.q_en, mcode=mcode)
-        elif kind == 'month':
-            self._col(table, f.key, 'date', not req, comment=f.q_en + ' (first of the month)', mcode=mcode)
-        elif kind == 'bool':
-            self._col(table, f.key, 'boolean', not req, comment=f.q_en, mcode=mcode)
-            if spec.get('stamp'):
-                self._col(table, f.key + '_recorded_on', 'timestamptz', True, comment='when ' + f.key + ' was recorded', mcode=mcode)
-                self._col(table, f.key + '_recorded_by', 'uuid', True, comment='who recorded ' + f.key, mcode=mcode)
-        elif kind == 'select':
-            name = list_name(fid, f, spec)
-            opts = spec.get('options') or f.opts_en
-            opts_ar = spec.get('options_ar') or f.opts_ar
-            if spec.get('options'):
-                self._verbatim(f, opts, opts_ar, where)
-            l = self.add_list(name, opts, opts_ar, where, codes=spec.get('codes'), no_other=spec.get('no_other', False))
-            self._col(table, f.key + '_id', 'uuid', not req, ref=name, comment=f.q_en, mcode=mcode)
-            if any(effective_free(l.name, o[0], o[3]) for o in l.options):
-                self._col(table, f.key + '_other', 'text', True, comment='free text for ' + f.key, mcode=mcode)
-            if spec.get('stamp'):
-                self._col(table, f.key + '_recorded_on', 'timestamptz', True, comment='when ' + f.key + ' was recorded', mcode=mcode)
-                self._col(table, f.key + '_recorded_by', 'uuid', True, comment='who recorded ' + f.key, mcode=mcode)
-        elif kind == 'multi':
-            name = list_name(fid, f, spec)
-            self.add_list(name, f.opts_en, f.opts_ar, where)
-            self.questions[table].append((self.qcode(fid, f.key, mcode), name, mcode))
-        elif kind == 'checklist':
-            opts = spec.get('options') or f.opts_en
-            opts_ar = spec.get('options_ar') or f.opts_ar
-            name = list_name(fid, f, spec) if not spec.get('options') else 'checklist_status'
-            if spec.get('options'):
-                self._verbatim(f, opts, opts_ar, where)
-            self.add_list(name, opts, opts_ar, where, checklist=True)
-            has_detail = any(has_blank(o) for o in opts)
-            self.checklist_items[mcode].append((f.no, f.key, name, has_detail))
-        elif kind == 'counts':
-            name = '%s_%s' % (fid, f.key)
-            cells = spec['cells']
-            self.add_list(name, [c[1] for c in cells], [c[2] for c in cells], where, codes=[c[0] for c in cells], cells=True)
-            self.count_fields[table].append((self.qcode(fid, f.key, mcode), name, mcode))
-        elif kind == 'parts':
-            # a required compound field makes its FIRST typed part NOT NULL (the
-            # answer that says which case applies); a free-text part never is
-            first = True
-            for (col, pkind, en, ar, cfg) in spec['parts']:
-                pwhere = where + '.' + col
-                nullable = not (req and first and pkind in ('select', 'bool', 'number', 'date', 'money'))
-                first = False
-                if pkind in ('text', 'phone'):
-                    self._col(table, col, 'text', True, comment=en, mcode=mcode)
-                elif pkind == 'number':
-                    self._col(table, col, 'int', nullable, comment=en, mcode=mcode)
-                elif pkind == 'money':
-                    self._col(table, col, 'numeric(12,3)', nullable, comment=en, mcode=mcode)
-                elif pkind == 'date':
-                    self._col(table, col, 'date', nullable, comment=en, mcode=mcode)
-                elif pkind == 'bool':
-                    self._col(table, col, 'boolean', nullable, comment=en, mcode=mcode)
-                elif pkind == 'select':
-                    l = self._list_for_part(fid, f, col, cfg, pwhere)
-                    self._col(table, col, 'uuid', nullable, ref=cfg['list'], comment=en, mcode=mcode)
-                    if any(effective_free(l.name, o[0], o[3]) for o in l.options):
-                        self._col(table, re.sub(r'_id$', '', col) + '_other', 'text', True, comment='free text for ' + col, mcode=mcode)
-                elif pkind == 'multi':
-                    self._list_for_part(fid, f, col, cfg, pwhere)
-                    self.questions[table].append((self.qcode(fid, col, mcode), cfg['list'], mcode))
-                elif pkind == 'record':
-                    self._col(table, col, 'uuid', True, ref='@' + cfg['table'], comment=en, mcode=mcode)
-                elif pkind == 'person_phone':
-                    pass  # person.phone
-                else:
-                    raise ValueError('%s: unknown part kind %s' % (pwhere, pkind))
-        elif kind == 'record':
-            self._col(table, spec['column'], 'uuid', not req, ref='@' + spec['table'], comment=f.q_en, mcode=mcode)
-        elif kind == 'age_group':
-            self.add_list('age_group', f.opts_en, f.opts_ar, where)
-            self._col(table, 'age_group_id', 'uuid', not req, ref='age_group', comment=f.q_en, mcode=mcode)
-        elif kind in ('ident', 'person_name', 'person_sex', 'person_phone', 'dob', 'dob_age'):
-            if kind == 'person_sex':
-                self.add_list('sex', f.opts_en, f.opts_ar, where)
-        elif kind == 'readonly':
-            if spec.get('list'):
-                self.add_list(spec['list'], f.opts_en, f.opts_ar, where)
-        elif kind == 'rating':
-            items, ratings = parse_matrix(f)
-            self.add_list('so20_facility_item', [i[0] for i in items], [i[1] for i in items], where, cells=True)
-            self.add_list('so20_facility_rating', [r[0] for r in ratings], [r[1] for r in ratings], where, cells=True)
-        elif kind == 'session':
-            n = spec['n']
-            name = list_name(fid, f, spec)
-            # the session's date has its own column; "Attended — date: ____" takes no free text
-            self.add_list(name, f.opts_en, f.opts_ar, where, no_other=True)
-            self._col(table, 's%d_status_id' % n, 'uuid', True, ref=name, comment=f.q_en, mcode=mcode)
-            self._col(table, 's%d_date' % n, 'date', True, comment='date of session %d' % n, mcode=mcode)
-        elif kind in ('participants', 'participation_log'):
-            pass
+    def col(self, table, name, sqltype, notnull, ref, comment):
+        if any(c[0] == name for c in self.columns[table]):
+            self.err('%s: column %s twice' % (table, name))
+        self.columns[table].append((name, sqltype, notnull, ref, comment))
+
+    def plan(self, fm, field):
+        t, k, f = fm.table, field.kind, field.sheet
+        comment = '%s %s' % (field.fid, field.label_en)
+        notnull = field.required and not field.conditional
+        if k in SQLTYPE:
+            self.col(t, field.col, SQLTYPE[k], notnull, None, comment)
+            if k == 'bool':
+                self.check_bool(field)
+            if k == 'likert':
+                self.check_cell('%s likert' % f.fid, f.opts_en, f.opts_ar, C.SCALES[field.spec['scale']])
+        elif k == 'select' or k == 'id_type':
+            self.use_list(field.list, field)
+            self.col(t, field.col, 'uuid', notnull, field.list, comment)
+            if any(C.free(c) for c, _e, _a in C.LISTS[field.list]):
+                self.col(t, field.col[:-3] + '_other', 'text', False, None, 'free text for ' + field.fid)
+        elif k == 'multi':
+            self.use_list(field.list, field)
+            self.questions[t].append((field.key, field.list))
+        elif k == 'records':
+            self.junctions.append((field.spec['junction'], t, C.CHILD_FK[t], field.spec['table'], field))
+        elif k == 'record':
+            self.col(t, field.col, 'uuid', notnull and 'extra' not in field.spec, '@' + field.spec['table'], comment)
+            extra = field.spec.get('extra')
+            if extra and extra[1]:
+                self.col(t, extra[1], 'boolean', True, 'default false', '%s "%s"' % (field.fid, 'General park visit'))
+        elif k == 'person_ref':
+            self.col(t, field.col, 'uuid', notnull, '@person', comment)
+        elif k == 'occasion':
+            self.col(t, 'campaign_id', 'uuid', False, '@khld_campaign', comment + ' (a FORM-07 campaign)')
+            self.col(t, 'activity_id', 'uuid', False, '@khld_activity', comment + ' (a FORM-08 activity)')
+        elif k == 'stamp':
+            self.col(t, field.col, 'timestamptz', True, 'now()', comment)
+        elif k == 'file':
+            self.files.append((t, field.fid, field.spec.get('max', 5), field.required, field.when))
+        elif k in ('reference', 'shown', 'ident', 'person_name', 'person_sex', 'dob', 'person_phone'):
+            if k == 'person_sex':
+                self.use_list(field.list, field)
         else:
-            raise ValueError('%s: unknown kind %s' % (where, kind))
+            self.err('%s: unknown kind %s' % (field.fid, k))
 
+    def field(self, fid):
+        for fm in self.forms.values():
+            for f in fm.fields:
+                if f.fid == fid:
+                    return f
+        raise KeyError(fid)
 
-def parse_matrix(f):
-    """SO2-0's rate_facilities: 'Rate each: a | b | c … → Good / Acceptable / Poor / Not available'."""
-    en = f.opts_en
-    ar = f.opts_ar
-    items_en = [x.strip() for x in en[0].split(':', 1)[1].split('|')]
-    items_ar = [x.strip() for x in ar[0].split(':', 1)[1].split('|')]
-    ratings_en = [x.strip() for x in en[1].lstrip('→ ').split('/')]
-    ratings_ar = [x.strip() for x in ar[1].lstrip('→ ').split('/')]
-    if len(items_en) != len(items_ar) or len(ratings_en) != len(ratings_ar):
-        raise ValueError('rate_facilities: English and Arabic do not align')
-    return list(zip(items_en, items_ar)), list(zip(ratings_en, ratings_ar))
+    def check_whens(self):
+        for fm in self.forms.values():
+            ids = {f.fid for f in fm.fields}
+            for f in fm.fields:
+                for (gov, values) in f.when:
+                    if gov not in ids:
+                        self.err('%s: when= names %s, which is not on %s' % (f.fid, gov, fm.id))
+                        continue
+                    g = self.field(gov)
+                    if g.kind in ('select', 'id_type'):
+                        codes = [C.code_of(c) for c, _e, _a in C.LISTS[g.list]]
+                        for v in values:
+                            if v not in codes:
+                                self.err('%s: when= code %r is not an option of %s' % (f.fid, v, g.list))
+                    elif g.kind == 'bool':
+                        if not set(values) <= {'true', 'false'}:
+                            self.err('%s: when= on a bool takes true / false' % f.fid)
+                    elif g.kind == 'record':
+                        if not set(values) <= {'__extra__', '__record__'}:
+                            self.err('%s: when= on a record takes __extra__ / __record__' % f.fid)
+                    else:
+                        self.err('%s: when= on a %s is not supported' % (f.fid, g.kind))
 
 
 def build():
@@ -316,8 +251,10 @@ def build():
 
 if __name__ == '__main__':
     m = build()
-    print(len(m.lists), 'lists,', sum(len(l.options) for l in m.lists.values()), 'options')
-    for t in TABLES:
-        print(' ', t, len(m.columns.get(t, [])), 'columns', len(m.questions.get(t, [])), 'questions', len(m.count_fields.get(t, [])), 'count fields')
-    for mc, items in m.checklist_items.items():
-        print(' ', mc, [i[0] for i in items])
+    print(len(m.forms), 'forms,', sum(len(f.fields) for f in m.forms.values()), 'fields,', len(m.lists_used), 'lists,',
+          sum(len(C.LISTS[l]) for l in m.lists_used), 'options,', len(m.files), 'file fields,', len(m.junctions), 'junctions')
+    for t, cols in m.columns.items():
+        print(' ', t, len(cols), 'columns', len(m.questions[t]), 'multi')
+    unused = [l for l in C.LISTS if l not in m.lists_used]
+    if unused:
+        print('unused lists', unused)
