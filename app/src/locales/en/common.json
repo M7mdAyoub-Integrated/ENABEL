@@ -9,7 +9,7 @@
     "phoneOnlyHeading": "{count, plural, one {# person is verified by phone only} other {# people are verified by phone only}}",
     "phoneOnlyBody": "No date of birth, but a phone number is on file, so the site can still find them. Adding a date of birth is better: a phone number changes."
   },
-  "appName": "SHM M&E Platform",
+  "appName": "Enabel M&E Platform",
   "subtitle": "Municipal programmes",
   "yes": "Yes",
   "no": "No",
