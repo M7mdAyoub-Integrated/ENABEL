@@ -105,14 +105,16 @@ export type IndicatorSource = {
 
 /**
  * Why a row has no figure, from `v_rmth_indicator_status` (0132) and
- * `v_khld_indicator_status` (0150), each of which reads the same rows its
+ * `v_khld_indicator_status` (0163), each of which reads the same rows its
  * programme's views do -- so the screen and the figure cannot disagree.
  *
  *   threshold_unset      the view returns null because a definition in
  *                        `rmth_threshold` is still null; `missing_keys` names it
  *   no_statement         the framework gives the code and no indicator text
- *   rule_not_evaluable   a Khalidiyah milestone's rule names items that are
- *                        not checklist rows (OQ-56); `detail` names them
+ *   rule_not_evaluable   the first Khalidiyah build's milestone rules named
+ *                        items that were not checklist rows (OQ-56); since
+ *                        0163 every Khalidiyah indicator computes and the
+ *                        view names no reason, so none arrives today
  *
  * Both views are queried for every municipality: the alternative is a branch
  * on the municipality's code in the component, which is the shape that put
@@ -130,7 +132,7 @@ export type IndicatorStatusRow = {
   milestone_code?: string | null
 }
 
-/** "Of whom unique" beside a count, from `v_rmth_indicator_unique` (0133) and `v_khld_indicator_unique` (0150). */
+/** The second figure beside a count, from `v_rmth_indicator_unique` (0133) and `v_khld_indicator_unique` (0163). */
 export type IndicatorUniqueRow = { code: string; period_code: string; unique_actual: number }
 
 /**

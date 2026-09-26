@@ -43,12 +43,12 @@ docs/04_DATA_DICTIONARY.md     ← every field of every form, with option lists
 docs/05_ROLES_AND_RLS.md       ← the five roles and the policy for every table
 docs/06_OPEN_QUESTIONS.md      ← decisions that must NOT be guessed
 docs/07_BUILD_CHECKLIST.md     ← the 17 migrations, in order, with verification
-09_MULTI_MUNICIPALITY.md       ← the second municipality (Ramtha), part by part, 0111–0135; Parts 10–11 are the super admin's chrome and the platform dialog; Part 12 is the third (Khalidiyah), 0138–0152
+09_MULTI_MUNICIPALITY.md       ← the second municipality (Ramtha), part by part, 0111–0135; Parts 10–11 are the super admin's chrome and the platform dialog; Part 12 is the third (Khalidiyah), 0138–0152; Part 13 replaces Khalidiyah's forms with the reviewed workbook, 0153–0164
 RAMTHA_IMPLEMENTATION_PLAN.md  ← the brief that work followed
 RAMTHA_REPORT.md               ← where Ramtha stands: what computes, what waits on a decision
 KHALIDIYAH_IMPLEMENTATION_PLAN.md ← the brief the third municipality followed
-KHALIDIYAH_REPORT.md           ← where Khalidiyah stands: 19 of 21 compute, two milestones wait on the M&E lead
-supabase/khalidiyah/           ← one reading of the Khalidiyah workbooks and the generators for 0141, 0145 and 0149 and for app/src/khld; edit the catalogue, never the output
+KHALIDIYAH_REPORT.md           ← where Khalidiyah stands: 23 forms from Khaldia_2_reviewed.xlsx, all 21 indicators compute, what waits on a decision
+supabase/khalidiyah/           ← one reading of Khaldia_2_reviewed.xlsx and the generators for 0156–0160, 0162–0163 and app/src/khld (gen_schema, gen_views, gen_forms); v1/ is the retired first build's, still reproducing 0141–0149; edit the catalogue, never the output
 supabase/migrations/           ← the SQL you write
 ```
 
@@ -123,6 +123,18 @@ Do this instead:
 4. Append the ledger line to `supabase/.ledger_manifest`, then run the check.
 
 The manifest is a saved snapshot, so a migration applied after it was last generated shows up as `NOT APPLIED` — the check is comparing against a stale list, not reporting a real problem. Append the new line rather than concluding the file is wrong.
+
+**One decided exception to "never `drop table` on anything holding data".**
+On 26 September 2026 the municipality's owner replaced Khalidiyah's 21
+indicator forms (`0141`–`0152`) with the 24 operational forms of
+`Khaldia_2_reviewed.xlsx`, and asked whether to keep the old tables beside
+the new ones, answered **"Drop them."** `0153`–`0155` drop the 50 tables and
+238 option lists; what they held — 275 rows the admin account entered while
+trying the first build out, none of it reported — survives in `audit_log`.
+It is written here so it reads as a decision and not a precedent: it was the
+user's call, made about test data, before any quarter was returned. Anything
+else that wants to drop a table holding data asks the same question first.
+See `06_OPEN_QUESTIONS.md` OQ-60.
 
 **Write migration files with LF endings, and be careful when a script writes one.** `0098` was assembled by a Python script that appended to the file with the default `open(path, 'a')`. On Windows that translates `\n` to `\r\n`, so the second half of the file had CRLF while the half written by the editor had LF. The applied text had LF throughout, so the file and the ledger no longer matched — and the file *read back* identically, because Python's universal-newline mode converts CRLF to LF on the way in. Every line hashed the same; only the whole-file hash differed.
 

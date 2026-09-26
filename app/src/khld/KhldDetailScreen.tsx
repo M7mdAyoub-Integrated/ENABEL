@@ -68,7 +68,7 @@ function Detail({ fid }: { fid: KhldFormId }) {
         back={<BackLink onClick={() => navigate(`/khld/${fid}`)}>{t('khld:form.back')}</BackLink>}
         eyebrow={`${L.sheet}${reference ? ` ${SEP} ${reference}` : ''}`}
         title={heading}
-        description={L.title}
+        {...(heading.toLowerCase() === L.title.toLowerCase() || heading === L.short ? {} : { description: L.title })}
         size="md"
         action={
           <div className="flex flex-wrap gap-2">

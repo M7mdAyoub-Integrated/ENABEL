@@ -2076,6 +2076,10 @@ answering different questions.
 
 **Added 21 September 2026**, with migration `0147` (plan Part 7).
 
+> **Superseded 26 September 2026.** The forms this concerns were retired
+> when `Khaldia_2_reviewed.xlsx` replaced them (OQ-60, migrations
+> `0153`–`0164`). Kept for the record; nothing in the schema reads it now.
+
 **What the sheets say.** Each milestone sheet ends with a calculation line
 naming the checklist items that must all be *In place* for the milestone
 to read *Established*, by the sheet's own **No.** column:
@@ -2168,6 +2172,10 @@ closed).
 
 **Added 21 September 2026**, with migration `0150`.
 
+> **Superseded 26 September 2026.** The forms this concerns were retired
+> when `Khaldia_2_reviewed.xlsx` replaced them (OQ-60, migrations
+> `0153`–`0164`). Kept for the record; nothing in the schema reads it now.
+
 **What the sheets say.** Each form's head block gives the calculation, and
 five of them name a question by number:
 
@@ -2247,3 +2255,274 @@ about precisely this gap. So:
 **Decides.** Whoever does the go-live pass: whether the four roles get
 permanent fixture accounts again, on this project or on a separate one.
 
+---
+
+## 🔴 OQ-60 · Khalidiyah's first forms were dropped, not archived — hard rule 5, by decision
+
+**Added 26 September 2026**, with migrations `0153`–`0155`.
+
+**What happened.** The municipality's owner replaced the 21 indicator forms
+of `Khalidiyah_Indicator_Data_Collection_Forms.xlsx` (built 21–22 September,
+`0141`–`0152`) with the 24 operational forms of `Khaldia_2_reviewed.xlsx`,
+and when asked whether to keep the old tables beside the new ones, answered
+**"Drop them."** `0153` drops the 50 tables, their views and functions;
+`0154`–`0155` the 238 option lists. CLAUDE.md hard rule 5 says never to
+`drop table` on anything holding data, so this is recorded there as a
+decided exception, not a lapse.
+
+**What was lost.** 275 rows the Khalidiyah admin account entered on 21–22
+September while trying the first build out (the audit log still names
+them — `audit_log` is insert-only and was not touched). Nothing in them was
+reported: no Khalidiyah quarter has been returned to the donor.
+
+**What was kept deliberately.**
+
+- `attachment_entity_type_known` still names the retired tables, because
+  one soft-deleted attachment row (the evidence test of 22 September) still
+  names `khld_coordination_meeting`, and an attachment row is never deleted.
+  The evidence function lists only the tables that exist.
+- `khld_reference_counter` was not reset. The first build issued
+  `KHLD-VOL-0001` and `-0002` (and `CM`, `CON`, `EV`, `MKT`, `VC` numbers
+  dated 2027 in the test data); the new forms continue after them, so the
+  first real volunteer is `KHLD-VOL-0003`. A reference that was ever printed
+  is never reissued to a different record.
+
+**Decides.** Nothing further unless the test rows turn out to have been
+real: if they were, they are in `audit_log` (`row_data`) and can be re-keyed
+into the new forms by hand.
+
+---
+
+## 🟠 OQ-61 · FORM-12 is filled in by the public; a registration counts only once staff approve it
+
+**Added 26 September 2026**, with migrations `0159`, `0161` and `0164`.
+
+**The decision.** Asked who fills FORM-12, -15 and -17, the owner answered
+that the volunteer database is "a public form for the people", and the
+vendor (FORM-17) and enterprise (FORM-15) forms are for staff.
+
+**What was built.** `/khalidiyah/volunteer` renders FORM-12 from the same
+generated definition as the staff screen and calls
+`khld_register_volunteer` (security definer, the shape of
+`apply_for_opportunity`): throttled per client and per identifier; a person
+already on file must give their date of birth (or, where none is on file,
+their phone) and nothing about them is changed or returned; F060 "No" is
+`not_eligible` before anything is looked up. The row arrives with
+`application_status = 'submitted'`, `submitted_publicly = true`, and counts
+in no figure until a coordinator or data-entry user approves it on the
+record's page (`khld_stamp_review` records who and when). Staff entries are
+approved when saved. `anon` gains exactly two objects: the function and
+`v_public_khld_volunteer_option` (nine lists, labels only).
+
+**Two things to decide.**
+
+1. `cannot_verify` is the answer to every identity failure **and** to the
+   rate limiter — the OQ-41 shape. The page's wording says "check the date
+   of birth, or try again later" and does not claim to know which.
+2. Whether a registration should be auto-approved after some check. It is
+   not, because SO3-0's denominator is "all registered volunteers" and an
+   unreviewed public form would let anyone move it.
+
+**Decides.** The community coordinator (review workflow); M&E lead (1).
+
+---
+
+## 🔴 OQ-62 · FORM-12 has no guardian block, and nothing stops a child registering
+
+**Added 26 September 2026**, with migration `0159`.
+
+**What the sheets say.** The first build's volunteer sheet (SO3-F2) asked
+for a guardian's name, relationship, phone and written consent, and the
+database refused a volunteer under 18 without them (`guard_khld_guardian`,
+`0144`–`0145`). The reviewed FORM-12 asks for none, and gives no minimum
+age.
+
+**What was built.** Asked, the owner chose **"Follow the sheet"**: no
+guardian fields, no age limit. The date of birth (F057) is required, so the
+age of every volunteer is known and a report can find the minors.
+
+**Why it is red.** The form is now public (OQ-61). A child can register
+themselves, and a photo consent (F067) given by a minor is the child's
+own. This is a safeguarding question, not a data one.
+
+**Decides.** The Municipality with Enabel's safeguarding focal point: a
+minimum age, or a guardian block (two fields and a rule, generated like the
+others), before the public link is printed on a poster.
+
+---
+
+## 🟡 OQ-63 · A third identifier, "Other ID", with no format
+
+**Added 26 September 2026**, with migrations `0158` and `0161`.
+
+**What the sheets say.** F144 / F151 / F156 *ID type*: "Jordanian National
+Number – UNHCR registration (refugee) – Other ID". The reviewer added the
+field because "F058 mixes ID types".
+
+**What was built.** `person.other_id_number`: normalised like the UNHCR
+number (trimmed, upper-cased, inner spaces collapsed), unique, immutable
+under `guard_person_national_id`, and one of the three identifiers
+`person_has_identifier` accepts. The record keeps the TYPE chosen
+(`id_type_id`), which is how SO3-F2's "% refugees = F144 UNHCR" is counted.
+As with OQ-52, no format is checked, and the same document number could be
+typed as "Other ID" by one enumerator and as UNHCR by another: the two would
+be two people.
+
+**Decides.** The community coordinator: which documents "Other ID" is for
+(a passport? a Syrian ID? a service card?), and whether each should be its
+own type.
+
+---
+
+## 🟠 OQ-64 · The reviewer's corrections, applied — and one conflict left open (F089)
+
+**Added 26 September 2026**, with migrations `0156`–`0160`.
+
+The workbook's Reviewer note column flags issues; `catalogue.REVIEW_FIXES`
+applies each one by name, and the sheet's own text stays verbatim beside it:
+
+- F004's English label cell is `#VALUE!` → **Partner name**; its sub-page
+  → *List of potential partners*.
+- FORM-03 holds one field (F010) and shares FORM-04's sub-page → **one form**
+  (`khld_partner_contact`), F010 its database-issued reference.
+- F060's options were missing → **Yes / No**, and "if no then disqualified"
+  is a CHECK (`khld_volunteer_is_resident_yes`).
+- F061's options were missing → the nationality list the other forms use.
+- F038, F070, F112 were free text → **pickers** over FORM-08, FORM-12 and
+  FORM-17, so a mistyped name cannot break a unique count.
+- FORM-06's Page En and F094's empty page → the park and business pages.
+
+**Left open: F089.** *Do you have an existing business?* — Validation "if no
+then disqualified", and the reviewer's note: *"conflicts with F090 option
+'Not started yet' — confirm eligibility rule."* Both are recorded; **neither
+is enforced**, because enforcing F089 would refuse the applicant F090 exists
+to describe.
+
+**Decides.** M&E lead: F089's rule.
+
+---
+
+## 🟠 OQ-65 · Which window each Khalidiyah figure reads
+
+**Added 26 September 2026**, with migrations `0162`–`0163`.
+
+The Calculation formulas sheet's shared definition: *"Every indicator is
+filtered on its date field within the reporting quarter / year; cumulative
+indicators use date <= report date."* Each indicator's Frequency column says
+which. For a quarter, the views read, up to its end:
+
+- **year to date** — IMP-0, SO1-0, SO2-0, SO4-0 (surveys "in reporting
+  year"), A3, C2;
+- **everything to date** — A2, C1 (the latest report), D1, D2, F2, F3, G1,
+  G2, H1, H2, SO3-0;
+- **milestones** A1, B1, E1, F1 — 1 from the quarter of the first record
+  that establishes them, 0 before;
+- a quarter not yet begun reads NULL, never the total so far.
+
+A quarterly return therefore shows the to-date figure, not the quarter's
+increment. F159 (the survey's timestamp) is read in Asia/Amman time.
+
+**Decides.** M&E lead: whether the donor return wants increments per
+quarter for the cumulative ones — a second column, not a change to these.
+
+---
+
+## 🟠 OQ-66 · SO3-0 divides by every approved volunteer, the sheet's own denominator
+
+**Added 26 September 2026**, with migration `0163`.
+
+**What the sheet says.** Denominator `COUNT DISTINCT(FORM-12.F058)`, and
+the note: *"Denominator per the indicator = all registered volunteers.
+Alternative (stricter) denominator = volunteers with ≥ 1 attendance – state
+which is used."*
+
+**What was built.** All volunteers approved and registered by the quarter's
+end. Stated here, as the sheet asks. A public registration waiting for
+review is in neither the numerator nor the denominator.
+
+**Decides.** M&E lead: keep, or switch to the stricter one (one line of the
+view).
+
+---
+
+## 🟠 OQ-67 · G1 uses the sheet's simplification: all four core topics
+
+**Added 26 September 2026**, with migration `0162`.
+
+**What the sheet says.** An enterprise completes when its attended core
+sessions equal "total core sessions of their cycle" — and, *"if cycles are
+not defined: completed = attended all 4 core topics (F149: basics,
+licensing, hygiene/H&S, marketing & pricing)"*.
+
+**What was built.** No form defines a cycle, so the simplification: an owner
+(F197) completes on the day they have attended (F201) a core session
+(F150 = Yes) of each of the four topics. A fifth topic, *Other*, never counts.
+
+**Decides.** M&E lead: whether cycles will be defined (a field on FORM-14),
+at which point G1 becomes the sheet's main rule.
+
+---
+
+## 🟡 OQ-68 · Five strings the sheet has in English only were drafted in Arabic
+
+**Added 26 September 2026**, with `supabase/khalidiyah/gen_forms.py` (`DRAFTED`).
+
+The Help Text and Dependency columns are English only. The app shows:
+
+| Field | The sheet's English | Drafted Arabic |
+|---|---|---|
+| F136 help | Mixed groups, teams or joint tasks between the two communities | مجموعات أو فرق مختلطة أو مهام مشتركة بين المجتمعين |
+| F158 help | if no then end survey | إذا كانت الإجابة لا، ينتهي الاستبيان |
+| F162 help | Respondents under 15 are not surveyed | لا يُستطلع رأي من هم دون 15 عاماً |
+| F160 added option | General park visit | زيارة عامة للحديقة |
+| F181 added option | Other | أخرى (the sheet's own word elsewhere) |
+
+The screens' own words (buttons, notices, the public page) are the app's,
+in both languages, as for Ramtha (OQ-46). The generator refuses to run if
+the sheet's English for any of these changes.
+
+**Decides.** The Municipality's Arabic reviewer.
+
+---
+
+## 🟡 OQ-69 · What the screens narrow and the database does not refuse
+
+**Added 26 September 2026**, with the app for `0156`–`0164`.
+
+The Dependency column prepopulates three pickers "when today >= start and
+today <= end": F088 (the session to attend), F155 (the bazaar applied for),
+F157 (the bazaar attended). The screens list only those open today (and
+keep a record's saved choice). The database does **not** refuse an entry
+outside the window, because a record typed up a week later from a paper
+form is legitimate. Likewise the screens list only confirmed partners for
+F174 (a rule the database does enforce, 0158) and only markets held for
+F207 (also enforced).
+
+The file-upload fields the sheet marks required (F017, F120, F124, F052,
+F196 when established) cannot be required at save — a file is attached to a
+record that exists. The record's page says when one is missing, and A2 and
+E1 count only records whose F120 / F052 is attached, as the sheet's filters
+say.
+
+D1's note — *exclude a "Community market or bazaar" activity if the same
+event is also recorded in FORM-16* — is **not applied**: no field says that
+an activity is also a FORM-16 market, so the view could only guess.
+
+**Decides.** M&E lead: D1's exclusion (a link from FORM-08 to FORM-16 would
+make it exact).
+
+---
+
+## 🟡 OQ-70 · Committee members, focal points and partner contacts keep a name and phone on their own row
+
+**Added 26 September 2026**, with migrations `0159`–`0160`.
+
+Hard rule 6 says nothing but `person` stores a name or phone for a
+participant. FORM-10 (committee members), FORM-01 (the focal point) and
+FORM-02 (a partner's contact) ask for a name and a phone and no identifier,
+so there is nothing to find a `person` by; they are stored on their own rows.
+None of them is counted as a participant by any indicator — E1 counts a
+founding meeting, not members.
+
+**Decides.** M&E lead, if committee membership is ever to be counted by
+person: FORM-10 would need an ID type and number like FORM-12.

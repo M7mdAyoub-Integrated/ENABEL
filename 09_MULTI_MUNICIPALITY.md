@@ -1631,3 +1631,122 @@ a query that succeeded.
   mock people gained `age_unrecorded_reason: null`; nothing else changed,
   because every Khalidiyah read and write goes through a loosely typed
   handle by name, as Ramtha's do.
+
+---
+
+## Part 13 — Khalidiyah's forms replaced by the reviewed workbook (26 September 2026, migrations 0153–0164, `supabase/khalidiyah`, `app/src/khld`)
+
+Five days after Part 12, the Municipality sent `Khaldia_2_reviewed.xlsx`:
+the same programme, re-cut from **21 indicator forms into 24 operational
+forms** — a partner list, an outreach log, meetings, contributions, a
+milestones register, a rehabilitation checklist, campaigns, activities,
+attendance, a park survey, a committee, a volunteer database, volunteer
+attendance, counselling sessions, attendance requests, a support log,
+markets, vendors, market attendance and a producer survey — each field with
+an ID (F001–F213), a type, a dependency and the indicators it feeds, and a
+**Calculation formulas** sheet writing every indicator in terms of those
+IDs. The request was to replace all of Khalidiyah's forms with these. Four
+questions were put to the owner first; the answers are this part's
+premises:
+
+- **FORM-12 (volunteers) is public**; FORM-15 (enterprise owners) and
+  FORM-17 (vendors) are staff forms.
+- **The old tables are dropped**, not kept beside (OQ-60 — the recorded
+  exception to hard rule 5).
+- **Applied to the live project**, through the MCP, file first.
+- **Minors: follow the sheet** — no guardian block (OQ-62).
+
+### One reading, three generators, and the first build kept reproducible
+
+`workbook.py` reads the reviewed workbook's four sheets; `catalogue.py`
+says, per Field ID, what KIND of thing it is (text, select, multi, likert,
+file, record, the person block …) and which column it writes; `model.py`
+holds every typed option to the sheet's option cell, both languages, both
+ways. `gen_schema.py` writes `0156`–`0160`, `gen_views.py` writes `0162`–
+`0163`, `gen_forms.py` writes the app's definitions and both locale files;
+each refuses to run when an applied file would change. The first build's
+generators moved to `supabase/khalidiyah/v1/` and still reproduce
+`0141`–`0149` byte for byte (into `v1/out/`, ignored by git).
+
+### 0153–0155 — the first build retired
+
+Views first (the leaf views depend on `v_khld_milestone_quarter`), then the
+50 tables in one statement, no cascade, then the 238 option lists in two
+migrations of 119 — one transaction ran out of lock slots. `v_indicator_actual`
+is recreated without the Khalidiyah branches, and Sahel Horan's and
+Ramtha's rows are asserted unchanged. The three views the app reads
+(`v_khld_indicator_unique`, `_status`, `v_public_khld_whats_on`) are
+recreated empty with their columns, so the production app kept working
+between migrations.
+
+### 0156–0160 — 39 lists, 23 tables, and the rules as data
+
+- **39 option lists, 196 options**, verbatim; twelve "Other" options take
+  free text (the OQ-53 convention, unchanged).
+- **The person block** (FORM-12, -15, -17): the ID type is a column of the
+  record (F144 / F151 / F156); the number, name, sex, date of birth and
+  phone are `person`, found by the identifier of the type chosen. A third
+  identifier, `person.other_id_number` (OQ-63), beside the national ID and
+  the UNHCR number.
+- **Evidence under a Field ID**: `attachment.field_code`, `khld_file_field`
+  (nine fields, the sheet's "5 max"), `guard_khld_attachment_field`.
+- **The Dependency column as data**: `khld_field_rule`, 36 rows — a field is
+  required while its answer is chosen and must be BLANK while it is not
+  (FORM-19's consent governs every other answer). One trigger reads the
+  rows for its table; refusals are named `khld_<field>_required` /
+  `_not_applicable`, and the screen words them from the field's label.
+  The three rules that look at another table (a confirmed partner for F174,
+  a market held for F207, a person registered on the form the sheet names)
+  are written out.
+- **Every link is a composite foreign key and the only one on its pair**,
+  so PostgREST sees one relationship (the Part 7 lesson, again).
+
+### 0161 — one save path, and the public register
+
+`save_khld_record(p_table, p)`: `{id?, row, person?, option_questions?,
+options?, partners?}`, one exception block covering every delete, the
+read-back guard, the child rules checked after the children are written.
+`khld_register_volunteer` is anon's one write (OQ-61).
+
+### 0162–0163 — twenty-one views from the Calculation formulas sheet
+
+One view per indicator under the sheet's formula, each window taken from
+the sheet's Frequency column (OQ-65). The choices the sheet leaves open are
+OQ-66 (SO3-0's denominator), OQ-67 (G1's four core topics) and OQ-69 (D1's
+bazaar exclusion, not applied). **All 21 compute**; nothing waits on a
+definition. A2 counts a partner meeting only once its attendance sheet
+(F120) is attached — verified as the Khalidiyah coordinator in both
+directions: 0 → 1 when the sheet is attached, back to 0 when the meeting is
+made internal or the sheet removed.
+
+### 0164 — the public form's option lists
+
+`v_public_khld_volunteer_option`: nine lists, labels only, the reasoning
+of `0056`.
+
+### The screens
+
+One form, one list and one detail screen serve all 23 forms, from
+`forms.generated.ts`. `answers.ts` is the one reading of `when`, so the form
+and the detail agree on what was asked. The person block looks the
+identifier up as it is typed and offers restore for a deleted person;
+pickers narrow as the sheet says (open today, confirmed partners, markets
+held — OQ-69 on what the database does not refuse); file fields attach
+under their Field ID once the record exists. A volunteer's page carries the
+review; an activity's or market's page the publish switch. The milestone
+rules screen of Part 12 is gone with the rules. `/khalidiyah/volunteer` is
+the public register, linked from the what's-on page.
+
+**How it was checked.** The generators' own checks; `check-khld-forms`,
+`check-constraint-names`, `check-soft-delete-guards` (taught to read a
+multi-table drop and 0154's pattern drop), `check-untranslated`, `tsc`,
+`eslint`, the build; the save path, the rules, the review and the evidence
+guard driven as the Khalidiyah coordinator in rolled-back transactions; and
+all 184 screens (23 forms × list, new, detail, edit × two languages) opened
+in a browser against a stub backend built from the catalogue — the
+container cannot reach the project — searching every page for raw keys,
+case-insensitively, and in aria-labels. That sweep found one: the lists'
+"Open" action had no key in either locale (Ramtha's too), and the Arabic
+screen said "Open". The enumerator's path to the three questionnaires is
+untested at that role: there is no enumerator account (OQ-59).
+

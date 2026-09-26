@@ -32,7 +32,8 @@
     "expand": "Expand",
     "collapse": "Collapse",
     "retry": "Try again",
-    "edit": "Edit"
+    "edit": "Edit",
+    "open": "Open"
   },
   "toast": {
     "saved": "Saved",

@@ -126,7 +126,7 @@ function ListFor({ fid }: { fid: KhldFormId }) {
   ]
 
   const actions = (row: ListRow): RowAction[] => [
-    { id: 'open', label: t('common:actions.open', { defaultValue: 'Open' }), onSelect: () => navigate(`/khld/${fid}/${row.id}`) },
+    { id: 'open', label: t('common:actions.open'), onSelect: () => navigate(`/khld/${fid}/${row.id}`) },
   ]
 
   return (

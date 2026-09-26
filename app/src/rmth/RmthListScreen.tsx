@@ -115,7 +115,7 @@ export function RmthListScreen() {
   if (showDeleted) columns.push(t('rmth:list.columns.status'))
 
   const actions = (row: ListRow): RowAction[] => [
-    { id: 'open', label: t('common:actions.open', { defaultValue: 'Open' }), onSelect: () => navigate(`/rmth/${fid}/${row.id}`) },
+    { id: 'open', label: t('common:actions.open'), onSelect: () => navigate(`/rmth/${fid}/${row.id}`) },
   ]
 
   return (
