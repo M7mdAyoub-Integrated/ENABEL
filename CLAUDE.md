@@ -43,12 +43,12 @@ docs/04_DATA_DICTIONARY.md     ← every field of every form, with option lists
 docs/05_ROLES_AND_RLS.md       ← the five roles and the policy for every table
 docs/06_OPEN_QUESTIONS.md      ← decisions that must NOT be guessed
 docs/07_BUILD_CHECKLIST.md     ← the 17 migrations, in order, with verification
-09_MULTI_MUNICIPALITY.md       ← the second municipality (Ramtha), part by part, 0111–0135; Parts 10–11 are the super admin's chrome and the platform dialog; Part 12 is the third (Khalidiyah), 0138–0152; Part 13 replaces Khalidiyah's forms with the reviewed workbook, 0153–0164
+09_MULTI_MUNICIPALITY.md       ← the second municipality (Ramtha), part by part, 0111–0135; Parts 10–11 are the super admin's chrome and the platform dialog; Part 12 is the third (Khalidiyah), 0138–0152; Part 13 replaces Khalidiyah's forms with the reviewed workbook, 0153–0167
 RAMTHA_IMPLEMENTATION_PLAN.md  ← the brief that work followed
 RAMTHA_REPORT.md               ← where Ramtha stands: what computes, what waits on a decision
 KHALIDIYAH_IMPLEMENTATION_PLAN.md ← the brief the third municipality followed
 KHALIDIYAH_REPORT.md           ← where Khalidiyah stands: 22 forms from Khaldia_2_reviewed.xlsx (FORM-20 off the app, OQ-71), 20 of 21 indicators compute, what waits on a decision
-supabase/khalidiyah/           ← one reading of Khaldia_2_reviewed.xlsx and the generators for 0156–0160, 0162–0163 and app/src/khld (gen_schema, gen_views, gen_forms); v1/ is the retired first build's, still reproducing 0141–0149; edit the catalogue, never the output
+supabase/khalidiyah/           ← one reading of Khaldia_2_reviewed.xlsx and the generators for 0156–0160, 0162–0163, 0165, 0167 and app/src/khld (gen_schema, gen_views, gen_forms); a later change is dated in the catalogue (`since`, `was`) so the applied files still reproduce; v1/ is the retired first build's, still reproducing 0141–0149; edit the catalogue, never the output
 supabase/migrations/           ← the SQL you write
 ```
 

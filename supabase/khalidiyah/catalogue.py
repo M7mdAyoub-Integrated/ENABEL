@@ -73,7 +73,9 @@ GROUPS = O([
 # the year or None); short: the sidebar name, the app's words; retired: the
 # form is off the app at the owner's request (26 September 2026, FORM-20,
 # OQ-71) -- its table and view stay, so 0156-0163 still reproduce, and
-# gen_forms.py writes no screen, no sidebar entry and no labels for it.
+# gen_forms.py writes no screen, no sidebar entry and no labels for it;
+# published: a coordinator publishes a row on the public page -- True from
+# the build, or the migration that added it (see SINCE below).
 FORMS = O([
     ('form01', dict(sheets=['FORM-01'], table='khld_focal_point', group='partnerships', writer='can_write',
                     short=('Focal point', 'ضابط الارتباط'))),
@@ -91,7 +93,7 @@ FORMS = O([
                     short=('Milestones', 'المعالم المؤسسية'))),
     ('form06', dict(sheets=['FORM-06'], table='khld_rehab_report', group='park', writer='can_write',
                     ref=('REH', 2, 'report_date'), short=('Rehabilitation progress', 'إنجاز التأهيل'))),
-    ('form07', dict(sheets=['FORM-07'], table='khld_campaign', group='park', writer='can_write',
+    ('form07', dict(sheets=['FORM-07'], table='khld_campaign', group='park', writer='can_write', published='0167',
                     ref=('VC', 2, 'start_date'), short=('Volunteer campaigns', 'الحملات التطوعية'))),
     ('form08', dict(sheets=['FORM-08'], table='khld_activity', group='park', writer='can_write', published=True,
                     ref=('EV', 2, 'start_date'), short=('Community activities', 'الأنشطة المجتمعية'))),
@@ -107,7 +109,7 @@ FORMS = O([
                     ref=('VOL', 4, None), short=('Volunteers', 'المتطوعون'))),
     ('form13', dict(sheets=['FORM-13'], table='khld_volunteer_attendance', group='volunteer', writer='can_write',
                     short=('Volunteer attendance', 'حضور المتطوعين'))),
-    ('form14', dict(sheets=['FORM-14'], table='khld_guidance_session', group='business', writer='can_write',
+    ('form14', dict(sheets=['FORM-14'], table='khld_guidance_session', group='business', writer='can_write', published='0167',
                     ref=('GS', 2, 'start_date'), short=('Counselling sessions', 'جلسات الإرشاد'))),
     ('form15', dict(sheets=['FORM-15'], table='khld_enterprise_request', group='business', writer='can_write',
                     short=('Attendance requests', 'طلبات الحضور'))),
@@ -390,6 +392,32 @@ SCALES['suitable'] = [
 YES_NO = (('Yes', 'نعم'), ('No', 'لا'))
 ATTENDED_ABSENT = (('Attended', 'حضر'), ('Absent', 'غاب'))
 
+# ── fields the owner added after the build (no row in the workbook) ────────
+# Field IDs continue after the sheet's last, F213. Each names its form, the
+# field it follows, whether it is required, the migration that added it,
+# and its labels -- the owner's request put into words, not the sheet's,
+# so 06_OPEN_QUESTIONS.md OQ-72 lists them for the Arabic reviewer.
+ADDED = O([
+    # "are you going to give us volunteers" (28 September 2026)
+    ('F214', dict(form='form02', after='F007', required=True, since='0165',
+                  label=('Will this partner provide volunteers?', 'هل سيوفّر هذا الشريك متطوعين؟'))),
+    # "if he chooses جمعية ... put the partners that said yes"; listed partners only
+    ('F215', dict(form='form12', after='F145', required=True, since='0165',
+                  label=('Partner association', 'الجمعية الشريكة'))),
+])
+
+# ── what changed after the build, and in which migration ───────────────────
+# The generators rebuild the model as it stood at a migration
+# (model.build(upto='0164') for 0156-0160), so a file already applied is
+# reproduced byte for byte and a later change becomes a later migration:
+#   ADDED[...]['since']        a field that did not exist before
+#   FIELDS[...]['was']         (migration, the spec's keys before it)
+#   FORMS[...]['published']    a migration number: publishable from it
+#   ORDER_SINCE[form]          an ORDER entry that applies from a migration
+#                              (before it the form had the sheet's order;
+#                              ORDER decides column order in 0159 / 0160)
+ORDER_SINCE = {'form08': '0165'}
+
 
 def F(kind, col=None, **kw):
     d = dict(kind=kind)
@@ -416,6 +444,7 @@ FIELDS = {
     'F008': F('text', 'contact_position'),
     'F009': F('text', 'email', ltr=True),
     'F115': F('select', 'partner_category_id', list='partner_category'),
+    'F214': F('bool', 'provides_volunteers'),                      # ADDED, 0165
     # FORM-03 + FORM-04 Reach out to partners
     'F010': F('reference', 'reference'),
     'F011': F('record', 'partner_id', table='khld_partner'),
@@ -513,7 +542,11 @@ FIELDS = {
     'F066': F('multi', list='time_of_day'),
     'F067': F('bool', 'photo_consent'),
     'F145': F('select', 'affiliation_id', list='affiliation'),
-    'F146': F('text', 'affiliation_name', when=('F145', ['school', 'university', 'cso', 'other'])),
+    # For a CSO / association the partner is picked (F215), not typed (0165).
+    'F146': F('text', 'affiliation_name', when=('F145', ['school', 'university', 'other']),
+              was=('0165', dict(when=('F145', ['school', 'university', 'cso', 'other'])))),
+    'F215': F('record', 'affiliation_partner_id', table='khld_partner', volunteers=True,   # ADDED, 0165
+              when=('F145', ['cso'])),
     # FORM-13 Volunteer attendance record
     'F068': F('date', 'report_date'),
     'F069': F('shown', of='F070'),
@@ -542,7 +575,12 @@ FIELDS = {
     'F085': F('bool', 'is_resident'),
     'F086': F('select', 'nationality_id', list='nationality'),
     'F087': F('select', 'disability_id', list='disability'),
-    'F088': F('record', 'session_id', table='khld_guidance_session', window=('start_date', 'end_date')),
+    # The sheet says "when today>=f074 and today<=f075", the session's own
+    # dates; a request is made while applications are open, as on FORM-17
+    # (F155), and the owner found a session missing from this list during
+    # its application window (28 September 2026, OQ-69). The screen's filter
+    # only: the database never refused a request outside it.
+    'F088': F('record', 'session_id', table='khld_guidance_session', window=('applications_open', 'applications_close')),
     'F089': F('bool', 'has_business'),
     'F090': F('select', 'working_status_id', list='working_status'),
     'F152': F('select', 'product_type_id', list='product_type'),
@@ -650,6 +688,8 @@ ORDER = {
     'form04': ['F010', 'F011', 'F012'],
     'form13': ['F068', 'F070', 'F069'],
     'form18': ['F110', 'F157', 'F112', 'F111'],
+    # the owner's request, 28 September 2026: the activity's name first
+    'form08': ['F129'],
 }
 
 # The CHECK constraints that are rules between the columns of one row, from

@@ -13,6 +13,12 @@ reads the list, AND once every option is taken out of the cell nothing but
 delimiters may remain -- so a list can neither invent an option nor drop
 one. The fields whose cell is empty or wrong are the reviewer's corrections
 (catalogue.REVIEW_FIXES) and are named where they are skipped.
+
+build(upto='0164') is the model as it stood at that migration: the fields
+the owner added later (catalogue.ADDED) are left out, a field's earlier
+spec (`was`) is put back, and a later ORDER or publish flag is not applied.
+The schema generator reproduces the applied files from it; build() is the
+model today, which the app and the later migrations are generated from.
 """
 import os, re, sys
 from collections import OrderedDict
@@ -34,6 +40,23 @@ SQLTYPE = {'text': 'text', 'area': 'text', 'int': 'int', 'money': 'numeric(12,3)
 
 def squash(s):
     return re.sub(r'\s+', ' ', s).strip()
+
+
+class AddedField:
+    """A field the owner added after the build (catalogue.ADDED): no sheet row,
+    so the attributes a sheet row carries are the catalogue's, or empty."""
+    added = True
+
+    def __init__(self, fid, a):
+        self.fid = fid
+        self.form = a['form']
+        self.label_en, self.label_ar = a['label']
+        self.required = a['required']
+        self.help = ''
+        self.opts_en = self.opts_ar = ''
+        self.dependency = ''
+        self.indicators = []
+        self.sub_en = self.sub_ar = ''
 
 
 class FieldM:
@@ -81,7 +104,8 @@ class FormM:
 
 
 class Model:
-    def __init__(self):
+    def __init__(self, upto=None):
+        self.upto = upto
         self.sheet = load_forms()
         self.forms = OrderedDict()
         self.lists_used = OrderedDict()     # list -> [field ids]
@@ -93,6 +117,21 @@ class Model:
 
     def err(self, s):
         self.errors.append(s)
+
+    def since_ok(self, since):
+        """Did the change a migration number names exist at `upto`?"""
+        return since is None or self.upto is None or since <= self.upto
+
+    def published(self, meta):
+        p = meta.get('published')
+        return p is True or (isinstance(p, str) and self.since_ok(p))
+
+    def spec_of(self, fid):
+        spec = dict(C.FIELDS[fid])
+        was = spec.pop('was', None)
+        if was and not self.since_ok(was[0]):
+            spec.update(was[1])
+        return spec
 
     # ── verbatim ──────────────────────────────────────────────────────────
     def check_cell(self, where, cell_en, cell_ar, opts):
@@ -112,7 +151,7 @@ class Model:
 
     def check_bool(self, fm):
         f = fm.sheet
-        if f.fid in NO_OPTION_CELL:
+        if f.fid in NO_OPTION_CELL or getattr(f, 'added', False):
             return
         (te, ta), (fe, fa) = fm.spec.get('labels', C.YES_NO)
         self.check_cell('%s bool' % f.fid, f.opts_en, f.opts_ar, [('t', te, ta), ('f', fe, fa)])
@@ -127,10 +166,18 @@ class Model:
         for fid, meta in C.FORMS.items():
             fm = FormM(fid, meta)
             sheet_fields = [f for s in meta['sheets'] for f in self.sheet[s].fields]
-            order = C.ORDER.get(fid, [])
+            order = C.ORDER.get(fid, []) if self.since_ok(C.ORDER_SINCE.get(fid)) else []
             ordered = [by_sheet[x] for x in order] + [f for f in sheet_fields if f.fid not in order]
             if sorted(f.fid for f in ordered) != sorted(f.fid for f in sheet_fields):
                 self.err('%s: ORDER names a field that is not on the form' % fid)
+            for aid, a in C.ADDED.items():
+                if a['form'] != fid or not self.since_ok(a['since']):
+                    continue
+                at = [i for i, f in enumerate(ordered) if f.fid == a['after']]
+                if not at:
+                    self.err('%s: ADDED after %s, which is not on %s' % (aid, a['after'], fid))
+                    continue
+                ordered.insert(at[0] + 1, AddedField(aid, a))
             # the title: the sub-page of the form's fields (F004's is the reviewer's fix)
             subs = {(f.sub_en, f.sub_ar) for f in sheet_fields if f.fid != 'F004' and f.fid != 'F010'}
             if len(subs) != 1:
@@ -141,13 +188,14 @@ class Model:
                     self.err('%s: no catalogue entry' % f.fid)
                     continue
                 seen.add(f.fid)
-                field = FieldM(f, C.FIELDS[f.fid], fm)
+                field = FieldM(f, self.spec_of(f.fid), fm)
                 gate = FORM_GATES.get(fid)
                 if gate and f.fid not in UNGATED:
                     field.when.insert(0, gate)
                 fm.fields.append(field)
             self.forms[fid] = fm
-        missing = set(C.FIELDS) - seen
+        later = {aid for aid, a in C.ADDED.items() if not self.since_ok(a['since'])}
+        missing = set(C.FIELDS) - seen - later
         if missing:
             self.err('catalogue fields not on any form: %s' % sorted(missing))
         for fm in self.forms.values():
@@ -164,7 +212,7 @@ class Model:
             return
         self.lists_used.setdefault(name, []).append(field.fid)
         f = field.sheet
-        if f.fid in NO_OPTION_CELL:
+        if f.fid in NO_OPTION_CELL or getattr(f, 'added', False):
             return
         opts = [(C.code_of(c), e, a) for c, e, a in C.LISTS[name]]
         self.check_cell('%s (%s)' % (f.fid, name), f.opts_en, f.opts_ar, opts)
@@ -245,8 +293,8 @@ class Model:
                         self.err('%s: when= on a %s is not supported' % (f.fid, g.kind))
 
 
-def build():
-    return Model().build()
+def build(upto=None):
+    return Model(upto).build()
 
 
 if __name__ == '__main__':

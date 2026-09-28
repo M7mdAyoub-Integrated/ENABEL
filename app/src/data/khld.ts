@@ -269,11 +269,11 @@ export type KhldPick = {
 
 /** What names a row of each table a picker lists. */
 export const PICK: Partial<Record<KhldTable, { title?: string; date?: string; person?: string; extra?: readonly string[] }>> = {
-  khld_partner: { title: 'name' },
+  khld_partner: { title: 'name', extra: ['provides_volunteers'] },
   khld_activity: { title: 'activity_name', date: 'start_date', extra: ['end_date'] },
   khld_campaign: { title: 'campaign_name', date: 'start_date', extra: ['end_date'] },
   khld_volunteer: { person: 'person_id', extra: ['application_status'] },
-  khld_guidance_session: { title: 'title', date: 'start_date', extra: ['end_date'] },
+  khld_guidance_session: { title: 'title', date: 'start_date', extra: ['end_date', 'applications_open', 'applications_close'] },
   khld_market: { title: 'name', date: 'start_date', extra: ['end_date', 'applications_open', 'applications_close', 'status_id'] },
 }
 
@@ -398,12 +398,14 @@ export function useSetKhldDeleted(table: KhldTable) {
   })
 }
 
+/** The tables whose rows a coordinator publishes on the public page (v_public_khld_whats_on, 0163 and 0167). */
+export type KhldPublishedTable = 'khld_activity' | 'khld_market' | 'khld_campaign' | 'khld_guidance_session'
+
 /**
- * Publishing an activity or a market on the public page (0163's
- * v_public_khld_whats_on): `is_published` is a plain column a coordinator
- * flips, never a form field, because no sheet asks for it.
+ * Publishing a row on the public page: `is_published` is a plain column a
+ * coordinator flips, never a form field, because no sheet asks for it.
  */
-export function useSetKhldPublished(table: 'khld_activity' | 'khld_market') {
+export function useSetKhldPublished(table: KhldPublishedTable) {
   const qc = useQueryClient()
   return useMutation({
     mutationKey: ['khld', table, 'published'],

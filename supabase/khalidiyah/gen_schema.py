@@ -12,6 +12,19 @@ Khalidiyah's forms (Khaldia_2_reviewed.xlsx):
   0160  khalidiyah_forms_tables_2         the other tables, the junctions, RLS, the
                                           standard triggers, the indexes, the check
 
+and, from what the catalogue says changed after the build (its ADDED,
+`was`, `published` and ORDER_SINCE entries -- model.build(upto=...)):
+
+  0165  khalidiyah_partner_volunteers     F214 (does a partner provide
+                                          volunteers) and F215 (a volunteer's
+                                          partner association), their rules
+  0167  khalidiyah_publish_campaigns_sessions
+                                          is_published on FORM-07 and FORM-14,
+                                          and both on the public page
+
+0156-0160 are generated from the model as it stood at 0164, so the files
+already applied are reproduced whatever the catalogue has gained since.
+
 Split so each is small enough to apply through the MCP as one exact text,
 and so no transaction runs out of lock slots (0153's header).
 
@@ -27,7 +40,7 @@ import catalogue as C
 from model import build
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
-m = build()
+m = build(upto='0164')
 
 
 def q(s):
@@ -158,10 +171,11 @@ end $verify$;
 
 
 # ═══ 0158 — what the tables share ═══════════════════════════════════════════
-def when_text(f):
+def when_text(f, mm=None):
+    mm = mm or m
     parts = []
     for (gid, values) in f.when:
-        g = m.field(gid)
+        g = mm.field(gid)
         if g.kind in ('select', 'id_type'):
             labels = [e for c, e, _a in C.LISTS[g.list] if C.code_of(c) in values]
             parts.append('%s is %s' % (gid, ' or '.join(labels)))
@@ -172,8 +186,8 @@ def when_text(f):
     return ' and '.join(parts)
 
 
-def condition(gid, values):
-    g = m.field(gid)
+def condition(gid, values, mm=None):
+    g = (mm or m).field(gid)
     if g.kind in ('select', 'id_type'):
         return {'column': g.col, 'list': g.list, 'codes': values}
     if g.kind == 'bool':
@@ -183,26 +197,32 @@ def condition(gid, values):
     raise ValueError('%s: no rule for %s %s' % (gid, g.kind, values))
 
 
-def rule_rows():
-    rows = []
-    for fm in m.forms.values():
+def rule_data(mm):
+    """The khld_field_rule rows of a model: (table, field) -> (column, required, conditions json, when_text)."""
+    out = {}
+    for fm in mm.forms.values():
         for f in fm.fields:
             if f.kind in ('multi', 'records') and (f.when or f.required):
                 target = 'option:%s' % f.key if f.kind == 'multi' else 'partners'
-                conds = [condition(g, v) for g, v in f.when]
-                rows.append("  (%s, %s, %s, %s, %s, %s)" % (
-                    q(fm.table), q(f.fid), q(target), 'true' if f.required else 'false',
-                    q(json.dumps(conds, separators=(',', ':'))), q(when_text(f) or 'always')))
+                conds = [condition(g, v, mm) for g, v in f.when]
+                out[(fm.table, f.fid)] = (target, f.required, json.dumps(conds, separators=(',', ':')), when_text(f, mm) or 'always')
                 continue
             if not f.when or not f.col or f.kind in ('multi', 'records', 'file', 'shown', 'stamp', 'reference'):
                 continue
-            if any(m.field(g).kind == 'record' and v == ['__extra__'] for g, v in f.when):
+            if any(mm.field(g).kind == 'record' and v == ['__extra__'] for g, v in f.when):
                 continue       # F182: the CHECK khld_contribution_one_contributor says it
-            conds = [condition(g, v) for g, v in f.when]
-            rows.append("  (%s, %s, %s, %s, %s, %s)" % (
-                q(fm.table), q(f.fid), q(f.col), 'true' if f.required else 'false',
-                q(json.dumps(conds, separators=(',', ':'))), q(when_text(f))))
-    return rows
+            conds = [condition(g, v, mm) for g, v in f.when]
+            out[(fm.table, f.fid)] = (f.col, f.required, json.dumps(conds, separators=(',', ':')), when_text(f, mm))
+    return out
+
+
+def rule_row(key, r):
+    (t, fid), (col, req, conds, text) = key, r
+    return "  (%s, %s, %s, %s, %s, %s)" % (q(t), q(fid), q(col), 'true' if req else 'false', q(conds), q(text))
+
+
+def rule_rows():
+    return [rule_row(k, r) for k, r in rule_data(m).items()]
 
 
 def shared_sql():
@@ -616,7 +636,7 @@ def table_ddl(t):
         L.append('  person_id uuid not null references public.person(id),')
     for (name, sqltype, notnull, ref, comment) in cols:
         L.append(col_line(name, sqltype, notnull, ref))
-    if meta.get('published'):
+    if m.published(meta):
         L.append('  is_published boolean not null default false,')
     if meta.get('public'):
         L.append("  application_status text not null default 'approved' check (application_status in ('submitted', 'approved', 'rejected')),")
@@ -888,12 +908,477 @@ end $verify$;
 """ % dict(rows=',\n'.join(rows), all=len(rows), c=n_child))
 
 
+# ═══ after the build — what the catalogue says changed, migration by migration ══
+def delta(old, new):
+    """What `new` has that `old` did not: columns, rule rows, publish flags."""
+    cols = []
+    for t in C.TABLES:
+        have = {c[0] for c in old.columns[t]}
+        cols += [(t, c) for c in new.columns[t] if c[0] not in have]
+    r_old, r_new = rule_data(old), rule_data(new)
+    gone = [k for k in r_old if k not in r_new]
+    if gone:
+        raise SystemExit('a later migration would drop rule rows %s; write that one by hand' % gone)
+    added = [(k, r_new[k]) for k in r_new if k not in r_old]
+    changed = [(k, r_old[k], r_new[k]) for k in r_new if k in r_old and r_old[k] != r_new[k]]
+    pub = [fm.table for fm in new.forms.values() if new.published(fm.meta) and not old.published(fm.meta)]
+    jn = lambda mm: [(j, parent, fk, target, f.fid) for (j, parent, fk, target, f) in mm.junctions]
+    for q_old, q_new in ((old.questions, new.questions), (jn(old), jn(new)), (old.files, new.files)):
+        if q_old != q_new:
+            raise SystemExit('a later migration adds a multi-select, a partner list or a file field; teach delta() first')
+    return cols, added, changed, pub
+
+
+def add_column_sql(t, col, new):
+    name, sqltype, notnull, ref, comment = col
+    f = next(f for fm in new.forms.values() for f in fm.fields if fm.table == t and f.col == name)
+    L = ['alter table public.%s add column %s %s;' % (t, name, sqltype)]
+    if ref and ref.startswith('@') and ref != '@person':
+        L.append('alter table public.%s add constraint %s_%s_fkey foreign key (%s, municipality_id) references public.%s(id, municipality_id);'
+                 % (t, t, name, name, ref[1:]))
+        L.append('create index %s_%s_idx on public.%s (%s);' % (t, name, t, name))
+    elif ref and not ref.startswith('@') and ref not in ('now()', 'default false'):
+        L.append('alter table public.%s add constraint %s_%s_fkey foreign key (%s) references public.ref_khld_%s(id);' % (t, t, name, name, ref))
+        L.append('create index %s_%s_idx on public.%s (%s);' % (t, name, t, name))
+    L.append('comment on column public.%s.%s is %s;' % (t, name, q('%s (added at the owner\'s request, 28 September 2026). 0165.' % comment)))
+    if notnull:
+        # a required answer on a table that already has rows: every NEW row
+        # answers it, and an answer once given is never taken back; the rows
+        # saved before the question existed stay unanswered until edited
+        # (the edit screen requires it) -- nothing is guessed for them
+        L.append('create trigger trg_%s_%s_answered before insert or update of %s on public.%s for each row '
+                 'execute function public.guard_khld_answered(%s, %s);' % (t, name, name, t, q(name), q(f.fid)))
+    if f.spec.get('volunteers'):
+        L.append('create trigger trg_%s_%s_volunteers before insert or update of %s on public.%s for each row '
+                 'execute function public.guard_khld_partner_provides_volunteers(%s, %s);' % (t, name, name, t, q(name), q(f.fid)))
+    return '\n'.join(L)
+
+
+def partner_volunteers_sql():
+    old, new = build(upto='0164'), build(upto='0165')
+    cols, added, changed, pub = delta(old, new)
+    if pub:
+        raise SystemExit('0165 publishes nothing')
+    upd = []
+    for (t, fid), (col, req, conds, text), (col2, req2, conds2, text2) in changed:
+        upd.append("update public.khld_field_rule set column_name = %s, required = %s, conditions = %s, when_text = %s\n"
+                   " where table_name = %s and field_code = %s;" % (q(col2), 'true' if req2 else 'false', q(conds2), q(text2), q(t), q(fid)))
+    ins = [rule_row(k, r) for k, r in added]
+    n_rules = len(rule_data(new))
+    return """-- ═══════════════════════════════════════════════════════════════════════════
+--  0165 — Khalidiyah: which partners provide volunteers (F214), and a
+--         volunteer's partner association (F215)
+--
+--  GENERATED by supabase/khalidiyah/gen_schema.py from the catalogue's
+--  ADDED and `was` entries (model.build(upto='0165') against '0164').
+--
+--  The municipality's owner asked on 28 September 2026 for a yes / no on
+--  the partners form -- will this partner provide volunteers -- and, on the
+--  volunteer form, for the partners who answered yes to be the choices when
+--  a volunteer's affiliation is "CSO / association", listed partners only.
+--  Neither is in Khaldia_2_reviewed.xlsx, so their Field IDs continue after
+--  the sheet's last (F213) and their wording is the owner's request put into
+--  words (06_OPEN_QUESTIONS.md OQ-72).
+--
+--  ── F214, khld_partner.provides_volunteers ──
+--
+--  Required on the form. The partners saved before the question existed
+--  have no answer and none is guessed: a NOT NULL would need one, so
+--  guard_khld_answered requires it of every new row and refuses to take an
+--  answer back, and an old row is answered when it is next edited.
+--
+--  ── F215, khld_volunteer.affiliation_partner_id ──
+--
+--  Asked when F145 is "CSO / association", and then required; F146 (the
+--  name typed) is no longer asked for a CSO -- the partner IS the name. Both
+--  are khld_field_rule rows, read by guard_khld_rules (0158): F146's row is
+--  updated, F215's added. The partner must be live, of the volunteer's
+--  municipality (the composite key) and one that provides volunteers
+--  (guard_khld_partner_provides_volunteers). A partner who later answers no
+--  does not block the edits of a volunteer already linked to them: the
+--  guard reads the partner only when the link is set or changed.
+--
+--  The one volunteer saved before this (a staff entry, CSO, a typed name)
+--  keeps its row; its next edit asks for a listed partner and blanks the
+--  typed name, which is what the rule says of every CSO volunteer now.
+--
+--  The public form's side -- the list of those partners, and the
+--  registration that carries the choice -- is 0166.
+-- ═══════════════════════════════════════════════════════════════════════════
+
+-- ── 1. a required answer on a table with rows ─────────────────────────────
+create function public.guard_khld_answered()
+returns trigger
+language plpgsql
+set search_path = public, pg_temp
+as $$
+declare
+  v_col text := tg_argv[0];
+  v_fid text := tg_argv[1];
+begin
+  if (to_jsonb(new) ->> v_col) is null
+     and (tg_op = 'INSERT' or (to_jsonb(old) ->> v_col) is not null) then
+    raise exception '%% is required', v_fid
+      using errcode = 'check_violation', constraint = 'khld_' || lower(v_fid) || '_required';
+  end if;
+  return new;
+end $$;
+revoke all on function public.guard_khld_answered() from public, anon, authenticated;
+comment on function public.guard_khld_answered() is
+  'BEFORE INSERT OR UPDATE OF <column>: a field added after its table had rows (catalogue.ADDED) '
+  'is required of every new row and cannot be blanked once answered; rows from before stay '
+  'unanswered until edited. Refuses as khld_<field>_required. 0165.';
+
+-- ── 2. a partner who provides volunteers ──────────────────────────────────
+create function public.guard_khld_partner_provides_volunteers()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+declare
+  v_col text := tg_argv[0];
+  v_fid text := tg_argv[1];
+  v_id  uuid := (to_jsonb(new) ->> v_col)::uuid;
+begin
+  if v_id is null or (tg_op = 'UPDATE' and v_id is not distinct from (to_jsonb(old) ->> v_col)::uuid) then
+    return new;
+  end if;
+  if not exists (select 1 from public.khld_partner p
+                  where p.id = v_id and p.municipality_id = new.municipality_id
+                    and p.provides_volunteers and p.deleted_at is null) then
+    raise exception '%%: the partner must be one that provides volunteers (FORM-02 F214 = Yes)', v_fid
+      using errcode = 'check_violation', constraint = 'khld_' || lower(v_fid) || '_provides_volunteers';
+  end if;
+  return new;
+end $$;
+revoke all on function public.guard_khld_partner_provides_volunteers() from public, anon, authenticated;
+comment on function public.guard_khld_partner_provides_volunteers() is
+  'BEFORE INSERT OR UPDATE OF <column>: a partner picked where only partners who provide '
+  'volunteers are listed (F215) is one -- live, same municipality, F214 = Yes. Read when the '
+  'link is set or changed. Security definer, as guard_khld_rules: the partner is read whoever '
+  'saves. Refuses as khld_<field>_provides_volunteers. 0165.';
+
+-- ── 3. the columns ────────────────────────────────────────────────────────
+%(cols)s
+
+-- ── 4. the rules between fields ───────────────────────────────────────────
+%(upd)s
+insert into public.khld_field_rule (table_name, field_code, column_name, required, conditions, when_text) values
+%(ins)s;
+
+-- ── verification: the catalogue's rows, and the rules driven, discarded ───
+do $verify$
+declare
+  v_khld uuid := '00000000-0000-4000-8000-0000000000b2';
+  v_yes  uuid;
+  v_no   uuid;
+  v_pid  uuid;
+  v_vol  uuid;
+  v_row  jsonb;
+begin
+  if (select count(*) from public.khld_field_rule) <> %(n_rules)d then
+    raise exception '0165: the rule rows are not the catalogue''s';
+  end if;
+
+  -- a new partner must answer F214
+  begin
+    insert into public.khld_partner (municipality_id, name, phone, partner_type_id, partner_category_id)
+    select v_khld, '0165 probe partner', '0790000165', (select id from public.ref_khld_partner_type limit 1),
+           (select id from public.ref_khld_partner_category where code = 'local_association');
+    raise exception '0165: a partner without F214 was saved';
+  exception when check_violation then
+    if sqlerrm !~ '^F214 is required' then raise; end if;
+  end;
+
+  begin
+    insert into public.khld_partner (municipality_id, name, phone, partner_type_id, partner_category_id, provides_volunteers)
+    select v_khld, '0165 probe yes', '0790000165', (select id from public.ref_khld_partner_type limit 1),
+           (select id from public.ref_khld_partner_category where code = 'local_association'), true
+    returning id into v_yes;
+    insert into public.khld_partner (municipality_id, name, phone, partner_type_id, partner_category_id, provides_volunteers)
+    select v_khld, '0165 probe no', '0790000166', (select id from public.ref_khld_partner_type limit 1),
+           (select id from public.ref_khld_partner_category where code = 'local_association'), false
+    returning id into v_no;
+    -- an answer cannot be taken back
+    begin
+      update public.khld_partner set provides_volunteers = null where id = v_yes;
+      raise exception '0165: an F214 answer was blanked';
+    exception when check_violation then
+      if sqlerrm !~ '^F214 is required' then raise; end if;
+    end;
+
+    insert into public.person (other_id_number, full_name, date_of_birth, sex) values ('0165 PROBE', '0165 probe', '2000-01-01', 'female')
+    returning id into v_pid;
+    v_row := jsonb_build_object(
+      'municipality_id', v_khld, 'person_id', v_pid,
+      'id_type_id', (select id from public.ref_khld_id_type where code = 'other_id'),
+      'is_resident', true,
+      'nationality_id', (select id from public.ref_khld_nationality where code = 'jordanian'),
+      'disability_id', (select id from public.ref_khld_disability where code = 'no_difficulty'),
+      'situation_id', (select id from public.ref_khld_situation where code = 'employee'),
+      'photo_consent', true,
+      'affiliation_id', (select id from public.ref_khld_affiliation where code = 'cso'));
+
+    -- CSO without a partner: F215 required
+    begin
+      insert into public.khld_volunteer (municipality_id, person_id, id_type_id, is_resident, nationality_id, disability_id,
+                                         situation_id, photo_consent, affiliation_id)
+      select (r).municipality_id, (r).person_id, (r).id_type_id, true, (r).nationality_id, (r).disability_id, (r).situation_id, true,
+             (r).affiliation_id
+        from (select jsonb_populate_record(null::public.khld_volunteer, v_row) as r) x;
+      raise exception '0165: a CSO volunteer without a partner was saved';
+    exception when check_violation then
+      if sqlerrm !~ '^F215 is required' then raise; end if;
+    end;
+    -- CSO with a typed name: F146 not asked
+    begin
+      insert into public.khld_volunteer (municipality_id, person_id, id_type_id, is_resident, nationality_id, disability_id,
+                                         situation_id, photo_consent, affiliation_id, affiliation_partner_id, affiliation_name)
+      select (r).municipality_id, (r).person_id, (r).id_type_id, true, (r).nationality_id, (r).disability_id, (r).situation_id, true,
+             (r).affiliation_id, v_yes, 'typed'
+        from (select jsonb_populate_record(null::public.khld_volunteer, v_row) as r) x;
+      raise exception '0165: a CSO volunteer with a typed name was saved';
+    exception when check_violation then
+      if sqlerrm !~ '^F146 belongs' then raise; end if;
+    end;
+    -- a partner who does not provide volunteers is refused
+    begin
+      insert into public.khld_volunteer (municipality_id, person_id, id_type_id, is_resident, nationality_id, disability_id,
+                                         situation_id, photo_consent, affiliation_id, affiliation_partner_id)
+      select (r).municipality_id, (r).person_id, (r).id_type_id, true, (r).nationality_id, (r).disability_id, (r).situation_id, true,
+             (r).affiliation_id, v_no
+        from (select jsonb_populate_record(null::public.khld_volunteer, v_row) as r) x;
+      raise exception '0165: a partner who provides no volunteers was accepted';
+    exception when check_violation then
+      if sqlerrm !~ '^F215: the partner must be one that provides volunteers' then raise; end if;
+    end;
+    -- one who does is accepted
+    insert into public.khld_volunteer (municipality_id, person_id, id_type_id, is_resident, nationality_id, disability_id,
+                                       situation_id, photo_consent, affiliation_id, affiliation_partner_id)
+    select (r).municipality_id, (r).person_id, (r).id_type_id, true, (r).nationality_id, (r).disability_id, (r).situation_id, true,
+           (r).affiliation_id, v_yes
+      from (select jsonb_populate_record(null::public.khld_volunteer, v_row) as r) x
+    returning id into v_vol;
+    -- the partner answers no later: the volunteer's other edits still save,
+    -- with the link in the SET list as save_khld_record writes it
+    update public.khld_partner set provides_volunteers = false where id = v_yes;
+    update public.khld_volunteer set photo_consent = false, affiliation_partner_id = v_yes where id = v_vol;
+    if not exists (select 1 from public.khld_volunteer where id = v_vol and not photo_consent) then
+      raise exception '0165: the edit of a linked volunteer did not save';
+    end if;
+    raise exception using errcode = 'P0165', message = 'rollback the probes';
+  exception when sqlstate 'P0165' then null;
+  end;
+  if exists (select 1 from public.khld_partner where name like '0165 probe%%') then
+    raise exception '0165: probe rows survived the rollback';
+  end if;
+end $verify$;
+""" % dict(cols='\n'.join(add_column_sql(t, c, new) for t, c in cols), upd='\n'.join(upd),
+           ins=',\n'.join(ins), n_rules=n_rules)
+
+
+def publish_sql():
+    old, new = build(upto='0166'), build(upto='0167')
+    cols, added, changed, pub = delta(old, new)
+    if cols or added or changed:
+        raise SystemExit('0167 publishes; it adds no field and no rule')
+    if pub != ['khld_campaign', 'khld_guidance_session']:
+        raise SystemExit('0167 is written for FORM-07 and FORM-14; the catalogue publishes %s' % pub)
+    alters = '\n'.join('alter table public.%s add column is_published boolean not null default false;\n'
+                       'comment on column public.%s.is_published is %s;'
+                       % (t, t, q('On the public page (v_public_khld_whats_on) until it ends; flipped by a coordinator on the '
+                                  'record\'s page, never a form field. 0167.')) for t in pub)
+    return """-- ═══════════════════════════════════════════════════════════════════════════
+--  0167 — Khalidiyah: volunteer campaigns (FORM-07) and counselling sessions
+--         (FORM-14) published on the public page
+--
+--  GENERATED by supabase/khalidiyah/gen_schema.py from the catalogue's
+--  `published` entries (model.build(upto='0167') against '0166').
+--
+--  The municipality's owner found on 28 September 2026 that a volunteer
+--  campaign and a counselling session did not appear on the public page
+--  once created, and that neither had a way to publish it. Activities
+--  (FORM-08) and markets (FORM-16) have had both since 0159 / 0163; these
+--  two now have the same: is_published, false until a coordinator flips it
+--  on the record's page (save_khld_record refuses it as a form column, 0161,
+--  as it does the other two), and a branch each in the public view.
+--
+--  ── v_public_khld_whats_on ──
+--
+--  From its last definition, 0163's (generated by gen_views.py; grep -l
+--  "view public.v_public_khld_whats_on" supabase/migrations/*.sql lists
+--  0152, 0153 and 0163), its twelve columns unchanged in name, type and
+--  order, and two appended: end_date (every kind has one) and apply_until
+--  -- the last day to apply, for a campaign (F027) and a session (F077),
+--  null for an activity or a market, whose sheets ask the public to apply
+--  for nothing. The same four filters on the new branches: published, not
+--  deleted, the municipality active, not yet ended. A campaign's type is
+--  its F125 answers, in the list's order; a session's is its topic (F149).
+--  Nothing else about either is published: no sponsor, no executing
+--  entity, no status, no counts. `create or replace` keeps the grants; they
+--  are stated again below so this file says who reads the view.
+-- ═══════════════════════════════════════════════════════════════════════════
+
+-- ── 1. the flag ───────────────────────────────────────────────────────────
+%(alters)s
+
+-- ── 2. the public page ────────────────────────────────────────────────────
+create or replace view public.v_public_khld_whats_on
+with (security_invoker = false) as
+select a.id,
+       'activity'::text as kind,
+       a.activity_name as title,
+       a.start_date as on_date,
+       null::text as time_from,
+       null::text as time_to,
+       null::text as place_en,
+       null::text as place_ar,
+       t.label_en as type_en,
+       t.label_ar as type_ar,
+       a.description,
+       m.slug as municipality_slug,
+       a.end_date,
+       null::date as apply_until
+  from public.khld_activity a
+  join public.municipality m on m.id = a.municipality_id and m.is_active and m.deleted_at is null
+  left join public.ref_khld_activity_type t on t.id = a.activity_type_id
+ where a.is_published and a.deleted_at is null and a.end_date >= current_date
+union all
+select k.id,
+       'market'::text,
+       k.name,
+       k.start_date,
+       null::text,
+       null::text,
+       null::text,
+       null::text,
+       o.label_en,
+       o.label_ar,
+       k.description,
+       m.slug,
+       k.end_date,
+       null::date
+  from public.khld_market k
+  join public.municipality m on m.id = k.municipality_id and m.is_active and m.deleted_at is null
+  left join public.ref_khld_market_occasion o on o.id = k.occasion_id
+ where k.is_published and k.deleted_at is null and k.end_date >= current_date
+union all
+select c.id,
+       'campaign'::text,
+       c.campaign_name,
+       c.start_date,
+       null::text,
+       null::text,
+       null::text,
+       null::text,
+       ct.type_en,
+       ct.type_ar,
+       c.description,
+       m.slug,
+       c.end_date,
+       c.applications_close
+  from public.khld_campaign c
+  join public.municipality m on m.id = c.municipality_id and m.is_active and m.deleted_at is null
+  left join lateral (
+    select string_agg(r.label_en, ', ' order by r.sort_order) as type_en,
+           string_agg(r.label_ar, '، ' order by r.sort_order) as type_ar
+      from public.khld_campaign_option x
+      join public.ref_khld_campaign_activity_type r on r.id = x.option_id
+     where x.campaign_id = c.id and x.question_code = 'f125'
+  ) ct on true
+ where c.is_published and c.deleted_at is null and c.end_date >= current_date
+union all
+select g.id,
+       'session'::text,
+       g.title,
+       g.start_date,
+       null::text,
+       null::text,
+       null::text,
+       null::text,
+       s.label_en,
+       s.label_ar,
+       g.description,
+       m.slug,
+       g.end_date,
+       g.applications_close
+  from public.khld_guidance_session g
+  join public.municipality m on m.id = g.municipality_id and m.is_active and m.deleted_at is null
+  left join public.ref_khld_session_topic s on s.id = g.topic_id
+ where g.is_published and g.deleted_at is null and g.end_date >= current_date;
+
+revoke all on public.v_public_khld_whats_on from public, anon, authenticated;
+grant select on public.v_public_khld_whats_on to anon, authenticated;
+
+-- ── verification: as anon, discarded ─────────────────────────────────────
+do $verify$
+declare
+  v_khld uuid := '00000000-0000-4000-8000-0000000000b2';
+  v_camp uuid;
+  v_sess uuid;
+  v_hide uuid;
+  v_n    int;
+begin
+  insert into public.khld_campaign (municipality_id, campaign_name, start_date, end_date, applications_open, applications_close,
+                                    description, has_sponsor, status_id, is_published)
+  values (v_khld, '0167 probe campaign', current_date + 3, current_date + 4, current_date, current_date + 2, 'probe', false,
+          (select id from public.ref_khld_event_status where code = 'planned'), true)
+  returning id into v_camp;
+  insert into public.khld_campaign_option (campaign_id, municipality_id, question_code, option_id)
+  select v_camp, v_khld, 'f125', id from public.ref_khld_campaign_activity_type where code in ('cleaning', 'planting');
+  insert into public.khld_guidance_session (municipality_id, title, start_date, end_date, applications_open, applications_close,
+                                            description, executing_entity, topic_id, is_core, is_published)
+  values (v_khld, '0167 probe session', current_date + 3, current_date + 9, current_date, current_date + 2, 'probe', 'probe',
+          (select id from public.ref_khld_session_topic where code = 'licensing'), true, true)
+  returning id into v_sess;
+  insert into public.khld_guidance_session (municipality_id, title, start_date, end_date, applications_open, applications_close,
+                                            description, executing_entity, topic_id, is_core)
+  values (v_khld, '0167 probe unpublished', current_date + 3, current_date + 9, current_date, current_date + 2, 'probe', 'probe',
+          (select id from public.ref_khld_session_topic where code = 'basics'), true)
+  returning id into v_hide;
+
+  set local role anon;
+  if not exists (select 1 from public.v_public_khld_whats_on
+                  where id = v_camp and kind = 'campaign' and title = '0167 probe campaign'
+                    and type_en = 'Cleaning, Planting and afforestation' and apply_until = current_date + 2
+                    and end_date = current_date + 4) then
+    raise exception '0167: anon does not see the published campaign as written';
+  end if;
+  if not exists (select 1 from public.v_public_khld_whats_on
+                  where id = v_sess and kind = 'session' and type_en = 'Licensing requirements' and apply_until = current_date + 2) then
+    raise exception '0167: anon does not see the published session as written';
+  end if;
+  if exists (select 1 from public.v_public_khld_whats_on where id = v_hide) then
+    raise exception '0167: an unpublished session is on the public page';
+  end if;
+  reset role;
+  -- unpublished: gone, and anon writes nothing
+  update public.khld_campaign set is_published = false where id = v_camp;
+  set local role anon;
+  select count(*) into v_n from public.v_public_khld_whats_on where id = v_camp;
+  reset role;
+  if v_n <> 0 then
+    raise exception '0167: an unpublished campaign is on the public page';
+  end if;
+  if has_table_privilege('anon', 'public.v_public_khld_whats_on', 'insert') then
+    raise exception '0167: anon may write the public view';
+  end if;
+  raise exception using errcode = 'P0167', message = 'rollback the probes';
+exception when sqlstate 'P0167' then
+  null;
+end $verify$;
+""" % dict(alters=alters)
+
+
 FILES = [
     ('0156', 'khalidiyah_forms_option_lists', lists_sql_1),
     ('0157', 'khalidiyah_forms_option_lists_2', lists_sql_2),
     ('0158', 'khalidiyah_forms_shared', shared_sql),
     ('0159', 'khalidiyah_forms_tables', tables_sql_1),
     ('0160', 'khalidiyah_forms_tables_2', tables_sql_2),
+    ('0165', 'khalidiyah_partner_volunteers', partner_volunteers_sql),
+    ('0167', 'khalidiyah_publish_campaigns_sessions', publish_sql),
 ]
 
 if __name__ == '__main__':

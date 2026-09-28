@@ -2,7 +2,7 @@
 """
 Generates, from the workbook and the catalogue (through model.build()):
 
-  app/src/khld/forms.generated.ts      the 23 form definitions the screens render
+  app/src/khld/forms.generated.ts      the form definitions the screens render
   app/src/locales/en/khld.json         English
   app/src/locales/ar/khld.json         Arabic
 
@@ -16,6 +16,8 @@ catalogue.
 What is NOT the sheet's is named, and written here once:
 
   - SHORT          the sidebar name of each form (catalogue.FORMS short=)
+  - ADDED          the two fields the owner added after the build (F214,
+                   F215), whose labels are the catalogue's (OQ-72)
   - DRAFTED        the Arabic the sheet does not have: three help texts
                    (the Help Text column is English only) and the label of
                    F160's added option, "General park visit" (the Dependency
@@ -70,7 +72,7 @@ DRAFTED = {
 # ── the list screen's columns: the app's choice, fields of the form ──────────
 LIST = {
     'form01': ['F001', 'F002', 'F003'],
-    'form02': ['F004', 'F006', 'F115'],
+    'form02': ['F004', 'F006', 'F115', 'F214'],
     'form04': ['F010', 'F011', 'F013', 'F015'],
     'form05': ['F016', 'F117', 'F119'],
     'form21': ['F181', 'F183', 'F184', 'F186'],
@@ -125,6 +127,8 @@ def field_def(f):
             d['extra']['column'] = col
     if s.get('held'):
         d['held'] = True
+    if s.get('volunteers'):
+        d['volunteers'] = True
     if f.kind == 'file':
         d['maxFiles'] = s.get('max', 5)
     if f.kind == 'shown':
@@ -200,7 +204,7 @@ for fid, fm in m.forms.items():
     d = O(id=fid, sheets=list(fm.sheets), table=fm.table, group=fm.group, writer=meta['writer'])
     if meta.get('ref'):
         d['reference'] = 'KHLD-' + meta['ref'][0]
-    if meta.get('published'):
+    if m.published(meta):
         d['published'] = True
     if meta.get('public'):
         d['public'] = True
@@ -249,6 +253,7 @@ S_EN = O([
         ('invalid', 'Not saved. {message}'), ('notSaved', 'Not saved'),
         ('ruleRequired', '"{label}" is required with the answers given.'),
         ('ruleNotApplicable', '"{label}" is not asked with the answers given, so it must be left empty.'),
+        ('ruleProvidesVolunteers', 'The partner chosen for "{label}" is not one that provides volunteers.'),
         ('notFound', 'This record no longer exists or is not yours to edit.'),
         ('unknownColumn', 'Not saved: the form sent a field the database does not know ({column}). This is a defect in the form.'),
         ('unknownBlock', 'Not saved: the form sent a block this table does not take ({block}). This is a defect in the form.'),
@@ -257,6 +262,7 @@ S_EN = O([
             ('none', 'None'), ('loadFailed', 'The list could not be loaded.'),
             ('window', 'Only those open today are listed.'),
             ('held', 'Only markets marked held are listed.'),
+            ('volunteers', 'Only partners who will provide volunteers are listed.'),
             ('fromSource', 'Only people registered on {form} are listed.'),
             ('noneToChoose', 'Nothing to choose yet.'),
         ])),
@@ -282,7 +288,7 @@ S_EN = O([
         ('publish', O([
             ('title', 'Public page'), ('on', 'Published'), ('off', 'Not published'),
             ('publish', 'Publish on the public page'), ('unpublish', 'Take off the public page'),
-            ('note', 'The public page at /khalidiyah lists published activities and markets that have not ended: the title, the type, the dates and the description, and nothing else.'),
+            ('note', 'The public page at /khalidiyah lists what is published and has not ended — activities, markets, volunteer campaigns and counselling sessions: the title, the type, the dates, the last day to apply where there is one, and the description, and nothing else.'),
         ])),
         ('review', O([
             ('title', 'Registration'),
@@ -361,6 +367,7 @@ S_AR = O([
         ('invalid', 'لم يُحفظ. {message}'), ('notSaved', 'لم يُحفظ'),
         ('ruleRequired', '"{label}" مطلوب مع الإجابات المعطاة.'),
         ('ruleNotApplicable', '"{label}" لا يُسأل مع الإجابات المعطاة، فيجب أن يبقى فارغاً.'),
+        ('ruleProvidesVolunteers', 'الشريك المختار في "{label}" ليس من الشركاء الذين يوفّرون متطوعين.'),
         ('notFound', 'هذا السجل لم يعد موجوداً أو ليس لك تعديله.'),
         ('unknownColumn', 'لم يُحفظ: أرسل النموذج حقلاً لا تعرفه قاعدة البيانات ({column}). هذا خلل في النموذج.'),
         ('unknownBlock', 'لم يُحفظ: أرسل النموذج كتلة لا يقبلها هذا الجدول ({block}). هذا خلل في النموذج.'),
@@ -369,6 +376,7 @@ S_AR = O([
             ('none', 'لا شيء'), ('loadFailed', 'تعذّر تحميل القائمة.'),
             ('window', 'لا يُدرج إلا ما هو مفتوح اليوم.'),
             ('held', 'لا تُدرج إلا البازارات المسجّلة على أنها نُفّذت.'),
+            ('volunteers', 'لا يُدرج إلا الشركاء الذين سيوفّرون متطوعين.'),
             ('fromSource', 'لا يُدرج إلا المسجّلون في {form}.'),
             ('noneToChoose', 'لا يوجد ما يُختار بعد.'),
         ])),
@@ -394,7 +402,7 @@ S_AR = O([
         ('publish', O([
             ('title', 'الصفحة العامة'), ('on', 'منشور'), ('off', 'غير منشور'),
             ('publish', 'نشر على الصفحة العامة'), ('unpublish', 'إزالة من الصفحة العامة'),
-            ('note', 'تعرض الصفحة العامة على /khalidiyah الأنشطة والبازارات المنشورة التي لم تنتهِ: العنوان والنوع والتواريخ والوصف، ولا شيء غير ذلك.'),
+            ('note', 'تعرض الصفحة العامة على /khalidiyah ما نُشر ولم ينتهِ — الأنشطة والبازارات والحملات التطوعية والجلسات الإرشادية: العنوان والنوع والتواريخ وآخر يوم للتقديم إن وُجد والوصف، ولا شيء غير ذلك.'),
         ])),
         ('review', O([
             ('title', 'التسجيل'),

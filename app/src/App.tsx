@@ -483,7 +483,7 @@ const router = createBrowserRouter([
       //
       // The same shape as Ramtha's: `:form` is the form id, the screens read
       // their structure from KHLD_FORMS (Khaldia_2_reviewed.xlsx), and
-      // RequireKhalidiyah refuses an id that is not one of the twenty-three
+      // RequireKhalidiyah refuses an id that is not a form of KHLD_FORMS
       // and an account whose municipality is not Khalidiyah.
       { path: '/khld', element: <Navigate to={`/khld/${KHLD_FORM_IDS[0]}`} replace /> },
       {

@@ -7,10 +7,13 @@ import type { RefRow } from './refTables'
  * ─────────────────────────────────────────────────────────────────────────────
  *  The public volunteer registration (FORM-12, Khalidiyah).
  *
- *  Two objects, both granted to anon for this and nothing else:
+ *  Three objects, all granted to anon for this and nothing else:
  *
  *    v_public_khld_volunteer_option   the nine option lists the form asks
  *                                     (0164): ids, codes, labels, order
+ *    v_public_khld_volunteer_partner  the partners a CSO volunteer may name
+ *                                     (F215, 0166): id and name, the ones
+ *                                     who answered yes to F214
  *    khld_register_volunteer          the write (0161): security definer,
  *                                     throttled, a person on file proves who
  *                                     they are, the row arrives 'submitted'
@@ -29,7 +32,12 @@ import type { RefRow } from './refTables'
 type OptionRow = RefRow & { list: string }
 
 type Loose = {
-  from: (t: string) => { select: (c: string) => { order: (c: string) => Promise<{ data: unknown; error: unknown }> } }
+  from: (t: string) => {
+    select: (c: string) => {
+      order: (c: string) => Promise<{ data: unknown; error: unknown }>
+      eq: (c: string, v: string) => { order: (c: string) => Promise<{ data: unknown; error: unknown }> }
+    }
+  }
   rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>
 }
 const db = supabase as unknown as Loose
@@ -45,6 +53,20 @@ export function usePublicVolunteerOptions() {
       const out: Record<string, RefRow[]> = {}
       for (const r of rows) (out[r.list] ??= []).push(r)
       return out
+    },
+  })
+}
+
+/** A partner a CSO volunteer may name (F215): live, provides volunteers, of this municipality. */
+export type PublicVolunteerPartner = { id: string; name: string }
+
+export function usePublicVolunteerPartners(slug: string) {
+  return useQuery({
+    queryKey: ['public', 'khldVolunteerPartners', slug],
+    staleTime: 5 * 60_000,
+    queryFn: async (): Promise<PublicVolunteerPartner[]> => {
+      const res = await db.from('v_public_khld_volunteer_partner').select('id, name').eq('municipality_slug', slug).order('name')
+      return unwrapList(res as unknown as { data: PublicVolunteerPartner[] | null; error: unknown })
     },
   })
 }

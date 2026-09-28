@@ -8,7 +8,7 @@ import { useToast } from '../ui/Toast'
 import { refLabel, type RefRow } from '../data/refTables'
 import {
   identifierOf, useKhldPicker, useKhldRecord, useKhldRefs, usePersonNames, useSetKhldDeleted, useSetKhldPublished,
-  useSetVolunteerStatus, type KhldRecord, type VolunteerStatus,
+  useSetVolunteerStatus, type KhldPublishedTable, type KhldRecord, type VolunteerStatus,
 } from '../data/khld'
 import { useAttachments } from '../data/evidence'
 import { EvidencePanel } from '../components/EvidencePanel'
@@ -16,7 +16,8 @@ import { formatShortDate } from '../lib/format'
 import { useAuth } from '../auth/AuthProvider'
 import { can } from '../auth/permissions'
 import { answersFromRecord, isOn, listsOf, type Answers } from './answers'
-import { formDef, formOfTable, useKhldLabels } from './labels'
+import { formDef, formOfTable, isKhldFormId, useKhldLabels } from './labels'
+import NotFound from '../routes/NotFound'
 import type { KhldFormId } from './forms.generated'
 import type { KhldFieldDef, KhldFormDef, KhldTable } from './types'
 import { BidiIsolate } from '../components/BidiIsolate'
@@ -35,7 +36,9 @@ import { SEP, ELLIPSIS, COLON } from '../ui/glyphs'
  */
 export function KhldDetailScreen() {
   const { form } = useParams()
-  return <Detail key={form} fid={form as KhldFormId} />
+  // an unknown or retired form id, whatever guards the route (KhldListScreen)
+  if (!isKhldFormId(form)) return <NotFound />
+  return <Detail key={form} fid={form} />
 }
 
 function Detail({ fid }: { fid: KhldFormId }) {
@@ -87,7 +90,7 @@ function Detail({ fid }: { fid: KhldFormId }) {
 
       {def.public ? <ReviewPanel id={id!} row={r.row} locale={locale} /> : null}
       {def.published && !deleted ? (
-        <PublishPanel table={def.table as 'khld_activity' | 'khld_market'} id={id!} published={r.row['is_published'] === true} />
+        <PublishPanel table={def.table as KhldPublishedTable} id={id!} published={r.row['is_published'] === true} />
       ) : null}
 
       <section className="mt-[26px]">
@@ -185,11 +188,12 @@ function ReviewPanel({ id, row, locale }: { id: string; row: Record<string, unkn
 }
 
 /**
- * Whether this activity or market is on the public page. A coordinator's
- * switch; the public view also requires the end date to be today or later,
- * which is said here so a published past event is not looked for.
+ * Whether this activity, market, campaign or session is on the public page.
+ * A coordinator's switch; the public view also requires the end date to be
+ * today or later, which is said here so a published past event is not
+ * looked for.
  */
-function PublishPanel({ table, id, published }: { table: 'khld_activity' | 'khld_market'; id: string; published: boolean }) {
+function PublishPanel({ table, id, published }: { table: KhldPublishedTable; id: string; published: boolean }) {
   const { t } = useTranslation('khld')
   const { role } = useAuth()
   const set = useSetKhldPublished(table)

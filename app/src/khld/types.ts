@@ -65,6 +65,8 @@ export type KhldFieldDef = {
   readonly extra?: { readonly code: string; readonly column?: string }
   /** F207: markets whose status is Held. */
   readonly held?: boolean
+  /** F215: partners who answered yes to F214, "will this partner provide volunteers". */
+  readonly volunteers?: boolean
   readonly maxFiles?: number
   /** A shown field: the field whose record it names. */
   readonly of?: string
@@ -85,7 +87,7 @@ export type KhldFormDef = {
   readonly writer: 'can_write' | 'is_staff'
   /** The reference prefix the database issues on save (`KHLD-MTG`), when the table has one. */
   readonly reference?: string
-  /** Activities and markets: published on the public page by a coordinator. */
+  /** Activities, markets, volunteer campaigns and counselling sessions: published on the public page by a coordinator. */
   readonly published?: boolean
   /** FORM-12: also filled in by the public, and reviewed. */
   readonly public?: boolean

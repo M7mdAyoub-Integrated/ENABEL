@@ -1805,3 +1805,92 @@ languages:
 - that a super admin's switch calls `set_acting_municipality`, lands on
   `/dashboard?m=ramtha` and closes the panel.
 
+### 28 September: the owner's second round (0165–0167)
+
+The owner tried the forms on the deployed site and asked for five things.
+One, a change to activity participation (FORM-09), was withdrawn when it
+turned out to save correctly, as the coordinator, on the live database.
+
+**A later change is a later migration, and the generators know it.**
+0156–0160 are generated from the catalogue and must go on reproducing
+byte for byte. So the catalogue now records when each change arrived:
+
+- `ADDED` fields carry `since`;
+- a field's earlier spec is `was`;
+- `published` may be a migration number;
+- `ORDER_SINCE` dates a reordering (ORDER decides column order in 0159).
+
+`model.build(upto='0164')` is the model as the applied files saw it.
+`gen_schema.py` generates each later migration from the difference, and
+refuses a difference it was not taught to write (a dropped rule, a new
+multi-select). The earlier files still reproduce, and so do 0165 and 0167.
+
+- **0165, F214 and F215 (OQ-72), generated.**
+  - `khld_partner.provides_volunteers`: required of every new partner, and
+    never taken back once answered (`guard_khld_answered`). The two
+    partners already saved stay unanswered; nothing is guessed.
+  - `khld_volunteer.affiliation_partner_id`: required for a CSO. F146 is
+    no longer asked there, as a `khld_field_rule` row updated and one added.
+    The partner must be live, of the municipality (the composite key) and
+    one who provides volunteers (`guard_khld_partner_provides_volunteers`,
+    read only when the link changes).
+  - Probed in the migration: each refusal by name, the accepted case, and a
+    later "no" not blocking the volunteer's other edits.
+- **0166, the public side, by hand.**
+  - `v_public_khld_volunteer_partner` holds the id and name only.
+  - `khld_register_volunteer` is 0161's text with one column added, and
+    the diff shows nothing else.
+  - Probed as anon: the list, a CSO registration kept with its partner,
+    and one without refused as `khld_f215_required`.
+- **0167, campaigns and sessions published (OQ-73), generated.**
+  - `is_published` added to FORM-07 and FORM-14.
+  - `v_public_khld_whats_on` keeps 0163's twelve columns and gains
+    `end_date` and `apply_until`, plus a branch for each new kind.
+  - Probed as anon: both shown as written, an unpublished session hidden,
+    and a campaign gone once unpublished.
+
+**Without a migration.**
+
+- F088 lists the sessions whose applications are open today, not those
+  running today (OQ-69). The live session, applications 27–30 September
+  and running 1–10 October, was invisible to FORM-15 all through its
+  application window.
+- FORM-08 asks the activity's name first.
+- The publish switch covers the four kinds.
+- The public page gives a campaign "register as a volunteer", a session
+  "register with the Municipality", and the last day to apply.
+- A refusal named `khld_f215_provides_volunteers` is worded from the
+  field's label, like the other rules.
+
+**How it was checked.**
+
+- `check_migration_files.sh` passes.
+- Each migration's text matched the ledger's md5 before its file was
+  renamed.
+- The snapshots gained exactly the one foreign key.
+- The regenerated types gained exactly the new columns and the view.
+- In a browser against the stub, in both languages:
+  - F214 sits after "Expected support", stops the first save when
+    unanswered, and is sent when answered;
+  - the partners list shows it;
+  - "CSO" enables F215 with only the partner who said yes, and dims F146;
+    "School" does the reverse;
+  - the volunteer's page names the partner;
+  - FORM-08 opens on the name;
+  - FORM-15 lists a session two days before it starts;
+  - both publish switches PATCH `is_published`;
+  - the public page shows all four kinds, with the campaign's link;
+  - the public volunteer form sends `affiliation_partner_id` and no typed
+    name.
+- The full sweep: all 176 screens of the 22 forms in both languages, with
+  no raw key and no page error.
+
+**The sweep also found a claim of the previous round that was not true
+everywhere.** OQ-71 said `/khld/form20` reads "not found". It did in
+production, where RequireKhalidiyah wraps the route. In demo mode,
+`guard()` drops the wrappers, and the three screens cast the id to a form
+and crashed on the missing definition. The claim came from reading the
+guard, not from opening the address. Each screen now checks the id itself
+(`isKhldFormId`), so "not found" no longer depends on which wrapper is in
+place. All eight form20 addresses now read it.
+

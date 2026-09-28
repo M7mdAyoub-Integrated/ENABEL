@@ -17,7 +17,8 @@ import {
   type KhldIdType, type KhldOption, type KhldPick, type KhldRecord, type PersonLookup, type SavePayload, type SaveResult,
 } from '../data/khld'
 import { EMPTY_ANSWERS, answersFromRecord, codeOf, isOn, listsOf, type Answers } from './answers'
-import { formDef, formOfTable, useKhldLabels } from './labels'
+import { formDef, formOfTable, isKhldFormId, useKhldLabels } from './labels'
+import NotFound from '../routes/NotFound'
 import type { KhldFormId } from './forms.generated'
 import type { KhldFieldDef, KhldFormDef, KhldTable } from './types'
 import { SEP } from '../ui/glyphs'
@@ -52,8 +53,10 @@ const EMPTY_PERSON: Person = { idNumber: '', name: '', phone: '', sex: '', dob: 
 
 export function KhldFormScreen({ mode }: { mode: 'new' | 'edit' }) {
   const { form, id } = useParams()
+  // an unknown or retired form id, whatever guards the route (KhldListScreen)
+  if (!isKhldFormId(form)) return <NotFound />
   // keyed, so moving from one form to another starts from empty answers
-  return <FormFor key={`${form ?? ''}:${id ?? 'new'}`} mode={mode} fid={form as KhldFormId} id={id} />
+  return <FormFor key={`${form}:${id ?? 'new'}`} mode={mode} fid={form} id={id} />
 }
 
 function FormFor({ mode, fid, id }: { mode: 'new' | 'edit'; fid: KhldFormId; id: string | undefined }) {
@@ -348,16 +351,24 @@ function FormFor({ mode, fid, id }: { mode: 'new' | 'edit'; fid: KhldFormId; id:
 
 /* ── refusals ─────────────────────────────────────────────────────────────── */
 
+const RULE_KEY = {
+  required: 'khld:form.ruleRequired',
+  not_applicable: 'khld:form.ruleNotApplicable',
+  provides_volunteers: 'khld:form.ruleProvidesVolunteers',
+} as const
+
 export function RefusalBand({ outcome, fid }: { outcome: Exclude<SaveResult, { ok: true }>; fid: KhldFormId }) {
   const { t } = useTranslation(['khld', 'errors'])
   const L = useKhldLabels(fid)
   const r = outcome.result
   const known = r === 'invalid' ? constraintMessageKey(outcome.constraint) : null
-  // A rule between fields (khld_field_rule, 0158) names the field it refused:
-  // khld_f015_required, khld_f030_not_applicable. Worded from the field's label.
-  const rule = r === 'invalid' ? /^khld_f(\d{3})_(required|not_applicable)$/.exec(outcome.constraint ?? '') : null
+  // A rule between fields (khld_field_rule, 0158; guard_khld_answered and
+  // guard_khld_partner_provides_volunteers, 0165) names the field it refused:
+  // khld_f015_required, khld_f030_not_applicable, khld_f215_provides_volunteers.
+  // Worded from the field's label.
+  const rule = r === 'invalid' ? /^khld_f(\d{3})_(required|not_applicable|provides_volunteers)$/.exec(outcome.constraint ?? '') : null
   const text =
-    rule ? t(rule[2] === 'required' ? 'khld:form.ruleRequired' : 'khld:form.ruleNotApplicable', { label: L.label({ id: `F${rule[1]}` }) })
+    rule ? t(RULE_KEY[rule[2] as keyof typeof RULE_KEY], { label: L.label({ id: `F${rule[1]}` }) })
     : r === 'not_found' ? t('khld:form.notFound')
     : r === 'person_deleted' ? t('khld:form.deleted.person')
     : r === 'unknown_column' ? t('khld:form.unknownColumn', { column: outcome.column ?? '?' })
@@ -611,6 +622,7 @@ function usePicks(f: KhldFieldDef, current: string, refs: Record<string, RefRow[
       if (typeof from !== 'string' || typeof to !== 'string' || now < from || now > to) return false
     }
     if (f.held && r.raw['status_id'] !== heldId) return false
+    if (f.volunteers && r.raw['provides_volunteers'] !== true) return false
     if (f.table === 'khld_volunteer' && r.raw['application_status'] === 'rejected') return false
     return true
   })
@@ -628,7 +640,7 @@ function RecordPicker({ base, f, p }: { base: Base; f: KhldFieldDef; p: FieldVie
   const extraLabel = f.extra ? L.extra(f) : undefined
   if (f.extra && extraLabel) options.push({ value: '__extra__', label: extraLabel })
   const value = p.answers.extras[f.id] ? '__extra__' : current
-  const note = f.window ? t('form.picker.window') : f.held ? t('form.picker.held') : undefined
+  const note = f.window ? t('form.picker.window') : f.held ? t('form.picker.held') : f.volunteers ? t('form.picker.volunteers') : undefined
   return (
     <Field
       spec={{ ...base, type: 'select', span: 6, options, placeholder: t('form.picker.none'),

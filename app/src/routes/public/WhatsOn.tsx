@@ -10,16 +10,18 @@ import { hasVolunteerJourney, usePublicSite } from './PublicSite'
 /**
  * The public page of a municipality whose activities are open: what's on.
  *
- * Khalidiyah's residents are not asked to apply for anything through this
- * site -- its activities and markets are open to all. The one thing a
- * resident does here is register as a volunteer (FORM-12, a public form
- * since 26 September 2026, see hasVolunteerJourney). So the page says what
- * is coming up in the park, offers the volunteer register, and nothing else:
- * no application check, no mention of accounts or signing in.
+ * It lists what the Municipality has published: activities and markets,
+ * open to all, and since 0167 volunteer campaigns and counselling sessions,
+ * which have a last day to apply. The one thing a resident does on the page
+ * itself is register as a volunteer (FORM-12, a public form since 26
+ * September 2026, see hasVolunteerJourney), so a campaign's card leads
+ * there; a session's attendance request is entered by staff (FORM-15, OQ-61),
+ * so its card says to register with the Municipality. No application
+ * check, no mention of accounts or signing in.
  *
  * Reading order, for someone who arrived from a poster: what this is in one
- * sentence; then the coming activities and markets, soonest first; then the
- * volunteer register; then the way to another municipality's page.
+ * sentence; then what is coming up, soonest first; then the volunteer
+ * register; then the way to another municipality's page.
  */
 export function WhatsOn() {
   const { t } = useTranslation('public')
@@ -68,7 +70,13 @@ export function WhatsOn() {
           </div>
         ) : (
           <ul className="mt-4 flex list-none flex-col gap-3 p-0">
-            {items.map((o) => <WhatsOnCard key={`${o.kind}-${o.id}`} o={o} />)}
+            {items.map((o) => (
+              <WhatsOnCard
+                key={`${o.kind}-${o.id}`}
+                o={o}
+                volunteerPath={hasVolunteerJourney(site.municipality.code) ? site.path('/volunteer') : null}
+              />
+            ))}
           </ul>
         )}
       </section>
@@ -99,9 +107,15 @@ function VolunteerPanel({ to }: { to: string }) {
   )
 }
 
-const KIND_ACCENT: Record<WhatsOnItem['kind'], string> = { activity: 'bg-green', market: 'bg-amber' }
+const KIND_ACCENT: Record<WhatsOnItem['kind'], string> = { activity: 'bg-green', market: 'bg-amber', campaign: 'bg-teal', session: 'bg-ink' }
 
-function WhatsOnCard({ o }: { o: WhatsOnItem }) {
+/** Today, as the view's date columns hold it. */
+function today(): string {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+function WhatsOnCard({ o, volunteerPath }: { o: WhatsOnItem; volunteerPath: string | null }) {
   const { t, i18n } = useTranslation('public')
   const locale = i18n.resolvedLanguage ?? 'en'
   const ar = locale.startsWith('ar')
@@ -111,6 +125,9 @@ function WhatsOnCard({ o }: { o: WhatsOnItem }) {
   // built outside the JSX: jsx-no-literals refuses a template literal as a child
   const timeText = time ? ` ${SEP} ${time}` : ''
   const placeText = place ? ` ${SEP} ${place}` : ''
+  const untilText = o.end_date && o.end_date !== o.on_date ? ` ${RANGE} ${formatDate(o.end_date, locale)}` : ''
+  // the last day to apply, while it has not passed; the view carries it for a campaign or a session only
+  const applyOpen = !!o.apply_until && o.apply_until >= today()
   return (
     <li className="flex border-[1.5px] border-ink bg-bg">
       <span aria-hidden="true" className={`w-[7px] flex-none ${KIND_ACCENT[o.kind]}`} />
@@ -120,11 +137,22 @@ function WhatsOnCard({ o }: { o: WhatsOnItem }) {
         </p>
         <h3 className="mt-1 text-[19px] font-extrabold leading-[1.2] tracking-[-0.02em] sm:text-[21px]" style={{ textWrap: 'balance' }}>{o.title}</h3>
         <p className="mt-2 text-[15px] leading-[1.5] text-body">
-          <span className="font-semibold text-ink">{formatDate(o.on_date, locale)}</span>
+          <span className="font-semibold text-ink">{formatDate(o.on_date, locale)}{untilText}</span>
           {time ? <span dir="ltr">{timeText}</span> : null}
           {placeText}
         </p>
+        {applyOpen ? (
+          <p className="mt-1 font-narrow text-[12px] font-bold uppercase tracking-[0.1em] text-ink">
+            {t('whatsOn.applyUntil', { date: formatDate(o.apply_until!, locale) })}
+          </p>
+        ) : null}
         {o.description ? <p className="mt-2 max-w-[60ch] text-[14.5px] leading-[1.5] text-body" style={{ textWrap: 'pretty' }}>{o.description}</p> : null}
+        {o.kind === 'campaign' && volunteerPath ? (
+          <p className="mt-3 text-[14.5px]">
+            <Link to={volunteerPath} className="font-semibold text-ink underline">{t('whatsOn.campaignAction')}</Link>
+          </p>
+        ) : null}
+        {o.kind === 'session' ? <p className="mt-3 text-[14.5px] text-body">{t('whatsOn.sessionAction')}</p> : null}
       </div>
     </li>
   )

@@ -60,7 +60,8 @@ export const KHLD_FORMS = {
     "list": [
       "F004",
       "F006",
-      "F115"
+      "F115",
+      "F214"
     ],
     "fields": [
       {
@@ -87,6 +88,12 @@ export const KHLD_FORMS = {
         "id": "F007",
         "kind": "area",
         "column": "expected_contribution"
+      },
+      {
+        "id": "F214",
+        "kind": "bool",
+        "column": "provides_volunteers",
+        "required": true
       },
       {
         "id": "F008",
@@ -550,6 +557,7 @@ export const KHLD_FORMS = {
     "group": "park",
     "writer": "can_write",
     "reference": "KHLD-VC",
+    "published": true,
     "indicators": [
       "KHLD-SO2-C2",
       "KHLD-SO3-F3",
@@ -675,8 +683,8 @@ export const KHLD_FORMS = {
     "published": true,
     "indicators": [
       "KHLD-SO2-D1",
-      "KHLD-SO1-A2",
-      "KHLD-SO2-D2"
+      "KHLD-SO2-D2",
+      "KHLD-SO1-A2"
     ],
     "list": [
       "F129",
@@ -685,6 +693,12 @@ export const KHLD_FORMS = {
       "F130"
     ],
     "fields": [
+      {
+        "id": "F129",
+        "kind": "text",
+        "column": "activity_name",
+        "required": true
+      },
       {
         "id": "F031",
         "kind": "date",
@@ -724,12 +738,6 @@ export const KHLD_FORMS = {
         "required": true,
         "list": "organiser",
         "other": "organiser_other"
-      },
-      {
-        "id": "F129",
-        "kind": "text",
-        "column": "activity_name",
-        "required": true
       },
       {
         "id": "F130",
@@ -1375,6 +1383,22 @@ export const KHLD_FORMS = {
         "other": "affiliation_other"
       },
       {
+        "id": "F215",
+        "kind": "record",
+        "column": "affiliation_partner_id",
+        "required": true,
+        "when": [
+          {
+            "field": "F145",
+            "values": [
+              "cso"
+            ]
+          }
+        ],
+        "table": "khld_partner",
+        "volunteers": true
+      },
+      {
         "id": "F146",
         "kind": "text",
         "column": "affiliation_name",
@@ -1384,7 +1408,6 @@ export const KHLD_FORMS = {
             "values": [
               "school",
               "university",
-              "cso",
               "other"
             ]
           }
@@ -1465,6 +1488,7 @@ export const KHLD_FORMS = {
     "group": "business",
     "writer": "can_write",
     "reference": "KHLD-GS",
+    "published": true,
     "indicators": [
       "KHLD-SO4-G1",
       "KHLD-SO4-G2"
@@ -1613,8 +1637,8 @@ export const KHLD_FORMS = {
         "required": true,
         "table": "khld_guidance_session",
         "window": [
-          "start_date",
-          "end_date"
+          "applications_open",
+          "applications_close"
         ]
       },
       {

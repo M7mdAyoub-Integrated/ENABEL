@@ -1951,6 +1951,7 @@ export type Database = {
           end_date: string
           has_sponsor: boolean
           id: string
+          is_published: boolean
           municipality_id: string
           reference: string | null
           sponsor_name: string | null
@@ -1971,6 +1972,7 @@ export type Database = {
           end_date: string
           has_sponsor: boolean
           id?: string
+          is_published?: boolean
           municipality_id?: string
           reference?: string | null
           sponsor_name?: string | null
@@ -1991,6 +1993,7 @@ export type Database = {
           end_date?: string
           has_sponsor?: boolean
           id?: string
+          is_published?: boolean
           municipality_id?: string
           reference?: string | null
           sponsor_name?: string | null
@@ -2590,6 +2593,7 @@ export type Database = {
           executing_entity: string
           id: string
           is_core: boolean
+          is_published: boolean
           municipality_id: string
           reference: string | null
           start_date: string
@@ -2610,6 +2614,7 @@ export type Database = {
           executing_entity: string
           id?: string
           is_core: boolean
+          is_published?: boolean
           municipality_id?: string
           reference?: string | null
           start_date: string
@@ -2630,6 +2635,7 @@ export type Database = {
           executing_entity?: string
           id?: string
           is_core?: boolean
+          is_published?: boolean
           municipality_id?: string
           reference?: string | null
           start_date?: string
@@ -3157,6 +3163,7 @@ export type Database = {
           partner_category_other: string | null
           partner_type_id: string
           phone: string
+          provides_volunteers: boolean | null
           updated_at: string
         }
         Insert: {
@@ -3174,6 +3181,7 @@ export type Database = {
           partner_category_other?: string | null
           partner_type_id: string
           phone: string
+          provides_volunteers?: boolean | null
           updated_at?: string
         }
         Update: {
@@ -3191,6 +3199,7 @@ export type Database = {
           partner_category_other?: string | null
           partner_type_id?: string
           phone?: string
+          provides_volunteers?: boolean | null
           updated_at?: string
         }
         Relationships: [
@@ -3705,6 +3714,7 @@ export type Database = {
           affiliation_id: string
           affiliation_name: string | null
           affiliation_other: string | null
+          affiliation_partner_id: string | null
           application_status: string
           client_uuid: string | null
           created_at: string
@@ -3730,6 +3740,7 @@ export type Database = {
           affiliation_id: string
           affiliation_name?: string | null
           affiliation_other?: string | null
+          affiliation_partner_id?: string | null
           application_status?: string
           client_uuid?: string | null
           created_at?: string
@@ -3755,6 +3766,7 @@ export type Database = {
           affiliation_id?: string
           affiliation_name?: string | null
           affiliation_other?: string | null
+          affiliation_partner_id?: string | null
           application_status?: string
           client_uuid?: string | null
           created_at?: string
@@ -3783,6 +3795,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "ref_khld_affiliation"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "khld_volunteer_affiliation_partner_id_fkey"
+            columns: ["affiliation_partner_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "khld_partner"
+            referencedColumns: ["id", "municipality_id"]
           },
           {
             foreignKeyName: "khld_volunteer_disability_id_fkey"
@@ -15537,9 +15556,19 @@ export type Database = {
         }
         Relationships: []
       }
+      v_public_khld_volunteer_partner: {
+        Row: {
+          id: string | null
+          municipality_slug: string | null
+          name: string | null
+        }
+        Relationships: []
+      }
       v_public_khld_whats_on: {
         Row: {
+          apply_until: string | null
           description: string | null
+          end_date: string | null
           id: string | null
           kind: string | null
           municipality_slug: string | null

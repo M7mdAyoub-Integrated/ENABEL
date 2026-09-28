@@ -2498,6 +2498,16 @@ form is legitimate. Likewise the screens list only markets held for F207
 (a rule the database does enforce, 0158). F174's confirmed-partner rule is
 enforced too, but no screen asks F174 now: FORM-20 is off the app (OQ-71).
 
+**F088 departs from the sheet (28 September 2026).** The sheet's window
+for the session to attend is the session's own dates ("today>=f074 and
+today<=f075"). A request is made while applications are open, as on FORM-17
+(F155), and the owner found a counselling session missing from FORM-15
+during its application window (27–30 September; the session runs 1–10
+October). F088 now lists the sessions whose applications (F076–F077) are
+open today. The screen's filter only, as before; the database refuses
+nothing outside it. F215 (OQ-72) lists only partners who provide
+volunteers, and there the database does refuse the others (0165).
+
 The file-upload fields the sheet marks required (F017, F120, F124, F052,
 F196 when established) cannot be required at save — a file is attached to a
 record that exists. The record's page says when one is missing, and A2 and
@@ -2560,4 +2570,91 @@ rule 1). The dashboard shows it with no link to a form.
    follows.
 3. FORM-20 comes back. Remove `retired=True` in `catalogue.py` and
    regenerate.
+
+---
+
+## 🟡 OQ-72 · Two fields the owner added, worded here: F214 and F215
+
+**Added 28 September 2026**, with migrations `0165`–`0166`.
+
+**What the owner asked.**
+
+- On the partners form (FORM-02): a yes / no, *"are you going to give us
+  volunteers"*.
+- On the volunteer form (FORM-12): when the affiliation (F145) is "CSO /
+  association", a choice among the partners who said yes.
+
+Neither is in `Khaldia_2_reviewed.xlsx`. Their Field IDs continue after
+the sheet's last (F213), and the catalogue's `ADDED` holds them with their
+labels.
+
+**What was built.**
+
+- **F214** "Will this partner provide volunteers?" / «هل سيوفّر هذا الشريك
+  متطوعين؟». A yes / no after F007 (expected support), required, and shown
+  as a column on the partners list.
+- **F215** "Partner association" / «الجمعية الشريكة». Asked, and
+  required, when F145 is "CSO / association". It lists only live partners
+  who answered yes, and the database refuses any other
+  (`khld_f215_provides_volunteers`). For a CSO the partner replaces F146
+  (the name typed), which is no longer asked there.
+
+The owner decided the rest:
+
+- Listed partners only: a volunteer whose association is not on the list
+  chooses "Other" in F145.
+- The public form shows the same list (`v_public_khld_volunteer_partner`:
+  id and name only).
+
+**What follows.**
+
+- The two partners saved before F214 existed have **no answer**; none was
+  guessed. Until one is edited and answered yes, the F215 list is empty
+  and nobody can register as a CSO volunteer, on either form.
+- The one volunteer saved before 0165 is a CSO with a typed name. Its row
+  is unchanged. Its next edit asks for a listed partner and blanks the
+  typed name.
+- A partner that is a person (F006 "Influencer") and answers yes is named
+  on the public form.
+- A partner who later answers no stays linked to the volunteers who named
+  them, and is no longer offered.
+
+**Decides.**
+
+- The Municipality's Arabic reviewer: both labels.
+- The M&E lead: whether F215 should feed SO3-F2's affiliation
+  disaggregation. No view or dashboard reads the affiliation today —
+  neither F145 nor F215 — so nothing counts differently because of this
+  change.
+
+---
+
+## 🟠 OQ-73 · Volunteer campaigns and counselling sessions on the public page
+
+**Added 28 September 2026**, with migration `0167`.
+
+The owner found that a campaign (FORM-07) and a counselling session
+(FORM-14) did not appear on the public page and had no way to be
+published. Both now have the switch that activities and markets have, on
+the record's page, and appear on `/khalidiyah` until they end.
+
+Each card shows the title, the type (a campaign's F125 answers, a
+session's topic), the dates, the description, and — while it has not
+passed — the last day to apply (F027 / F077).
+
+**What the card tells a resident to do.**
+
+- **Campaign:** "Take part: register as a volunteer", linking to the
+  public volunteer form.
+- **Session:** "To attend, register with the Municipality." Attendance
+  requests (FORM-15) are entered by staff (OQ-61), so the page cannot
+  take one, and it does not pretend to.
+
+**Decides.** The owner, with the M&E lead:
+
+- Whether residents should request a session place themselves, through a
+  public FORM-15 like the volunteer form. That would be a new public write,
+  with the same safeguards as 0161.
+- Whether a cancelled campaign or session (and activity or market) should
+  leave the page by itself. Today a coordinator takes it off.
 

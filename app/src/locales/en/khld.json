@@ -31,6 +31,13 @@
         "F007": {
           "label": "Expected support/contribution"
         },
+        "F214": {
+          "label": "Will this partner provide volunteers?",
+          "opts": {
+            "true": "Yes",
+            "false": "No"
+          }
+        },
         "F008": {
           "label": "Contact position"
         },
@@ -245,6 +252,9 @@
       "title": "Community Activities",
       "short": "Community activities",
       "fields": {
+        "F129": {
+          "label": "Activity name"
+        },
         "F031": {
           "label": "Start Date"
         },
@@ -262,9 +272,6 @@
         },
         "F036": {
           "label": "Organizer"
-        },
-        "F129": {
-          "label": "Activity name"
         },
         "F130": {
           "label": "Activity status"
@@ -548,6 +555,9 @@
         },
         "F145": {
           "label": "Affiliation"
+        },
+        "F215": {
+          "label": "Partner association"
         },
         "F146": {
           "label": "Name of school / university / organisation"
@@ -932,6 +942,7 @@
     "notSaved": "Not saved",
     "ruleRequired": "\"{label}\" is required with the answers given.",
     "ruleNotApplicable": "\"{label}\" is not asked with the answers given, so it must be left empty.",
+    "ruleProvidesVolunteers": "The partner chosen for \"{label}\" is not one that provides volunteers.",
     "notFound": "This record no longer exists or is not yours to edit.",
     "unknownColumn": "Not saved: the form sent a field the database does not know ({column}). This is a defect in the form.",
     "unknownBlock": "Not saved: the form sent a block this table does not take ({block}). This is a defect in the form.",
@@ -942,6 +953,7 @@
       "loadFailed": "The list could not be loaded.",
       "window": "Only those open today are listed.",
       "held": "Only markets marked held are listed.",
+      "volunteers": "Only partners who will provide volunteers are listed.",
       "fromSource": "Only people registered on {form} are listed.",
       "noneToChoose": "Nothing to choose yet."
     },
@@ -979,7 +991,7 @@
       "off": "Not published",
       "publish": "Publish on the public page",
       "unpublish": "Take off the public page",
-      "note": "The public page at /khalidiyah lists published activities and markets that have not ended: the title, the type, the dates and the description, and nothing else."
+      "note": "The public page at /khalidiyah lists what is published and has not ended — activities, markets, volunteer campaigns and counselling sessions: the title, the type, the dates, the last day to apply where there is one, and the description, and nothing else."
     },
     "review": {
       "title": "Registration",

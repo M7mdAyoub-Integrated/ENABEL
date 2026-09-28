@@ -12,7 +12,8 @@ import { formatShortDate } from '../lib/format'
 import { useAuth } from '../auth/AuthProvider'
 import { can } from '../auth/permissions'
 import { listsOf } from './answers'
-import { fieldOf, formDef, useKhldLabels } from './labels'
+import { fieldOf, formDef, isKhldFormId, useKhldLabels } from './labels'
+import NotFound from '../routes/NotFound'
 import type { KhldFormId } from './forms.generated'
 import type { KhldFieldDef, KhldTable } from './types'
 import type { Cell, ListRow } from '../hooks/useData'
@@ -26,7 +27,10 @@ import { SEP } from '../ui/glyphs'
  */
 export function KhldListScreen() {
   const { form } = useParams()
-  return <ListFor key={form} fid={form as KhldFormId} />
+  // RequireKhalidiyah says the same, but demo mode drops the route guards
+  // (App.tsx `guard`), and a retired form (FORM-20) must still read "not found"
+  if (!isKhldFormId(form)) return <NotFound />
+  return <ListFor key={form} fid={form} />
 }
 
 /** The tables a list column can link to: one picker hook each, always called, enabled when needed. */

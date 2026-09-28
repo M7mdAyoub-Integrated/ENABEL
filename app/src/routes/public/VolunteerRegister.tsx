@@ -4,7 +4,9 @@ import { useTranslation } from 'react-i18next'
 import { Field, type FieldOption } from '../../ui/Field'
 import { PrimaryButton, SecondaryButton } from '../../ui/primitives'
 import { refLabel, type RefRow } from '../../data/refTables'
-import { usePublicVolunteerOptions, useRegisterVolunteer, type RegisterResult } from '../../data/publicVolunteer'
+import {
+  usePublicVolunteerOptions, usePublicVolunteerPartners, useRegisterVolunteer, type PublicVolunteerPartner, type RegisterResult,
+} from '../../data/publicVolunteer'
 import { KHLD_FORMS } from '../../khld/forms.generated'
 import { isOn, type Answers } from '../../khld/answers'
 import { useKhldLabels } from '../../khld/labels'
@@ -44,6 +46,7 @@ function Register() {
   const L = useKhldLabels('form12')
   const { t } = useTranslation(['khld', 'public'])
   const options = usePublicVolunteerOptions()
+  const partners = usePublicVolunteerPartners(site.slug)
   const refs = useMemo(() => options.data ?? {}, [options.data])
   const register = useRegisterVolunteer()
   const [clientUuid, setClientUuid] = useState(() => crypto.randomUUID())
@@ -190,6 +193,8 @@ function Register() {
                 person={person}
                 setPerson={setPerson}
                 idType={idType}
+                partners={partners.data ?? []}
+                partnersFailed={partners.isError}
               />
             ))}
           </div>
@@ -221,6 +226,8 @@ function PublicField(p: {
   person: Person
   setPerson: (u: (s: Person) => Person) => void
   idType: string
+  partners: PublicVolunteerPartner[]
+  partnersFailed: boolean
 }) {
   const { t } = useTranslation('khld')
   const { f } = p
@@ -290,6 +297,18 @@ function PublicField(p: {
     }
     case 'text':
       return <Field spec={{ ...base, type: 'text', span: 6 }} value={v} onChange={(x) => p.setValue(col, x)} />
+    case 'record':
+      // F215, the partner association: the partners who provide volunteers
+      // (0166), the only record picker on this form
+      return (
+        <Field
+          spec={{ ...base, type: 'select', span: 6, options: p.partners.map((x) => ({ value: x.id, label: x.name })),
+            ...(p.partnersFailed ? { error: t('form.picker.loadFailed') }
+              : !p.off && p.partners.length === 0 ? { help: t('form.picker.noneToChoose') } : {}) }}
+          value={v}
+          onChange={(x) => p.setValue(col, x)}
+        />
+      )
     default:
       return null
   }

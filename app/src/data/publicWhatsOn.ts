@@ -6,10 +6,13 @@ import { unwrapList } from './errors'
  * ─────────────────────────────────────────────────────────────────────────────
  *  The Khalidiyah public read: what's on.
  *
- *  Nothing on Khalidiyah's page is applied for, so it lists what the
- *  Municipality has PUBLISHED -- the community activities (FORM-08) and
- *  markets (FORM-16) that have not ended, from `v_public_khld_whats_on`
- *  (0163). Like `v_public_opportunity` it is security definer over base
+ *  It lists what the Municipality has PUBLISHED and has not ended -- the
+ *  community activities (FORM-08), markets (FORM-16), volunteer campaigns
+ *  (FORM-07) and counselling sessions (FORM-14) -- from
+ *  `v_public_khld_whats_on` (0163, 0167). Nothing on it is applied for
+ *  through the page except by registering as a volunteer; `apply_until` is
+ *  the last day to apply, for a campaign or a session, and null otherwise.
+ *  Like `v_public_opportunity` it is security definer over base
  *  tables, and its own WHERE clauses are the entire boundary: published, not
  *  deleted, the municipality active, not yet ended. (The volunteer register
  *  is the page's one write; see data/publicVolunteer.ts.)
@@ -22,7 +25,7 @@ import { unwrapList } from './errors'
 
 export type WhatsOnItem = {
   id: string
-  kind: 'activity' | 'market'
+  kind: 'activity' | 'market' | 'campaign' | 'session'
   title: string
   on_date: string
   time_from: string | null
@@ -33,9 +36,11 @@ export type WhatsOnItem = {
   type_ar: string | null
   description: string | null
   municipality_slug: string
+  end_date: string
+  apply_until: string | null
 }
 
-const SELECT = 'id, kind, title, on_date, time_from, time_to, place_en, place_ar, type_en, type_ar, description, municipality_slug'
+const SELECT = 'id, kind, title, on_date, time_from, time_to, place_en, place_ar, type_en, type_ar, description, municipality_slug, end_date, apply_until'
 
 type Loose = { from: (t: string) => { select: (c: string) => { eq: (c: string, v: string) => { order: (c: string, o: { ascending: boolean }) => Promise<{ data: unknown; error: unknown }> } } } }
 
