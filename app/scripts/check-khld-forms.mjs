@@ -21,6 +21,8 @@
  *   - both answers of every bool field ('true', 'false')
  *   - the five answers of every likert field ('1'..'5')
  *   - the label of a record picker's added option (F160, F181)
+ *   - a tickets table's row and column headings and its counting method
+ *     (F039, 0168), and the table's own words (form.tickets)
  *   - the static keys the screens build from a code: the page groups, the
  *     objective headings, a volunteer registration's three statuses, the
  *     seven answers of the public registration, the two occasions, the
@@ -121,6 +123,14 @@ for (const [fid, def] of Object.entries(FORMS)) {
       need(locales, `${base}.fields.${f.id}.opts.${opt}`, `answer "${opt}" of ${fid}.${f.id}`)
     }
     if (f.extra) need(locales, `${base}.fields.${f.id}.extra`, `the added option of ${fid}.${f.id}`)
+    if (f.kind === 'tickets') {
+      for (const r of f.rows ?? []) need(locales, `${base}.fields.${f.id}.rows.${r}`, `row "${r}" of ${fid}.${f.id}`)
+      for (const c of f.cols ?? []) need(locales, `${base}.fields.${f.id}.cols.${c}`, `column "${c}" of ${fid}.${f.id}`)
+      need(locales, `${base}.fields.${f.id}.method`, `the counting method of ${fid}.${f.id}`)
+      if ((f.cells ?? []).length !== (f.rows ?? []).length || (f.cells ?? []).some((row) => row.length !== (f.cols ?? []).length)) {
+        problems.push(`${fid}.${f.id}: the cells are not ${(f.rows ?? []).length} x ${(f.cols ?? []).length}`)
+      }
+    }
   }
 }
 
@@ -134,6 +144,7 @@ const STATIC = {
   'detail.review': ['submitted', 'approved', 'rejected'],
   volunteer: ['registered', 'already_registered', 'withdrawn', 'not_eligible', 'not_open', 'cannot_verify', 'invalid'],
   'form.occasion': ['campaign', 'activity'],
+  'form.tickets': ['method', 'total', 'note', 'cell', 'invalid'],
   'dashboard.unique': ['A3', 'H1', 'H2'],
 }
 for (const [prefix, keys] of Object.entries(STATIC)) {

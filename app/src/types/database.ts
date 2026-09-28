@@ -1774,16 +1774,22 @@ export type Database = {
           created_by: string | null
           deleted_at: string | null
           id: string
+          jordanian_children: number
+          jordanian_men: number
+          jordanian_women: number
           municipality_id: string
           observed_interaction_id: string
-          pct_adults: number
-          pct_children: number
-          pct_disability: number
-          pct_female: number
-          pct_jordanian: number
-          pct_male: number
-          pct_syrian: number
-          pct_youth: number
+          other_children: number
+          other_men: number
+          other_women: number
+          pct_adults: number | null
+          pct_children: number | null
+          pct_disability: number | null
+          pct_female: number | null
+          pct_jordanian: number | null
+          pct_male: number | null
+          pct_syrian: number | null
+          pct_youth: number | null
           report_date: string
           social_media_links: string | null
           total_participants: number
@@ -1797,16 +1803,22 @@ export type Database = {
           created_by?: string | null
           deleted_at?: string | null
           id?: string
+          jordanian_children: number
+          jordanian_men: number
+          jordanian_women: number
           municipality_id?: string
           observed_interaction_id: string
-          pct_adults: number
-          pct_children: number
-          pct_disability: number
-          pct_female: number
-          pct_jordanian: number
-          pct_male: number
-          pct_syrian: number
-          pct_youth: number
+          other_children: number
+          other_men: number
+          other_women: number
+          pct_adults?: number | null
+          pct_children?: number | null
+          pct_disability?: number | null
+          pct_female?: number | null
+          pct_jordanian?: number | null
+          pct_male?: number | null
+          pct_syrian?: number | null
+          pct_youth?: number | null
           report_date: string
           social_media_links?: string | null
           total_participants: number
@@ -1820,16 +1832,22 @@ export type Database = {
           created_by?: string | null
           deleted_at?: string | null
           id?: string
+          jordanian_children?: number
+          jordanian_men?: number
+          jordanian_women?: number
           municipality_id?: string
           observed_interaction_id?: string
-          pct_adults?: number
-          pct_children?: number
-          pct_disability?: number
-          pct_female?: number
-          pct_jordanian?: number
-          pct_male?: number
-          pct_syrian?: number
-          pct_youth?: number
+          other_children?: number
+          other_men?: number
+          other_women?: number
+          pct_adults?: number | null
+          pct_children?: number | null
+          pct_disability?: number | null
+          pct_female?: number | null
+          pct_jordanian?: number | null
+          pct_male?: number | null
+          pct_syrian?: number | null
+          pct_youth?: number | null
           report_date?: string
           social_media_links?: string | null
           total_participants?: number

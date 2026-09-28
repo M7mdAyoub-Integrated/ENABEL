@@ -2658,3 +2658,70 @@ passed — the last day to apply (F027 / F077).
 - Whether a cancelled campaign or session (and activity or market) should
   leave the page by itself. Today a coordinator takes it off.
 
+
+---
+
+## 🟠 OQ-74 · Activity participation (FORM-09) counts from tickets, in one table
+
+**Added 28 September 2026**, with migration `0168`.
+
+**What the owner asked.** Remove the percentages and the other estimates
+from FORM-09. Make the count a table: columns Men, Women, Children; rows
+Jordanians and Other; counting method "Tickets"; with a total.
+
+**What was built.**
+
+- **F039 is the table.** One count per cell, each required, 0 allowed.
+  The screen adds up every row, every column and the whole as the numbers
+  are typed. The figure that counts, `total_participants`, is summed by the
+  database from the same six columns on every save
+  (`set_khld_attendance_from_tickets`) and held to them by a CHECK. It is
+  never typed, so D2 (`SUM(F039)`) reads it unchanged.
+- **The counting method is always Tickets.** It is added to
+  `ref_khld_counting_method` and set on every save. The sheet's three
+  methods (attendance sheet, head count, visual estimate) are inactive,
+  not deleted.
+- **Off the form:** F040–F044 and F133–F135 (the eight estimated
+  percentages), F045 (nationalities), F132 (the method) and F137 (its
+  attendance sheet). Their columns stay in the table. The percentages are
+  held blank by a CHECK, so no estimate can reach a breakdown later.
+- **Still on the form:** report date, activity, the social-media link,
+  photos, and F136 (observed interaction between Jordanian and Syrian
+  participants). F136 is an observation, not a count.
+- FORM-09 held no record when this was done, so no figure moved.
+
+**The wording is ours, not the sheet's** (for the Arabic reviewer):
+
+- the table's label: "Participants, counted from tickets" / «المشاركون، حسب التذاكر»
+- the rows: Jordanians / «أردنيون», Other / «أخرى»
+- the columns: Men / «رجال», Women / «نساء», Children / «أطفال»
+- the method: Tickets / «تذاكر»
+- the note under the table, and "Total" / «المجموع».
+
+**What it changes for D2.** The workbook splits D2 eight ways (Calculation
+formulas sheet). No view computes that split yet, so nothing reported
+moves. Against the table:
+
+| the workbook's split | from the table |
+|---|---|
+| Male, Female | Men, Women — **adults only**; children are not split by sex |
+| Children, Adults | Children; Men + Women |
+| Jordanian | Jordanians |
+| Syrian | **not available** — Syrians are inside "Other" |
+| Youth (15–24) | **not available** |
+| People with disabilities | **not available** |
+
+The last three matter for an EU refugee-response return, and F136 still
+asks about Jordanian–Syrian interaction on a form that no longer counts
+Syrians.
+
+**Decides.**
+
+- The M&E lead, with the owner:
+  - whether "Other" should be "Syrians" and "Other" (a third row);
+  - whether children need a boys / girls split;
+  - whether youth and disability are dropped from D2's breakdown or
+    sourced elsewhere.
+- The owner: whether one ticket is one participant, children included
+  (the table assumes so), and whether F136 stays.
+- The Arabic reviewer: the wording above.

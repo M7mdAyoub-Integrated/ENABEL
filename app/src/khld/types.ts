@@ -31,6 +31,12 @@ export type KhldKind =
   | 'id_type' | 'ident' | 'person_name' | 'person_sex' | 'dob' | 'person_phone'
   /** The name of the person another field picked, never typed (F069, F111). */
   | 'shown'
+  /**
+   * FORM-09 F039 from 0168: a table of counts from tickets, `rows` x `cols`,
+   * one column per cell (`cells`); `column` is the total, which the database
+   * sums (set_khld_attendance_from_tickets) and the screen only shows.
+   */
+  | 'tickets'
 
 /**
  * A control that belongs to answers of another control on the same form. A
@@ -75,6 +81,10 @@ export type KhldFieldDef = {
   readonly max?: number
   /** F060 "if no then disqualified": a CHECK in the database. */
   readonly mustBeTrue?: boolean
+  /** A tickets table: its row and column keys (labels under the field's `rows` / `cols`), and each cell's column, row by row. */
+  readonly rows?: readonly string[]
+  readonly cols?: readonly string[]
+  readonly cells?: readonly (readonly string[])[]
 }
 
 export type KhldFormDef = {

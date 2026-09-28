@@ -21,6 +21,7 @@ import NotFound from '../routes/NotFound'
 import type { KhldFormId } from './forms.generated'
 import type { KhldFieldDef, KhldFormDef, KhldTable } from './types'
 import { BidiIsolate } from '../components/BidiIsolate'
+import { TicketsTable } from './TicketsTable'
 import { SEP, ELLIPSIS, COLON } from '../ui/glyphs'
 
 /**
@@ -221,7 +222,7 @@ function Row({ f, def, rec, fid, refs, answers, locale }: {
   const { t } = useTranslation('khld')
   const row = rec.row
   const col = f.column ?? ''
-  const wide = f.kind === 'multi' || f.kind === 'area' || f.kind === 'records' || f.kind === 'likert'
+  const wide = f.kind === 'multi' || f.kind === 'area' || f.kind === 'records' || f.kind === 'likert' || f.kind === 'tickets'
   const show = (content: React.ReactNode, ltr = false) => (
     <div className={`min-w-0 border-b border-border-default pb-2 ${wide ? 'sm:col-span-2' : ''}`}>
       <dt className="font-narrow text-[11px] font-bold uppercase tracking-[0.12em] text-muted">
@@ -257,6 +258,14 @@ function Row({ f, def, rec, fid, refs, answers, locale }: {
     case 'text': return show(v == null || v === '' ? notSet : String(v), !!f.ltr)
     case 'area': return show(v == null || v === '' ? notSet : <span className="whitespace-pre-wrap">{String(v)}</span>)
     case 'int': case 'money': return show(v == null ? notSet : String(v), true)
+    case 'tickets':
+      return (
+        <div className="min-w-0 border-b border-border-default pb-3 sm:col-span-2">
+          <div className="mt-1 grid grid-cols-12">
+            <TicketsTable f={f} fid={fid} values={row as Record<string, string | number | null | undefined>} />
+          </div>
+        </div>
+      )
     case 'percent': return show(v == null ? notSet : `${String(v)}%`, true)
     case 'date': return show(typeof v === 'string' ? formatShortDate(v, locale) : notSet)
     case 'stamp': return show(typeof v === 'string' ? formatShortDate(v, locale) : notSet)

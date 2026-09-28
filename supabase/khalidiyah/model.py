@@ -16,7 +16,8 @@ one. The fields whose cell is empty or wrong are the reviewer's corrections
 
 build(upto='0164') is the model as it stood at that migration: the fields
 the owner added later (catalogue.ADDED) are left out, a field's earlier
-spec (`was`) is put back, and a later ORDER or publish flag is not applied.
+spec (`was`) is put back, a later ORDER or publish flag is not applied,
+and a field is on its form until the migration that takes it `off`.
 The schema generator reproduces the applied files from it; build() is the
 model today, which the app and the later migrations are generated from.
 """
@@ -74,6 +75,9 @@ class FieldM:
         fix = C.REVIEW_FIXES.get((f.fid, 'label_en'))
         if fix:
             self.label_en = fix[0]
+        if spec.get('label'):
+            # the owner's wording where the sheet's no longer fits (F039, OQ-74)
+            self.label_en, self.label_ar = spec['label']
         req = f.required if 'req' not in spec else spec['req']
         if self.kind in ('stamp', 'reference', 'shown'):
             req = False
@@ -99,6 +103,7 @@ class FormM:
         self.table = meta['table']
         self.sheets = meta['sheets']
         self.fields = []
+        self.planned = []                   # every field in order, off the form or not
         self.group = meta['group']
         self.title_en = self.title_ar = ''
 
@@ -108,6 +113,7 @@ class Model:
         self.upto = upto
         self.sheet = load_forms()
         self.forms = OrderedDict()
+        self.off = []                       # fields off their form at `upto`: (form, field)
         self.lists_used = OrderedDict()     # list -> [field ids]
         self.columns = OrderedDict((t, []) for t in C.TABLES)
         self.questions = OrderedDict((t, []) for t in C.TABLES)   # multi: (question, list)
@@ -192,14 +198,23 @@ class Model:
                 gate = FORM_GATES.get(fid)
                 if gate and f.fid not in UNGATED:
                     field.when.insert(0, gate)
+                if field.spec.get('off') and self.since_ok(field.spec['off']):
+                    # off the form: no screen, no rule; its column, question
+                    # or file field is still in the database, blank from now on
+                    field.before_off = (field.required, list(field.when))
+                    field.required = False
+                    self.off.append((fm, field))
+                    fm.planned.append(field)
+                    continue
                 fm.fields.append(field)
+                fm.planned.append(field)
             self.forms[fid] = fm
         later = {aid for aid, a in C.ADDED.items() if not self.since_ok(a['since'])}
         missing = set(C.FIELDS) - seen - later
         if missing:
             self.err('catalogue fields not on any form: %s' % sorted(missing))
         for fm in self.forms.values():
-            for field in fm.fields:
+            for field in fm.planned:
                 self.plan(fm, field)
         self.check_whens()
         if self.errors:
@@ -249,6 +264,11 @@ class Model:
                 self.col(t, extra[1], 'boolean', True, 'default false', '%s "%s"' % (field.fid, 'General park visit'))
         elif k == 'person_ref':
             self.col(t, field.col, 'uuid', notnull, '@person', comment)
+        elif k == 'tickets':
+            # the total, derived by the database from the six cells (0168)
+            self.col(t, field.col, 'int', notnull, None, comment)
+            for name, r, c in C.ticket_columns():
+                self.col(t, name, 'int', notnull, None, '%s %s, %s (tickets)' % (field.fid, r, c))
         elif k == 'occasion':
             self.col(t, 'campaign_id', 'uuid', False, '@khld_campaign', comment + ' (a FORM-07 campaign)')
             self.col(t, 'activity_id', 'uuid', False, '@khld_activity', comment + ' (a FORM-08 activity)')

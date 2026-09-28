@@ -41,6 +41,9 @@ export function answersFromRecord(def: KhldFormDef, rec: KhldRecord): Answers {
       a.values[f.column] = str(row[f.column])
       if (f.other) a.values[f.other] = str(row[f.other])
     }
+    if (f.kind === 'tickets') {
+      for (const c of (f.cells ?? []).flat()) a.values[c] = str(row[c])
+    }
     if (f.kind === 'record' && f.extra) {
       // "General park visit" has its own column; "Other" contributor is a
       // contribution with no partner (khld_contribution_one_contributor)

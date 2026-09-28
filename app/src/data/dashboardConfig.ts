@@ -244,9 +244,10 @@ const KHLD: DashboardConfig = {
     return fid ? [{ to: `/khld/${fid}`, labelKey: `khld:forms.${fid}.short` }] : []
   },
   // FORM-12, -15 and -17 collect sex, date of birth, the ID type (refugee
-  // status) and the Washington Group disability question; FORM-09 collects
-  // percentages. Nothing is uncollected by design; what is missing is a
-  // breakdown VIEW, which the panel states from `is_disaggregable`.
+  // status) and the Washington Group disability question; FORM-09 counts
+  // from tickets, Jordanians / Other by men / women / children (0168, OQ-74).
+  // What is missing is a breakdown VIEW, which the panel states from
+  // `is_disaggregable`.
   uncollectedDimensions: [],
   noTargetsNoteKey: 'khld:dashboard.planTargetNote',
   // A3's number of contributions beside its value, H1's markets beside its

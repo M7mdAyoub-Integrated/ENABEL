@@ -39,6 +39,10 @@ export function useKhldLabels(fid: KhldFormId) {
     opt: (f: Pick<KhldFieldDef, 'id'>, value: string) => t(`${base}.fields.${f.id}.opts.${value}`),
     /** A record picker's added option ("Other", "General park visit"). */
     extra: (f: Pick<KhldFieldDef, 'id'>) => maybe(`${base}.fields.${f.id}.extra`),
+    /** A tickets table's row and column headings, and its counting method (F039, 0168). */
+    ticketRow: (f: Pick<KhldFieldDef, 'id'>, key: string) => t(`${base}.fields.${f.id}.rows.${key}`),
+    ticketCol: (f: Pick<KhldFieldDef, 'id'>, key: string) => t(`${base}.fields.${f.id}.cols.${key}`),
+    ticketMethod: (f: Pick<KhldFieldDef, 'id'>) => t(`${base}.fields.${f.id}.method`),
   }
 }
 

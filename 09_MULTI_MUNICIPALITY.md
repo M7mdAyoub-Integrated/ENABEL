@@ -1894,3 +1894,66 @@ guard, not from opening the address. Each screen now checks the id itself
 (`isKhldFormId`), so "not found" no longer depends on which wrapper is in
 place. All eight form20 addresses now read it.
 
+
+### 28 September: activity participation counted from tickets (0168)
+
+The owner asked for FORM-09's count to be one table — Jordanians / Other
+by Men / Women / Children, counting method "Tickets", with a total — and
+for the percentages and every other estimate to go (OQ-74).
+
+**In the catalogue.**
+
+- F039 becomes kind `tickets`. `TICKET_ROWS` and `TICKET_COLS` name the
+  cells, and each cell is a column, `<row>_<col>`.
+- The label is the owner's, because the sheet's says "estimated". `was`
+  keeps the int it was before 0168.
+- F040–F045, F132–F135 and F137 carry `off='0168'`.
+
+**In the model.** A field `off` at `upto` leaves the form: no screen, no
+rule. It is still planned in place, so its column, question and file field
+stay in the model as they are in the database. A rule row it had stays and
+asks nothing: F045's is `required = false`, since `khld_field_rule` has no
+`deleted_at`.
+
+**0168, generated.** It refuses a catalogue difference other than the six
+columns and F045's rule.
+
+- **The counts.** Six `int not null` columns; the table was asserted empty
+  first. CHECKs: none negative, and `total_participants` equals their sum.
+- **The estimates.** The eight percentage columns lose NOT NULL and are
+  held blank by a CHECK.
+- **The method.** "Tickets" is added to `ref_khld_counting_method`, and the
+  sheet's three are made inactive. The first draft soft-deleted them and
+  `guard_soft_delete` refused it: a delete is a coordinator's act, and
+  retiring an option is not a delete.
+- **The trigger.** `set_khld_attendance_from_tickets` sums the total and
+  sets the method on every save. A blank cell refuses as
+  `khld_f039_required`, which the screen words from the label.
+- **Probed in the migration, then rolled back.** The total is 21 from
+  1–6, and a typed 999 is overwritten. D2 moves by exactly 21. An edit
+  recomputes. A blank cell, a negative count and a percentage are each
+  refused by name.
+
+**How it was checked.**
+
+- `check_migration_files.sh` passes. The file's md5 equalled the ledger's
+  before it was renamed. The local `.ledger_manifest` (not in git) had
+  stopped at 0152 and is now complete to 0168.
+- `.constraint_names` gained the three constraints, and its md5 equals the
+  live query's.
+- `save_khld_record` was driven as Khalidiyah's coordinator
+  (`set_config('role', 'authenticated')` plus the JWT claims, rolled
+  back):
+  - total 68 from 10 / 12 / 30 / 3 / 4 / 9, method Tickets;
+  - an edit recomputed it to 70;
+  - a missing cell came back `khld_f039_required`;
+  - a percentage came back `…_estimates_off_form`.
+- In a browser at desktop and 375 px, in English and Arabic:
+  - the totals follow the typing;
+  - the first Save stops on a blank box and marks only that box;
+  - Arabic-Indic digits typed become Western digits;
+  - no horizontal scroll;
+  - no field of the old count remains.
+- `check-khld-forms.mjs` now needs the table's rows, columns and method
+  in both languages. It failed with `cols.women` deleted from `ar`, and
+  passed again once regenerated.

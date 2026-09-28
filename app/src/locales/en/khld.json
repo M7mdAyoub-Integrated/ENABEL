@@ -292,25 +292,17 @@
           "label": "Activity Name"
         },
         "F039": {
-          "label": "Total number of participants estimated"
-        },
-        "F040": {
-          "label": "Estimated percentage of children"
-        },
-        "F041": {
-          "label": "Estimated Percentage of Adults"
-        },
-        "F042": {
-          "label": "Estimated Percentage of Males"
-        },
-        "F043": {
-          "label": "Estimated Percentage of Females"
-        },
-        "F044": {
-          "label": "Percentage of people with disabilities"
-        },
-        "F045": {
-          "label": "Nationalities of the participants"
+          "label": "Participants, counted from tickets",
+          "rows": {
+            "jordanian": "Jordanians",
+            "other": "Other"
+          },
+          "cols": {
+            "men": "Men",
+            "women": "Women",
+            "children": "Children"
+          },
+          "method": "Tickets"
         },
         "F046": {
           "label": "If any content about the activity is shared via social media, please add the content link"
@@ -318,24 +310,9 @@
         "F047": {
           "label": "Pictures of the activity"
         },
-        "F132": {
-          "label": "Counting method"
-        },
-        "F133": {
-          "label": "Estimated percentage of youth (15-24)"
-        },
-        "F134": {
-          "label": "Estimated percentage of Jordanian participants"
-        },
-        "F135": {
-          "label": "Estimated percentage of Syrian participants"
-        },
         "F136": {
           "label": "Observed level of interaction between Jordanian and Syrian participants",
           "help": "Mixed groups, teams or joint tasks between the two communities"
-        },
-        "F137": {
-          "label": "Attendance sheet (if available)"
         }
       }
     },
@@ -960,6 +937,13 @@
     "occasion": {
       "campaign": "Volunteer campaign",
       "activity": "Community activity"
+    },
+    "tickets": {
+      "method": "Counting method",
+      "total": "Total",
+      "note": "Enter the number of tickets in each box; 0 where there were none. The totals add up by themselves.",
+      "cell": "{row}, {col}",
+      "invalid": "Every box needs a whole number, 0 or more."
     },
     "deleted": {
       "person": "This identifier belongs to a person who was deleted.",

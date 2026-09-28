@@ -21,6 +21,7 @@ import { formDef, formOfTable, isKhldFormId, useKhldLabels } from './labels'
 import NotFound from '../routes/NotFound'
 import type { KhldFormId } from './forms.generated'
 import type { KhldFieldDef, KhldFormDef, KhldTable } from './types'
+import { TicketsTable } from './TicketsTable'
 import { SEP } from '../ui/glyphs'
 
 /**
@@ -159,6 +160,13 @@ function FormFor({ mode, fid, id }: { mode: 'new' | 'edit'; fid: KhldFormId; id:
       case 'records':
         if (f.required && answers.partners.length === 0) errors[f.id] = req
         break
+      case 'tickets': {
+        // every cell a whole number, 0 allowed; the total is the database's
+        const cells = (f.cells ?? []).flat().map((c) => (answers.values[c] ?? '').trim())
+        if (f.required && cells.every((c) => c === '')) errors[f.id] = req
+        else if (cells.some((c) => !/^\d+$/.test(c))) errors[f.id] = t('khld:form.tickets.invalid')
+        break
+      }
       case 'occasion':
         if (f.required && !answers.occasion) errors[f.id] = req
         break
@@ -206,6 +214,11 @@ function FormFor({ mode, fid, id }: { mode: 'new' | 'edit'; fid: KhldFormId; id:
         const [kind, oid] = (fieldOn ? answers.occasion : '').split(':')
         row['campaign_id'] = kind === 'campaign' ? oid : null
         row['activity_id'] = kind === 'activity' ? oid : null
+        continue
+      }
+      if (f.kind === 'tickets') {
+        // the six counts only: total_participants is summed by the database (0168)
+        for (const c of (f.cells ?? []).flat()) put(c, 'int', fieldOn ? answers.values[c] : '')
         continue
       }
       if (f.kind === 'record' && f.extra) {
@@ -557,6 +570,18 @@ function FieldView(p: FieldViewProps) {
         </>
       )
     }
+
+    case 'tickets':
+      return (
+        <TicketsTable
+          f={f}
+          fid={fid}
+          values={p.answers.values}
+          onChange={(c, x) => p.setValue(c, x)}
+          required={!!f.required}
+          error={p.error}
+        />
+      )
 
     /* links to other records */
     case 'record':

@@ -772,8 +772,8 @@ export const KHLD_FORMS = {
     "writer": "can_write",
     "indicators": [
       "KHLD-SO2-D2",
-      "KHLD-IMP-0",
-      "KHLD-SO2-D1"
+      "KHLD-SO2-D1",
+      "KHLD-IMP-0"
     ],
     "list": [
       "F037",
@@ -796,57 +796,31 @@ export const KHLD_FORMS = {
       },
       {
         "id": "F039",
-        "kind": "int",
+        "kind": "tickets",
         "column": "total_participants",
         "required": true,
-        "min": 0
-      },
-      {
-        "id": "F040",
-        "kind": "percent",
-        "column": "pct_children",
-        "required": true,
         "min": 0,
-        "max": 100
-      },
-      {
-        "id": "F041",
-        "kind": "percent",
-        "column": "pct_adults",
-        "required": true,
-        "min": 0,
-        "max": 100
-      },
-      {
-        "id": "F042",
-        "kind": "percent",
-        "column": "pct_male",
-        "required": true,
-        "min": 0,
-        "max": 100
-      },
-      {
-        "id": "F043",
-        "kind": "percent",
-        "column": "pct_female",
-        "required": true,
-        "min": 0,
-        "max": 100
-      },
-      {
-        "id": "F044",
-        "kind": "percent",
-        "column": "pct_disability",
-        "required": true,
-        "min": 0,
-        "max": 100
-      },
-      {
-        "id": "F045",
-        "kind": "multi",
-        "required": true,
-        "list": "nationality",
-        "question": "f045"
+        "rows": [
+          "jordanian",
+          "other"
+        ],
+        "cols": [
+          "men",
+          "women",
+          "children"
+        ],
+        "cells": [
+          [
+            "jordanian_men",
+            "jordanian_women",
+            "jordanian_children"
+          ],
+          [
+            "other_men",
+            "other_women",
+            "other_children"
+          ]
+        ]
       },
       {
         "id": "F046",
@@ -859,55 +833,11 @@ export const KHLD_FORMS = {
         "maxFiles": 5
       },
       {
-        "id": "F132",
-        "kind": "select",
-        "column": "counting_method_id",
-        "required": true,
-        "list": "counting_method"
-      },
-      {
-        "id": "F133",
-        "kind": "percent",
-        "column": "pct_youth",
-        "required": true,
-        "min": 0,
-        "max": 100
-      },
-      {
-        "id": "F134",
-        "kind": "percent",
-        "column": "pct_jordanian",
-        "required": true,
-        "min": 0,
-        "max": 100
-      },
-      {
-        "id": "F135",
-        "kind": "percent",
-        "column": "pct_syrian",
-        "required": true,
-        "min": 0,
-        "max": 100
-      },
-      {
         "id": "F136",
         "kind": "select",
         "column": "observed_interaction_id",
         "required": true,
         "list": "observed_interaction"
-      },
-      {
-        "id": "F137",
-        "kind": "file",
-        "when": [
-          {
-            "field": "F132",
-            "values": [
-              "attendance_sheet"
-            ]
-          }
-        ],
-        "maxFiles": 5
       }
     ]
   },

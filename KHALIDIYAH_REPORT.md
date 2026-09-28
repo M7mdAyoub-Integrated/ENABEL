@@ -2,13 +2,13 @@
 
 **26 September 2026.** Khalidiyah's forms were replaced by those of
 `Khaldia_2_reviewed.xlsx`. The full account is `09_MULTI_MUNICIPALITY.md`
-Part 13; the decisions that must not be guessed are OQ-60 to OQ-73 in
+Part 13; the decisions that must not be guessed are OQ-60 to OQ-74 in
 `06_OPEN_QUESTIONS.md`. This is the short version, for the M&E lead. The
 first build (21 forms, 22 September) is described in Part 12, and its
 generators are kept in `supabase/khalidiyah/v1/`.
 
-What exists now: migrations `0153`–`0167` (fifteen, every one
-byte-identical to the ledger; `0165`–`0167` are the owner's second round,
+What exists now: migrations `0153`–`0168` (sixteen, every one
+byte-identical to the ledger; `0165`–`0168` are the owner's second round,
 28 September), the `evidence` Edge Function at version 6,
 **22 forms** as screens with one save path (FORM-03 and FORM-04 are one,
 as the reviewer asked; FORM-20 was taken off the app afterwards at the
@@ -58,6 +58,12 @@ Also that day:
 - FORM-08 asks the activity's name first.
 - FORM-15's session list follows the applications dates rather than the
   session's own (OQ-69).
+- **FORM-09** (activity participation) counts from tickets, in one table:
+  Jordanians / Other by Men / Women / Children, with the totals added up.
+  The percentages, the nationality list and the choice of counting method
+  are gone; the database sums F039 from the table, so D2 is unchanged
+  (0168, OQ-74). The table cannot give D2's Syrian, youth or disability
+  split.
 
 Every label and option is the sheet's, in both languages. Five strings the
 sheet has in English only were drafted in Arabic (OQ-68). The Dependency
@@ -104,6 +110,7 @@ Worth knowing when reading them:
 | 🔴 OQ-62 | a minimum age or a guardian block, **before the public link is printed** | the Municipality with Enabel's safeguarding focal point |
 | 🟠 OQ-71 | SO1-0 without FORM-20: drop it from the return, source it elsewhere, or bring the form back | the owner with the M&E lead |
 | 🟠 OQ-73 | whether residents request a counselling session place themselves; whether a cancelled item leaves the public page by itself | the owner with the M&E lead |
+| 🟠 OQ-74 | FORM-09's table: a Syrian row, children by sex, youth and disability for D2; one ticket = one participant | the M&E lead with the owner; Arabic reviewer |
 | 🟡 OQ-72 | the wording of F214 and F215; the two partners saved before F214 need an answer before anyone can register as a CSO volunteer | Arabic reviewer; community coordinator |
 | 🟠 OQ-61 | whether `cannot_verify` needs two wordings; the review workflow | community coordinator, M&E lead |
 | 🟠 OQ-64 | F089 "if no then disqualified" conflicts with F090 "Not started yet" — not enforced | M&E lead |

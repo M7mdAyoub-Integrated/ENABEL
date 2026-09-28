@@ -141,6 +141,12 @@ def field_def(f):
         d['min'], d['max'] = 0, 100
     if s.get('must_be_true'):
         d['mustBeTrue'] = True
+    if f.kind == 'tickets':
+        # F039 from 0168: the rows and columns of the table, and the column
+        # each cell writes; `column` is the total the database derives
+        d['rows'] = [r for r, _e, _a in C.TICKET_ROWS]
+        d['cols'] = [c for c, _e, _a in C.TICKET_COLS]
+        d['cells'] = [[n for n, rr, _c in C.ticket_columns() if rr == r] for r, _e, _a in C.TICKET_ROWS]
     return d
 
 
@@ -158,6 +164,12 @@ def field_labels(f):
         (te, ta), (fe, fa) = f.spec.get('labels', C.YES_NO)
         e['opts'] = O([('true', te), ('false', fe)])
         a['opts'] = O([('true', ta), ('false', fa)])
+    if f.kind == 'tickets':
+        e['rows'] = O((r, en) for r, en, _ar in C.TICKET_ROWS)
+        a['rows'] = O((r, ar) for r, _en, ar in C.TICKET_ROWS)
+        e['cols'] = O((c, en) for c, en, _ar in C.TICKET_COLS)
+        a['cols'] = O((c, ar) for c, _en, ar in C.TICKET_COLS)
+        e['method'], a['method'] = C.TICKET_METHOD[1], C.TICKET_METHOD[2]
     if f.kind == 'likert':
         e['opts'] = O((c, en) for c, en, _ar in C.SCALES[f.spec['scale']])
         a['opts'] = O((c, ar) for c, _en, ar in C.SCALES[f.spec['scale']])
@@ -267,6 +279,12 @@ S_EN = O([
             ('noneToChoose', 'Nothing to choose yet.'),
         ])),
         ('occasion', O([('campaign', 'Volunteer campaign'), ('activity', 'Community activity')])),
+        ('tickets', O([
+            ('method', 'Counting method'), ('total', 'Total'),
+            ('note', 'Enter the number of tickets in each box; 0 where there were none. The totals add up by themselves.'),
+            ('cell', '{row}, {col}'),
+            ('invalid', 'Every box needs a whole number, 0 or more.'),
+        ])),
         ('deleted', O([
             ('person', 'This identifier belongs to a person who was deleted.'),
             ('who', 'Deleted {when} by {by}'), ('whoUnknown', 'Deleted {when}'),
@@ -381,6 +399,12 @@ S_AR = O([
             ('noneToChoose', 'لا يوجد ما يُختار بعد.'),
         ])),
         ('occasion', O([('campaign', 'حملة تطوعية'), ('activity', 'نشاط مجتمعي')])),
+        ('tickets', O([
+            ('method', 'طريقة العد'), ('total', 'المجموع'),
+            ('note', 'أدخل عدد التذاكر في كل خانة، و0 حيث لا يوجد أحد. تُجمع المجاميع تلقائياً.'),
+            ('cell', '{row}، {col}'),
+            ('invalid', 'كل خانة تحتاج رقماً صحيحاً، 0 أو أكثر.'),
+        ])),
         ('deleted', O([
             ('person', 'هذا المعرّف يعود لشخص محذوف.'),
             ('who', 'حُذف {when} بواسطة {by}'), ('whoUnknown', 'حُذف {when}'),

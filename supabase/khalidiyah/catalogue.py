@@ -416,7 +416,30 @@ ADDED = O([
 #   ORDER_SINCE[form]          an ORDER entry that applies from a migration
 #                              (before it the form had the sheet's order;
 #                              ORDER decides column order in 0159 / 0160)
+#   FIELDS[...]['off']         a migration number: off the form from it; the
+#                              column stays in the table, blank from then on
 ORDER_SINCE = {'form08': '0165'}
+
+# ── FORM-09's participants, as the owner redrew them (28 September 2026) ────
+# "remove the percentage ... make it a table: the columns Men, Women,
+# Children, the rows Jordanians and Other, and the counting method Tickets".
+# F039 becomes that table (kind 'tickets'): one count per cell, the column
+# <row>_<col>, and the total F039 always had, now the sum of the six --
+# derived by the database, never typed, so D2 reads it unchanged. Every
+# estimate the sheet asked for alongside (F040-F045, F133-F135) and the
+# choice of counting method (F132, with F137 its attendance sheet) are off
+# the form from 0168 (`off`). The wording is the owner's request put into
+# words, not the sheet's: 06_OPEN_QUESTIONS.md OQ-74.
+TICKET_ROWS = [('jordanian', 'Jordanians', 'أردنيون'), ('other', 'Other', 'أخرى')]
+TICKET_COLS = [('men', 'Men', 'رجال'), ('women', 'Women', 'نساء'), ('children', 'Children', 'أطفال')]
+# the one counting method from 0168: a ref_khld_counting_method row the
+# database sets on every save (the sheet's three are retired, not the list)
+TICKET_METHOD = ('tickets', 'Tickets', 'تذاكر')
+
+
+def ticket_columns():
+    """The six cells of FORM-09's table, row by row: [(column, row, col)]."""
+    return [('%s_%s' % (r, c), r, c) for r, _re, _ra in TICKET_ROWS for c, _ce, _ca in TICKET_COLS]
 
 
 def F(kind, col=None, **kw):
@@ -496,21 +519,25 @@ FIELDS = {
     # FORM-09 Register your participation in garden activities (aggregate)
     'F037': F('date', 'report_date'),
     'F038': F('record', 'activity_id', table='khld_activity'),
-    'F039': F('int', 'total_participants', min=0),
-    'F040': F('percent', 'pct_children'),
-    'F041': F('percent', 'pct_adults'),
-    'F042': F('percent', 'pct_male'),
-    'F043': F('percent', 'pct_female'),
-    'F044': F('percent', 'pct_disability'),
-    'F045': F('multi', list='nationality'),
+    # F039: the ticket table from 0168 (TICKET_ROWS above); the sheet's label
+    # says "estimated", which a count from tickets is not, so it has the owner's
+    'F039': F('tickets', 'total_participants', min=0,
+              label=('Participants, counted from tickets', 'المشاركون، حسب التذاكر'),
+              was=('0168', dict(kind='int', label=None))),
+    'F040': F('percent', 'pct_children', off='0168'),
+    'F041': F('percent', 'pct_adults', off='0168'),
+    'F042': F('percent', 'pct_male', off='0168'),
+    'F043': F('percent', 'pct_female', off='0168'),
+    'F044': F('percent', 'pct_disability', off='0168'),
+    'F045': F('multi', list='nationality', off='0168'),
     'F046': F('area', 'social_media_links'),
     'F047': F('file', max=5),
-    'F132': F('select', 'counting_method_id', list='counting_method'),
-    'F133': F('percent', 'pct_youth'),
-    'F134': F('percent', 'pct_jordanian'),
-    'F135': F('percent', 'pct_syrian'),
+    'F132': F('select', 'counting_method_id', list='counting_method', off='0168'),
+    'F133': F('percent', 'pct_youth', off='0168'),
+    'F134': F('percent', 'pct_jordanian', off='0168'),
+    'F135': F('percent', 'pct_syrian', off='0168'),
     'F136': F('select', 'observed_interaction_id', list='observed_interaction'),
-    'F137': F('file', max=5, when=('F132', ['attendance_sheet'])),
+    'F137': F('file', max=5, when=('F132', ['attendance_sheet']), off='0168'),
     # FORM-10 Volunteer management committee (members)
     'F048': F('text', 'member_name'),
     'F049': F('text', 'phone', ltr=True),
