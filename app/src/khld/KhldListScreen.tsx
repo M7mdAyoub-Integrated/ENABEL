@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { PageHead, PrimaryButton, EmptyState } from '../ui/primitives'
-import { DataTable, type RowAction } from '../ui/DataTable'
-import { ErrorState, TableSkeleton } from '../ui/states'
+import { PageHead, PrimaryButton } from '../ui/primitives'
+import type { RowAction } from '../ui/DataTable'
+import { ListTable } from '../ui/ListTable'
 import { refLabel } from '../data/refTables'
 import {
   identifierOf, useKhldList, useKhldPicker, useKhldRefs, usePersonNames, type KhldPick, type KhldRow,
@@ -63,7 +63,6 @@ function ListFor({ fid }: { fid: KhldFormId }) {
   const navigate = useNavigate()
   const { role } = useAuth()
   const [showDeleted, setShowDeleted] = useState(false)
-  const [onlySubmitted, setOnlySubmitted] = useState(false)
   const list = useKhldList(def.table, showDeleted)
   const refs = useKhldRefs(useMemo(() => listsOf(def), [def]))
   const cols = useMemo(() => def.list.map((id) => fieldOf(def, id)).filter((f): f is KhldFieldDef => !!f), [def])
@@ -109,7 +108,8 @@ function ListFor({ fid }: { fid: KhldFormId }) {
     }
   }
 
-  const source = (list.data ?? []).filter((r) => !onlySubmitted || r['application_status'] === 'submitted')
+  // FORM-12's review status is a column, so "waiting for review" is its filter
+  const source = list.data ?? []
   const rows: ListRow[] = source.map((r) => {
     const cells: Cell[] = []
     if (showReference) cells.push({ kind: 'ltr', text: typeof r['reference'] === 'string' ? (r['reference'] as string) : '—' })
@@ -141,31 +141,20 @@ function ListFor({ fid }: { fid: KhldFormId }) {
         description={def.indicators.join(` ${SEP} `)}
         action={can(role, 'record.create') ? <PrimaryButton onClick={() => navigate(`/khld/${fid}/new`)}>{t('khld:list.new')}</PrimaryButton> : undefined}
       />
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b-[3px] border-ink pb-2">
-        <span className="font-narrow text-[12px] font-bold uppercase tracking-[0.1em] text-muted">
-          {list.data ? t('khld:list.count', { count: source.length }) : ''}
-        </span>
-        <div className="flex flex-wrap items-center gap-4">
-          {def.public ? (
-            <label className="flex items-center gap-2 text-[13px] text-muted">
-              <input type="checkbox" checked={onlySubmitted} onChange={(e) => setOnlySubmitted(e.target.checked)} />
-              {t('khld:list.onlySubmitted')}
-            </label>
-          ) : null}
-          <label className="flex items-center gap-2 text-[13px] text-muted">
-            <input type="checkbox" checked={showDeleted} onChange={(e) => setShowDeleted(e.target.checked)} />
-            {t('khld:list.showDeleted')}
-          </label>
-        </div>
-      </div>
-      {list.isLoading ? <TableSkeleton columns={columns.length} /> : null}
-      {list.isError ? <ErrorState error={list.error} onRetry={() => void list.refetch()} /> : null}
-      {list.data && source.length === 0 ? (
-        <div className="mt-[18px]">
-          <EmptyState title={t('khld:list.empty')} description={t('khld:list.emptyBody')} />
-        </div>
-      ) : null}
-      {list.data && source.length > 0 ? <DataTable columns={columns} rows={rows} actions={actions} recordLabel={L.short} /> : null}
+      <ListTable
+        columns={columns}
+        rows={rows}
+        actions={actions}
+        recordLabel={L.short}
+        isLoading={list.isLoading}
+        isError={list.isError}
+        error={list.error}
+        onRetry={() => void list.refetch()}
+        toggles={[
+          { id: 'deleted', label: t('khld:list.showDeleted'), checked: showDeleted, onChange: setShowDeleted },
+        ]}
+        empty={{ title: t('khld:list.empty'), description: t('khld:list.emptyBody') }}
+      />
     </>
   )
 }

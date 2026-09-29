@@ -685,5 +685,11 @@
       "bad_action": "That is not a review action. Nothing was changed.",
       "invalid": "The review was refused and nothing was changed."
     }
+  },
+  "col": {
+    "participant": "Participant",
+    "round": "Round",
+    "contact": "Contact date",
+    "status": "Status"
   }
 }

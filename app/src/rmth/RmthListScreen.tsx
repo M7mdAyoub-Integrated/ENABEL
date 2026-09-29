@@ -2,9 +2,9 @@ import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
-import { PageHead, PrimaryButton, EmptyState } from '../ui/primitives'
-import { DataTable, type RowAction } from '../ui/DataTable'
-import { ErrorState, TableSkeleton } from '../ui/states'
+import { PageHead, PrimaryButton } from '../ui/primitives'
+import type { RowAction } from '../ui/DataTable'
+import { ListTable } from '../ui/ListTable'
 import { refLabel } from '../data/refTables'
 import { useRmthList, useRmthRef, type RmthRow } from '../data/rmth'
 import { supabase } from '../lib/supabase'
@@ -126,23 +126,18 @@ export function RmthListScreen() {
         description={L.calc}
         action={can(role, 'record.create') ? <PrimaryButton onClick={() => navigate(`/rmth/${fid}/new`)}>{t('rmth:list.new')}</PrimaryButton> : undefined}
       />
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b-[3px] border-ink pb-2">
-        <span className="font-narrow text-[12px] font-bold uppercase tracking-[0.1em] text-muted">
-          {list.data ? t('rmth:list.count', { count: list.data.length }) : ''}
-        </span>
-        <label className="flex items-center gap-2 text-[13px] text-muted">
-          <input type="checkbox" checked={showDeleted} onChange={(e) => setShowDeleted(e.target.checked)} />
-          {t('rmth:list.showDeleted')}
-        </label>
-      </div>
-      {list.isLoading ? <TableSkeleton columns={columns.length} /> : null}
-      {list.isError ? <ErrorState error={list.error} onRetry={() => void list.refetch()} /> : null}
-      {list.data && list.data.length === 0 ? (
-        <div className="mt-[18px]">
-          <EmptyState title={t('rmth:list.empty')} description={t('rmth:list.emptyBody')} />
-        </div>
-      ) : null}
-      {list.data && list.data.length > 0 ? <DataTable columns={columns} rows={rows} actions={actions} recordLabel={L.title} /> : null}
+      <ListTable
+        columns={columns}
+        rows={rows}
+        actions={actions}
+        recordLabel={L.title}
+        isLoading={list.isLoading}
+        isError={list.isError}
+        error={list.error}
+        onRetry={() => void list.refetch()}
+        toggles={[{ id: 'deleted', label: t('rmth:list.showDeleted'), checked: showDeleted, onChange: setShowDeleted }]}
+        empty={{ title: t('rmth:list.empty'), description: t('rmth:list.emptyBody') }}
+      />
     </>
   )
 }

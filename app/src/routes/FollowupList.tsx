@@ -1,8 +1,12 @@
 import { useTranslation } from 'react-i18next'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useFollowups } from '../data/followups'
-import { EmptyState, PageHead, SectionRule } from '../ui/primitives'
+import { PageHead, PrimaryButton } from '../ui/primitives'
 import { formatShortDate } from '../lib/format'
+import { ListTable } from '../ui/ListTable'
+import type { RowAction } from '../ui/DataTable'
+import type { ChipKind } from '../modules'
+import type { Cell, ListRow } from '../hooks/useData'
 
 /**
  * Follow-up surveys.
@@ -17,104 +21,49 @@ import { formatShortDate } from '../lib/format'
  * this list is genuinely not in any figure.
  */
 
-const TONE: Record<string, string> = {
-  draft: 'border-warning text-warning',
-  submitted: 'border-success text-success',
-  approved: 'border-success text-success',
-  rejected: 'border-error text-error',
+const TONE: Record<string, ChipKind> = {
+  draft: 'warn',
+  submitted: 'ok',
+  approved: 'ok',
+  rejected: 'err',
 }
 
 export function FollowupList() {
-  const { t, i18n } = useTranslation(['survey', 'forms'])
+  const { t, i18n } = useTranslation(['survey', 'forms', 'common'])
   const locale = i18n.resolvedLanguage ?? 'en'
   const navigate = useNavigate()
   const q = useFollowups()
-  const rows = q.data ?? []
-  const drafts = rows.filter((r) => r.status === 'draft')
 
-  if (q.isLoading) {
-    return (
-      <div aria-hidden="true" className="pt-6">
-        <div className="h-10 w-64 animate-pulse bg-track" />
-        <div className="mt-6 h-64 animate-pulse bg-track" />
-      </div>
-    )
-  }
-
-  if (q.isError) {
-    return (
-      <EmptyState heading title={t('survey:loadFailedTitle')} description={t('survey:loadFailed')} />
-    )
-  }
+  const columns = [t('survey:col.participant'), t('survey:col.round'), t('survey:col.contact'), t('survey:col.status')]
+  const rows: ListRow[] = (q.data ?? []).map((r) => {
+    const cells: Cell[] = [
+      { kind: 'text', text: r.personName || '—', ...(r.nationalId ? { sub: r.nationalId } : {}) },
+      { kind: 'text', text: t(`survey:round.${r.round}`) },
+      { kind: 'text', text: formatShortDate(r.contactDate, locale) },
+      { kind: 'chip', text: t(`survey:status.${r.status}`, { defaultValue: r.status }), tone: TONE[r.status] ?? 'mute' },
+    ]
+    return { id: r.id, cells, filterValue: '', search: cells.map((c) => c.text).join(' ') }
+  })
+  const actions = (row: ListRow): RowAction[] => [
+    { id: 'open', label: t('common:actions.open'), onSelect: () => navigate(`/followups/${row.id}`) },
+  ]
+  const start = <PrimaryButton onClick={() => navigate('/followups/new')}>{t('survey:startOne')}</PrimaryButton>
 
   return (
     <>
-      <PageHead
-        eyebrow={t('survey:eyebrow')}
-        title={t('survey:listTitle')}
-        description={t('survey:listIntro')}
-        action={
-          <Link
-            to="/followups/new"
-            className="inline-flex min-h-12 items-center bg-ink px-5 font-narrow text-[12.5px] font-bold uppercase tracking-[0.12em] text-bg no-underline hover:text-bg"
-          >
-            {t('survey:startOne')}
-          </Link>
-        }
+      <PageHead eyebrow={t('survey:eyebrow')} title={t('survey:listTitle')} description={t('survey:listIntro')} action={start} />
+      <ListTable
+        columns={columns}
+        rows={rows}
+        actions={actions}
+        recordLabel={t('forms:record')}
+        isLoading={q.isLoading}
+        isError={q.isError}
+        error={q.error}
+        onRetry={() => void q.refetch()}
+        empty={{ title: t('survey:emptyTitle'), description: t('survey:emptyBody'), action: start }}
       />
-
-      <div className="mt-8">
-        <SectionRule
-          title={t('survey:surveys')}
-          right={
-            <span className="font-narrow text-[12px] font-bold uppercase tracking-[0.1em] text-muted">
-              {t('survey:draftCount', { count: drafts.length })}
-            </span>
-          }
-        />
-
-        {rows.length === 0 ? (
-          <div className="mt-4">
-            <EmptyState title={t('survey:emptyTitle')} description={t('survey:emptyBody')} />
-          </div>
-        ) : (
-          <ul className="mt-4 list-none p-0">
-            {rows.map((r) => (
-              <li key={r.id} className="border-b border-border-default">
-                <button
-                  type="button"
-                  onClick={() => navigate(`/followups/${r.id}`)}
-                  className="flex w-full flex-wrap items-baseline gap-x-4 gap-y-1 py-3 text-start hover:bg-sunken"
-                >
-                  <span dir="auto" className="text-[15px] font-semibold text-ink">
-                    {r.personName}
-                  </span>
-                  <span dir="ltr" className="font-narrow text-[13px] tracking-[0.08em] text-muted">
-                    {r.nationalId}
-                  </span>
-                  <span className="text-[13.5px] text-muted">
-                    {t(`survey:round.${r.round}`)}
-                  </span>
-                  <span className="text-[13.5px] text-muted">
-                    {formatShortDate(r.contactDate, locale)}
-                  </span>
-                  <span
-                    className={`ms-auto inline-block whitespace-nowrap border-[1.5px] px-2 py-[2px] font-narrow text-[11px] font-bold uppercase tracking-[0.1em] ${
-                      TONE[r.status] ?? 'border-border-strong text-muted'
-                    }`}
-                  >
-                    {t(`survey:status.${r.status}`, { defaultValue: r.status })}
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      <p className="mt-6 max-w-[62ch] text-[13.5px] leading-[1.55] text-muted">
-        {t('survey:listNote')}
-      </p>
+      <p className="mt-6 max-w-[62ch] text-[13.5px] leading-[1.55] text-muted">{t('survey:listNote')}</p>
     </>
   )
 }

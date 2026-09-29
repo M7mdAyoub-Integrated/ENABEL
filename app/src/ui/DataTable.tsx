@@ -2,7 +2,35 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BidiIsolate } from '../components/BidiIsolate'
 import { ActionButton, ActionGroup, Chip } from './primitives'
+import { SearchSelect } from './SearchSelect'
 import type { Cell, ListRow } from '../hooks/useData'
+
+/**
+ * A filter on every column (ListTable owns the state): the distinct values
+ * of each column, the one chosen ('' = all), and how to change it.
+ */
+export type ColumnFilters = {
+  options: string[][]
+  selected: string[]
+  onChange: (column: number, value: string) => void
+}
+
+const FILTER_CONTROL =
+  'min-h-9 w-full border-[1.5px] border-border-strong bg-input px-2 py-1 text-[13px] font-normal normal-case tracking-normal text-ink'
+
+function ColumnFilter({ label, i, filters }: { label: string; i: number; filters: ColumnFilters }) {
+  const { t } = useTranslation('common')
+  const values = filters.options[i] ?? []
+  return (
+    <SearchSelect
+      aria-label={t('table.filterBy', { column: label })}
+      value={filters.selected[i] ?? ''}
+      onValueChange={(v) => filters.onChange(i, v)}
+      className={`${FILTER_CONTROL} ${filters.selected[i] ? 'border-ink font-semibold' : ''}`}
+      options={[{ value: '', label: t('table.all') }, ...values.map((v) => ({ value: v, label: v }))]}
+    />
+  )
+}
 
 export type RowAction = {
   id: string
@@ -55,12 +83,14 @@ export function DataTable({
   actions,
   recordLabel,
   layout = 'responsive',
+  filters,
 }: {
   columns: string[]
   rows: ListRow[]
   actions: (row: ListRow) => RowAction[]
   recordLabel: string
   layout?: 'responsive' | 'stacked'
+  filters?: ColumnFilters | undefined
 }) {
   const { t } = useTranslation('common')
   const [expanded, setExpanded] = useState<string | null>(null)
@@ -68,6 +98,18 @@ export function DataTable({
 
   return (
     <>
+      {/* Phone: the same filters, above the cards */}
+      {filters ? (
+        <div className={`mt-[18px] grid grid-cols-1 gap-2 sm:grid-cols-2 ${stacked ? '' : 'md:hidden'}`}>
+          {columns.map((c, i) => (
+            <label key={i} className="block min-w-0">
+              <span className="font-narrow text-[11px] font-bold uppercase tracking-[0.12em] text-muted">{c}</span>
+              <span className="mt-1 block"><ColumnFilter label={c} i={i} filters={filters} /></span>
+            </label>
+          ))}
+        </div>
+      ) : null}
+
       {/* Phone: card list */}
       <ul className={`mt-[18px] flex flex-col gap-3 ${stacked ? '' : 'md:hidden'}`}>
         {rows.map((row) => {
@@ -165,6 +207,16 @@ export function DataTable({
                   {recordLabel}
                 </th>
               </tr>
+              {filters ? (
+                <tr>
+                  {columns.map((c, i) => (
+                    <th key={i} scope="col" className="border-b-[1.5px] border-ink py-2 pe-[14px] text-start align-top font-normal">
+                      <ColumnFilter label={c} i={i} filters={filters} />
+                    </th>
+                  ))}
+                  <th className="border-b-[1.5px] border-ink" aria-hidden="true" />
+                </tr>
+              ) : null}
             </thead>
             <tbody>
               {rows.map((row) => (

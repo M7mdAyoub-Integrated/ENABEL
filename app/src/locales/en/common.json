@@ -192,5 +192,13 @@
     "search": "Search…",
     "noMatch": "Nothing matches",
     "choose": "Choose…"
+  },
+  "table": {
+    "search": "Search…",
+    "all": "All",
+    "filterBy": "Filter by {column}",
+    "count": "{shown} of {total}",
+    "clear": "Clear filters",
+    "noneMatch": "None of the {total} records matches the search and filters."
   }
 }

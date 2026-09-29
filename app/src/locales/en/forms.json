@@ -489,7 +489,17 @@
     "backToAdvisory": "All advisory sessions",
     "publishedBodyAdvisory": "This session is on the public site now. People who have completed a training can see it and apply.",
     "notPublishedBodyAdvisory": "This session is not on the public site. Nobody outside the Municipality can see it.",
-    "endedNoPublishAdvisory": "This session has already ended, so it cannot be published. The public site only lists what is still to come — publishing it would change nothing anyone could see."
+    "endedNoPublishAdvisory": "This session has already ended, so it cannot be published. The public site only lists what is still to come — publishing it would change nothing anyone could see.",
+    "col": {
+      "title": "Title",
+      "dates": "Dates",
+      "venue": "Venue",
+      "track": "Track",
+      "website": "Website",
+      "delivery": "Delivery",
+      "details": "Details"
+    },
+    "ready": "Complete"
   },
   "newSession": {
     "heading": "New training session",
@@ -781,7 +791,15 @@
     "adviser": "Adviser",
     "dateRequired": "A date is required.",
     "topicRequired": "A topic is required.",
-    "deleteWarn": "C1.3 drops by one. This cannot be undone."
+    "deleteWarn": "C1.3 drops by one. This cannot be undone.",
+    "col": {
+      "title": "Initiative",
+      "producer": "Producer",
+      "started": "Started",
+      "status": "Status",
+      "linkage": "Linkage",
+      "sessions": "Mentorship sessions"
+    }
   },
   "contribution": {
     "heading": "Contributions this partner has made",

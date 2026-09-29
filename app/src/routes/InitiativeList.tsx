@@ -1,9 +1,11 @@
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useInitiatives } from '../data/initiatives'
 import { formatShortDate } from '../lib/format'
-import { BidiIsolate } from '../components/BidiIsolate'
-import { SEP } from '../ui/glyphs'
+import { PageHead, PrimaryButton } from '../ui/primitives'
+import { ListTable } from '../ui/ListTable'
+import type { RowAction } from '../ui/DataTable'
+import type { Cell, ListRow } from '../hooks/useData'
 
 /**
  * Production initiatives, from the Municipality's side.
@@ -19,96 +21,59 @@ import { SEP } from '../ui/glyphs'
  * of that rule, free to drift from the one in the donor return.
  */
 export function InitiativeList() {
-  const { t, i18n } = useTranslation(['forms', 'nav'])
+  const { t, i18n } = useTranslation(['forms', 'nav', 'common'])
   const locale = i18n.resolvedLanguage ?? 'en'
+  const navigate = useNavigate()
   const q = useInitiatives()
-  const rows = q.data ?? []
+  const listSep = locale.startsWith('ar') ? '\u060C ' : ', '
+
+  const columns = [
+    t('forms:initiative.col.title'),
+    t('forms:initiative.col.producer'),
+    t('forms:initiative.col.started'),
+    t('forms:initiative.col.status'),
+    t('forms:initiative.col.linkage'),
+    t('forms:initiative.col.sessions'),
+  ]
+
+  const rows: ListRow[] = (q.data ?? []).map((r) => {
+    const cells: Cell[] = [
+      { kind: 'text', text: r.title },
+      { kind: 'text', text: r.personName || '—', ...(r.nationalId ? { sub: r.nationalId } : {}) },
+      { kind: 'text', text: r.startedOn ? formatShortDate(r.startedOn, locale) : '—' },
+      { kind: 'chip', text: t(`forms:initiative.status.${r.status}`, { defaultValue: r.status }), tone: 'mute' },
+      // The linkage statuses RAW, one per live linkage -- C1.2's rule lives in v_ind_c1_2
+      { kind: 'text', text: r.linkageStatuses.map((s) => t(`forms:initiative.linkage.${s}`, { defaultValue: s })).join(listSep) || '—' },
+      { kind: 'text', text: String(r.mentorshipCount) },
+    ]
+    return { id: r.id, cells, filterValue: '', search: cells.map((c) => c.text).join(' ') }
+  })
+
+  const actions = (row: ListRow): RowAction[] => [
+    { id: 'open', label: t('common:actions.open'), onSelect: () => navigate(`/initiatives/${row.id}`) },
+  ]
 
   return (
     <div className="pb-16">
-      <h1 className="mt-4 text-[24px] font-black uppercase leading-[1.08] tracking-[-0.03em] sm:text-[30px]">
-        {t('forms:initiative.listHeading')}
-      </h1>
-      <p className="mt-1 max-w-[62ch] text-[14px] leading-[1.5] text-muted">
-        {t('forms:initiative.listIntro')}
-      </p>
-
-      {q.isLoading ? (
-        <ul className="mt-5 flex list-none flex-col gap-2 p-0" aria-hidden="true">
-          {[0, 1, 2].map((i) => (
-            <li
-              key={i}
-              className="h-24 animate-pulse border-[1.5px] border-border-default bg-track"
-            />
-          ))}
-        </ul>
-      ) : q.isError ? (
-        <p role="alert" className="mt-5 border-[1.5px] border-error p-4 text-[15px]">
-          {t('forms:initiative.loadFailed')}
-        </p>
-      ) : rows.length === 0 ? (
-        // No "create one" button. An initiative is created by matching a
-        // linkage request or recording a direct linkage, and offering a second
-        // creation path here would let one be made with no linkage behind it.
-        <div className="mt-5 border-[1.5px] border-dashed border-border-muted p-6 text-center">
-          <p className="m-0 text-[15px] text-muted">{t('forms:initiative.none')}</p>
-          <Link
-            to="/linkage-requests"
-            className="mt-3 inline-flex min-h-11 items-center bg-ink px-5 font-narrow text-[12.5px] font-bold uppercase tracking-[0.12em] text-bg no-underline hover:text-bg"
-          >
-            {t('nav:linkageRequests')}
-          </Link>
-        </div>
-      ) : (
-        <ul className="mt-5 flex list-none flex-col gap-2 p-0">
-          {rows.map((r) => (
-            <li key={r.id}>
-              <Link
-                to={`/initiatives/${r.id}`}
-                className="block border-[1.5px] border-border-strong bg-bg p-4 text-ink no-underline hover:bg-sunken"
-              >
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="border border-border-strong px-2 py-[2px] font-narrow text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">
-                    {t(`forms:initiative.status.${r.status}`, {
-                      defaultValue: r.status,
-                    })}
-                  </span>
-                  {r.linkageStatuses.map((s, i) => (
-                    <span
-                      key={`${s}-${i}`}
-                      className="border-[1.5px] border-dashed border-green px-2 py-[2px] font-narrow text-[10.5px] font-bold uppercase tracking-[0.12em] text-green"
-                    >
-                      {t(`forms:initiative.linkage.${s}`, { defaultValue: s })}
-                    </span>
-                  ))}
-                  {r.mentorshipCount > 0 ? (
-                    <span className="bg-green px-2 py-[2px] font-narrow text-[10.5px] font-bold uppercase tracking-[0.12em] text-bg">
-                      {t('forms:initiative.sessionCount', { count: r.mentorshipCount })}
-                    </span>
-                  ) : null}
-                </div>
-
-                <h2
-                  dir="auto"
-                  className="mt-2 text-[18px] font-extrabold leading-[1.2] tracking-[-0.02em]"
-                >
-                  {r.title}
-                </h2>
-                <p className="mt-1 text-[13.5px] text-muted">
-                  <span dir="auto">{r.personName}</span>{' '}
-                  {SEP} <BidiIsolate className="font-narrow tracking-wide">{r.nationalId}</BidiIsolate>
-                  {r.startedOn ? (
-                    <>
-                      {' '}
-                      {SEP} {formatShortDate(r.startedOn, locale)}
-                    </>
-                  ) : null}
-                </p>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+      <PageHead title={t('forms:initiative.listHeading')} description={t('forms:initiative.listIntro')} />
+      <ListTable
+        columns={columns}
+        rows={rows}
+        actions={actions}
+        recordLabel={t('forms:record')}
+        isLoading={q.isLoading}
+        isError={q.isError}
+        error={q.error}
+        onRetry={() => void q.refetch()}
+        empty={{
+          // No "create one" button. An initiative is created by matching a
+          // linkage request or recording a direct linkage, and offering a second
+          // creation path here would let one be made with no linkage behind it.
+          title: t('forms:initiative.none'),
+          description: t('forms:initiative.listIntro'),
+          action: <PrimaryButton onClick={() => navigate('/linkage-requests')}>{t('nav:linkageRequests')}</PrimaryButton>,
+        }}
+      />
     </div>
   )
 }
