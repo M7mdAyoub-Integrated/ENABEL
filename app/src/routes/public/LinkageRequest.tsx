@@ -13,6 +13,7 @@ import { useRequestLinkage, type LinkageRequestOutcome } from '../../data/linkag
 import { PublicShell } from './PublicShell'
 import { PublicNotFound, hasLinkageJourney, usePublicSite } from './PublicSite'
 import { ARROW_START } from '../../ui/glyphs'
+import { SearchSelect } from '../../ui/SearchSelect'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -335,7 +336,7 @@ export function LinkageRequest() {
           </Field>
 
           <Field label={t('linkage.activityType')} hint={t('linkage.activityTypeHint')}>
-            <select
+            <SearchSelect
               className={INPUT}
               value={activityTypeId}
               disabled={activityTypes.isLoading}
@@ -347,7 +348,7 @@ export function LinkageRequest() {
                   {labelOf(a, locale)}
                 </option>
               ))}
-            </select>
+            </SearchSelect>
           </Field>
 
           <Field label={t('linkage.mainProduct')} hint={t('linkage.mainProductHint')}>

@@ -15,6 +15,7 @@ import {
 import { usePartnershipOptions } from '../data/partnerships'
 import { useRef as useRefTable } from '../data/refTables'
 import { ARROW_START } from '../ui/glyphs'
+import { SearchSelect } from '../ui/SearchSelect'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -287,7 +288,7 @@ function SessionForm({
                 hint={t('forms:newSession.trackHint')}
                 required
               >
-                <select
+                <SearchSelect
                   className={INPUT}
                   value={track}
                   onChange={(e) => setTrack(e.target.value as '' | AdvisoryTrack)}
@@ -295,7 +296,7 @@ function SessionForm({
                   <option value="">{t('forms:newSession.choose')}</option>
                   <option value="market">{t('common:enums.advisoryTrack.market')}</option>
                   <option value="home_based">{t('common:enums.advisoryTrack.home_based')}</option>
-                </select>
+                </SearchSelect>
                 {track !== '' ? (
                   <p className="mt-1 text-[13px] leading-[1.5] text-muted">
                     {t(`forms:newSession.trackNote.${track}`)}
@@ -312,14 +313,14 @@ function SessionForm({
                 list is ref_training_topic. One list, two words, no second
                 table -- see 0043. */}
             <Field label={t('forms:newSession.sector')} hint={t('forms:newSession.sectorHint')} required>
-              <select className={INPUT} value={topicId} onChange={(e) => setTopicId(e.target.value)}>
+              <SearchSelect className={INPUT} value={topicId} onChange={(e) => setTopicId(e.target.value)}>
                 <option value="">{t('forms:newSession.choose')}</option>
                 {topics.map((r) => (
                   <option key={r.id} value={r.id}>
                     {locale.startsWith('ar') ? r.label_ar || r.label_en : r.label_en}
                   </option>
                 ))}
-              </select>
+              </SearchSelect>
             </Field>
 
             <Field label={t('forms:newSession.description')} hint={t('forms:newSession.goesPublic')}>
@@ -371,7 +372,7 @@ function SessionForm({
           </legend>
           <div className="flex flex-col gap-4">
             <Field label={t('forms:newSession.partner')} hint={t('forms:newSession.partnerHint')}>
-              <select
+              <SearchSelect
                 className={INPUT}
                 value={partnershipId}
                 disabled={partnerships.isLoading || noPartners}
@@ -396,7 +397,7 @@ function SessionForm({
                     </option>
                   )
                 })}
-              </select>
+              </SearchSelect>
             </Field>
 
             {/* Empty dropdown is normal early on. Say so and point at where a

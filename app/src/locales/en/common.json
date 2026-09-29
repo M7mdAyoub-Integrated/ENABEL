@@ -187,5 +187,10 @@
       "byRecord": "Largest by record",
       "nothingVisible": "No evidence files in the municipalities you can see."
     }
+  },
+  "picker": {
+    "search": "Search…",
+    "noMatch": "Nothing matches",
+    "choose": "Choose…"
   }
 }

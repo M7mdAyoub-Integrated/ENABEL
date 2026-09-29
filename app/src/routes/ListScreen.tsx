@@ -11,6 +11,7 @@ import { DataTable, type RowAction } from '../ui/DataTable'
 import { AccentRule, EmptyState, PageHead, Pill, PrimaryButton, SecondaryButton } from '../ui/primitives'
 import { NotFound } from './NotFound'
 import { SEP } from '../ui/glyphs'
+import { SearchSelect } from '../ui/SearchSelect'
 
 /**
  * A module's list screen, copied from the prototype.
@@ -143,7 +144,7 @@ export function ListScreen() {
         </label>
         <label className="flex-none border-t-[1.5px] border-ink sm:max-w-[270px] sm:border-t-0 sm:border-s-[1.5px]">
           <span className="sr-only">{t('forms:filterLabel')}</span>
-          <select
+          <SearchSelect
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             className="min-h-11 w-full cursor-pointer border-0 bg-raised px-[14px] py-[11px] font-narrow text-[12.5px] font-bold uppercase tracking-[0.08em] text-ink"
@@ -154,7 +155,7 @@ export function ListScreen() {
                 {v}
               </option>
             ))}
-          </select>
+          </SearchSelect>
         </label>
         <span className="flex flex-none items-center whitespace-nowrap border-t-[1.5px] border-ink px-[14px] py-2 font-narrow text-[12px] font-bold uppercase tracking-[0.08em] text-muted sm:border-t-0 sm:border-s-[1.5px] sm:py-0">
           {t('forms:countOf', { shown: shown.length, total: rows.length })}

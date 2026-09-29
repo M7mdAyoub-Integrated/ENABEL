@@ -2,6 +2,7 @@ import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Accent } from '../modules'
 import { HOOK } from './glyphs'
+import { SearchSelect } from './SearchSelect'
 
 export type FieldOption = { value: string; label: string; disabled?: boolean }
 
@@ -229,22 +230,19 @@ export function Field({
 
   if (spec.type === 'select') {
     return wrap(
-      <select
+      <SearchSelect
         id={id}
         value={str}
         disabled={spec.disabled}
-        onChange={(e) => onChange(e.target.value)}
+        onValueChange={onChange}
         aria-invalid={invalid}
         {...(describedBy ? { 'aria-describedby': describedBy } : {})}
         className={`${INPUT_BASE} cursor-pointer ${borderClass}`}
-      >
-        <option value="">{spec.placeholder ?? t('selectOption')}</option>
-        {(spec.options ?? []).map((o) => (
-          <option key={o.value} value={o.value} disabled={o.disabled}>
-            {o.label}
-          </option>
-        ))}
-      </select>,
+        options={[
+          { value: '', label: spec.placeholder ?? t('selectOption') },
+          ...(spec.options ?? []).map((o) => ({ value: o.value, label: o.label, ...(o.disabled ? { disabled: true } : {}) })),
+        ]}
+      />,
     )
   }
 

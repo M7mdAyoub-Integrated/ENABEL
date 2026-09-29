@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../auth/AuthProvider'
 import { useMunicipalities, useMunicipalityName } from '../data/municipalities'
+import { SearchSelect } from '../ui/SearchSelect'
 
 /**
  * The super admin's switcher (plan §3.4).
@@ -47,7 +48,7 @@ export function MunicipalitySwitcher({ onSwitched }: { onSwitched?: () => void }
       >
         {t('switchMunicipality')}
       </label>
-      <select
+      <SearchSelect
         id={selectId}
         value={municipalityId ?? ''}
         disabled={busy}
@@ -77,7 +78,7 @@ export function MunicipalitySwitcher({ onSwitched }: { onSwitched?: () => void }
             {name(m)}
           </option>
         ))}
-      </select>
+      </SearchSelect>
       {error ? (
         <p role="alert" className="mt-[6px] text-[12px] text-error">
           {t('switchFailed')}

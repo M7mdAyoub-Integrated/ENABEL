@@ -13,6 +13,7 @@ import {
 } from '../data/evidence'
 import { guessKind, type EvidenceKind } from '../lib/evidence/compress'
 import { SEP } from '../ui/glyphs'
+import { SearchSelect } from '../ui/SearchSelect'
 
 /**
  * The evidence files of one record: the list, a way to add one, a way to
@@ -177,7 +178,7 @@ export function EvidencePanel({
           </div>
           <label className="text-[12px] font-narrow uppercase tracking-[0.1em]">
             {t('common:evidence.kind.label')}
-            <select
+            <SearchSelect
               value={pending.kind}
               onChange={(e) => setPending({ ...pending, kind: e.target.value as EvidenceKind })}
               className="mt-1 block min-h-10 border-[1.5px] border-ink bg-input px-2 text-[14px] normal-case tracking-normal"
@@ -185,7 +186,7 @@ export function EvidencePanel({
               <option value="photo">{t('common:evidence.kind.photo')}</option>
               <option value="document">{t('common:evidence.kind.document')}</option>
               <option value="other">{t('common:evidence.kind.other')}</option>
-            </select>
+            </SearchSelect>
           </label>
           <SecondaryButton onClick={() => setPending(null)}>{t('common:actions.cancel')}</SecondaryButton>
           <SecondaryButton onClick={start}>{t('common:evidence.upload')}</SecondaryButton>

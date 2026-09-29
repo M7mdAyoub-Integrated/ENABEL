@@ -25,6 +25,7 @@ export const HOOK = '↳' // ↳
 export const EMPTY = '—' // — shown where a value is absent
 /** Remove / dismiss, on a filter chip. Not the letter x. */
 export const CROSS = '×' // ×
+export const CHECK = '✓' // ✓ the chosen option in a dropdown
 /** Percent sign. Same in both locales.
     The Arabic percent sign U+066A is not used, because D-1 resolved to Western
     digits and U+066A belongs with Arabic-Indic ones -- see lib/format.ts. */

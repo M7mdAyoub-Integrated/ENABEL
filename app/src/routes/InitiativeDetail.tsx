@@ -29,6 +29,7 @@ import { useToast } from '../ui/Toast'
 import { BidiIsolate, isolateLtr } from '../components/BidiIsolate'
 import { formatShortDate } from '../lib/format'
 import { ARROW_START, SEP, EMPTY } from '../ui/glyphs'
+import { SearchSelect } from '../ui/SearchSelect'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -165,11 +166,11 @@ function InitiativeDetails({
             </label>
             <label className="flex flex-col gap-1">
               <span className={LABEL}>{t('forms:initiative.statusLabel')}</span>
-              <select value={d.status} onChange={(e) => setD({ ...d, status: e.target.value as DetailsDraft['status'] })} className={INPUT}>
+              <SearchSelect value={d.status} onChange={(e) => setD({ ...d, status: e.target.value as DetailsDraft['status'] })} className={INPUT}>
                 {(['planned', 'operating', 'paused', 'stopped'] as const).map((sv) => (
                   <option key={sv} value={sv}>{t(`forms:initiative.status.${sv}`)}</option>
                 ))}
-              </select>
+              </SearchSelect>
             </label>
             <label className="flex flex-col gap-1 sm:col-span-2">
               <span className={LABEL}>{t('forms:initiative.product')}</span>
@@ -177,19 +178,19 @@ function InitiativeDetails({
             </label>
             <label className="flex flex-col gap-1">
               <span className={LABEL}>{t('forms:initiative.womenLed')}</span>
-              <select value={d.womenLed} onChange={(e) => setD({ ...d, womenLed: e.target.value as DetailsDraft['womenLed'] })} className={INPUT}>
+              <SearchSelect value={d.womenLed} onChange={(e) => setD({ ...d, womenLed: e.target.value as DetailsDraft['womenLed'] })} className={INPUT}>
                 <option value="">{t('forms:initiative.unknown')}</option>
                 <option value="yes">{t('common:yes')}</option>
                 <option value="no">{t('common:no')}</option>
-              </select>
+              </SearchSelect>
             </label>
             <label className="flex flex-col gap-1">
               <span className={LABEL}>{t('forms:initiative.youthLed')}</span>
-              <select value={d.youthLed} onChange={(e) => setD({ ...d, youthLed: e.target.value as DetailsDraft['youthLed'] })} className={INPUT}>
+              <SearchSelect value={d.youthLed} onChange={(e) => setD({ ...d, youthLed: e.target.value as DetailsDraft['youthLed'] })} className={INPUT}>
                 <option value="">{t('forms:initiative.unknown')}</option>
                 <option value="yes">{t('common:yes')}</option>
                 <option value="no">{t('common:no')}</option>
-              </select>
+              </SearchSelect>
             </label>
           </div>
           {save.isError ? <WriteError error={save.error} onDismiss={() => save.reset()} /> : null}

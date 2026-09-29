@@ -16,6 +16,7 @@ import {
 import { PublicShell } from './PublicShell'
 import { usePublicSite } from './PublicSite'
 import { ARROW_START } from '../../ui/glyphs'
+import { SearchSelect } from '../../ui/SearchSelect'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -481,11 +482,11 @@ export function ApplyForm() {
           </Field>
 
           <Field label={t('apply.sex')}>
-            <select className={INPUT} value={sex} onChange={(e) => setSex(e.target.value)}>
+            <SearchSelect className={INPUT} value={sex} onChange={(e) => setSex(e.target.value)}>
               <option value="">{t('apply.preferNotToSay')}</option>
               <option value="female">{t('apply.female')}</option>
               <option value="male">{t('apply.male')}</option>
-            </select>
+            </SearchSelect>
           </Field>
 
           <Field label={t('apply.village')}>
@@ -536,7 +537,7 @@ export function ApplyForm() {
           <p className="m-0 text-[15px] leading-[1.55] text-body">{t('apply.stallIntro')}</p>
 
           <Field label={t('apply.producerType')} hint={t('apply.producerTypeHint')}>
-            <select
+            <SearchSelect
               className={INPUT}
               value={producerTypeId}
               disabled={producerTypes.isLoading}
@@ -548,7 +549,7 @@ export function ApplyForm() {
                   {labelOf(pt, locale)}
                 </option>
               ))}
-            </select>
+            </SearchSelect>
           </Field>
 
           {/* A junction table, not a text field: the market team plans stalls

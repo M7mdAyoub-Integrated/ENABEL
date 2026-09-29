@@ -19,6 +19,7 @@ import { allFields, formDef, useRmthLabels } from './labels'
 import type { RmthFormId } from './forms.generated'
 import type { RmthFieldDef, RmthPartDef, RmthTable } from './types'
 import { HOOK, EMDASH, REQUIRED, COLON } from '../ui/glyphs'
+import { SearchSelect } from '../ui/SearchSelect'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -683,14 +684,14 @@ function FieldView(p: FieldViewProps) {
                       ) : null}
                     </td>
                     <td className="px-3 py-2 align-top">
-                      <select
+                      <SearchSelect
                         value={cur.rating}
                         onChange={(e) => p.setSupport((s) => ({ ...s, [c.id]: { ...cur, rating: e.target.value } }))}
                         className="w-full min-h-10 border-[1.5px] border-ink bg-input px-2 text-[14px]"
                       >
                         <option value="">{t('rmth:form.choose')}</option>
                         {ratings.map((r) => <option key={r.id} value={r.id}>{refLabel(r, L.locale)}</option>)}
-                      </select>
+                      </SearchSelect>
                     </td>
                   </tr>
                 )

@@ -14,6 +14,7 @@ import { usePartnershipOptions } from '../data/partnerships'
 import { BackLink, PageHead, SectionRule } from '../ui/primitives'
 import { useToast } from '../ui/Toast'
 import { SEP } from '../ui/glyphs'
+import { SearchSelect } from '../ui/SearchSelect'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -273,7 +274,7 @@ export function LinkageDirect() {
                   </label>
                   <label className="mt-4 block">
                     <span className={LABEL}>{t('forms:linkageDirect.activityType')}</span>
-                    <select
+                    <SearchSelect
                       className={INPUT}
                       value={activityTypeId}
                       disabled={activityTypes.isLoading}
@@ -288,7 +289,7 @@ export function LinkageDirect() {
                           {labelOf(a, locale)}
                         </option>
                       ))}
-                    </select>
+                    </SearchSelect>
                   </label>
                   <label className="mt-4 block">
                     <span className={LABEL}>{t('forms:linkageDirect.mainProduct')}</span>
@@ -307,7 +308,7 @@ export function LinkageDirect() {
               <SectionRule title={t('forms:linkageDirect.theLinkage')} />
               <label className="mt-4 block">
                 <span className={LABEL}>{t('forms:linkageAdmin.partner')}</span>
-                <select
+                <SearchSelect
                   className={INPUT}
                   value={partnershipId}
                   disabled={partnerships.isLoading}
@@ -323,7 +324,7 @@ export function LinkageDirect() {
                       ].join(` ${SEP} `)}
                     </option>
                   ))}
-                </select>
+                </SearchSelect>
               </label>
 
               <label className="mt-4 block">

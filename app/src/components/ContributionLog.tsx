@@ -22,6 +22,7 @@ import { can } from '../auth/permissions'
 import { WriteError } from '../ui/states'
 import { isolateLtr } from './BidiIsolate'
 import { formatShortDate } from '../lib/format'
+import { SearchSelect } from '../ui/SearchSelect'
 
 /**
  * The G0.4 log for one partnership.
@@ -284,7 +285,7 @@ export function ContributionLog({
                     {t('forms:requiredMark')}
                   </span>
                 </span>
-                <select
+                <SearchSelect
                   value={form.partnershipId}
                   onChange={(e) => setForm({ ...form, partnershipId: e.target.value })}
                   aria-invalid={!!psErr}
@@ -296,7 +297,7 @@ export function ContributionLog({
                       {t(`common:enums.partnershipType.${ps.type}`, { defaultValue: ps.type })}
                     </option>
                   ))}
-                </select>
+                </SearchSelect>
                 {psErr ? (
                   <span role="alert" className="text-[13px] font-semibold text-error">
                     {psErr}
@@ -329,7 +330,7 @@ export function ContributionLog({
               <span className="font-narrow text-[11.5px] font-bold uppercase tracking-[0.12em] text-muted">
                 {t('forms:contribution.typeLabel')}
               </span>
-              <select
+              <SearchSelect
                 value={form.type}
                 onChange={(e) => setForm({ ...form, type: e.target.value as ContributionType })}
                 className="min-h-11 w-full border-[1.5px] border-border-strong bg-bg px-3 text-[15px] text-ink"
@@ -339,7 +340,7 @@ export function ContributionLog({
                     {t(`forms:contribution.type.${v}`)}
                   </option>
                 ))}
-              </select>
+              </SearchSelect>
             </label>
             <label className="flex flex-col gap-1 sm:col-span-2">
               <span className="font-narrow text-[11.5px] font-bold uppercase tracking-[0.12em] text-muted">

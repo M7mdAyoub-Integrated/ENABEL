@@ -17,6 +17,7 @@ import { EvidencePanel } from '../components/EvidencePanel'
 import { usePartnershipOptions } from '../data/partnerships'
 import { useInitiatives } from '../data/initiatives'
 import { usePersonByNationalId, isCompleteNationalId } from '../data/completions'
+import { SearchSelect } from '../ui/SearchSelect'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -309,14 +310,14 @@ function PromotionalForm() {
       </div>
       <div className="min-w-[170px]">
         <Field label={t('manual.fieldChannel')}>
-          <select className={INPUT} value={channelId} onChange={(e) => setChannelId(e.target.value)}>
+          <SearchSelect className={INPUT} value={channelId} onChange={(e) => setChannelId(e.target.value)}>
             <option value="">{t('manual.choose')}</option>
             {(channels.data ?? []).map((c) => (
               <option key={c.id} value={c.id}>
                 {locale.startsWith('ar') ? c.label_ar || c.label_en : c.label_en}
               </option>
             ))}
-          </select>
+          </SearchSelect>
         </Field>
       </div>
       <div className="min-w-[160px]">
@@ -501,14 +502,14 @@ function CaseStudyForm() {
         </div>
         <div className="min-w-[220px] flex-1">
           <Field label={t('manual.fieldAboutInitiative')}>
-            <select className={INPUT} value={initiativeId} onChange={(e) => setInitiativeId(e.target.value)}>
+            <SearchSelect className={INPUT} value={initiativeId} onChange={(e) => setInitiativeId(e.target.value)}>
               <option value="">{t('manual.aboutNone')}</option>
               {(initiatives.data ?? []).map((i) => (
                 <option key={i.id} value={i.id}>
                   {[i.title, i.personName].join(' · ')}
                 </option>
               ))}
-            </select>
+            </SearchSelect>
           </Field>
         </div>
       </div>

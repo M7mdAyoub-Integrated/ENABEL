@@ -32,6 +32,7 @@ import { useToast } from '../ui/Toast'
 import { formatShortDate } from '../lib/format'
 import { SEP } from '../ui/glyphs'
 import { StatusBadge } from './LinkageQueue'
+import { SearchSelect } from '../ui/SearchSelect'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -528,7 +529,7 @@ export function LinkageMatch() {
               <span className="mt-0.5 block text-[13px] text-muted">
                 {t('forms:linkageAdmin.partnerHint')}
               </span>
-              <select
+              <SearchSelect
                 className="mt-1.5 block min-h-12 w-full border-[1.5px] border-border-strong bg-bg px-3 text-[16px] text-ink focus:border-ink focus:outline-none"
                 value={partnershipId}
                 disabled={partnerships.isLoading}
@@ -549,7 +550,7 @@ export function LinkageMatch() {
                     ].join(` ${SEP} `)}
                   </option>
                 ))}
-              </select>
+              </SearchSelect>
             </label>
 
             {/* ── what the linkage covers ───────────────────────────────── */}

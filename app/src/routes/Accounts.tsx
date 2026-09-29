@@ -22,6 +22,7 @@ import {
 import { useMunicipalities, useMunicipalityName, type Municipality } from '../data/municipalities'
 import { ACCOUNT_FILTER_PARAMS } from '../layout/platformDialogContext'
 import type { ListRow } from '../hooks/useData'
+import { SearchSelect } from '../ui/SearchSelect'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -161,7 +162,7 @@ function AccountFilters({
         <div className="flex flex-col md:flex-row md:items-stretch">
           <label className="min-w-0 border-t-[1.5px] border-ink md:flex-1">
             <span className="sr-only">{t('accounts:filters.municipality')}</span>
-            <select value={filters.muni ?? ''} onChange={(e) => onChange('muni', e.target.value)} className={SELECT}>
+            <SearchSelect value={filters.muni ?? ''} onChange={(e) => onChange('muni', e.target.value)} className={SELECT}>
               <option value="">{t('accounts:filters.anyMunicipality')}</option>
               {municipalities.map((m) => (
                 <option key={m.id} value={m.slug}>
@@ -169,26 +170,26 @@ function AccountFilters({
                 </option>
               ))}
               <option value={NO_MUNICIPALITY}>{t('accounts:filters.noMunicipality')}</option>
-            </select>
+            </SearchSelect>
           </label>
           <label className="min-w-0 border-t-[1.5px] border-ink md:flex-1 md:border-s-[1.5px]">
             <span className="sr-only">{t('accounts:filters.role')}</span>
-            <select value={filters.role ?? ''} onChange={(e) => onChange('role', e.target.value)} className={SELECT}>
+            <SearchSelect value={filters.role ?? ''} onChange={(e) => onChange('role', e.target.value)} className={SELECT}>
               <option value="">{t('accounts:filters.anyRole')}</option>
               {ROLES.map((r) => (
                 <option key={r} value={r}>
                   {t(`auth:role.${r}`)}
                 </option>
               ))}
-            </select>
+            </SearchSelect>
           </label>
           <label className="min-w-0 border-t-[1.5px] border-ink md:flex-1 md:border-s-[1.5px]">
             <span className="sr-only">{t('accounts:filters.status')}</span>
-            <select value={filters.status ?? ''} onChange={(e) => onChange('status', e.target.value)} className={SELECT}>
+            <SearchSelect value={filters.status ?? ''} onChange={(e) => onChange('status', e.target.value)} className={SELECT}>
               <option value="">{t('accounts:filters.anyStatus')}</option>
               <option value="active">{t('accounts:status.active')}</option>
               <option value="deactivated">{t('accounts:status.inactive')}</option>
-            </select>
+            </SearchSelect>
           </label>
         </div>
       </div>

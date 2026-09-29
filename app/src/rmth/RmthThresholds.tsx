@@ -10,6 +10,7 @@ import { can } from '../auth/permissions'
 import { formatShortDate } from '../lib/format'
 import { COLON, SEP } from '../ui/glyphs'
 import { makeTranslate, type Translate } from '../i18n/tx'
+import { SearchSelect } from '../ui/SearchSelect'
 
 /**
  * The seven open items (OQ-47), as the screen where they are answered.
@@ -92,20 +93,20 @@ function Editor({ row, onDone }: { row: RmthThreshold; onDone: () => void }) {
       {kind === 'choice' ? (
         <label className="text-[12px] font-narrow uppercase tracking-[0.1em]">
           {t('thresholds.value')}
-          <select value={text} onChange={(e) => setText(e.target.value)} className={`${inputClass} normal-case tracking-normal`}>
+          <SearchSelect value={text} onChange={(e) => setText(e.target.value)} className={`${inputClass} normal-case tracking-normal`}>
             <option value="">{t('thresholds.notDecided')}</option>
             {(CHOICES[row.key] ?? []).map((c) => <option key={c} value={c}>{t(`thresholds.choice.${row.key}.${c}`)}</option>)}
-          </select>
+          </SearchSelect>
         </label>
       ) : null}
       {kind === 'bool' ? (
         <label className="text-[12px] font-narrow uppercase tracking-[0.1em]">
           {t('thresholds.value')}
-          <select value={bool} onChange={(e) => setBool(e.target.value)} className={`${inputClass} normal-case tracking-normal`}>
+          <SearchSelect value={bool} onChange={(e) => setBool(e.target.value)} className={`${inputClass} normal-case tracking-normal`}>
             <option value="">{t('thresholds.notDecided')}</option>
             <option value="true">{t('thresholds.yes')}</option>
             <option value="false">{t('thresholds.no')}</option>
-          </select>
+          </SearchSelect>
         </label>
       ) : null}
       <div className="flex gap-2">
