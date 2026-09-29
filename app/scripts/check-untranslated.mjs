@@ -50,7 +50,7 @@ const BASELINE = {
   'common.json': 0,
   'errors.json': 0,
   'forms.json': 71,
-  'indicators.json': 42,
+  'indicators.json': 1,
   'nav.json': 0,
   'portal.json': 0,
   'public.json': 0,
