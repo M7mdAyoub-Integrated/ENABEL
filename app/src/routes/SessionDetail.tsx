@@ -17,7 +17,9 @@ import {
   type Participant,
 } from '../data/sessions'
 import { formatShortDate, formatDateRange } from '../lib/format'
-import { ARROW_START, SEP } from '../ui/glyphs'
+import { SEP } from '../ui/glyphs'
+import { BackLink, PageHead, PrimaryButton } from '../ui/primitives'
+import { PublishPanel } from '../ui/PublishPanel'
 import { useToast } from '../ui/Toast'
 
 /**
@@ -187,37 +189,60 @@ export function SessionDetail({ kind = 'training' }: { kind?: SessionKind }) {
 
   return (
     <div className="pb-16">
-      <Link
-        to={kind === "advisory" ? "/advisory" : "/sessions"}
-        className="mt-4 inline-flex min-h-11 items-center font-narrow text-[12px] font-bold uppercase tracking-[0.14em] text-muted no-underline hover:text-ink"
-      >
-        <span aria-hidden="true" className="inline-block mirror-rtl">
-          {ARROW_START}
-        </span>
-        <span className="ms-2">{t(kind === 'advisory' ? 'session.backToAdvisory' : 'session.backToSessions')}</span>
-      </Link>
+      <PageHead
+        back={<BackLink onClick={() => navigate(kind === 'advisory' ? '/advisory' : '/sessions')}>{t(kind === 'advisory' ? 'session.backToAdvisory' : 'session.backToSessions')}</BackLink>}
+        title={s.title}
+        description={`${formatDateRange(s.start_date, s.end_date, locale)}${s.venue ? ` ${SEP} ${s.venue}` : ''}`}
+        size="md"
+        action={<PrimaryButton onClick={() => navigate(`${kind === 'advisory' ? '/advisory' : '/sessions'}/${s.id}/edit`)}>{t('session.editDetails')}</PrimaryButton>}
+      />
 
-      <h1
-        dir="auto"
-        className="mt-1 text-[24px] font-black uppercase leading-[1.08] tracking-[-0.03em] sm:text-[30px]"
+      {/* ── PUBLISH. About the public: the same panel, in the same place, on
+             every screen that publishes (PublishPanel). ────────────────────── */}
+      <PublishPanel
+        published={s.is_published}
+        pending={publish.isPending}
+        onToggle={() => publish.mutate({ id: s.id, on: !s.is_published, kind })}
+        body={
+          ended
+            ? undefined
+            : s.is_published
+              ? t(kind === 'advisory' ? 'session.publishedBodyAdvisory' : 'session.publishedBody')
+              : t(kind === 'advisory' ? 'session.notPublishedBodyAdvisory' : 'session.notPublishedBody')
+        }
+        blocked={
+          ended || s.is_cancelled
+            ? (s.is_cancelled ? t('session.cancelled') : t(kind === 'advisory' ? 'session.endedNoPublishAdvisory' : 'session.endedNoPublish'))
+            : !s.is_published && missingForPublish(s).length > 0
+              ? t('session.needsDetails')
+              : undefined
+        }
       >
-        {s.title}
-      </h1>
-      <Link
-        to={`${kind === "advisory" ? "/advisory" : "/sessions"}/${s.id}/edit`}
-        className="mt-1 inline-block font-narrow text-[12px] font-bold uppercase tracking-[0.12em] text-muted underline hover:text-ink"
-      >
-        {t('session.editDetails')}
-      </Link>
-      <p className="mt-1 text-[14px] text-muted">
-        {formatDateRange(s.start_date, s.end_date, locale)}
-        {s.venue ? (
-          <span dir="auto">
-            {' '}
-            {SEP} {s.venue}
-          </span>
-        ) : null}
-      </p>
+        {/* What actually becomes public, named. focal_point especially: it is
+            free text a member of staff types, and it lands on a page anyone
+            can read. Saying so at the moment of publishing is the only point
+            where it can still be changed. */}
+        <details>
+          <summary className="cursor-pointer font-narrow text-[12px] font-bold uppercase tracking-[0.1em] text-muted">
+            {t('session.whatGoesPublic')}
+          </summary>
+          <ul className="mt-2 list-disc space-y-1 ps-5 text-[14px] text-body">
+            <li>{t('session.publicTitle')}</li>
+            <li>{t('session.publicDates')}</li>
+            <li>{t('session.publicVenue')}</li>
+            <li>{t('session.publicDescription')}</li>
+            <li className="font-semibold">
+              {t('session.publicFocalPoint')}
+              {s.focal_point ? (
+                <span dir="auto" className="ms-1 font-normal">
+                  {t('session.publicFocalPointValue', { value: s.focal_point })}
+                </span>
+              ) : null}
+            </li>
+          </ul>
+          <p className="mt-2 text-[13px] text-muted">{t('session.publicNever')}</p>
+        </details>
+      </PublishPanel>
 
       {/* The TRACK, on advisory only, stated with what it decides.
           It was captured on the form and enforced by the database and shown
@@ -264,63 +289,6 @@ export function SessionDetail({ kind = 'training' }: { kind?: SessionKind }) {
           </Link>
         </section>
       ) : null}
-
-      {/* ── PUBLISH. About the public. ─────────────────────────────────── */}
-      <section className="mt-6 border-[1.5px] border-teal bg-sunken p-4">
-        <h2 className="m-0 font-narrow text-[12px] font-bold uppercase tracking-[0.14em] text-teal">
-          {t('session.publishHeading')}
-        </h2>
-        <p className="mt-1 max-w-[60ch] text-[14px] leading-[1.5] text-body">
-          {ended
-            ? t(kind === 'advisory' ? 'session.endedNoPublishAdvisory' : 'session.endedNoPublish')
-            : s.is_published
-              ? t(kind === 'advisory' ? 'session.publishedBodyAdvisory' : 'session.publishedBody')
-              : t(kind === 'advisory' ? 'session.notPublishedBodyAdvisory' : 'session.notPublishedBody')}
-        </p>
-
-        {/* What actually becomes public, named. focal_point especially: it is
-            free text a member of staff types, and it lands on a page anyone
-            can read. Saying so at the moment of publishing is the only point
-            where it can still be changed. */}
-        <details className="mt-3">
-          <summary className="cursor-pointer font-narrow text-[12px] font-bold uppercase tracking-[0.1em] text-muted">
-            {t('session.whatGoesPublic')}
-          </summary>
-          <ul className="mt-2 list-disc space-y-1 ps-5 text-[14px] text-body">
-            <li>{t('session.publicTitle')}</li>
-            <li>{t('session.publicDates')}</li>
-            <li>{t('session.publicVenue')}</li>
-            <li>{t('session.publicDescription')}</li>
-            <li className="font-semibold">
-              {t('session.publicFocalPoint')}
-              {s.focal_point ? (
-                <span dir="auto" className="ms-1 font-normal">
-                  {t('session.publicFocalPointValue', { value: s.focal_point })}
-                </span>
-              ) : null}
-            </li>
-          </ul>
-          <p className="mt-2 text-[13px] text-muted">{t('session.publicNever')}</p>
-        </details>
-
-        <button
-          type="button"
-          disabled={
-            publish.isPending ||
-            s.is_cancelled ||
-            ended ||
-            (!s.is_published && missingForPublish(s).length > 0)
-          }
-          onClick={() => publish.mutate({ id: s.id, on: !s.is_published, kind })}
-          className={`mt-4 inline-flex min-h-11 items-center justify-center px-5 font-narrow text-[12.5px] font-bold uppercase tracking-[0.12em] disabled:bg-track disabled:text-faint ${
-            s.is_published
-              ? 'border-[1.5px] border-border-strong text-ink'
-              : 'bg-teal text-bg'
-          }`}
-        >
-          {s.is_published ? t('session.unpublish') : t('session.publish')}
-        </button>
-      </section>
 
       {/* ── DELIVERY. About the donor return. Deliberately unlike the above:
              different colour, different framing, further down the page, and

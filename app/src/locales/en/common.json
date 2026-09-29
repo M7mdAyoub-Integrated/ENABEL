@@ -200,5 +200,12 @@
     "count": "{shown} of {total}",
     "clear": "Clear filters",
     "noneMatch": "None of the {total} records matches the search and filters."
+  },
+  "publish": {
+    "heading": "Public website",
+    "on": "Published",
+    "off": "Not published",
+    "publish": "Publish",
+    "unpublish": "Unpublish"
   }
 }

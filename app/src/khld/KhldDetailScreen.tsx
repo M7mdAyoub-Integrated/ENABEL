@@ -21,6 +21,7 @@ import NotFound from '../routes/NotFound'
 import type { KhldFormId } from './forms.generated'
 import type { KhldFieldDef, KhldFormDef, KhldTable } from './types'
 import { BidiIsolate } from '../components/BidiIsolate'
+import { PublishPanel as SharedPublishPanel } from '../ui/PublishPanel'
 import { TicketsTable } from './TicketsTable'
 import { SEP, ELLIPSIS, COLON } from '../ui/glyphs'
 
@@ -199,19 +200,14 @@ function PublishPanel({ table, id, published }: { table: KhldPublishedTable; id:
   const { role } = useAuth()
   const set = useSetKhldPublished(table)
   return (
-    <div className={`mt-2 flex flex-wrap items-center justify-between gap-3 border-s-[3px] px-4 py-3 ${published ? 'border-success' : 'border-border-default'}`}>
-      <div>
-        <span className="font-narrow text-[11px] font-bold uppercase tracking-[0.12em] text-muted">{t('detail.publish.title')}{COLON} </span>
-        <span className="text-[15px] font-semibold text-ink">{published ? t('detail.publish.on') : t('detail.publish.off')}</span>
-        <p className="mb-0 mt-1 text-[13px] text-muted" style={{ textWrap: 'pretty' }}>{t('detail.publish.note')}</p>
-        {set.error ? <WriteError error={set.error} onDismiss={set.reset} /> : null}
-      </div>
-      {can(role, 'record.edit') ? (
-        <SecondaryButton disabled={set.isPending} onClick={() => void set.mutateAsync({ id, published: !published })}>
-          {published ? t('detail.publish.unpublish') : t('detail.publish.publish')}
-        </SecondaryButton>
-      ) : null}
-    </div>
+    <SharedPublishPanel
+      published={published}
+      pending={set.isPending}
+      canToggle={can(role, 'record.edit')}
+      onToggle={() => void set.mutateAsync({ id, published: !published })}
+      body={t('detail.publish.note')}
+      error={set.error ? <WriteError error={set.error} onDismiss={set.reset} /> : undefined}
+    />
   )
 }
 

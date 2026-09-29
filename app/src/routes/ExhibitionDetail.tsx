@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   useExhibition,
@@ -10,7 +10,9 @@ import {
   type RegistrationRow,
 } from '../data/exhibitions'
 import { formatDateRange } from '../lib/format'
-import { ARROW_START, SEP } from '../ui/glyphs'
+import { SEP } from '../ui/glyphs'
+import { BackLink, PageHead, PrimaryButton } from '../ui/primitives'
+import { PublishPanel } from '../ui/PublishPanel'
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -70,6 +72,7 @@ export function ExhibitionDetail() {
   const { id } = useParams()
   const { t, i18n } = useTranslation('forms')
   const locale = i18n.resolvedLanguage ?? 'en'
+  const navigate = useNavigate()
 
   const eq = useExhibition(id)
   const rq = useExhibitionRegistrations(id, locale)
@@ -102,32 +105,47 @@ export function ExhibitionDetail() {
 
   return (
     <div className="pb-16">
-      <Link
-        to="/forms/ex"
-        className="mt-4 inline-flex min-h-11 items-center font-narrow text-[12px] font-bold uppercase tracking-[0.14em] text-muted no-underline hover:text-ink"
-      >
-        <span aria-hidden="true" className="inline-block mirror-rtl">
-          {ARROW_START}
-        </span>
-        <span className="ms-2">{t('exhibitionAdmin.backToList')}</span>
-      </Link>
+      <PageHead
+        back={<BackLink onClick={() => navigate('/forms/ex')}>{t('exhibitionAdmin.backToList')}</BackLink>}
+        title={e.name}
+        description={`${formatDateRange(e.startDate, e.endDate, locale)} ${SEP} ${t('exhibitionAdmin.days', { count: durationDays(e.startDate, e.endDate) })}${e.location ? ` ${SEP} ${e.location}` : ''}`}
+        size="md"
+        action={<PrimaryButton onClick={() => navigate(`/forms/ex/${e.id}/edit`)}>{t('action.edit')}</PrimaryButton>}
+      />
 
-      <h1
-        dir="auto"
-        className="mt-1 text-[24px] font-black uppercase leading-[1.08] tracking-[-0.03em] sm:text-[30px]"
-      >
-        {e.name}
-      </h1>
-      <p className="mt-1 text-[14px] text-muted">
-        {formatDateRange(e.startDate, e.endDate, locale)} {SEP}{' '}
-        {t('exhibitionAdmin.days', { count: durationDays(e.startDate, e.endDate) })}
-        {e.location ? (
-          <span dir="auto">
-            {' '}
-            {SEP} {e.location}
-          </span>
-        ) : null}
-      </p>
+      {/* ── the public site: the same panel, in the same place, on every
+             screen that publishes (PublishPanel) ────────────────────────── */}
+      <PublishPanel
+        published={e.isPublished}
+        pending={publish.isPending}
+        onToggle={() => publish.mutate({ id: e.id, on: !e.isPublished })}
+        body={e.hasEnded ? undefined : e.isPublished ? t('exhibitionAdmin.publishedBody') : t('exhibitionAdmin.notPublishedBody')}
+        blocked={
+          // Publishing an ended market puts it nowhere: v_public_opportunity
+          // only lists what is still to come. A control that succeeds and
+          // changes nothing visible is worse than no control.
+          e.hasEnded ? (
+            t('exhibitionAdmin.endedNoPublish')
+          ) : e.isCancelled ? (
+            t('session.cancelled')
+          ) : gaps.length > 0 ? (
+            <>
+              <p className="m-0 font-semibold">{t('exhibitionAdmin.cannotPublishYet')}</p>
+              <ul className="mt-1 list-disc space-y-0.5 ps-5">
+                {gaps.map((g) => (
+                  <li key={g}>{t(`exhibitionAdmin.missing.${g}`)}</li>
+                ))}
+              </ul>
+              <Link
+                to={`/forms/ex/${e.id}/edit`}
+                className="mt-2 inline-flex min-h-11 items-center bg-ink px-4 font-narrow text-[12px] font-bold uppercase tracking-[0.12em] text-bg no-underline hover:text-bg"
+              >
+                {t('exhibitionAdmin.fillInDetails')}
+              </Link>
+            </>
+          ) : undefined
+        }
+      />
 
       {/* ── booths, live ───────────────────────────────────────────────── */}
       <section className="mt-5 border-[1.5px] border-ink p-4">
@@ -150,61 +168,6 @@ export function ExhibitionDetail() {
             {t('exhibitionAdmin.atCapacity')}
           </p>
         ) : null}
-      </section>
-
-      {/* ── the public site ────────────────────────────────────────────── */}
-      <section className="mt-4 border-[1.5px] border-amber bg-sunken p-4">
-        <h2 className="m-0 font-narrow text-[12px] font-bold uppercase tracking-[0.14em] text-amber">
-          {t('exhibitionAdmin.publicHeading')}
-        </h2>
-
-        {e.hasEnded ? (
-          // Publishing an ended market puts it nowhere: v_public_opportunity
-          // only lists what is still to come. A control that succeeds and
-          // changes nothing visible is worse than no control.
-          <p className="mt-1 max-w-[62ch] text-[14px] leading-[1.5] text-body">
-            {t('exhibitionAdmin.endedNoPublish')}
-          </p>
-        ) : (
-          <>
-            <p className="mt-1 max-w-[62ch] text-[14px] leading-[1.5] text-body">
-              {e.isPublished
-                ? t('exhibitionAdmin.publishedBody')
-                : t('exhibitionAdmin.notPublishedBody')}
-            </p>
-            {gaps.length > 0 ? (
-              <div className="mt-2">
-                <p className="m-0 text-[14px] font-semibold text-ink">
-                  {t('exhibitionAdmin.cannotPublishYet')}
-                </p>
-                <ul className="mt-1 list-disc space-y-0.5 ps-5 text-[14px] text-body">
-                  {gaps.map((g) => (
-                    <li key={g}>{t(`exhibitionAdmin.missing.${g}`)}</li>
-                  ))}
-                </ul>
-                <Link
-                  to={`/forms/ex/${e.id}/edit`}
-                  className="mt-2 inline-flex min-h-11 items-center bg-ink px-4 font-narrow text-[12px] font-bold uppercase tracking-[0.12em] text-bg no-underline hover:text-bg"
-                >
-                  {t('exhibitionAdmin.fillInDetails')}
-                </Link>
-              </div>
-            ) : (
-              <button
-                type="button"
-                disabled={publish.isPending || e.isCancelled}
-                onClick={() => publish.mutate({ id: e.id, on: !e.isPublished })}
-                className={`mt-3 inline-flex min-h-11 items-center justify-center px-5 font-narrow text-[12.5px] font-bold uppercase tracking-[0.12em] disabled:bg-track disabled:text-faint ${
-                  e.isPublished ? 'border-[1.5px] border-border-strong text-ink' : 'bg-amber text-bg'
-                }`}
-              >
-                {e.isPublished
-                  ? t('exhibitionAdmin.unpublish')
-                  : t('exhibitionAdmin.publish')}
-              </button>
-            )}
-          </>
-        )}
       </section>
 
       {/* ── registrations ──────────────────────────────────────────────── */}
