@@ -153,8 +153,8 @@ const router = createBrowserRouter([
       // apply/:id. Only where the journey exists; see hasLinkageJourney.
       { path: 'linkage', element: <LinkageRequest /> },
       // No session, by design: someone who applied through the public site
-      // has no account to sign in to. Identity is the same national ID plus
-      // date of birth check as everywhere else, in its own RPC. See 0070.
+      // has no account to sign in to. The national ID alone identifies them,
+      // as on the apply page (0171, OQ-76), in its own RPC (0070).
       { path: 'my-applications', element: <MyApplications /> },
       // Khalidiyah's FORM-12, filled in by the volunteer (0161). Only where
       // the journey exists; see hasVolunteerJourney.
