@@ -2725,3 +2725,81 @@ Syrians.
 - The owner: whether one ticket is one participant, children included
   (the table assumes so), and whether F136 stays.
 - The Arabic reviewer: the wording above.
+
+---
+
+## 🟡 OQ-75 · Sahel Horan's choices in Arabic, from the framework and drafted
+
+**Added 29 September 2026**, with migration `0169`.
+
+Eighteen of Sahel Horan's option lists (138 choices) had no Arabic, so
+every dropdown on the Arabic screens read in English. The owner asked for
+everything in Arabic, from `إطار_عمل_بلدية_سهل_حوران_عربي.xlsx`.
+
+- **From the framework's form sheets, verbatim:**
+  - products and producer types (نموذج_التسجيل_في_المعرض);
+  - partner types and roles (نموذج_الشراكة, نموذج_شراكة_دعم_الإنتاج);
+  - agricultural involvement and activity (نموذج_إتمام_التدريب);
+  - buyer types, sales channels, food-safety items and office services
+    (نموذج_ما_بعد_التدخل).
+- **Drafted, for the Arabic reviewer:**
+  - disability types (the Washington Group domains);
+  - guidance types;
+  - nationality;
+  - promotional channels;
+  - stakeholder types;
+  - training topics.
+
+Only `label_ar` changed; no stored answer or figure moves.
+
+**Decides.** The Municipality's Arabic reviewer: the drafted lists.
+
+---
+
+## 🔴 OQ-76 · The public forms identify an applicant by national ID alone
+
+**Decided by the owner, 29 September 2026**, with migration `0171`.
+
+**What the owner asked.** "Remove the login limit or register when
+applying … remove the date of birth, make it only national ID."
+
+The choice was put to the owner with what each option exposes, and the
+owner chose: national ID only, prefill, no limit.
+
+**What was built.** The four functions the public site calls
+(`applicant_prefill`, `apply_for_opportunity`, `request_linkage`,
+`my_applications`):
+
+- no longer ask for a date of birth or phone to confirm who is applying;
+- no longer count attempts;
+- a new applicant needs a name, not a date of birth (`person` gains the
+  reason `public_id_only`).
+
+The apply, linkage and "my applications" pages ask for the national ID and
+nothing else.
+
+**What it means — why this is red.**
+
+- Anyone who types a national ID that is on file sees that person's full
+  name, sex, village and phone.
+- Anyone can apply, or ask for linkage, in that person's name.
+- Anyone can read that person's list of applications.
+- With no limit, the register — refugees included — can be read by
+  trying numbers.
+- A person registered this way has no date of birth, so the age
+  breakdowns count them as unknown.
+
+The protections this removes were built on purpose. The headers of 0052,
+0053, 0062 and 0120 say why, and "cannot_verify" was one answer for every
+identity failure so the page could not be used to learn who is
+registered.
+
+**Not changed.** Khalidiyah's public volunteer form (`khld_register_volunteer`)
+still asks for the date of birth: it is a field of the workbook (F057), and
+it keeps its limit.
+
+**Decides.** The owner, with Enabel's data-protection focal point, before
+the public link is printed. Two ways back that keep "ID only":
+
+- prefill nothing;
+- keep a generous limit.

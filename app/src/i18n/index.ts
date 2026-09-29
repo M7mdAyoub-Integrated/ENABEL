@@ -79,6 +79,13 @@ const resources = {
   },
 } as const
 
+// Arabic unless the address says otherwise (?lng=en). The browser's own
+// language is not consulted: the owner decided on 29 September 2026 that
+// the whole site opens in Arabic, whatever the device is set to. The
+// language chip switches for the visit; nothing is cached (section 6).
+const arabicFirst = new LanguageDetector()
+arabicFirst.addDetector({ name: 'arabicFirst', lookup: () => 'ar' })
+
 void i18n
   // ICU MessageFormat. This is what gives Arabic all six plural categories
   // (zero/one/two/few/many/other). A `count === 1 ? x : y` ternary is wrong in
@@ -89,7 +96,7 @@ void i18n
     name: 'latnDigits',
     process: (value: string) => toWesternDigits(value),
   })
-  .use(LanguageDetector)
+  .use(arabicFirst)
   .use(initReactI18next)
   .init({
     resources,
@@ -97,13 +104,14 @@ void i18n
     ns: [...NAMESPACES],
     defaultNS: 'common',
 
-    // D-4: the users are Jordanian, so Arabic is the default. English is
-    // reachable by toggle and is the fallback when an Arabic key is missing.
+    // D-4: the users are Jordanian, so Arabic is the default (the
+    // arabicFirst detector above). English is reachable by the language chip
+    // and is the fallback when an Arabic key is missing.
     fallbackLng: { ar: ['en'], default: ['en'] },
     load: 'languageOnly',
 
     detection: {
-      order: ['querystring', 'navigator', 'htmlTag'],
+      order: ['querystring', 'arabicFirst'],
       lookupQuerystring: 'lng',
       // Section 6 of the build plan bans localStorage/sessionStorage outside
       // Supabase Auth, so the detector is not allowed to cache there.

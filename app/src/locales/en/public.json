@@ -71,7 +71,6 @@
     "errNoMatch": "The two numbers are different. Check both against your card.",
     "checkAgainstCard": "Check this against your card:",
     "dateOfBirth": "Date of birth",
-    "dateOfBirthHint": "We use this to confirm it is really you.",
     "continue": "Continue",
     "checking": "Checking…",
     "sending": "Sending…",
@@ -85,9 +84,7 @@
     "noRecordBody": "Nothing on file matches",
     "takenPartBefore": "Have you taken part in a Municipality training or market before?",
     "yesCheckNumber": "Yes — let me check the number",
-    "yesTryPhone": "Yes — try my phone number instead",
     "noFirstTime": "No, this is my first time",
-    "phoneIntro": "If you have taken part before but we have no date of birth for you, your phone number can confirm it instead.",
     "phone": "Phone number",
     "phoneOptional": "Phone number (optional)",
     "phoneHint": "For example 0791234567.",
@@ -114,7 +111,7 @@
       },
       "cannot_verify": {
         "title": "We could not confirm your details",
-        "body": "Two things cause this. Either the national ID or the date of birth does not match what we hold — check both against your card — or you have tried several times in a few minutes, in which case wait ten minutes and try once more. If neither fixes it, please visit the Municipality office and we can sort it out there."
+        "body": "We could not send this application. Check the national ID against your card, and that your name is filled in. If it still does not work, please visit the Municipality office and we can sort it out there."
       },
       "not_open": {
         "title": "This is no longer open",
@@ -170,7 +167,7 @@
       },
       "cannot_verify": {
         "title": "We could not confirm who you are",
-        "body": "Either the details do not match a record we hold — check the national ID and the date of birth — or you have tried several times in a few minutes, in which case wait ten minutes and try once more. If neither fixes it, contact the Municipality."
+        "body": "Nothing on file matches this national ID, or a detail of the request is missing. Check the number against your card and try again. If it still does not work, contact the Municipality."
       },
       "ineligible": {
         "title": "An advisory session comes first",
@@ -192,13 +189,12 @@
   },
   "mine": {
     "heading": "My applications",
-    "intro": "Enter your national ID and date of birth to see everything you have applied for and what has happened with it.",
+    "intro": "Enter your national ID to see everything you have applied for and what has happened with it.",
     "show": "Show my applications",
-    "usePhone": "I do not know my date of birth",
     "yours": "What you have applied for",
     "count": "{count, plural, one {# application} other {# applications}}",
     "checkAnother": "Check another number",
-    "cannotVerifyBody": "Either the details do not match a record we hold — check the national ID and the date of birth — or you have looked up several times in a few minutes, in which case wait ten minutes and try once more. We give the same answer whenever we cannot confirm who you are, so this page can never be used to find out whether a number is registered.",
+    "cannotVerifyBody": "Nothing on file matches this national ID. Check the number against your card and try again.",
     "emptyTitle": "Nothing yet",
     "emptyBody": "We know who you are, and you have not applied for anything so far. Have a look at what is open.",
     "kind": {

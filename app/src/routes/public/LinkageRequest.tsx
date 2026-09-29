@@ -6,7 +6,6 @@ import {
   useActivityTypes,
   groupNationalId,
   isCompleteNationalId,
-  isUsablePhone,
   labelOf,
   normaliseNationalId,
 } from '../../data/apply'
@@ -32,24 +31,23 @@ import { ARROW_START } from '../../ui/glyphs'
  *
  *  So the "we have no record of this number" branch here must not offer
  *  "register me", and this file must never grow that button by being brought
- *  into line with the other form. It offers checking the number, the phone
- *  fallback, and the office. Three answers, none of which create anything.
+ *  into line with the other form. It offers checking the number, and the
+ *  office. Neither creates anything.
  *
  *  ── ELIGIBILITY IS NOT CHECKED BEFORE THE FORM ──
  *
  *  Someone can fill in the whole request and be told at the end that they have
  *  no completed advisory on record. That is deliberate. Checking earlier would
- *  mean an endpoint that answers "has this person completed an advisory?", and
- *  the identity gate in front of it is a date of birth -- which is not a
- *  secret. The rest of the public surface was built to avoid exactly that, and
- *  one convenience is not worth reopening it.
+ *  mean an endpoint that answers "has this person completed an advisory?" for
+ *  any national ID. Since 0171 the national ID is the only thing asked (the
+ *  owner's decision, OQ-76), so that answer would be anyone's to read.
  *
  *  The typed text is not lost when it happens: the outcome panel offers a way
  *  back to the form, and React state is still holding every field.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-type Step = 'identify' | 'phone' | 'notFound' | 'confirm' | 'details' | 'done'
+type Step = 'identify' | 'notFound' | 'confirm' | 'details' | 'done'
 
 function Field({
   label,
@@ -103,10 +101,7 @@ export function LinkageRequest() {
   const [step, setStep] = useState<Step>('identify')
   const [nid, setNid] = useState('')
   const [nid2, setNid2] = useState('')
-  const [dob, setDob] = useState('')
-  const [phone, setPhone] = useState('')
   const [foundName, setFoundName] = useState<string | null>(null)
-  const [usedPhone, setUsedPhone] = useState(false)
   const [touched, setTouched] = useState(false)
 
   const [title, setTitle] = useState('')
@@ -122,21 +117,16 @@ export function LinkageRequest() {
 
   const idsMatch = normaliseNationalId(nid) === normaliseNationalId(nid2)
   const idReady = isCompleteNationalId(nid) && idsMatch
-  const canLookup = idReady && !!dob
+  // The national ID alone identifies the applicant (0171, OQ-76).
+  const canLookup = idReady
   const detailsReady = !!title.trim() && !!activityTypeId && !!request.trim()
 
   // After every hook. The journey is Sahel Horan's (see hasLinkageJourney);
   // on any other municipality's site this address is not a page.
   if (!hasLinkageJourney(site.municipality.code)) return <PublicNotFound />
 
-  async function runLookup(withPhone: boolean) {
-    const res = await lookup.mutateAsync({
-      nationalId: nid,
-      dateOfBirth: withPhone ? null : dob,
-      phone: withPhone ? phone : null,
-      municipalitySlug: site.slug,
-    })
-    setUsedPhone(withPhone)
+  async function runLookup() {
+    const res = await lookup.mutateAsync({ nationalId: nid, municipalitySlug: site.slug })
     if (res.found) {
       setFoundName(res.full_name)
       setStep('confirm')
@@ -148,10 +138,6 @@ export function LinkageRequest() {
   async function submit() {
     const res = await submitRequest.mutateAsync({
       nationalId: nid,
-      // Whichever one identified them is the one the RPC re-checks. Sending
-      // both would let a wrong date of birth through on a phone match.
-      dateOfBirth: usedPhone ? null : dob,
-      phone: usedPhone ? phone : null,
       initiativeTitle: title,
       activityTypeId,
       request,
@@ -198,7 +184,7 @@ export function LinkageRequest() {
           onSubmit={(e) => {
             e.preventDefault()
             setTouched(true)
-            if (canLookup) void runLookup(false)
+            if (canLookup) void runLookup()
           }}
         >
           <p className="m-0 text-[15px] leading-[1.55] text-body">{t('linkage.identifyIntro')}</p>
@@ -247,17 +233,6 @@ export function LinkageRequest() {
             </p>
           ) : null}
 
-          <Field label={t('apply.dateOfBirth')} hint={t('apply.dateOfBirthHint')}>
-            <input
-              className={INPUT}
-              type="date"
-              dir="ltr"
-              value={dob}
-              max={new Date().toISOString().slice(0, 10)}
-              onChange={(e) => setDob(e.target.value)}
-            />
-          </Field>
-
           {lookup.isError ? (
             <p role="alert" className="mt-3 text-[14px] font-semibold text-error">
               {t('apply.errNetwork')}
@@ -302,41 +277,8 @@ export function LinkageRequest() {
             >
               {t('apply.yesCheckNumber')}
             </button>
-            <button type="button" onClick={() => setStep('phone')} className={SECONDARY}>
-              {t('apply.yesTryPhone')}
-            </button>
           </div>
         </div>
-      ) : null}
-
-      {/* ── phone fallback, for people with no date of birth on file ───── */}
-      {step === 'phone' ? (
-        <form
-          className="mt-6 border-[1.5px] border-ink p-4 sm:p-5"
-          onSubmit={(e) => {
-            e.preventDefault()
-            if (isUsablePhone(phone)) void runLookup(true)
-          }}
-        >
-          <p className="m-0 text-[15px] leading-[1.55] text-body">{t('apply.phoneIntro')}</p>
-          <Field label={t('apply.phone')} hint={t('apply.phoneHint')}>
-            <input
-              className={INPUT}
-              inputMode="tel"
-              dir="ltr"
-              autoComplete="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-          </Field>
-          <button
-            type="submit"
-            disabled={!isUsablePhone(phone) || lookup.isPending}
-            className={`${PRIMARY} mt-5 w-full sm:w-auto`}
-          >
-            {lookup.isPending ? t('apply.checking') : t('apply.continue')}
-          </button>
-        </form>
       ) : null}
 
       {/* ── is this you ───────────────────────────────────────────────── */}

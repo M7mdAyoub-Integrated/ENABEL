@@ -10,7 +10,6 @@ import {
   usePortalPerson,
 } from '../../hooks/useData'
 import { Field } from '../../ui/Field'
-import { SegmentBar } from '../../ui/primitives'
 import { BidiIsolate } from '../../components/BidiIsolate'
 import { PortalShell } from './PortalShell'
 import { ARROW_START } from '../../ui/glyphs'
@@ -128,25 +127,7 @@ export function PortalRegister() {
 
           {chosen ? (
             <div className="mt-4 bg-amber px-[18px] py-4 text-bg">
-              <div className="flex items-baseline justify-between gap-3.5">
-                <span className="text-[17px] font-extrabold tracking-[-0.025em]">
-                  {chosen.name}
-                </span>
-                <span className="font-narrow text-[12px] font-bold uppercase tracking-[0.1em] tabular-nums">
-                  {t('forms:registration.boothsTaken', {
-                    taken: chosen.taken,
-                    capacity: chosen.capacity,
-                  })}
-                </span>
-              </div>
-              <div className="mt-3">
-                <SegmentBar
-                  segments={chosen.capacity}
-                  filled={chosen.taken}
-                  label={t('forms:registration.boothProgress')}
-                  height="h-[18px]"
-                />
-              </div>
+              <span className="text-[17px] font-extrabold tracking-[-0.025em]">{chosen.name}</span>
             </div>
           ) : null}
 

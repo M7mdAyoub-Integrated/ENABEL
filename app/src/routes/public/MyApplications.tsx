@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import {
   groupNationalId,
   isCompleteNationalId,
-  isUsablePhone,
   normaliseNationalId,
 } from '../../data/apply'
 import { useMyApplications, type ApplicationRow } from '../../data/myApplications'
@@ -19,21 +18,14 @@ import { formatShortDate } from '../../lib/format'
  *
  *  ── THE FAILURE IS ONE MESSAGE, AND THAT IS THE POINT ──
  *
- *  A wrong date of birth, a wrong phone and a national ID we have never seen
- *  all come back as the same `{"found": false}`, so this screen has one thing
- *  to say about all three. That reads as slightly unhelpful, and it is
- *  deliberate: if the page could distinguish them, anyone could use it to find
- *  out whether an ID is on the Municipality's register.
- *
- *  So the copy does not say "no applications found" -- that would leak the
- *  distinction back in words that SQL was careful not to leak. It says we could
- *  not confirm who you are, which is true of every branch.
+ *  Since 0171 the national ID alone opens this page (the owner's decision,
+ *  OQ-76): an ID on file answers with its applications, and one we have never
+ *  seen comes back `{"found": false}`, which the copy states plainly.
  *
  *  ── AN EMPTY LIST IS A DIFFERENT THING FROM A FAILED LOOKUP ──
  *
  *  found: true with no rows means we know who you are and you have not applied
- *  for anything. That is safe to say plainly, because the identity check has
- *  already passed.
+ *  for anything.
  *
  *  ── NOTHING IS COMPUTED HERE ──
  *
@@ -45,7 +37,7 @@ import { formatShortDate } from '../../lib/format'
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-type Step = 'identify' | 'phone' | 'results'
+type Step = 'identify' | 'results'
 
 const INPUT =
   'block w-full min-h-12 border-[1.5px] border-border-strong bg-bg px-3 text-[16px] text-ink ' +
@@ -109,22 +101,16 @@ export function MyApplications() {
 
   const [step, setStep] = useState<Step>('identify')
   const [nid, setNid] = useState('')
-  const [dob, setDob] = useState('')
-  const [phone, setPhone] = useState('')
   const [touched, setTouched] = useState(false)
   const [result, setResult] = useState<
     { found: false } | { found: true; applications: ApplicationRow[] } | null
   >(null)
 
-  const canLookup = isCompleteNationalId(nid) && !!dob
+  // The national ID alone identifies the applicant (0171, OQ-76).
+  const canLookup = isCompleteNationalId(nid)
 
-  async function run(withPhone: boolean) {
-    const res = await lookup.mutateAsync({
-      nationalId: nid,
-      dateOfBirth: withPhone ? null : dob,
-      phone: withPhone ? phone : null,
-      municipalitySlug: site.slug,
-    })
+  async function run() {
+    const res = await lookup.mutateAsync({ nationalId: nid, municipalitySlug: site.slug })
     setResult(res)
     setStep('results')
   }
@@ -132,8 +118,6 @@ export function MyApplications() {
   function startOver() {
     setResult(null)
     setNid('')
-    setDob('')
-    setPhone('')
     setTouched(false)
     setStep('identify')
   }
@@ -167,7 +151,7 @@ export function MyApplications() {
           onSubmit={(e) => {
             e.preventDefault()
             setTouched(true)
-            if (canLookup) void run(false)
+            if (canLookup) void run()
           }}
         >
           <label className="block">
@@ -202,21 +186,6 @@ export function MyApplications() {
             </p>
           ) : null}
 
-          <label className="mt-4 block">
-            <span className="font-narrow text-[12px] font-bold uppercase tracking-[0.12em] text-muted">
-              {t('apply.dateOfBirth')}
-            </span>
-            <span className="mt-0.5 block text-[13px] text-muted">{t('apply.dateOfBirthHint')}</span>
-            <input
-              className={`${INPUT} mt-1.5`}
-              type="date"
-              dir="ltr"
-              value={dob}
-              max={new Date().toISOString().slice(0, 10)}
-              onChange={(e) => setDob(e.target.value)}
-            />
-          </label>
-
           {lookup.isError ? (
             <p role="alert" className="mt-3 text-[14px] font-semibold text-error">
               {t('apply.errNetwork')}
@@ -227,56 +196,7 @@ export function MyApplications() {
             <button type="submit" disabled={!canLookup || lookup.isPending} className={PRIMARY}>
               {lookup.isPending ? t('apply.checking') : t('mine.show')}
             </button>
-            <button type="button" onClick={() => setStep('phone')} className={SECONDARY}>
-              {t('mine.usePhone')}
-            </button>
           </div>
-        </form>
-      ) : null}
-
-      {step === 'phone' ? (
-        <form
-          className="mt-6 border-[1.5px] border-ink p-4 sm:p-5"
-          onSubmit={(e) => {
-            e.preventDefault()
-            if (isCompleteNationalId(nid) && isUsablePhone(phone)) void run(true)
-          }}
-        >
-          <p className="m-0 text-[15px] leading-[1.55] text-body">{t('apply.phoneIntro')}</p>
-          <label className="mt-4 block">
-            <span className="font-narrow text-[12px] font-bold uppercase tracking-[0.12em] text-muted">
-              {t('apply.nationalId')}
-            </span>
-            <input
-              className={`${INPUT} mt-1.5`}
-              inputMode="numeric"
-              autoComplete="off"
-              dir="ltr"
-              value={nid}
-              onChange={(e) => setNid(normaliseNationalId(e.target.value))}
-            />
-          </label>
-          <label className="mt-4 block">
-            <span className="font-narrow text-[12px] font-bold uppercase tracking-[0.12em] text-muted">
-              {t('apply.phone')}
-            </span>
-            <span className="mt-0.5 block text-[13px] text-muted">{t('apply.phoneHint')}</span>
-            <input
-              className={`${INPUT} mt-1.5`}
-              inputMode="tel"
-              dir="ltr"
-              autoComplete="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-          </label>
-          <button
-            type="submit"
-            disabled={!isCompleteNationalId(nid) || !isUsablePhone(phone) || lookup.isPending}
-            className={`${PRIMARY} mt-5`}
-          >
-            {lookup.isPending ? t('apply.checking') : t('mine.show')}
-          </button>
         </form>
       ) : null}
 

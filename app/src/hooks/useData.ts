@@ -404,15 +404,13 @@ export function useExhibitionOptions(t: Translate, locale: string): ExhibitionOp
         const full = exhibitionIsFull(e, taken)
         const dates = formatDateRange(e.start_date, e.end_date, locale)
         const reason = held ? 'held' : full ? 'full' : null
-        const suffix = held
-          ? t('common:exhibition.alreadyHeld')
-          : full
-            ? t('common:exhibition.full')
-            : t('common:exhibition.boothsFree', { count: e.booth_capacity - taken })
+        // A producer is not told how many booths a market has or has left
+        // (the owner, 29 September 2026; 0170 does the same on the public page)
+        const suffix = held ? t('common:exhibition.alreadyHeld') : full ? t('common:exhibition.full') : null
         return {
           id: e.id,
           name: e.name,
-          label: `${e.name} · ${dates} · ${suffix}`,
+          label: suffix ? `${e.name} · ${dates} · ${suffix}` : `${e.name} · ${dates}`,
           disabled: held || full,
           reason,
           taken,

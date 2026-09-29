@@ -7,7 +7,6 @@ import {
   useApplyForOpportunity,
   groupNationalId,
   isCompleteNationalId,
-  isUsablePhone,
   normaliseNationalId,
   useProducerTypes,
   useProducts,
@@ -63,7 +62,6 @@ import { ARROW_START } from '../../ui/glyphs'
 type Step =
   | 'identify'
   | 'notFound'
-  | 'phone'
   | 'confirm'
   | 'register'
   /** Exhibitions only: what kind of producer, and what do you make. */
@@ -122,7 +120,6 @@ export function ApplyForm() {
   const [step, setStep] = useState<Step>('identify')
   const [nid, setNid] = useState('')
   const [nid2, setNid2] = useState('')
-  const [dob, setDob] = useState('')
   const [phone, setPhone] = useState('')
   const [fullName, setFullName] = useState('')
   const [sex, setSex] = useState('')
@@ -142,7 +139,8 @@ export function ApplyForm() {
 
   const idsMatch = normaliseNationalId(nid) === normaliseNationalId(nid2)
   const idReady = isCompleteNationalId(nid) && idsMatch
-  const canLookup = idReady && !!dob
+  // The national ID alone identifies the applicant (0171, OQ-76).
+  const canLookup = idReady
 
   if (q.isLoading) {
     return (
@@ -197,13 +195,8 @@ export function ApplyForm() {
 
   const isExhibition = o.opportunity_type === 'exhibition'
 
-  async function runLookup(withPhone: boolean) {
-    const res = await lookup.mutateAsync({
-      nationalId: nid,
-      dateOfBirth: withPhone ? null : dob,
-      phone: withPhone ? phone : null,
-      municipalitySlug: site.slug,
-    })
+  async function runLookup() {
+    const res = await lookup.mutateAsync({ nationalId: nid, municipalitySlug: site.slug })
     if (res.found) {
       setFoundName(res.full_name)
       setVillage(res.village ?? '')
@@ -213,7 +206,7 @@ export function ApplyForm() {
       setKnown({ sex: res.sex, village: res.village, phone: res.phone })
       setStep('confirm')
     } else {
-      setStep(withPhone ? 'notFound' : 'notFound')
+      setStep('notFound')
     }
   }
 
@@ -222,7 +215,6 @@ export function ApplyForm() {
       opportunityId: o!.id,
       opportunityType: o!.opportunity_type,
       nationalId: nid,
-      dateOfBirth: dob || null,
       phone: phone || null,
       ...(isNew ? { fullName, sex, village } : {}),
       ...(isExhibition ? { producerTypeId, productIds } : {}),
@@ -276,7 +268,7 @@ export function ApplyForm() {
           onSubmit={(e) => {
             e.preventDefault()
             setTouched(true)
-            if (canLookup) void runLookup(false)
+            if (canLookup) void runLookup()
           }}
         >
           <p className="m-0 text-[15px] leading-[1.55] text-body">{t('apply.identifyIntro')}</p>
@@ -323,17 +315,6 @@ export function ApplyForm() {
               </strong>
             </p>
           ) : null}
-
-          <Field label={t('apply.dateOfBirth')} hint={t('apply.dateOfBirthHint')}>
-            <input
-              className={INPUT}
-              type="date"
-              dir="ltr"
-              value={dob}
-              max={new Date().toISOString().slice(0, 10)}
-              onChange={(e) => setDob(e.target.value)}
-            />
-          </Field>
 
           {lookup.isError ? (
             <p role="alert" className="mt-3 text-[14px] font-semibold text-error">
@@ -459,13 +440,6 @@ export function ApplyForm() {
             </button>
             <button
               type="button"
-              onClick={() => setStep('phone')}
-              className="inline-flex min-h-12 items-center justify-center border-[1.5px] border-border-strong px-5 font-narrow text-[13px] font-bold uppercase tracking-[0.12em] text-ink"
-            >
-              {t('apply.yesTryPhone')}
-            </button>
-            <button
-              type="button"
               onClick={() => {
                 setFullName('')
                 setStep('register')
@@ -478,43 +452,13 @@ export function ApplyForm() {
         </div>
       ) : null}
 
-      {/* ── phone fallback, for people with no date of birth on file ────── */}
-      {step === 'phone' ? (
-        <form
-          className="mt-6 border-[1.5px] border-ink p-4 sm:p-5"
-          onSubmit={(e) => {
-            e.preventDefault()
-            if (isUsablePhone(phone)) void runLookup(true)
-          }}
-        >
-          <p className="m-0 text-[15px] leading-[1.55] text-body">{t('apply.phoneIntro')}</p>
-          <Field label={t('apply.phone')} hint={t('apply.phoneHint')}>
-            <input
-              className={INPUT}
-              inputMode="tel"
-              dir="ltr"
-              autoComplete="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-          </Field>
-          <button
-            type="submit"
-            disabled={!isUsablePhone(phone) || lookup.isPending}
-            className="mt-5 inline-flex min-h-12 w-full items-center justify-center bg-ink px-6 font-narrow text-[13px] font-bold uppercase tracking-[0.12em] text-bg disabled:bg-track disabled:text-faint sm:w-auto"
-          >
-            {lookup.isPending ? t('apply.checking') : t('apply.continue')}
-          </button>
-        </form>
-      ) : null}
-
       {/* ── register, for someone genuinely new ─────────────────────────── */}
       {step === 'register' ? (
         <form
           className="mt-6 border-[1.5px] border-ink p-4 sm:p-5"
           onSubmit={(e) => {
             e.preventDefault()
-            if (fullName.trim() && dob) goToStallOrSubmit(true)
+            if (fullName.trim()) goToStallOrSubmit(true)
           }}
         >
           <p className="m-0 text-[15px] leading-[1.55] text-body">{t('apply.registerIntro')}</p>
@@ -572,7 +516,7 @@ export function ApplyForm() {
 
           <button
             type="submit"
-            disabled={!fullName.trim() || !dob || apply.isPending}
+            disabled={!fullName.trim() || apply.isPending}
             className="mt-5 inline-flex min-h-12 w-full items-center justify-center bg-ink px-6 font-narrow text-[13px] font-bold uppercase tracking-[0.12em] text-bg disabled:bg-track disabled:text-faint sm:w-auto"
           >
             {apply.isPending ? t('apply.sending') : t('apply.submit')}
