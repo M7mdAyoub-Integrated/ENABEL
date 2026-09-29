@@ -49,7 +49,7 @@ const BASELINE = {
   'auth.json': 0,
   'common.json': 0,
   'errors.json': 0,
-  'forms.json': 71,
+  'forms.json': 2,
   'indicators.json': 1,
   'nav.json': 0,
   'portal.json': 0,
@@ -58,7 +58,7 @@ const BASELINE = {
   // Both locales of khld.json are the sheet's own words (gen_forms.py); the
   // Form IDs are codes and live in the definition, not the locale.
   'khld.json': 0,
-  'survey.json': 108,
+  'survey.json': 0,
 }
 
 /**
