@@ -89,29 +89,22 @@ English/Arabic with full RTL. Deployed with Netlify from
 The Netlify site `enabel-platform` (`https://enabel-platform.netlify.app`)
 lives on the second Netlify account (team `m7mdayoub-integrated`, site id
 `419f30d7-4759-4c42-9451-d84f1d6e92ca`) since 29 September 2026, when the
-first account ran out of credits. It is **not** connected to GitHub: a push
-to `main` deploys nothing, so credits are spent only when a deploy is
-chosen. To publish, from `app/` with the Netlify CLI signed in to that
-account (`app/.netlify/state.json` links the folder to the site):
+first account ran out of credits. It builds **from this repository**: a push
+to `main` reaches Netlify through the webhook on the GitHub repo
+(`https://api.netlify.com/hooks/github`, shared by every Netlify site), and
+Netlify clones with the read-only deploy key "Netlify Deploy Key
+(enabel-platform, second account)". `netlify.toml` gives the base (`app`),
+the command (`npm run build`), the publish directory, the SPA redirect and
+the three security headers. The build runs the whole check suite before
+`vite build` and refuses to ship a bundle holding a demo credential, so the
+site's environment carries exactly two variables, `VITE_SUPABASE_URL` and
+`VITE_SUPABASE_ANON_KEY` (the publishable key, which is public by design),
+and must never carry `VITE_DEMO_PASSWORD` or `VITE_DEMO_EMAIL`.
 
-```bash
-VITE_DEMO_PASSWORD= VITE_DEMO_EMAIL= npm run build
-netlify deploy --prod --no-build --dir dist
-```
-
-The build runs the whole check suite before `vite build` and refuses to ship
-a bundle holding a demo credential; the two demo variables are emptied on
-the command line because `.env.local` carries them for `npm run dev`. The
-Supabase URL and publishable key come from `.env.local` into the bundle, as
-they would from the site's environment on a Netlify build (the publishable
-key is public by design). `netlify.toml` still gives the base, the SPA
-redirect and the three security headers, and a CLI deploy applies them.
-The new team protected every site behind a Netlify login by default; that
-was switched off (`sso_login = false`) so the public pages are public.
-
-To go back to deploying on every push, connect the repository in the
-site's settings and set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
-in its environment; never `VITE_DEMO_PASSWORD` or `VITE_DEMO_EMAIL`.
+**Every push to `main` is a production deploy, and each one spends
+credits.** Push once per piece of work, not after every commit. The new
+team protected every site behind a Netlify login by default; that was
+switched off (`sso_login = false`) so the public pages are public.
 
 Two settings live outside the repository and are listed in
 `06_OPEN_QUESTIONS.md` OQ-49: the evidence bucket's CORS rule must name
