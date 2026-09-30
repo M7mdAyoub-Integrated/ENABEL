@@ -2794,9 +2794,17 @@ The protections this removes were built on purpose. The headers of 0052,
 identity failure so the page could not be used to learn who is
 registered.
 
-**Not changed.** Khalidiyah's public volunteer form (`khld_register_volunteer`)
-still asks for the date of birth: it is a field of the workbook (F057), and
-it keeps its limit.
+**Every municipality (30 September 2026, `0173`).** The owner asked for
+the same on every municipality's public forms. Ramtha's public page already
+used the four functions above. Khalidiyah's volunteer registration
+(`khld_register_volunteer`) now does the same:
+
+- it identifies a volunteer on file by the ID alone;
+- it counts no attempts;
+- a new volunteer gives name, sex and phone, and no date of birth.
+
+The public page no longer shows the date-of-birth field. The staff FORM-12
+still asks it: it is the workbook's F057, and staff are not applying.
 
 **Decides.** The owner, with Enabel's data-protection focal point, before
 the public link is printed. Two ways back that keep "ID only":

@@ -1021,7 +1021,7 @@
     "withdrawn": "A registration under this ID was withdrawn. Please contact the Municipality office.",
     "not_eligible": "This registration is for residents of Al Khalidiyah.",
     "not_open": "Volunteer registration is not open on this page.",
-    "cannot_verify": "We could not register you with these details. If you registered before, check the date of birth, or try again later.",
+    "cannot_verify": "We could not register you with these details. Check the identity number against your card, and that your name, sex and phone are filled in.",
     "invalid": "Some answers are missing or not accepted. Check the form and try again.",
     "failed": "The registration could not be sent. Check your connection and try again.",
     "again": "Register someone else",

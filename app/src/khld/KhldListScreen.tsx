@@ -145,7 +145,7 @@ function ListFor({ fid }: { fid: KhldFormId }) {
         columns={columns}
         rows={rows}
         actions={actions}
-        recordLabel={L.short}
+        recordLabel={t('forms:record')}
         isLoading={list.isLoading}
         isError={list.isError}
         error={list.error}

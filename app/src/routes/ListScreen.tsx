@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { makeTranslate } from '../i18n/tx'
 import { isModuleId, MODULES, ACCENT_BG } from '../modules'
 import { useAuth } from '../auth/AuthProvider'
-import { can, canWriteModule } from '../auth/permissions'
+import { canWriteModule } from '../auth/permissions'
 import { useModuleRows } from '../data/moduleRows'
 import type { RowAction } from '../ui/DataTable'
 import { ListTable } from '../ui/ListTable'
@@ -42,49 +42,14 @@ export function ListScreen() {
   const writable = canWriteModule(role, module)
 
   /**
-   * Row actions: View, then Edit and Delete when the role allows them --
-   * 05 sections 4 and 5, so a data_entry user sees View and Edit and no more.
+   * One action per row, "Open", as on every other list (ListTable): Edit and
+   * Delete are on the record's page, where the delete dialog states which
+   * indicators drop. The owner asked on 30 September 2026 for Sahel Horan's
+   * lists to match Ramtha's and Khalidiyah's.
    */
-  // ── THE APPROVE / REJECT ROW ACTIONS WERE REMOVED HERE ──
-  //
-  // They rendered on `module === 'rg'`, retired and redirected to /forms/ex
-  // since 2f8edff, so they were unreachable. And they called
-  // `mutations.setRegistrationStatus` — the session-local MOCK — then fired
-  // "Approved". Nothing was written, and E0.2 counts approved registrations,
-  // so had the redirect gone away a coordinator would have approved a producer
-  // into a market and watched the indicator stay still.
-  //
-  // The real decision is on /exhibitions/:id. `pending` is gone with them: it
-  // was only ever `module === 'rg' && …`.
-  const rowActions = (): RowAction[] => {
-    const list: RowAction[] = []
-
-    list.push({
-      id: 'view',
-      label: t('forms:action.view'),
-      onSelect: (id) => navigate(`/forms/${module}/${id}`),
-    })
-
-    if (writable) {
-      list.push({
-        id: 'edit',
-        label: t('forms:action.edit'),
-        onSelect: (id) => navigate(`/forms/${module}/${id}/edit`),
-      })
-    }
-    if (can(role, 'record.delete')) {
-      list.push({
-        id: 'delete',
-        label: t('forms:action.delete'),
-        tone: 'danger',
-        // Straight to the record, where the delete dialog states which
-        // indicators drop. A one-click destructive action in a table row is
-        // not something a donor-facing register should offer.
-        onSelect: (id) => navigate(`/forms/${module}/${id}`),
-      })
-    }
-    return list
-  }
+  const rowActions = (): RowAction[] => [
+    { id: 'open', label: t('common:actions.open'), onSelect: (id) => navigate(`/forms/${module}/${id}`) },
+  ]
 
   return (
     <>

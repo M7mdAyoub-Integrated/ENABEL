@@ -130,7 +130,7 @@ export function RmthListScreen() {
         columns={columns}
         rows={rows}
         actions={actions}
-        recordLabel={L.title}
+        recordLabel={t('forms:record')}
         isLoading={list.isLoading}
         isError={list.isError}
         error={list.error}

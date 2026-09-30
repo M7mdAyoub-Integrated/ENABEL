@@ -100,8 +100,10 @@ function Milestones() {
         <div key={m.id} className="border-[1.5px] border-border-strong p-4">
           <div className="flex flex-wrap items-center gap-2">
             <IndicatorTag code={m.code} />
+            {/* milestone.name is English only; B1.1 and G0.1 ARE the indicator,
+                whose Arabic is the framework's statement (indicators:name.*) */}
             <span dir="auto" className="text-[15px] font-semibold text-ink">
-              {m.name}
+              {locale.startsWith('ar') ? t(`name.${m.code}`, { defaultValue: m.name }) : m.name}
             </span>
           </div>
 

@@ -26,9 +26,10 @@ import { ARROW_START } from '../../ui/glyphs'
  *  khld_register_volunteer (0161), which decides. A registration arrives
  *  waiting for review and counts nowhere until staff approve it.
  *
- *  Every refusal is the function's, in its own words. `cannot_verify` is the
- *  answer to every identity failure AND to the rate limiter, so the page says
- *  what may have happened and does not claim to know which.
+ *  Every refusal is the function's, in its own words. Since 0173 the ID alone
+ *  identifies a volunteer -- no date of birth is asked and there is no limit
+ *  on attempts (OQ-76) -- so `cannot_verify` means an ID that is malformed or
+ *  a new volunteer's details missing.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
@@ -75,7 +76,7 @@ function Register() {
     } else if (f.kind === 'person_sex') {
       if (!person.sex) errors[f.id] = req
     } else if (f.kind === 'dob') {
-      if (!person.dob) errors[f.id] = req
+      // not asked on the public form: the ID alone identifies a volunteer (0173, OQ-76)
     } else if (f.kind === 'person_phone') {
       if (person.phone.replace(/\D/g, '').length < 9) errors[f.id] = req
     } else if (f.kind === 'multi') {
@@ -253,7 +254,8 @@ function PublicField(p: {
     case 'person_sex':
       return <Field spec={{ ...base, type: 'radio', span: 6, options: rows.map((r) => ({ value: r.code, label: refLabel(r, p.locale) })) }} value={p.person.sex} onChange={(x) => p.setPerson((s) => ({ ...s, sex: x }))} />
     case 'dob':
-      return <Field spec={{ ...base, type: 'date', span: 4 }} value={p.person.dob} onChange={(x) => p.setPerson((s) => ({ ...s, dob: x }))} />
+      // not asked on the public form (0173, OQ-76); the staff form still asks it
+      return null
     case 'person_phone':
       return <Field spec={{ ...base, type: 'tel', ltr: true, span: 6, placeholder: '07XXXXXXXX' }} value={p.person.phone} onChange={(x) => p.setPerson((s) => ({ ...s, phone: x }))} />
     case 'bool':
