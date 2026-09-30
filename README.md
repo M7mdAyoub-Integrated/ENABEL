@@ -111,7 +111,7 @@ use "Trigger deploy → Clear cache and deploy site" in the Netlify UI.
 Set the environment BEFORE connecting a repository: connecting starts a
 build at once, and on 30 September 2026 that first build ran before the
 two variables existed and published a site that could not reach the
-database, until a rebuild an hour later. The new team also protected
+database for about eight minutes, until a rebuild. The new team also protected
 every site behind a Netlify login by default; that was switched off
 (`sso_login = false`) so the public pages are public.
 
