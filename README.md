@@ -101,10 +101,19 @@ site's environment carries exactly two variables, `VITE_SUPABASE_URL` and
 `VITE_SUPABASE_ANON_KEY` (the publishable key, which is public by design),
 and must never carry `VITE_DEMO_PASSWORD` or `VITE_DEMO_EMAIL`.
 
-**Every push to `main` is a production deploy, and each one spends
-credits.** Push once per piece of work, not after every commit. The new
-team protected every site behind a Netlify login by default; that was
-switched off (`sso_login = false`) so the public pages are public.
+**A push to `main` that changes anything under `app/` is a production
+deploy, and each one spends credits**; a push that touches only files
+outside `app/` (docs, migrations) is skipped by Netlify, because the base
+directory is `app`. Push once per piece of work, not after every commit.
+To rebuild without a push (after changing the site's environment, say),
+use "Trigger deploy → Clear cache and deploy site" in the Netlify UI.
+
+Set the environment BEFORE connecting a repository: connecting starts a
+build at once, and on 30 September 2026 that first build ran before the
+two variables existed and published a site that could not reach the
+database, until a rebuild an hour later. The new team also protected
+every site behind a Netlify login by default; that was switched off
+(`sso_login = false`) so the public pages are public.
 
 Two settings live outside the repository and are listed in
 `06_OPEN_QUESTIONS.md` OQ-49: the evidence bucket's CORS rule must name
