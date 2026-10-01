@@ -250,5 +250,13 @@
     "applyUntil": "Apply by {date}",
     "campaignAction": "Take part: register as a volunteer",
     "sessionAction": "To attend, register with the Municipality."
+  },
+  "whatsOnRmth": {
+    "heading": "What's on",
+    "intro": "Ramtha Municipality's job fairs, vocational guidance sessions, training programmes and business incubators. Everything the Municipality has announced is listed here, soonest first.",
+    "emptyTitle": "Nothing announced right now",
+    "emptyBody": "Activities are announced through the year — check back later.",
+    "kind": "Activity",
+    "sector": "Sector / field: {sector}"
   }
 }

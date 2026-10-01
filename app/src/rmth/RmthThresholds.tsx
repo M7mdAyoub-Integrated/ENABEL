@@ -13,13 +13,17 @@ import { makeTranslate, type Translate } from '../i18n/tx'
 import { SearchSelect } from '../ui/SearchSelect'
 
 /**
- * The seven open items (OQ-47), as the screen where they are answered.
+ * The open definitions (rmth_threshold, 0123; reworded by 0179), as the
+ * screen where they are answered: the parameters the Calculation Method sheet
+ * of RMTH_Forms_and_Calculations_v2.xlsx marks REQUIRES CONFIRMATION -- X
+ * months (IMP-0), the short-term intensive thresholds (C1.1), N months of six
+ * (SO3-0), programmes or sessions (F0.2).
  *
- * Each row is one value in rmth_threshold (0123): the question in the
- * reader's language, the note that says what the sheet proposed, the current
- * answer or "not decided", and which indicators wait on it (from
- * v_rmth_indicator_status, the same view the dashboard reads -- so this
- * screen and the dashboard cannot disagree about what is blocked).
+ * Each row is one value: the question in the reader's language, the note
+ * that says what the sheet proposed, the current answer or "not decided", and
+ * which indicators wait on it (from v_rmth_indicator_status, the same view
+ * the dashboard reads -- so this screen and the dashboard cannot disagree
+ * about what is blocked).
  *
  * A coordinator of Ramtha writes the answer here; RLS decides who that is.
  * Writing it is a data change, not a migration: the indicator views read the
@@ -28,15 +32,12 @@ import { SearchSelect } from '../ui/SearchSelect'
 
 const CHOICES: Record<string, readonly string[]> = {
   f02_counting_reading: ['programmes', 'sessions'],
-  so10_employability_threshold: ['form_rule', 'placement_only'],
 }
-const BOOL_KEYS = new Set(['so20_self_employment_counts'])
-/** Plan §5.4 lists the seven in this order; the rows come back by key. */
-const ITEM_ORDER = [
-  'sustained_engagement', 'short_term_intensive', 'regular_income', 'completion_criteria',
-  'self_employment_as_placement', 'programmes_or_sessions', 'employability_threshold',
-]
-const TEXT_KEYS = new Set(['c12_completion_rule', 'e03_completion_rule', 'f01_completion_rule'])
+/** None of the four is a yes/no or a written rule; the editor keeps both kinds for a definition that is. */
+const BOOL_KEYS = new Set<string>()
+const TEXT_KEYS = new Set<string>()
+/** The sheet's order: IMP-0, C1.1, SO3-0, F0.2. The rows come back by key. */
+const ITEM_ORDER = ['sustained_engagement', 'short_term_intensive', 'regular_income', 'programmes_or_sessions']
 
 function kindOf(t: RmthThreshold): 'choice' | 'bool' | 'text' | 'numeric' {
   if (CHOICES[t.key]) return 'choice'

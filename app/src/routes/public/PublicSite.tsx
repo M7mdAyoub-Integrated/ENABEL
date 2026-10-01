@@ -54,10 +54,10 @@ export function usePublicSiteOptional(): PublicSiteContext | null {
  * The market-linkage request is Sahel Horan's: C1.2, a producer who has
  * completed a market advisory asks to be connected with a buyer. Ramtha's
  * forms have no public journey of their own -- its residents are recorded by
- * staff at events, in training cycles and in incubators -- so its public page
- * lists what its staff publish and lets a person check an application, and
- * nothing more. `request_linkage` answers `ineligible` on a Ramtha page
- * regardless (0120); this only decides whether the page is offered.
+ * staff at events, in training programmes and in incubators -- so its public
+ * page lists the activities its staff publish (0181) and nothing more.
+ * `request_linkage` answers `ineligible` on a Ramtha page regardless (0120);
+ * this only decides whether the page is offered.
  */
 export function hasLinkageJourney(code: string): boolean {
   return code === 'SHM'
@@ -69,11 +69,14 @@ export function hasLinkageJourney(code: string): boolean {
  * Khalidiyah's activities and markets are open to all: nothing on its page
  * is applied for. Its page therefore shows the published activities and
  * markets from v_public_khld_whats_on (0163) and never mentions
- * applications or accounts. The other two, and any fourth municipality until
- * someone says otherwise, list opportunities.
+ * applications or accounts. Ramtha's page, since its owner asked on
+ * 1 October 2026 for a button that publishes an activity of the Activity
+ * Register, is the same kind of page over v_public_rmth_whats_on (0181):
+ * Ramtha has nothing the public applies for. Sahel Horan, and any fourth
+ * municipality until someone says otherwise, list opportunities.
  */
 export function publicJourney(code: string): 'apply' | 'whats_on' {
-  return code === 'KHLD' ? 'whats_on' : 'apply'
+  return code === 'KHLD' || code === 'RMTH' ? 'whats_on' : 'apply'
 }
 
 /**

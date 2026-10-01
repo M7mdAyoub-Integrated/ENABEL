@@ -43,12 +43,13 @@ docs/04_DATA_DICTIONARY.md     ← every field of every form, with option lists
 docs/05_ROLES_AND_RLS.md       ← the five roles and the policy for every table
 docs/06_OPEN_QUESTIONS.md      ← decisions that must NOT be guessed
 docs/07_BUILD_CHECKLIST.md     ← the 17 migrations, in order, with verification
-09_MULTI_MUNICIPALITY.md       ← the second municipality (Ramtha), part by part, 0111–0135; Parts 10–11 are the super admin's chrome and the platform dialog; Part 12 is the third (Khalidiyah), 0138–0152; Part 13 replaces Khalidiyah's forms with the reviewed workbook, 0153–0168
+09_MULTI_MUNICIPALITY.md       ← the second municipality (Ramtha), part by part, 0111–0135; Parts 10–11 are the super admin's chrome and the platform dialog; Part 12 is the third (Khalidiyah), 0138–0152; Part 13 replaces Khalidiyah's forms with the reviewed workbook, 0153–0168; Part 14 replaces Ramtha's with RMTH_Forms_and_Calculations_v2.xlsx, 0174–0181
 RAMTHA_IMPLEMENTATION_PLAN.md  ← the brief that work followed
-RAMTHA_REPORT.md               ← where Ramtha stands: what computes, what waits on a decision
+RAMTHA_REPORT.md               ← where Ramtha stands: seven forms from RMTH_Forms_and_Calculations_v2.xlsx, 14 of 18 indicators compute, four wait on a definition
 KHALIDIYAH_IMPLEMENTATION_PLAN.md ← the brief the third municipality followed
 KHALIDIYAH_REPORT.md           ← where Khalidiyah stands: 22 forms from Khaldia_2_reviewed.xlsx (FORM-20 off the app, OQ-71), 20 of 21 indicators compute, what waits on a decision
 supabase/khalidiyah/           ← one reading of Khaldia_2_reviewed.xlsx and the generators for 0156–0160, 0162–0163, 0165, 0167–0168 and app/src/khld (gen_schema, gen_views, gen_forms); a later change is dated in the catalogue (`since`, `was`, `off`) so the applied files still reproduce; v1/ is the retired first build's, still reproducing 0141–0149; edit the catalogue, never the output
+supabase/ramtha/               ← one reading of RMTH_Forms_and_Calculations_v2.xlsx and the generators for 0176, 0179 and app/src/rmth (gen_lists, gen_framework, gen_forms); v1/ is the seventeen-form build's, still reproducing 0122 and 0131; edit the catalogue, never the output
 supabase/migrations/           ← the SQL you write
 ```
 
@@ -135,6 +136,14 @@ It is written here so it reads as a decision and not a precedent: it was the
 user's call, made about test data, before any quarter was returned. Anything
 else that wants to drop a table holding data asks the same question first.
 See `06_OPEN_QUESTIONS.md` OQ-60.
+
+**It happened a second time, for Ramtha, on 1 October 2026.** The owner
+replaced Ramtha's seventeen indicator forms (`0122`–`0133`) with the seven
+forms of `RMTH_Forms_and_Calculations_v2.xlsx` and, asked the same question,
+answered **"Drop them."** `0174`–`0175` drop the 23 tables and 106 option
+lists; their 112 rows, all written by test accounts between 14 and 16
+September, survive in `audit_log`. Same conditions, same reading: test data,
+no quarter returned, the owner's call. See OQ-77.
 
 **Write migration files with LF endings, and be careful when a script writes one.** `0098` was assembled by a Python script that appended to the file with the default `open(path, 'a')`. On Windows that translates `\n` to `\r\n`, so the second half of the file had CRLF while the half written by the editor had LF. The applied text had LF throughout, so the file and the ledger no longer matched — and the file *read back* identically, because Python's universal-newline mode converts CRLF to LF on the way in. Every line hashed the same; only the whole-file hash differed.
 

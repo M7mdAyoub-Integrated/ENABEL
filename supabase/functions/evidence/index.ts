@@ -66,18 +66,17 @@ function json(body: unknown, status = 200): Response {
 // The tables that exist today among those attachment_entity_type_known names
 // (0128, 0151, 0158). Checked here so the query below is over a known table
 // name and never over a string from the request. The database's list is the
-// longer one: it keeps the names of the Khalidiyah tables 0153 retired, for
-// the attachment row that still names one, and a retired table cannot take a
-// new file. Kept by hand; 0158's verification reads the database's list,
-// this one is read by opening the file.
+// longer one: it keeps the names of the Khalidiyah tables 0153 retired and
+// the Ramtha tables 0174 retired, for the attachment rows that still name
+// them, and a retired table cannot take a new file. Ramtha's seven forms of
+// 0177 take none: RMTH_Forms_and_Calculations_v2.xlsx has no file field.
+// Kept by hand; 0158's verification reads the database's list, this one is
+// read by opening the file.
 const ENTITY_TABLES = new Set([
   "training_session", "training_enrolment", "exhibition", "exhibition_registration",
   "partnership", "production_initiative", "followup_survey", "coordination_meeting",
   "office_service", "guidance_record", "mentorship_session", "advisory_session",
   "milestone", "case_study",
-  "rmth_event", "rmth_proposal", "rmth_training_programme", "rmth_training_cycle",
-  "rmth_training_enrolment", "rmth_project_implementer", "rmth_incubator",
-  "rmth_enterprise", "rmth_incubation_service", "rmth_outcome_survey",
   "khld_focal_point", "khld_partner", "khld_partner_contact", "khld_meeting",
   "khld_rehab_report", "khld_campaign", "khld_activity", "khld_activity_attendance",
   "khld_committee_member", "khld_committee_meeting", "khld_volunteer",

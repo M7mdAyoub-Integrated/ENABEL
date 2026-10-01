@@ -3,9 +3,10 @@ import { supabase } from '../lib/supabase'
 import { toAppError, unwrapList } from './errors'
 
 /**
- * The seven open definitions (0123). Read by the forms (to show the agreed
- * completion rule, or that there is none) and by the dashboard (to say why an
- * indicator is not computable). Written by the M&E lead, not here.
+ * The open definitions (rmth_threshold, 0123; the four the new workbook still
+ * leaves open since 0179). Read by the Open items screen and by the dashboard
+ * (to say why an indicator is not computable); written on the Open items
+ * screen by a coordinator, below.
  */
 export type RmthThreshold = {
   id: string

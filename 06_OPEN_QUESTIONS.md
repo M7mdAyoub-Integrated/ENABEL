@@ -378,12 +378,14 @@ than no summary — a reader counts nine reds and stops looking.
 
 | Priority | Count | Codes |
 |---|---|---|
-| 🔴 Blocks a reported number | 13 | OQ-1, OQ-2, OQ-3, OQ-4, OQ-5, OQ-12, OQ-25, OQ-32, OQ-40, OQ-44, OQ-47, OQ-48, OQ-56 |
-| 🟠 Affects the schema, the forms or a permission | 25 | OQ-6, OQ-7, OQ-8, OQ-9, OQ-10, OQ-11, OQ-13, OQ-14, OQ-21, OQ-26, OQ-27, OQ-28, OQ-29, OQ-35, OQ-36, OQ-37, OQ-39, OQ-41, OQ-43, OQ-45, OQ-49, OQ-51, OQ-52, OQ-55, OQ-57 |
-| 🟡 Wording and presentation | 14 | OQ-15, OQ-16, OQ-17, OQ-18, OQ-19, OQ-20, OQ-33, OQ-34, OQ-38, OQ-46, OQ-50, OQ-53, OQ-54, OQ-58 |
-| 🟢 Resolved, fixed or moot | 6 | OQ-22, OQ-23, OQ-24, OQ-30, OQ-31, OQ-42 |
+| 🔴 Blocks a reported number | 18 | OQ-1, OQ-2, OQ-3, OQ-4, OQ-5, OQ-12, OQ-25, OQ-32, OQ-40, OQ-44, OQ-47, OQ-48, OQ-56, OQ-60, OQ-62, OQ-76, OQ-77, OQ-80 |
+| 🟠 Affects the schema, the forms or a permission | 36 | OQ-6, OQ-7, OQ-8, OQ-9, OQ-10, OQ-11, OQ-13, OQ-14, OQ-21, OQ-26, OQ-27, OQ-28, OQ-29, OQ-35, OQ-36, OQ-37, OQ-39, OQ-41, OQ-43, OQ-45, OQ-49, OQ-51, OQ-52, OQ-55, OQ-57, OQ-59, OQ-61, OQ-64, OQ-65, OQ-66, OQ-67, OQ-71, OQ-73, OQ-74, OQ-79, OQ-81 |
+| 🟡 Wording and presentation | 20 | OQ-15, OQ-16, OQ-17, OQ-18, OQ-19, OQ-20, OQ-33, OQ-34, OQ-38, OQ-50, OQ-53, OQ-54, OQ-58, OQ-63, OQ-68, OQ-69, OQ-70, OQ-72, OQ-75, OQ-78 |
+| 🟢 Resolved, fixed or moot | 7 | OQ-22, OQ-23, OQ-24, OQ-30, OQ-31, OQ-42, OQ-46 |
 
-**52 open, 6 closed, 58 in total.**
+**74 open, 7 closed, 81 in total.**
+
+Rebuilt again 1 October 2026 from the headings (OQ-31's is marked ✅ and counted here as resolved): it had stopped at OQ-58. OQ-77 to OQ-81 are added with Ramtha's seven forms (`0174`–`0181`); OQ-46 is moot.
 
 Updated 21 September 2026: OQ-52 to OQ-58 are added with the Khalidiyah
 migrations `0138`–`0150` — the UNHCR number's format, the bare "Other",
@@ -1517,7 +1519,7 @@ yes it is a small piece of work; if no, the two controls should go.
 
 ---
 
-## 🟡 OQ-46 · The 613 Ramtha option labels carry drafted Arabic, not the Municipality's
+## 🟢 OQ-46 · The 613 Ramtha option labels carry drafted Arabic, not the Municipality's
 
 **Added 14 September 2026**, with migration `0122`.
 
@@ -1550,6 +1552,8 @@ or the form screens with the interface set to Arabic) and corrects any label
 by updating the row. No migration is needed; `label_ar` is data.
 
 **Decides.** Ramtha Municipality's M&E focal point.
+
+**Moot since 1 October 2026** (`0175`). The 613 drafted labels went with the seventeen forms (OQ-77). The new workbook gives every option in Arabic itself; what is still drafted for Ramtha is OQ-78.
 
 ---
 
@@ -1586,6 +1590,8 @@ E0.1, E0.2), and SO1-A1 has no statement at all (OQ-48, Part 6).
 
 **Decides.** Ramtha's M&E lead with ENABEL, for the count-versus-ratio half of
 item 1 and for item 6, where the two source documents disagree.
+
+**Updated 1 October 2026** (`0179`). The seven items were the first forms'. The new workbook answers three of them through its own fields (PA-03, FU-03, SO2-0's formula) and leaves four open — X months, the short-term intensive thresholds (now total hours), N months of six, programmes or sessions. The values the table held were audit probes and were set back to *not decided*. OQ-80 is the current list.
 
 ---
 
@@ -1667,6 +1673,8 @@ named rather than leaving a hole between SO1-0 and A1.2.
 and then the targets per quarter for it. Until then every Ramtha target
 stays null. **Never** enter a target from the Copy against an
 `English_form` code because the words match.
+
+**Updated 1 October 2026** (`0179`). SO1-A1 has a statement now, from the new workbook (OQ-79), and A1.2 / A1.3 are A0.1 / A0.2. The targets are unchanged: none, in any quarter.
 
 ---
 
@@ -2811,3 +2819,197 @@ the public link is printed. Two ways back that keep "ID only":
 
 - prefill nothing;
 - keep a generous limit.
+
+---
+
+## 🔴 OQ-77 · Ramtha's first forms were dropped, not archived — hard rule 5, by decision
+
+**Decided by the owner, 1 October 2026**, with migrations `0174` and `0175`.
+
+**What was asked.** The owner replaced Ramtha's seventeen indicator forms
+with the seven forms of `RMTH_Forms_and_Calculations_v2.xlsx` ("I want all
+the forms to be exactly like the forms in the xlsx"), and, told that the old
+tables held only trial rows, chose **"Drop them"** over keeping them hidden
+beside the new ones — the question OQ-60 asked for Khalidiyah.
+
+**What was dropped.** The 23 tables of `0125`–`0130` (21 record rows and 91
+option and link rows, every one written 14–16 September 2026 by the test
+accounts during the build's verification and the form audit), their 17 leaf
+views, the functions that served only them, and the 106 option lists of
+`0122` (613 options). Every row survives in `audit_log`. What stays is in
+`0174`'s header: the framework, `rmth_threshold`, the reference counter,
+`guard_rmth_other` (Khalidiyah's tables use it), the person rows.
+
+**Why it is recorded.** It is the second time hard rule 5 was set aside, and
+both times it was the owner's call about test data before any quarter was
+returned. It is not a precedent: anything else that wants to drop a table
+holding data asks the same question first.
+
+**Decides.** Decided. Recorded so it reads as a decision.
+
+---
+
+## 🟡 OQ-78 · Arabic drafted for Ramtha's new forms
+
+**Added 1 October 2026**, with migrations `0176`, `0179` and
+`supabase/ramtha/gen_forms.py`.
+
+**What the workbook gives.** Every form title, page, field label and option
+of `RMTH_Forms_and_Calculations_v2.xlsx` in Arabic as well as English — all
+of those are the sheet's own words, verbatim. Unlike the first workbook
+(OQ-46), nothing in the forms' lists is drafted.
+
+**What it does not give, and was drafted** under OQ-32's rule:
+
+- the seven **help texts** (Help Text is English only):
+  `catalogue.HELP_AR`, keyed by the English so a changed cell fails the
+  generator;
+- **SO1-A1's statement** in Arabic (the workbook gives the English only);
+- the reworded **open definitions** (`rmth_threshold.label_ar` /
+  `note_ar`, `0179`);
+- the screens' own strings (`gen_forms.STRINGS`) and the public page's
+  Ramtha lines (`public.json`, `whatsOnRmth`);
+- the two fields the owner added (OQ-79): "الاسم الكامل", "هل لديك إعاقة؟".
+
+**Decides.** Ramtha's focal point reads them. The help texts are a
+regeneration (`catalogue.HELP_AR`); the rest are data or locale strings.
+
+---
+
+## 🟠 OQ-79 · Ramtha's framework follows the new workbook: two codes, SO1-A1, and two fields the owner added
+
+**Decided by the owner, 1 October 2026**, with migrations `0177` and `0179`.
+
+**Codes.** The workbook numbers the networking-event and guidance-session
+indicators **RMTH-SO1-A0.1** and **A0.2**; both framework workbooks (English
+and Arabic) call them **A1.2** and **A1.3**. The owner chose the workbook.
+`0179` renamed `code` and `full_code`; the statements are the same in both
+and were kept. Whoever reconciles the framework (OQ-48) should know the
+platform now uses the workbook's numbers.
+
+**SO1-A1.** It had a code and no statement (OQ-48). The workbook gives one —
+"% of job fair and career guidance participants who report improved
+knowledge of available job opportunities and how to access them" — and a
+formula over FORM-05. `0179` takes both. Its **type** is stated nowhere: it
+is set to *intermediate result*, because B1 and C1, the other "%" rows at the
+same place in the framework, are. Its Arabic is drafted (OQ-78).
+
+**Two fields not in the sheet**, added to FORM-01 at the owner's request:
+
+- **PR-07 "Full name"**, after the national ID: the shared `person` table
+  requires a name, and FORM-04/05/06 pick people by name and ID;
+- **PR-06 "Do you have a disability?" (Yes / No)**: the Calculation Method
+  sheet disaggregates IMP-0, SO1-0, SO2-0 and SO3-0 by "vulnerability
+  PR-06", which FORM-01 did not ask. The owner chose a disability question
+  as that field; whether "vulnerability" should mean more than disability
+  (refugee status, for instance — nationality only partly says it) is open.
+
+**Decides.** M&E lead: SO1-A1's type; what "vulnerability" covers.
+
+---
+
+## 🔴 OQ-80 · What Ramtha's Calculation Method sheet leaves to confirm, and the readings the views take
+
+**Added 1 October 2026**, with migration `0180`.
+
+The sheet writes every indicator in the Field IDs of the seven forms, and
+marks some of them **REQUIRES CONFIRMATION**. Where the formula is explicit
+the view follows it; where a formula needs a number nobody has given, the
+indicator is **not computable**, named, never zero.
+
+**Not computable until decided** (the Open items screen, `/rmth/thresholds`):
+
+| indicator | waits on |
+|---|---|
+| IMP-0 | X: months working or earning continuously |
+| C1.1 | the maximum duration (weeks, AC-04 to AC-05) **and** the minimum total contact hours (AC-09) |
+| SO3-0 | N: months with income out of six (the sheet's working assumption is 4) |
+| F0.2 | programmes (count of FORM-03 records) or sessions (sum of AC-11) |
+
+The ten definitions `rmth_threshold` held were the 16 September audit's probe
+values ("AUD rule c12 …", CLEANUP_PLAN.md), not decisions; `0179` set them
+all back to *not decided* and retired the six the new forms answer directly
+(completion is now PA-03; the employability outcome is FU-03; SO2-0's
+formula names its placement types; C1.1 now counts total hours, not hours
+per week).
+
+**Computed as the formula says, with the confirmation still open:**
+
+- **SO2-0 — self-employment.** Excluded: the formula's placements are an
+  internship / on-the-job placement or paid employment, and FU-04 (the date
+  that decides "within three months") is asked only for those.
+- **C1.2, E0.3, F0.1, SO2-0 — what "completed" means.** The enumerator
+  answers PA-03 ("…complete the training and meet its completion
+  criteria?"); the criteria themselves are not written down anywhere.
+- **C1 — entrepreneurship trainees.** Excluded, as the sheet says ("currently
+  excluded").
+- **A0.2, B1, B1.1, C1.1** — the sheet notes that the framework's own
+  definition or disaggregation for these rows was copied from another row;
+  the statement is followed.
+
+**Readings the sheet does not settle, taken here:**
+
+- **Windows.** "Reporting quarter" is the quarter; "reporting year" is the
+  calendar year to the quarter's end; IMP-0 and E0.1 are cumulative to the
+  quarter's end. A quarter not yet begun reads blank. As Khalidiyah's
+  (OQ-65), a quarterly return shows the to-date figure for the year-to-date
+  ones, not the quarter's increment.
+- **E0.1** says "AC-04 ≤ end of the reporting **year**". Read to the
+  **quarter's** end, so an incubator opened in Q4 is not counted in Q1 of
+  the same year.
+- **IMP-0's eligibility** ("PR-01 appears in FORM-04 for any activity")
+  counts a participation from its activity's start date; SO1-0 and SO3-0
+  likewise. A deleted activity or a deleted registration takes the
+  person's records out of every figure.
+- **SO2-0** counts each completer once in the quarter their three-month
+  window ends, placed if any follow-up shows an internship or paid job
+  started by then; a completer never followed up stays in the denominator,
+  as the sheet says.
+- **B1 / FORM-07**: "one response per project per survey round" is not
+  enforced — the sheet defines no round — and B1 reads each project's latest
+  response in the year.
+- **C1.2's cumulative total** ("a person completing two trainings counts
+  once") is shown beside the quarter's figure (`v_rmth_indicator_unique`).
+
+**Not built: the breakdowns.** The sheet gives every indicator a
+"Disaggregate by" line (stored in `indicator.disaggregation`), and FORM-01 now
+collects sex, age group, nationality and disability. No breakdown **view**
+exists for Ramtha yet; the dashboard says so.
+
+**Decides.** M&E lead: the four numbers; the completion criteria; whether
+self-employment is a placement; whether a quarterly return wants increments;
+which breakdowns to build first.
+
+---
+
+## 🟠 OQ-81 · Ramtha's activities on the public page
+
+**Decided by the owner, 1 October 2026**, with migrations `0177` and `0181`.
+
+**What was asked.** "The activity register when the activity gets created it
+should [have] a button to the municipality to publish it in the public site
+or not." Asked what the public should see, given that FORM-03 has no name,
+place or description, the owner chose **the workbook's fields only**.
+
+**What was built.**
+
+- `rmth_activity.is_published`, off by default: a **Publish** switch on the
+  activity's page (coordinators and data entry), not a form field.
+- `v_public_rmth_whats_on`: published, not deleted, not ended — category
+  (AC-02) as the title, the networking type or type of training
+  (AC-03 / AC-10), the sector (AC-06, with its "Other" text), and the dates
+  (AC-04, AC-05). Nothing about participants, projects, hours or partners.
+- Ramtha's public page is now the "what's on" page Khalidiyah has, with its
+  own heading and introduction. The "apply" page it showed before listed
+  opportunities from tables Ramtha never wrote to.
+- An activity leaves the page the day after it ends; a **business
+  incubator** has no end date (AC-05 is not asked of it) and stays while it
+  is published.
+
+**Open.** Whether the public should be able to register for an activity
+(not built: Ramtha's participants are recorded by staff on FORM-04); and
+whether an activity should carry a public name or description — the owner
+chose not, and the card reads e.g. "Activity · Job fair — Networking event
+— 20 October 2026".
+
+**Decides.** The owner.

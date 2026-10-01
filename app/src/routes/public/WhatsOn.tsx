@@ -19,6 +19,12 @@ import { hasVolunteerJourney, usePublicSite } from './PublicSite'
  * so its card says to register with the Municipality. No application
  * check, no mention of accounts or signing in.
  *
+ * Ramtha's page is the same page since 1 October 2026: the activities its
+ * coordinators publish from the Activity Register (FORM-03, 0181), each read
+ * as the sheet records it -- category, type, sector, dates -- because the
+ * sheet gives an activity no name. Its words are `whatsOnRmth`, not the
+ * park's.
+ *
  * Reading order, for someone who arrived from a poster: what this is in one
  * sentence; then what is coming up, soonest first; then the volunteer
  * register; then the way to another municipality's page.
@@ -26,16 +32,18 @@ import { hasVolunteerJourney, usePublicSite } from './PublicSite'
 export function WhatsOn() {
   const { t } = useTranslation('public')
   const site = usePublicSite()
-  const q = usePublicWhatsOn(site.slug)
+  const q = usePublicWhatsOn(site.slug, site.municipality.code)
   const items = q.data ?? []
+  // the page's own words: the park's for Khalidiyah, the activities' for Ramtha
+  const copy = site.municipality.code === 'RMTH' ? 'whatsOnRmth' : 'whatsOn'
 
   return (
     <PublicShell>
       <section className="pt-7 sm:pt-10">
         <h1 className="text-[26px] font-black uppercase leading-[1.05] tracking-[-0.03em] sm:text-[38px]" style={{ textWrap: 'balance' }}>
-          {t('whatsOn.heading')}
+          {t(`${copy}.heading`)}
         </h1>
-        <p className="mt-3 max-w-[52ch] text-[15px] leading-[1.55] text-body sm:text-[16px]">{t('whatsOn.intro')}</p>
+        <p className="mt-3 max-w-[52ch] text-[15px] leading-[1.55] text-body sm:text-[16px]">{t(`${copy}.intro`)}</p>
       </section>
 
       <section className="mt-8 sm:mt-10">
@@ -65,8 +73,8 @@ export function WhatsOn() {
           </ul>
         ) : items.length === 0 ? (
           <div className="mt-4 border-[1.5px] border-dashed border-border-muted bg-sunken p-6 text-center sm:p-8">
-            <p className="m-0 text-[19px] font-extrabold tracking-[-0.02em] sm:text-[22px]">{t('whatsOn.emptyTitle')}</p>
-            <p className="mx-auto mt-2 max-w-[42ch] text-[15px] leading-[1.55] text-body">{t('whatsOn.emptyBody')}</p>
+            <p className="m-0 text-[19px] font-extrabold tracking-[-0.02em] sm:text-[22px]">{t(`${copy}.emptyTitle`)}</p>
+            <p className="mx-auto mt-2 max-w-[42ch] text-[15px] leading-[1.55] text-body">{t(`${copy}.emptyBody`)}</p>
           </div>
         ) : (
           <ul className="mt-4 flex list-none flex-col gap-3 p-0">
@@ -74,6 +82,7 @@ export function WhatsOn() {
               <WhatsOnCard
                 key={`${o.kind}-${o.id}`}
                 o={o}
+                kindLabel={copy === 'whatsOnRmth' ? t('whatsOnRmth.kind') : t(`whatsOn.kind.${o.kind}`)}
                 volunteerPath={hasVolunteerJourney(site.municipality.code) ? site.path('/volunteer') : null}
               />
             ))}
@@ -115,12 +124,14 @@ function today(): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-function WhatsOnCard({ o, volunteerPath }: { o: WhatsOnItem; volunteerPath: string | null }) {
+function WhatsOnCard({ o, kindLabel, volunteerPath }: { o: WhatsOnItem; kindLabel: string; volunteerPath: string | null }) {
   const { t, i18n } = useTranslation('public')
   const locale = i18n.resolvedLanguage ?? 'en'
   const ar = locale.startsWith('ar')
   const place = (ar ? o.place_ar : null) ?? o.place_en
   const type = (ar ? o.type_ar : null) ?? o.type_en
+  const title = (ar ? o.title_ar : null) ?? o.title
+  const sector = (ar ? o.sector_ar : null) ?? o.sector_en ?? null
   const time = o.time_from && o.time_to ? `${o.time_from} ${RANGE} ${o.time_to}` : o.time_from ?? null
   // built outside the JSX: jsx-no-literals refuses a template literal as a child
   const timeText = time ? ` ${SEP} ${time}` : ''
@@ -133,9 +144,9 @@ function WhatsOnCard({ o, volunteerPath }: { o: WhatsOnItem; volunteerPath: stri
       <span aria-hidden="true" className={`w-[7px] flex-none ${KIND_ACCENT[o.kind]}`} />
       <div className="min-w-0 flex-1 p-4 sm:p-5">
         <p className="m-0 font-narrow text-[11.5px] font-bold uppercase tracking-[0.12em] text-muted">
-          {t(`whatsOn.kind.${o.kind}`)}{type ? ` ${SEP} ${type}` : ''}
+          {kindLabel}{type ? ` ${SEP} ${type}` : ''}
         </p>
-        <h3 className="mt-1 text-[19px] font-extrabold leading-[1.2] tracking-[-0.02em] sm:text-[21px]" style={{ textWrap: 'balance' }}>{o.title}</h3>
+        <h3 className="mt-1 text-[19px] font-extrabold leading-[1.2] tracking-[-0.02em] sm:text-[21px]" style={{ textWrap: 'balance' }}>{title}</h3>
         <p className="mt-2 text-[15px] leading-[1.5] text-body">
           <span className="font-semibold text-ink">{formatDate(o.on_date, locale)}{untilText}</span>
           {time ? <span dir="ltr">{timeText}</span> : null}
@@ -146,6 +157,7 @@ function WhatsOnCard({ o, volunteerPath }: { o: WhatsOnItem; volunteerPath: stri
             {t('whatsOn.applyUntil', { date: formatDate(o.apply_until!, locale) })}
           </p>
         ) : null}
+        {sector ? <p className="mt-1 text-[14px] text-body">{t('whatsOnRmth.sector', { sector })}</p> : null}
         {o.description ? <p className="mt-2 max-w-[60ch] text-[14.5px] leading-[1.5] text-body" style={{ textWrap: 'pretty' }}>{o.description}</p> : null}
         {o.kind === 'campaign' && volunteerPath ? (
           <p className="mt-3 text-[14.5px]">

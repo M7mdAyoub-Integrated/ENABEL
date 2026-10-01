@@ -1,404 +1,325 @@
 # -*- coding: utf-8 -*-
 """
-Generates, from forms.py and the forms workbook:
+Writes the app's side of Ramtha's seven forms from model.build():
 
-  app/src/rmth/forms.generated.ts      the form definitions the screens render
-  app/src/locales/en/rmth.json         English, VERBATIM from the sheets
-  app/src/locales/ar/rmth.json         Arabic, drafted in forms.py
-
-Every field's `row` must be a label in its sheet, every option and sub-label
-must appear in the sheet's response-option column, and every row that carries
-an enumerator note must have an Arabic note in forms.py. The generator fails
-otherwise, so the labels on screen cannot drift from the workbook.
+  app/src/rmth/forms.generated.ts    structure only: which column, list,
+                                     junction question and condition each
+                                     field has, in the terms save_rmth_record
+                                     (0178) accepts
+  app/src/locales/en/rmth.json       every word the Ramtha screens show, the
+  app/src/locales/ar/rmth.json       sheet's own for the forms, and the
+                                     screens' fixed strings below
 
 Run from the repository root:  python supabase/ramtha/gen_forms.py
+Then: node app/scripts/check-rmth-forms.mjs
+
+Labels are the sheet's cells in both languages (Field Label En / Ar, sub-page
+En / Ar, Page En / Ar, Options En / Ar for the Yes - No answers); option
+labels of the lists are ref_rmth_* rows in the database (0176), never locale
+keys. The two fields the owner added and the drafted Arabic of the help texts
+are catalogue.py's, named there.
 """
-import io, json, os, re, sys
+import io, json, os, sys
 from collections import OrderedDict
-import openpyxl
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
 sys.path.insert(0, HERE)
-from forms import FORMS, DISAGG_AR, SHORT_EN, STATEMENT_AR
-from lists import L as LISTS
+import catalogue as C  # noqa: E402
+import model  # noqa: E402
 
-WB = openpyxl.load_workbook(os.path.join(ROOT, 'RMTH_indicator_forms.xlsx'), read_only=True, data_only=True)
+# ── the screens' fixed strings ───────────────────────────────────────────────
+#
+# (en, ar) pairs. The form, list and detail screens build these keys from
+# fixed names; check-rmth-forms.mjs fails when one is missing in either
+# language, and every key built from a CODE (a group, a refusal, a threshold
+# item) is listed there from this same table.
+STRINGS = OrderedDict([
+    ('nav.group.definitions', ('Definitions', 'التعريفات')),
+    ('nav.thresholds', ('Open items', 'البنود المفتوحة')),
+    ('objective.impact', ('Impact', 'الأثر')),
+    ('objective.so1', ('SO1 · Job opportunities', 'SO1 · فرص العمل')),
+    ('objective.so2', ('SO2 · Training', 'SO2 · التدريب')),
+    ('objective.so3', ('SO3 · Entrepreneurship', 'SO3 · ريادة الأعمال')),
 
-def norm(s):
-    return re.sub(r'\s+', ' ', str(s)).strip()
+    ('list.new', ('New record', 'سجل جديد')),
+    ('list.empty', ('No records yet.', 'لا توجد سجلات بعد.')),
+    ('list.emptyBody', ('Records entered through this form appear here, newest first.',
+                        'تظهر هنا السجلات المدخلة عبر هذا النموذج، الأحدث أولاً.')),
+    ('list.deleted', ('Deleted', 'محذوف')),
+    ('list.showDeleted', ('Show deleted', 'إظهار المحذوف')),
+    ('list.status', ('Status', 'الحالة')),
+    ('list.public', ('Public page', 'الصفحة العامة')),
+    ('list.published', ('Published', 'منشور')),
+    ('list.notPublished', ('Not published', 'غير منشور')),
 
-def sheet_rows(name):
-    ws = WB[name]
-    rows = []
-    for r in ws.iter_rows(values_only=True):
-        c = [norm(v) if v is not None else '' for v in r]
-        c += [''] * (3 - len(c))
-        rows.append(c[:3])
-    return rows
+    ('form.newTitle', ('New: {title}', 'جديد: {title}')),
+    ('form.editTitle', ('Edit: {title}', 'تعديل: {title}')),
+    ('form.save', ('Save', 'حفظ')),
+    ('form.saving', ('Saving…', 'جارٍ الحفظ…')),
+    ('form.saved', ('Saved', 'تم الحفظ')),
+    ('form.savedRef', ('Saved as {reference}', 'حُفظ بالرقم {reference}')),
+    ('form.cancel', ('Cancel', 'إلغاء')),
+    ('form.back', ('Back to the list', 'العودة إلى القائمة')),
+    ('form.required', ('This field is required.', 'هذا الحقل مطلوب.')),
+    ('form.specify', ('Please specify', 'يرجى التحديد')),
+    ('form.range', ('From {min} to {max}.', 'من {min} إلى {max}.')),
+    ('form.positive', ('More than zero.', 'أكثر من صفر.')),
+    ('form.wholeNumber', ('A whole number.', 'عدد صحيح.')),
+    ('form.year', ('Four digits, not after {year}.', 'أربعة أرقام، ولا تتجاوز {year}.')),
+    ('form.future', ('Cannot be after today.', 'لا يمكن أن يكون بعد اليوم.')),
+    ('form.notBefore', ('Cannot be before {label}.', 'لا يمكن أن يكون قبل {label}.')),
+    ('form.notAfter', ('Cannot be after {label}.', 'لا يمكن أن يكون بعد {label}.')),
+    ('form.noneExclusive', ('"None" cannot be ticked with another answer.', 'لا يمكن اختيار "لا يوجد" مع إجابة أخرى.')),
+    ('form.assignedOnSave', ('Issued when the record is saved.', 'يُصدر عند حفظ السجل.')),
+    ('form.stampedOnSave', ('Recorded when the survey is saved.', 'يُسجَّل عند حفظ الاستبيان.')),
+    ('form.calcOnSave', ('Worked out from the year of birth when the record is saved.',
+                         'يُحتسب من سنة الميلاد عند حفظ السجل.')),
+    ('form.notAsked', ('Not asked for the answer chosen.', 'غير مطلوب للإجابة المختارة.')),
+    ('form.activityFirst', ('Choose the activity first: the questions depend on its category.',
+                            'اختر النشاط أولاً: الأسئلة تعتمد على فئته.')),
+    ('form.lookingUp', ('Looking up…', 'جارٍ البحث…')),
+    ('form.onFile', ('On file — the name is locked.', 'مسجّل — الاسم مقفل.')),
+    ('form.newPerson', ('Not on file — a new person will be registered.', 'غير مسجّل — سيُسجَّل شخص جديد.')),
+    ('form.nidInvalid', ('A national ID is exactly nine digits.', 'الرقم الوطني تسعة أرقام بالضبط.')),
+    ('form.personLocked', ('The person cannot change on a saved registration.', 'لا يمكن تغيير الشخص في تسجيل محفوظ.')),
+    ('form.alreadyRegistered', ('This national ID is already in the register.', 'هذا الرقم الوطني مسجّل بالفعل في السجل.')),
+    ('form.openRegistration', ('Open the registration', 'فتح التسجيل')),
+    ('form.registrationDeleted', ("This person's registration was deleted. It is restored from its page, never entered again.",
+                                  'حُذف تسجيل هذا الشخص. يُستعاد من صفحته، ولا يُدخل مرة أخرى.')),
+    ('form.openDeleted', ('Open the deleted registration', 'فتح التسجيل المحذوف')),
+    ('form.personDeleted', ('This national ID belongs to a person who was deleted. A coordinator restores them; they are never entered again.',
+                            'هذا الرقم الوطني يعود لشخص محذوف. يستعيده المنسق؛ ولا يُدخل مرة أخرى.')),
+    ('form.deletedBy', ('Deleted {when} by {by}.', 'حُذف في {when} بواسطة {by}.')),
+    ('form.deletedWhen', ('Deleted {when}.', 'حُذف في {when}.')),
+    ('form.restore', ('Restore', 'استعادة')),
+    ('form.restored', ('Restored. Save again.', 'تمت الاستعادة. احفظ مرة أخرى.')),
+    ('form.coordinatorOnly', ('Only a coordinator can restore a person.', 'المنسق وحده يستطيع استعادة الشخص.')),
+    ('form.picker.none', ('Choose…', 'اختر…')),
+    ('form.picker.loadFailed', ('The list could not be loaded.', 'تعذّر تحميل القائمة.')),
+    ('form.picker.empty', ('Nothing to choose yet.', 'لا يوجد ما يُختار بعد.')),
+    ('form.picker.register', ('People in the Person Register (FORM-01).', 'الأشخاص المسجلون في سجل المستفيدين (FORM-01).')),
+    ('form.picker.surveyed', ('Networking events and employability trainings only: this survey asks about those.',
+                              'فعاليات التشبيك وتدريبات قابلية التوظيف فقط: هذا الاستبيان يسأل عنها.')),
+    ('form.notSaved', ('Not saved', 'لم يُحفظ')),
+    ('form.invalid', ('The database refused the record: {message}', 'رفضت قاعدة البيانات السجل: {message}')),
+    ('form.notFound', ('This record no longer exists or is not yours to edit.', 'هذا السجل لم يعد موجوداً أو ليس لك تعديله.')),
+    ('form.unknownColumn', ('The form sent a field the database does not know ({column}). This is a defect in the form.',
+                            'أرسل النموذج حقلاً لا تعرفه قاعدة البيانات ({column}). هذا خلل في النموذج.')),
+    ('form.unknownBlock', ('The form sent a part the database does not accept ({block}). This is a defect in the form.',
+                           'أرسل النموذج جزءاً لا تقبله قاعدة البيانات ({block}). هذا خلل في النموذج.')),
+    # refusals named by field (rmth_<field>_<rule>, 0177 / 0178), worded from the field's label
+    ('form.rule.required', ('{label}: required for the answer chosen.', '{label}: مطلوب للإجابة المختارة.')),
+    ('form.rule.not_applicable', ('{label}: belongs to an answer that is not chosen; leave it empty.',
+                                  '{label}: يخص إجابة غير مختارة؛ اتركه فارغاً.')),
+    ('form.rule.not_registered', ('{label}: this person is not in the Person Register (FORM-01). Register them there first.',
+                                  '{label}: هذا الشخص غير مسجّل في سجل المستفيدين (FORM-01). سجّله هناك أولاً.')),
+    ('form.rule.deleted', ('{label}: the record chosen has been deleted.', '{label}: السجل المختار محذوف.')),
+    ('form.rule.future', ('{label}: cannot be after today.', '{label}: لا يمكن أن يكون بعد اليوم.')),
+    ('form.rule.in_use', ('{label}: cannot change, because participation or feedback has been recorded for this activity.',
+                          '{label}: لا يمكن تغييره، لأن مشاركة أو رأياً سُجّل لهذا النشاط.')),
+    ('form.rule.none_exclusive', ('{label}: "None" cannot be ticked with another answer.',
+                                  '{label}: لا يمكن اختيار "لا يوجد" مع إجابة أخرى.')),
+    ('form.rule.not_surveyed', ('{label}: this survey asks nothing about this kind of activity.',
+                                '{label}: هذا الاستبيان لا يسأل عن هذا النوع من الأنشطة.')),
+    ('form.rule.specify', ('{label}: please specify the "Other".', '{label}: يرجى تحديد "أخرى".')),
+    ('form.rule.locked', ('{label}: cannot change on a saved registration.', '{label}: لا يمكن تغييره في تسجيل محفوظ.')),
+    ('form.rule.person_deleted', ('{label}: belongs to a person who was deleted.', '{label}: يعود لشخص محذوف.')),
+    # the table constraints a screen can meet (0177), by name
+    ('form.constraint.rmth_participation_once_per_activity', ('This person is already recorded on this activity.',
+                                                              'هذا الشخص مسجّل بالفعل في هذا النشاط.')),
+    ('form.constraint.rmth_feedback_once_per_activity', ('This person has already answered for this activity.',
+                                                         'أجاب هذا الشخص بالفعل عن هذا النشاط.')),
+    ('form.constraint.rmth_activity_end_after_start', ('The end date cannot be before the start date.',
+                                                       'لا يمكن أن يكون تاريخ الانتهاء قبل تاريخ البدء.')),
+    ('form.constraint.rmth_followup_first_placement_by_followup', ('The first placement date cannot be after the follow-up date.',
+                                                                   'لا يمكن أن يكون تاريخ أول التحاق بعد تاريخ المتابعة.')),
+    ('form.constraint.rmth_followup_continuous_by_followup', ('Working continuously since cannot be after the follow-up date.',
+                                                              'لا يمكن أن يكون تاريخ العمل المتواصل بعد تاريخ المتابعة.')),
+    ('form.constraint.rmth_followup_income_months_of_six', ('Months with income is from 0 to 6.',
+                                                            'عدد الأشهر ذات الدخل من 0 إلى 6.')),
+    ('form.constraint.rmth_activity_contact_hours_positive', ('Contact hours must be more than zero.',
+                                                              'يجب أن تكون الساعات التدريبية أكثر من صفر.')),
+    ('form.constraint.rmth_activity_sessions_positive', ('Sessions delivered must be more than zero.',
+                                                         'يجب أن يكون عدد الجلسات أكثر من صفر.')),
+    ('form.constraint.rmth_beneficiary_year_of_birth_four_digits', ('The year of birth is four digits.',
+                                                                    'سنة الميلاد أربعة أرقام.')),
+    ('form.constraint.national_id_format', ('A national ID is exactly nine digits.', 'الرقم الوطني تسعة أرقام بالضبط.')),
 
-def head(rows):
-    """The header block: title, who, when, calc."""
-    title = rows[0][0]
-    d = {'title': title.split('|', 1)[1].strip() if '|' in title else title}
-    for c1, c2, _ in rows[1:9]:
-        if c1 == 'Who completes this form': d['who'] = c2
-        if c1 == 'When': d['when'] = c2
-        if c1 == 'How the indicator is calculated from this form': d['calc'] = c2
-        if c1 == 'Required disaggregation': d['disagg'] = c2
-    return d
+    ('detail.edit', ('Edit', 'تعديل')),
+    ('detail.delete', ('Delete', 'حذف')),
+    ('detail.restore', ('Restore', 'استعادة')),
+    ('detail.deleteConfirm', ('Delete this record? It stops counting and can be restored later.',
+                              'حذف هذا السجل؟ سيتوقف عن الاحتساب ويمكن استعادته لاحقاً.')),
+    ('detail.deletedNote', ('This record is deleted and does not count. A coordinator can restore it.',
+                            'هذا السجل محذوف ولا يُحتسب. يمكن للمنسق استعادته.')),
+    ('detail.created', ('Created', 'أُنشئ')),
+    ('detail.updated', ('Updated', 'حُدِّث')),
+    ('detail.notSet', ('Not set', 'غير محدد')),
+    ('detail.notAsked', ('Not asked', 'غير مطلوب')),
+    ('detail.feeds', ('Feeds', 'يغذي')),
+    ('detail.publish.note', ("Published activities appear on Ramtha's public page with their category, type, sector and dates, "
+                             'until the day after they end. A business incubator stays listed while it is published.',
+                             'تظهر الأنشطة المنشورة على الصفحة العامة لبلدية الرمثا بفئتها ونوعها وقطاعها وتواريخها، '
+                             'حتى اليوم التالي لانتهائها. وتبقى حاضنة الأعمال مدرجة ما دامت منشورة.')),
 
-def option_lines(c2):
-    """The response-option cell, split the way the sheets separate options."""
-    out = []
-    for part in re.split(r'\n', c2):
-        p = part.strip()
-        p = re.sub(r':\s*_+\s*$', '', p)
-        p = re.sub(r'\s*_+\s*$', '', p)
-        if p: out.append(norm(p))
-    return out
+    ('gate.title', ('Ramtha screens', 'شاشات الرمثا')),
+    ('gate.body', ('These forms belong to Ramtha Municipality. Your account works in another municipality.',
+                   'هذه النماذج تخص بلدية الرمثا. حسابك يعمل في بلدية أخرى.')),
 
-def contains(hay, needle):
-    return norm(needle).lower() in norm(hay).lower()
+    ('thresholds.title', ('Open items', 'البنود المفتوحة')),
+    ('thresholds.intro', ('The definitions the Calculation Method sheet marks REQUIRES CONFIRMATION and leaves open. '
+                          'Each is a value the indicator views read; while it is empty the indicator that depends on it '
+                          'is not computable — never zero. A coordinator writes the decision here, with the date; '
+                          'nothing else changes.',
+                          'التعريفات التي تشير ورقة طريقة الاحتساب إلى أنها تحتاج إلى تأكيد وتتركها مفتوحة. كل منها قيمة '
+                          'تقرأها عروض المؤشرات؛ وما دامت فارغة فالمؤشر المعتمد عليها غير قابل للاحتساب - وليس صفراً أبداً. '
+                          'يكتب المنسق القرار هنا مع تاريخه؛ ولا يتغير شيء آخر.')),
+    ('thresholds.notDecided', ('Not decided', 'لم يُقرَّر')),
+    ('thresholds.yes', ('Yes', 'نعم')),
+    ('thresholds.no', ('No', 'لا')),
+    ('thresholds.value', ('Value', 'القيمة')),
+    ('thresholds.rule', ('Rule, as it will be applied', 'القاعدة كما ستُطبَّق')),
+    ('thresholds.decide', ('Decide', 'قرِّر')),
+    ('thresholds.save', ('Save decision', 'حفظ القرار')),
+    ('thresholds.decidedOn', ('decided {date}', 'قُرِّر في {date}')),
+    ('thresholds.blocks', ('Waiting on this', 'بانتظار هذا البند')),
+    ('thresholds.item.sustained_engagement', ('Sustained employment (IMP-0)', 'التشغيل المستدام (IMP-0)')),
+    ('thresholds.item.short_term_intensive', ('Short-term intensive (C1.1)', 'قصير الأمد ومكثف (C1.1)')),
+    ('thresholds.item.regular_income', ('Regular income (SO3-0)', 'الدخل المنتظم (SO3-0)')),
+    ('thresholds.item.programmes_or_sessions', ('Programmes or sessions (F0.2)', 'البرامج أم الجلسات (F0.2)')),
+    ('thresholds.choice.f02_counting_reading.programmes', ('Programmes (FORM-03 records)', 'البرامج (سجلات FORM-03)')),
+    ('thresholds.choice.f02_counting_reading.sessions', ('Sessions delivered (sum of AC-11)', 'الجلسات المنفذة (مجموع AC-11)')),
 
-errors = []
-
-# Every form must have Arabic for its disaggregation line. Checked here rather
-# than left to the untranslated check, because that one compares en to ar and
-# would only notice if the two happened to be identical -- an Arabic string
-# that was never written for a NEW form would sail past it the same way
-# searchPlaceholder.os did. See CLAUDE.md's eleventh register row.
-_missing_short = [k for k in FORMS if k not in SHORT_EN]
-if _missing_short:
-    raise SystemExit('gen_forms: no SHORT_EN entry for: %s' % ', '.join(sorted(_missing_short)))
-_missing_stmt = [k for k in FORMS if k not in STATEMENT_AR]
-if _missing_stmt:
-    raise SystemExit('gen_forms: no STATEMENT_AR entry for: %s' % ', '.join(sorted(_missing_stmt)))
-_missing_disagg = [k for k in FORMS if k not in DISAGG_AR]
-if _missing_disagg:
-    raise SystemExit('gen_forms: no DISAGG_AR entry for: %s' % ', '.join(sorted(_missing_disagg)))
-_extra_disagg = [k for k in DISAGG_AR if k not in FORMS]
-if _extra_disagg:
-    raise SystemExit('gen_forms: DISAGG_AR has entries for forms that do not exist: %s'
-                     % ', '.join(sorted(_extra_disagg)))
-en = OrderedDict(forms=OrderedDict())
-ar = OrderedDict(forms=OrderedDict())
-defs = OrderedDict()
-
-for fid, f in FORMS.items():
-    rows = sheet_rows(f['sheet'])
-    by_label = {}
-    for c1, c2, c3 in rows:
-        if c1 and c1 not in by_label:
-            by_label[c1] = (c2, c3)
-    h = head(rows)
-    fen = OrderedDict(title=h['title'], short=SHORT_EN[fid], indicator=f['indicator'], who=h.get('who', ''), when=h.get('when', ''),
-                      calc=h.get('calc', ''), disaggregation=h.get('disagg', ''), sections=OrderedDict(), fields=OrderedDict())
-    # Arabic mirrors English: `title` is the indicator STATEMENT (the Arabic
-    # Copy's where it has one -- see STATEMENT_AR) and `short` is the name the
-    # sidebar shows. Until 14 September both were the short name.
-    far = OrderedDict(title=STATEMENT_AR[fid][1], short=f['title_ar'], indicator=f['indicator'], who=f['who_ar'], when=f['when_ar'],
-                      calc=f['calc_ar'], disaggregation=DISAGG_AR[fid], sections=OrderedDict(), fields=OrderedDict())
-    dsecs = []
-    for si, s in enumerate(f['sections']):
-        skey = f's{si}'
-        if s['row'] not in by_label:
-            errors.append(f"{fid}: section '{s['row']}' is not a row of {f['sheet']}")
-        fen['sections'][skey] = s['row']
-        far['sections'][skey] = s['title_ar']
-        dfields = []
-        for fl in s['fields']:
-            row = fl['row']
-            if row not in by_label:
-                errors.append(f"{fid}: field row '{row}' is not a row of {f['sheet']}")
-                c2, c3 = '', ''
-            else:
-                c2, c3 = by_label[row]
-            key = fl['key']
-            e = OrderedDict(label=row)
-            a = OrderedDict(label=fl['label_ar'])
-            if c3:
-                e['help'] = c3
-                if not fl.get('help_ar'):
-                    errors.append(f"{fid}.{key}: the sheet has a note and forms.py has no help_ar")
-                else:
-                    a['help'] = fl['help_ar']
-            elif fl.get('help_ar'):
-                errors.append(f"{fid}.{key}: help_ar given but the sheet has no note")
-            d = OrderedDict(key=key, type=fl['type'])
-            for k in ('required', 'counting', 'derived', 'ref', 'other', 'question', 'table', 'kind', 'payload',
-                      'components', 'ratings', 'services', 'create', 'rule', 'mirror', 'step', 'unit', 'max'):
-                if k in fl and fl[k] is not None:
-                    d[k] = fl[k]
-            if fl.get('sub'):
-                if c2 and not contains(c2, fl['sub']) and not contains(c2.replace('_', ''), fl['sub']):
-                    errors.append(f"{fid}.{key}: sub-label '{fl['sub']}' not in the sheet's options cell")
-                e['sub'] = fl['sub']; a['sub'] = fl['sub_ar']
-            if fl.get('empty'):
-                if c2 and not contains(c2, fl['empty']):
-                    errors.append(f"{fid}.{key}: empty label '{fl['empty']}' not in the sheet's options cell")
-                e['empty'] = fl['empty']; a['empty'] = fl['empty_ar']
-            if fl.get('criterion'):
-                e['criterion'] = fl['criterion']; a['criterion'] = fl['criterion_ar']
-            if fl.get('options'):
-                lines = option_lines(c2)
-                e['opts'] = OrderedDict(); a['opts'] = OrderedDict()
-                d['options'] = [o[0] for o in fl['options']]
-                for val, en_txt, ar_txt in fl['options']:
-                    # A `{reference}` placeholder stands where the sheet has a
-                    # blank to write the record reference into ("... under
-                    # record: _______"); option_lines() has already stripped
-                    # the blank, so strip the placeholder the same way.
-                    en_cmp = re.sub(r':\s*\{reference\}\s*$', '', en_txt)
-                    if not any(contains(l, en_cmp) or contains(en_cmp, l) for l in lines):
-                        errors.append(f"{fid}.{key}: option '{en_txt}' not in the sheet")
-                    e['opts'][val] = en_txt; a['opts'][val] = ar_txt
-            if fl.get('parts'):
-                e['parts'] = OrderedDict(); a['parts'] = OrderedDict()
-                d['parts'] = []
-                for col, ptype, sub_en, sub_ar, cfg in fl['parts']:
-                    if sub_en and c2 and not (contains(c2, sub_en) or contains(c2.replace('_', ''), sub_en)):
-                        errors.append(f"{fid}.{key}: part label '{sub_en}' not in the sheet's options cell")
-                    e['parts'][col] = sub_en; a['parts'][col] = sub_ar
-                    pd = OrderedDict(column=col, type=ptype)
-                    for k, v in cfg.items():
-                        if k == 'options':
-                            pd['options'] = [o[0] for o in v]
-                            e.setdefault('partOpts', OrderedDict())[col] = OrderedDict((o[0], o[1]) for o in v)
-                            a.setdefault('partOpts', OrderedDict())[col] = OrderedDict((o[0], o[2]) for o in v)
-                        else:
-                            pd[k] = v
-                    d['parts'].append(pd)
-            # the list a select/multi reads must exist in the catalogue
-            for k in ('ref', 'question', 'components', 'ratings', 'services'):
-                if k in d and d[k] not in LISTS:
-                    errors.append(f"{fid}.{key}: list '{d[k]}' is not in lists.py")
-            for pd in d.get('parts', []):
-                for k in ('ref', 'question'):
-                    if k in pd and pd[k] not in LISTS:
-                        errors.append(f"{fid}.{key}.{pd['column']}: list '{pd[k]}' is not in lists.py")
-            fen['fields'][key] = e
-            far['fields'][key] = a
-            dfields.append(d)
-        dsecs.append(OrderedDict(key=skey, fields=dfields))
-    en['forms'][fid] = fen
-    ar['forms'][fid] = far
-    defs[fid] = OrderedDict(id=fid, indicator=f['indicator'], sheet=f['sheet'], table=f['table'],
-                            fixed=f['fixed'], filter=f['filter'], sections=dsecs)
-
-if errors:
-    for e in errors: print('ERROR', e)
-    sys.exit(1)
-
-# ── the screens' own strings ──────────────────────────────────────────────
-common_en = OrderedDict([
-    ('nav', OrderedDict([
-        ('group', OrderedDict([('so1', 'Objective 1 · Job opportunities'), ('so2', 'Objective 2 · Training'), ('so3', 'Objective 3 · Entrepreneurship'), ('impact', 'Impact'), ('other', 'Other'), ('definitions', 'Definitions')])),
-        ('thresholds', 'Open items'),
-    ])),
-    ('list', OrderedDict([
-        ('new', 'New record'), ('empty', 'No records yet.'), ('emptyBody', 'Records entered through this form appear here, newest first.'),
-        ('loadFailed', 'The list could not be loaded.'), ('search', 'Search'), ('deleted', 'Deleted'),
-        ('showDeleted', 'Show deleted'), ('count', '{count, plural, =0 {No records} one {# record} other {# records}}'),
-        ('columns', OrderedDict([('reference', 'Reference'), ('title', 'Title'), ('person', 'Person'), ('date', 'Date'), ('counts', 'Counts'), ('status', 'Status')])),
-    ])),
-    ('form', OrderedDict([
-        ('newTitle', 'New: {title}'), ('editTitle', 'Edit: {title}'), ('save', 'Save'), ('saving', 'Saving…'),
-        ('saved', 'Saved'), ('savedRef', 'Saved as {reference}'), ('cancel', 'Cancel'), ('back', 'Back to the list'),
-        ('required', 'This field is required.'), ('assignedOnSave', 'Assigned when the record is saved.'),
-        ('derivedOnSave', 'Worked out from the answers when the record is saved.'), ('notYet', 'Not yet'),
-        ('specify', 'Please specify'), ('noneSelected', 'Nothing selected'), ('choose', 'Choose…'),
-        ('calcTitle', 'How the indicator is calculated from this form'), ('who', 'Who completes this form'),
-        ('when', 'When'), ('disaggregation', 'Required disaggregation'),
-        ('countingField', 'This field produces the indicator count'),
-        ('ruleTitle', 'Agreed rule'), ('ruleMissing', 'The rule has not been agreed yet (open item). Records can be entered; the indicator is not computable until the M&E lead writes the rule in the thresholds table.'),
-        ('lookup', 'Look up'), ('lookingUp', 'Looking up…'), ('onFile', 'On file — name is locked; empty details can be added.'),
-        ('newPerson', 'Not on file — a new person will be created.'), ('nidMismatch', 'The two numbers are different.'),
-        ('nidInvalid', 'A national ID is exactly nine digits.'), ('personDeleted', 'This national ID belongs to a person who was deleted. Restore them from the Sahel Horan person screen first.'),
-        ('invalid', 'Not saved. {message}'), ('notFound', 'This record no longer exists or is not yours to edit.'),
-        ('unknownColumn', 'Not saved: the form sent a field the database does not know ({column}). This is a defect in the form.'),
-        ('yes', 'Yes'), ('no', 'No'), ('undecided', 'Not decided'), ('decidedBy', 'Decided {when}'),
-        ('gridComponent', 'Component'), ('gridRating', 'Rating'), ('serviceBegan', 'Date it began'),
-        ('deliveryAdd', 'Add a delivery'), ('deliveryCycle', 'Cycle number'), ('deliveryStart', 'Start date'),
-        ('deliveryEnd', 'End date'), ('deliveryLocation', 'Location'), ('deliveryEnrolled', 'Participants enrolled'),
-        ('deliveryCompleting', 'Participants completing'), ('deliveryNone', 'No deliveries recorded yet.'),
-        ('deliveriesSavedSeparately', 'Deliveries are saved one at a time from the programme\'s page once the programme exists.'),
-        ('createEnterprise', 'New enterprise'), ('enterpriseName', 'Enterprise name'), ('mirrorEnd', 'A session is one day: the end date is the same as the date.'),
-        # The inline cycle for E0.3 (the sheet's own four rows, verbatim)
-        ('cycleNew', OrderedDict([
-            ('open', 'Add an incubator-design cycle'), ('title', 'Title'), ('start', 'Start'), ('end', 'End'),
-            ('hours', 'Total hours'), ('deliveredBy', 'Delivered by'), ('modules', 'Modules covered'),
-            ('add', 'Add cycle'), ('cancel', 'Cancel'),
-            ('note', 'RMTH-ID is the prefix for incubator-design cycles. The reference is assigned when the cycle is added; at least one design module must be recorded or the participant will not count.'),
-        ])),
-        ('recordPicker', OrderedDict([('none', 'None'), ('loadFailed', 'The list could not be loaded.')])),
-    ])),
-    ('detail', OrderedDict([
-        ('edit', 'Edit'), ('delete', 'Delete'), ('restore', 'Restore'), ('deleteConfirm', 'Delete this record? It stops counting and can be restored later.'),
-        ('deletedNote', 'This record is deleted and does not count. A coordinator can restore it.'),
-        ('created', 'Created'), ('updated', 'Updated'), ('notSet', 'Not set'),
-        # The evidence panel's strings are in common.json (`evidence.*`): since
-        # 0128 the panel is the platform's, not Ramtha's.
-        ('counts', 'Counts towards the indicator'), ('notCounts', 'Does not count'),
-        ('thresholdUndecided', 'Cannot be worked out until the open item is decided'),
-        ('deliveries', 'Deliveries'),
-    ])),
-    ('kinds', OrderedDict([('training', 'Training cycle'), ('event', 'Event'), ('enterprise', 'Enterprise')])),
-    ('gate', OrderedDict([('title', 'Ramtha screens'), ('body', 'These forms belong to Ramtha Municipality. Your account works in another municipality.')])),
-    # The dashboard (Part 6). Names and objectives come from the database
-    # (0131 seeded them from the workbook and its Arabic Copy); these are only
-    # the words around the numbers.
-    ('dashboard', OrderedDict([
-        ('title', 'Ramtha dashboard'),
-        ('intro', 'Eighteen indicators from the Ramtha results framework, computed from the seventeen forms. Every figure is read from the database; nothing is typed or worked out here.'),
-        ('noValue', '—'),
-        ('percent', '{value}%'),
-        ('ofTarget', 'of {target}'),
-        ('targetNotSet', 'target not set'),
-        ('ofWhomUnique', '{count, plural, one {# unique person} other {# unique people}}'),
-        ('denominator', 'of {count}'),
-        ('notComputable', 'Not computable until decided: {definition}'),
-        ('noStatement', 'The framework workbook gives this code and no indicator statement (OQ-48).'),
-        ('noForm', 'No form'),
-        ('openItems', 'Open items'),
-        ('targetsNotSet', 'No Ramtha target is set for any quarter. The English_form workbook carries none, and the English Copy sheet\'s targets belong to a different indicator list (OQ-48). A missing target is shown as "not set", never as zero.'),
-        ('blockedNotice', '{count, plural, one {# indicator cannot be computed} other {# indicators cannot be computed}} until an open item is decided.'),
-        ('noStatementNotice', 'RMTH-SO1-A1 has a code and no indicator statement in the framework workbook. It is listed so the gap stays visible (OQ-48).'),
-    ])),
-    # The open items screen: the seven definitions of plan §5.4, in the
-    # plan's order, answered as data (0123) by a coordinator.
-    ('thresholds', OrderedDict([
-        ('title', 'Open items'),
-        ('intro', 'The seven definitions the Ramtha forms index leaves open. Each is a value the indicator views read; while it is empty the indicator that depends on it is not computable — never zero. A coordinator writes the decision here, with the date; nothing else changes.'),
-        ('notDecided', 'Not decided'), ('yes', 'Yes'), ('no', 'No'),
-        ('value', 'Value'), ('rule', 'Rule, as it will be applied'),
-        ('decide', 'Decide'), ('save', 'Save decision'), ('decidedOn', 'decided {date}'),
-        ('blocks', 'Waiting on this'),
-        ('item', OrderedDict([
-            ('sustained_engagement', 'Open item 1 · Sustained engagement (IMP-0)'),
-            ('short_term_intensive', 'Open item 2 · Short-term intensive (C1.1)'),
-            ('regular_income', 'Open item 3 · Regular income (SO3-0)'),
-            ('completion_criteria', 'Open item 4 · Completion criteria (C1.2, E0.3, F0.1)'),
-            ('self_employment_as_placement', 'Open item 5 · Self-employment as a placement (SO2-0)'),
-            ('programmes_or_sessions', 'Open item 6 · Programmes or sessions (F0.2)'),
-            ('employability_threshold', 'Open item 7 · Employability threshold (SO1-0)'),
-        ])),
-        ('choice', OrderedDict([
-            ('f02_counting_reading', OrderedDict([('programmes', 'Programmes developed'), ('sessions', 'Sessions delivered')])),
-            ('so10_employability_threshold', OrderedDict([('form_rule', 'The form\'s rule: a confirmed placement, or one verifiable step plus one other'), ('placement_only', 'Confirmed placement only')])),
-        ])),
-    ])),
+    # C1.2's formula: "Cumulative total = COUNT(DISTINCT PA-02) across all periods"
+    ('dashboard.unique.C1.2', ('{count, plural, one {# person} other {# people}} to date, each counted once',
+                               '{count, plural, =0 {لا أحد} one {شخص واحد} two {شخصان} few {# أشخاص} many {# شخصاً} other {# شخص}} حتى الآن، كلٌّ مرة واحدة')),
 ])
-common_ar = OrderedDict([
-    ('nav', OrderedDict([
-        ('group', OrderedDict([('so1', 'الهدف 1 · فرص العمل'), ('so2', 'الهدف 2 · التدريب'), ('so3', 'الهدف 3 · ريادة الأعمال'), ('impact', 'الأثر'), ('other', 'أخرى'), ('definitions', 'التعريفات')])),
-        ('thresholds', 'البنود المفتوحة'),
-    ])),
-    ('list', OrderedDict([
-        ('new', 'سجل جديد'), ('empty', 'لا توجد سجلات بعد.'), ('emptyBody', 'تظهر هنا السجلات المدخلة عبر هذا النموذج، الأحدث أولاً.'),
-        ('loadFailed', 'تعذّر تحميل القائمة.'), ('search', 'بحث'), ('deleted', 'محذوف'),
-        ('showDeleted', 'إظهار المحذوف'), ('count', '{count, plural, =0 {لا توجد سجلات} one {سجل واحد} two {سجلان} few {# سجلات} many {# سجلاً} other {# سجل}}'),
-        ('columns', OrderedDict([('reference', 'المرجع'), ('title', 'العنوان'), ('person', 'الشخص'), ('date', 'التاريخ'), ('counts', 'يُحتسب'), ('status', 'الحالة')])),
-    ])),
-    ('form', OrderedDict([
-        ('newTitle', 'جديد: {title}'), ('editTitle', 'تعديل: {title}'), ('save', 'حفظ'), ('saving', 'جارٍ الحفظ…'),
-        ('saved', 'تم الحفظ'), ('savedRef', 'حُفظ بالمرجع {reference}'), ('cancel', 'إلغاء'), ('back', 'العودة إلى القائمة'),
-        ('required', 'هذا الحقل مطلوب.'), ('assignedOnSave', 'يُعيَّن عند حفظ السجل.'),
-        ('derivedOnSave', 'يُستخلص من الإجابات عند حفظ السجل.'), ('notYet', 'ليس بعد'),
-        ('specify', 'يرجى التحديد'), ('noneSelected', 'لم يُختر شيء'), ('choose', 'اختر…'),
-        ('calcTitle', 'كيف يُحتسب المؤشر من هذا النموذج'), ('who', 'من يكمل هذا النموذج'),
-        ('when', 'متى'), ('disaggregation', 'التفصيل المطلوب'),
-        ('countingField', 'هذا الحقل ينتج عدّ المؤشر'),
-        ('ruleTitle', 'القاعدة المتفق عليها'), ('ruleMissing', 'لم يُتفق على القاعدة بعد (بند مفتوح). يمكن إدخال السجلات؛ ولا يمكن احتساب المؤشر حتى يكتب مسؤول الرصد والتقييم القاعدة في جدول الحدود.'),
-        ('lookup', 'بحث'), ('lookingUp', 'جارٍ البحث…'), ('onFile', 'مسجّل - الاسم مقفل؛ يمكن إضافة التفاصيل الفارغة.'),
-        ('newPerson', 'غير مسجّل - سيُنشأ شخص جديد.'), ('nidMismatch', 'الرقمان مختلفان.'),
-        ('nidInvalid', 'الرقم الوطني تسعة أرقام بالضبط.'), ('personDeleted', 'هذا الرقم الوطني يعود لشخص محذوف. استعده أولاً من شاشة الأشخاص.'),
-        ('invalid', 'لم يُحفظ. {message}'), ('notFound', 'هذا السجل لم يعد موجوداً أو ليس لك تعديله.'),
-        ('unknownColumn', 'لم يُحفظ: أرسل النموذج حقلاً لا تعرفه قاعدة البيانات ({column}). هذا خلل في النموذج.'),
-        ('yes', 'نعم'), ('no', 'لا'), ('undecided', 'لم يُقرَّر'), ('decidedBy', 'قُرِّر {when}'),
-        ('gridComponent', 'المكوّن'), ('gridRating', 'التقييم'), ('serviceBegan', 'تاريخ البدء'),
-        ('deliveryAdd', 'إضافة تنفيذ'), ('deliveryCycle', 'رقم الدورة'), ('deliveryStart', 'تاريخ البدء'),
-        ('deliveryEnd', 'تاريخ الانتهاء'), ('deliveryLocation', 'الموقع'), ('deliveryEnrolled', 'المشاركون الملتحقون'),
-        ('deliveryCompleting', 'المشاركون المتمّون'), ('deliveryNone', 'لم تُسجَّل أي عمليات تنفيذ بعد.'),
-        ('deliveriesSavedSeparately', 'تُحفظ عمليات التنفيذ واحدة تلو الأخرى من صفحة البرنامج بعد إنشائه.'),
-        ('createEnterprise', 'مشروع جديد'), ('enterpriseName', 'اسم المشروع'), ('mirrorEnd', 'الجلسة يوم واحد: تاريخ الانتهاء هو التاريخ نفسه.'),
-        ('cycleNew', OrderedDict([
-            ('open', 'إضافة دورة تصميم حاضنات'), ('title', 'العنوان'), ('start', 'البداية'), ('end', 'النهاية'),
-            ('hours', 'إجمالي الساعات'), ('deliveredBy', 'مقدَّمة من'), ('modules', 'الوحدات المغطاة'),
-            ('add', 'إضافة الدورة'), ('cancel', 'إلغاء'),
-            ('note', 'RMTH-ID هي البادئة لدورات تصميم الحاضنات. يُعيَّن المرجع عند إضافة الدورة؛ ويجب تسجيل وحدة تصميم واحدة على الأقل وإلا فلن يُحتسب المشارك.'),
-        ])),
-        ('recordPicker', OrderedDict([('none', 'لا شيء'), ('loadFailed', 'تعذّر تحميل القائمة.')])),
-    ])),
-    ('detail', OrderedDict([
-        ('edit', 'تعديل'), ('delete', 'حذف'), ('restore', 'استعادة'), ('deleteConfirm', 'حذف هذا السجل؟ سيتوقف عن الاحتساب ويمكن استعادته لاحقاً.'),
-        ('deletedNote', 'هذا السجل محذوف ولا يُحتسب. يمكن للمنسق استعادته.'),
-        ('created', 'أُنشئ'), ('updated', 'حُدِّث'), ('notSet', 'غير محدد'),
-        ('counts', 'يُحتسب في المؤشر'), ('notCounts', 'لا يُحتسب'),
-        ('thresholdUndecided', 'لا يمكن استخلاصه حتى يُقرَّر البند المفتوح'),
-        ('deliveries', 'عمليات التنفيذ'),
-    ])),
-    ('kinds', OrderedDict([('training', 'دورة تدريب'), ('event', 'فعالية'), ('enterprise', 'مشروع')])),
-    ('gate', OrderedDict([('title', 'شاشات الرمثا'), ('body', 'هذه النماذج تخص بلدية الرمثا. حسابك يعمل في بلدية أخرى.')])),
-    ('dashboard', OrderedDict([
-        ('title', 'لوحة الرمثا'),
-        ('intro', 'ثمانية عشر مؤشراً من إطار نتائج الرمثا، تُحتسب من النماذج السبعة عشر. كل رقم يُقرأ من قاعدة البيانات؛ لا يُكتب ولا يُحتسب شيء هنا.'),
-        ('noValue', '—'),
-        ('percent', '{value}٪'),
-        ('ofTarget', 'من {target}'),
-        ('targetNotSet', 'الهدف غير محدد'),
-        ('ofWhomUnique', '{count, plural, =0 {لا أشخاص فريدين} one {شخص فريد واحد} two {شخصان فريدان} few {# أشخاص فريدين} many {# شخصاً فريداً} other {# شخص فريد}}'),
-        ('denominator', 'من {count}'),
-        ('notComputable', 'لا يمكن احتسابه حتى يُقرَّر: {definition}'),
-        ('noStatement', 'يعطي مصنف الإطار لهذا الرمز صياغة مؤشر فارغة (OQ-48).'),
-        ('noForm', 'لا نموذج'),
-        ('openItems', 'البنود المفتوحة'),
-        ('targetsNotSet', 'لم يُحدَّد أي هدف للرمثا لأي ربع. لا يحمل مصنف English_form أي أهداف، وأهداف ورقة English Copy تعود إلى قائمة مؤشرات مختلفة (OQ-48). يُعرض الهدف الناقص على أنه "غير محدد"، وليس صفراً أبداً.'),
-        ('blockedNotice', '{count, plural, =0 {لا مؤشرات} one {مؤشر واحد لا يمكن احتسابه} two {مؤشران لا يمكن احتسابهما} few {# مؤشرات لا يمكن احتسابها} many {# مؤشراً لا يمكن احتسابها} other {# مؤشر لا يمكن احتسابه}} حتى يُقرَّر بند مفتوح.'),
-        ('noStatementNotice', 'يحمل RMTH-SO1-A1 رمزاً دون صياغة مؤشر في مصنف الإطار. يُدرج هنا لتبقى الفجوة ظاهرة (OQ-48).'),
-    ])),
-    ('thresholds', OrderedDict([
-        ('title', 'البنود المفتوحة'),
-        ('intro', 'التعريفات السبعة التي يتركها فهرس نماذج الرمثا مفتوحة. كل منها قيمة تقرأها عروض المؤشرات؛ وما دامت فارغة فالمؤشر المعتمد عليها غير قابل للاحتساب - وليس صفراً أبداً. يكتب المنسق القرار هنا مع تاريخه؛ ولا يتغير شيء آخر.'),
-        ('notDecided', 'لم يُقرَّر'), ('yes', 'نعم'), ('no', 'لا'),
-        ('value', 'القيمة'), ('rule', 'القاعدة كما ستُطبَّق'),
-        ('decide', 'قرِّر'), ('save', 'حفظ القرار'), ('decidedOn', 'قُرِّر في {date}'),
-        ('blocks', 'بانتظار هذا البند'),
-        ('item', OrderedDict([
-            ('sustained_engagement', 'البند المفتوح 1 · الانخراط المستدام (IMP-0)'),
-            ('short_term_intensive', 'البند المفتوح 2 · قصير الأمد ومكثف (C1.1)'),
-            ('regular_income', 'البند المفتوح 3 · الدخل المنتظم (SO3-0)'),
-            ('completion_criteria', 'البند المفتوح 4 · معايير الإتمام (C1.2، E0.3، F0.1)'),
-            ('self_employment_as_placement', 'البند المفتوح 5 · العمل الحر بوصفه إلحاقاً (SO2-0)'),
-            ('programmes_or_sessions', 'البند المفتوح 6 · البرامج أم الجلسات (F0.2)'),
-            ('employability_threshold', 'البند المفتوح 7 · حد قابلية التشغيل (SO1-0)'),
-        ])),
-        ('choice', OrderedDict([
-            ('f02_counting_reading', OrderedDict([('programmes', 'البرامج المطوّرة'), ('sessions', 'الجلسات المنفذة')])),
-            ('so10_employability_threshold', OrderedDict([('form_rule', 'قاعدة النموذج: إلحاق مؤكد، أو خطوة واحدة قابلة للتحقق مع خطوة أخرى'), ('placement_only', 'الإلحاق المؤكد فقط')])),
-        ])),
-    ])),
-])
-en.update(common_en)
-ar.update(common_ar)
+
+# The threshold items the Open items screen orders by (rmth_threshold.open_item, 0179).
+THRESHOLD_ITEMS = ['sustained_engagement', 'short_term_intensive', 'regular_income', 'programmes_or_sessions']
+
+
+def put(tree, path, value):
+    cur = tree
+    parts = path.split('.')
+    # "dashboard.unique.C1.2": the code keeps its dot
+    if parts[:2] == ['dashboard', 'unique']:
+        parts = ['dashboard', 'unique', '.'.join(parts[2:])]
+    for p in parts[:-1]:
+        cur = cur.setdefault(p, OrderedDict())
+    cur[parts[-1]] = value
+
+
+def short(code):
+    parts = code.split('-')
+    return '-'.join(parts[1:]) if parts[2] == '0' else parts[2]
+
+
+def build():
+    m = model.build()
+    order = [c.code for c in m['calcs']]
+    rank = {code: i for i, code in enumerate(order)}
+    slug = {f['form']: f['slug'] for f in C.FORMS}
+
+    forms = OrderedDict()
+    en, ar = OrderedDict(), OrderedDict()
+    en['forms'], ar['forms'] = OrderedDict(), OrderedDict()
+    groups = OrderedDict()
+    for form in m['forms']:
+        spec = form['spec']
+        fid = spec['slug']
+        groups.setdefault(spec['group'], (form['page_en'], form['page_ar']))
+        fields = []
+        fen, far = OrderedDict(), OrderedDict()
+        for x in form['fields']:
+            s = x['spec']
+            d = OrderedDict([('id', x['id']), ('kind', s['kind'])])
+            for k in ('column', 'list', 'other', 'question', 'exclusive', 'table', 'categories', 'min', 'max',
+                      'maxCurrentYear', 'notFuture', 'notBefore', 'notAfter', 'positive'):
+                if k in s:
+                    d[k] = s[k]
+            if x['required']:
+                d['required'] = True
+            if s.get('when'):
+                d['when'] = s['when']
+            if x['added']:
+                d['added'] = True
+            fields.append(d)
+            le = OrderedDict([('label', x['label_en'])])
+            la = OrderedDict([('label', x['label_ar'])])
+            if x['help_en']:
+                le['help'], la['help'] = x['help_en'], x['help_ar']
+            if s['kind'] == 'bool':
+                le['opts'] = OrderedDict([('true', x['opts_en'][0]), ('false', x['opts_en'][1])])
+                la['opts'] = OrderedDict([('true', x['opts_ar'][0]), ('false', x['opts_ar'][1])])
+            fen[x['id']], far[x['id']] = le, la
+        d = OrderedDict([('id', fid), ('sheet', spec['form']), ('table', spec['table']), ('group', spec['group']),
+                         ('writer', spec['writer'])])
+        if spec.get('reference'):
+            d['reference'] = spec['reference']
+        if spec.get('published'):
+            d['published'] = True
+        d['indicators'] = sorted(form['indicators'], key=lambda c: rank.get(c, 99))
+        d['list'] = spec['list']
+        d['fields'] = fields
+        forms[fid] = d
+        en['forms'][fid] = OrderedDict([('title', form['title_en']), ('short', form['title_en']), ('fields', fen)])
+        ar['forms'][fid] = OrderedDict([('title', form['title_ar']), ('short', form['title_ar']), ('fields', far)])
+
+    for key, (pen, par) in groups.items():
+        put(en, 'nav.group.' + key, pen)
+        put(ar, 'nav.group.' + key, par)
+    for path, (e, a) in STRINGS.items():
+        put(en, path, e)
+        put(ar, path, a)
+
+    indicator_forms = OrderedDict()
+    for c in m['calcs']:
+        indicator_forms[short(c.code)] = [slug[f] for f in C.indicator_forms(c.fields)]
+    return forms, list(groups.keys()), indicator_forms, en, ar
+
+
+def ts(forms, groups, indicator_forms):
+    out = [
+        '// GENERATED by supabase/ramtha/gen_forms.py from RMTH_Forms_and_Calculations_v2.xlsx',
+        '// (workbook.py) and supabase/ramtha/catalogue.py. Do not edit; edit the catalogue',
+        '// and regenerate. Labels live in locales/{en,ar}/rmth.json under',
+        '// forms.<id>.fields.<Field ID>; option labels are ref_rmth_* rows in the database (0176).',
+        "import type { RmthFormDef } from './types'",
+        '',
+        'export const RMTH_FORMS = ' + json.dumps(forms, ensure_ascii=False, indent=2) + ' as const satisfies Record<string, RmthFormDef>',
+        '',
+        'export type RmthFormId = keyof typeof RMTH_FORMS',
+        'export const RMTH_FORM_IDS = Object.keys(RMTH_FORMS) as RmthFormId[]',
+        '',
+        "/** The workbook's pages (Page En), in the order the forms first appear on them: the sidebar's groups. */",
+        'export const RMTH_GROUPS = ' + json.dumps(groups) + ' as const',
+        '',
+        '/**',
+        ' * The forms an indicator is entered through, by its short code, from the Calculation',
+        ' * Method sheet\'s "Required Field(s)" (catalogue.indicator_forms): the first field of',
+        ' * each group names a form; FORM-01 supplies breakdowns, never the count.',
+        ' */',
+        'export const RMTH_INDICATOR_FORMS: Readonly<Record<string, readonly RmthFormId[]>> = '
+        + json.dumps(indicator_forms, indent=2),
+        '',
+    ]
+    return '\n'.join(out)
+
 
 def write(path, text):
     io.open(path, 'w', encoding='utf-8', newline='').write(text)
 
-write(os.path.join(ROOT, 'app', 'src', 'locales', 'en', 'rmth.json'), json.dumps(en, ensure_ascii=False, indent=2) + '\n')
-write(os.path.join(ROOT, 'app', 'src', 'locales', 'ar', 'rmth.json'), json.dumps(ar, ensure_ascii=False, indent=2) + '\n')
 
-ts = ["// GENERATED by supabase/ramtha/gen_forms.py from supabase/ramtha/forms.py and",
-      "// RMTH_indicator_forms.xlsx. Do not edit; edit forms.py and regenerate.",
-      "// Labels live in locales/{en,ar}/rmth.json under forms.<id>.fields.<key>.",
-      "import type { RmthFormDef } from './types'",
-      "",
-      "export const RMTH_FORMS = " + json.dumps(defs, ensure_ascii=False, indent=2) + " as const satisfies Record<string, RmthFormDef>",
-      "",
-      "export type RmthFormId = keyof typeof RMTH_FORMS",
-      "export const RMTH_FORM_IDS = Object.keys(RMTH_FORMS) as RmthFormId[]",
-      ""]
-write(os.path.join(ROOT, 'app', 'src', 'rmth', 'forms.generated.ts'), '\n'.join(ts))
+def main():
+    forms, groups, indicator_forms, en, ar = build()
+    write(os.path.join(ROOT, 'app', 'src', 'rmth', 'forms.generated.ts'), ts(forms, groups, indicator_forms))
+    write(os.path.join(ROOT, 'app', 'src', 'locales', 'en', 'rmth.json'), json.dumps(en, ensure_ascii=False, indent=2) + '\n')
+    write(os.path.join(ROOT, 'app', 'src', 'locales', 'ar', 'rmth.json'), json.dumps(ar, ensure_ascii=False, indent=2) + '\n')
+    n = sum(len(f['fields']) for f in forms.values())
+    print('ok: %d forms, %d fields; forms.generated.ts and both rmth.json written' % (len(forms), n))
 
-n = sum(len(s['fields']) for f in defs.values() for s in f['sections'])
-print('ok:', len(defs), 'forms,', n, 'fields; locales and forms.generated.ts written')
+
+if __name__ == '__main__':
+    main()

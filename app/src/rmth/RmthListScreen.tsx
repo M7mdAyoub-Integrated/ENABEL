@@ -1,118 +1,107 @@
 import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useQuery } from '@tanstack/react-query'
 import { PageHead, PrimaryButton } from '../ui/primitives'
 import type { RowAction } from '../ui/DataTable'
 import { ListTable } from '../ui/ListTable'
 import { refLabel } from '../data/refTables'
-import { useRmthList, useRmthRef, type RmthRow } from '../data/rmth'
-import { supabase } from '../lib/supabase'
-import { unwrapList } from '../data/errors'
+import { usePersonNames, useRmthList, useRmthPicker, useRmthRefs, type RmthRow } from '../data/rmth'
 import { formatShortDate } from '../lib/format'
 import { useAuth } from '../auth/AuthProvider'
 import { can } from '../auth/permissions'
-import { formDef, useRmthLabels } from './labels'
+import { listsOf } from './answers'
+import { fieldOf, formDef, isRmthFormId, useRmthLabels } from './labels'
+import { pickLabel } from './picks'
+import NotFound from '../routes/NotFound'
 import type { RmthFormId } from './forms.generated'
+import type { RmthFieldDef } from './types'
 import type { Cell, ListRow } from '../hooks/useData'
+import { SEP } from '../ui/glyphs'
 
 /**
- * The list behind each Ramtha form: reference, what it is, when, and whether
- * it counts. What "counts" means is per form and comes from the sheet's
- * counting field, read from the row -- never computed here.
+ * The list behind each Ramtha form: the reference the database issued (PJ-01,
+ * AC-01), then the fields the catalogue's `list` names for the form, in the
+ * sheet's wording. The Activity Register also says which activities are on
+ * the public page, because that is a coordinator's switch (0181) and the list
+ * is where one looks for it.
  */
-type Column = { col: string; kind: 'text' | 'date' | 'bool' | 'ref' | 'person'; ref?: string }
-
-const COLUMNS: Record<RmthFormId, Column[]> = {
-  imp0: [{ col: 'person_id', kind: 'person' }, { col: 'contact_date', kind: 'date' }, { col: 'imp0_criterion_id', kind: 'ref', ref: 'imp0_criterion' }],
-  so10: [{ col: 'person_id', kind: 'person' }, { col: 'contact_date', kind: 'date' }, { col: 'so10_threshold_id', kind: 'ref', ref: 'so10_threshold' }],
-  a12: [{ col: 'reference', kind: 'text' }, { col: 'title', kind: 'text' }, { col: 'start_date', kind: 'date' }, { col: 'solely_guidance', kind: 'bool' }],
-  a13: [{ col: 'reference', kind: 'text' }, { col: 'title', kind: 'text' }, { col: 'start_date', kind: 'date' }],
-  b1: [{ col: 'entity_name', kind: 'text' }, { col: 'interviewed_on', kind: 'date' }, { col: 'any_essential', kind: 'bool' }],
-  b11: [{ col: 'reference', kind: 'text' }, { col: 'title', kind: 'text' }, { col: 'completed_on', kind: 'date' }, { col: 'tailoring_met', kind: 'bool' }],
-  b12: [{ col: 'reference', kind: 'text' }, { col: 'title', kind: 'text' }, { col: 'submitted_on', kind: 'date' }, { col: 'decision_id', kind: 'ref', ref: 'b12_decision' }],
-  so20: [{ col: 'person_id', kind: 'person' }, { col: 'contact_date', kind: 'date' }, { col: 'so20_outcome_id', kind: 'ref', ref: 'so20_outcome' }],
-  so2c1: [{ col: 'person_id', kind: 'person' }, { col: 'contact_date', kind: 'date' }, { col: 'headline_id', kind: 'ref', ref: 'so2c1_headline' }],
-  c11: [{ col: 'reference', kind: 'text' }, { col: 'title', kind: 'text' }, { col: 'start_date', kind: 'date' }, { col: 'joint_development_met', kind: 'bool' }],
-  c12: [{ col: 'person_id', kind: 'person' }, { col: 'created_at', kind: 'date' }, { col: 'met_criteria', kind: 'bool' }],
-  so30: [{ col: 'person_id', kind: 'person' }, { col: 'contact_date', kind: 'date' }, { col: 'so30_criterion_id', kind: 'ref', ref: 'so30_criterion' }],
-  e01: [{ col: 'reference', kind: 'text' }, { col: 'name', kind: 'text' }, { col: 'achieved_on', kind: 'date' }, { col: 'established_id', kind: 'ref', ref: 'e01_status' }],
-  e02: [{ col: 'person_id', kind: 'person' }, { col: 'admitted_on', kind: 'date' }, { col: 'status_id', kind: 'ref', ref: 'e02_status' }],
-  e03: [{ col: 'person_id', kind: 'person' }, { col: 'created_at', kind: 'date' }, { col: 'met_criteria', kind: 'bool' }],
-  f01: [{ col: 'person_id', kind: 'person' }, { col: 'created_at', kind: 'date' }, { col: 'met_criteria', kind: 'bool' }],
-  f02: [{ col: 'reference', kind: 'text' }, { col: 'title', kind: 'text' }, { col: 'completed_on', kind: 'date' }, { col: 'development_complete_id', kind: 'ref', ref: 'f02_complete' }],
-}
-
-/** Names for the person-level lists, one query for the page. */
-function usePersonNames(ids: string[]) {
-  const key = ids.slice().sort().join(',')
-  return useQuery({
-    queryKey: ['people', 'names', key],
-    enabled: ids.length > 0,
-    staleTime: 60_000,
-    queryFn: async (): Promise<Record<string, { full_name: string; national_id: string }>> => {
-      const res = await (supabase.from('person').select('id, full_name, national_id').in('id', ids) as unknown as Promise<{ data: { id: string; full_name: string; national_id: string }[] | null; error: unknown }>)
-      const rows = unwrapList(res)
-      return Object.fromEntries(rows.map((r) => [r.id, { full_name: r.full_name, national_id: r.national_id }]))
-    },
-  })
-}
-
 export function RmthListScreen() {
-  const { form: fidParam } = useParams()
-  const fid = fidParam as RmthFormId
+  const { form } = useParams()
+  // RequireRamtha says the same, but demo mode drops the route guards
+  if (!isRmthFormId(form)) return <NotFound />
+  return <ListFor key={form} fid={form} />
+}
+
+function ListFor({ fid }: { fid: RmthFormId }) {
   const def = formDef(fid)
   const L = useRmthLabels(fid)
-  const { t, i18n } = useTranslation(['rmth', 'common'])
+  const { t, i18n } = useTranslation(['rmth', 'common', 'forms'])
   const locale = i18n.resolvedLanguage ?? 'en'
   const navigate = useNavigate()
   const { role } = useAuth()
   const [showDeleted, setShowDeleted] = useState(false)
-  const list = useRmthList(def.table, def.filter, showDeleted)
-  const cols = COLUMNS[fid]
-  const refCols = cols.filter((c) => c.kind === 'ref')
-  const ref0 = useRmthRef(refCols[0]?.ref)
+  const list = useRmthList(def.table, showDeleted)
+  const refs = useRmthRefs(useMemo(() => listsOf(def), [def]))
+  const cols = useMemo(() => def.list.map((id) => fieldOf(def, id)).filter((f): f is RmthFieldDef => !!f), [def])
+  const activities = useRmthPicker(cols.some((f) => f.table === 'rmth_activity') ? 'rmth_activity' : undefined)
+  const projects = useRmthPicker(cols.some((f) => f.table === 'rmth_project') ? 'rmth_project' : undefined)
+  const showReference = !!def.reference && !cols.some((f) => f.kind === 'reference')
   const personIds = useMemo(
-    () => (cols.some((c) => c.kind === 'person') ? Array.from(new Set((list.data ?? []).map((r) => r['person_id']).filter((v): v is string => typeof v === 'string'))) : []),
-    [list.data, cols],
+    () => Array.from(new Set((list.data ?? []).map((r) => r['person_id']).filter((x): x is string => typeof x === 'string'))),
+    [list.data],
   )
-  const names = usePersonNames(personIds)
+  const people = usePersonNames(personIds)
 
-  const rows: ListRow[] = useMemo(() => {
-    return (list.data ?? []).map((r: RmthRow) => {
-      const cells: Cell[] = cols.map((c) => {
-        const v = r[c.col]
-        if (c.kind === 'person') {
-          const p = typeof v === 'string' ? names.data?.[v] : undefined
-          return { kind: 'text', text: p?.full_name ?? '…', ...(p ? { sub: p.national_id } : {}) }
+  const cellOf = (f: RmthFieldDef, r: RmthRow): Cell => {
+    const v = f.column ? r[f.column] : undefined
+    const dash: Cell = { kind: 'text', text: '—' }
+    switch (f.kind) {
+      case 'ident': case 'person_name': case 'person_sex': case 'person': {
+        const p = typeof r['person_id'] === 'string' ? people.data?.[r['person_id'] as string] : undefined
+        if (!p) return { kind: 'text', text: typeof r['person_id'] === 'string' ? '…' : '—' }
+        if (f.kind === 'ident') return { kind: 'ltr', text: p.national_id ?? '—' }
+        if (f.kind === 'person_sex') {
+          const s = (refs[f.list ?? 'sex'] ?? []).find((x) => x.code === p.sex)
+          return s ? { kind: 'text', text: refLabel(s, locale) } : dash
         }
-        if (c.kind === 'date') return { kind: 'text', text: typeof v === 'string' ? formatShortDate(v, locale) : '—' }
-        if (c.kind === 'bool') {
-          if (v == null) return { kind: 'chip', text: t('rmth:form.undecided'), tone: 'pending' }
-          // A1.2's decision is inverted: "No - record it here" is the one that counts
-          const counts = fid === 'a12' ? v === false : v === true
-          return { kind: 'chip', text: counts ? t('rmth:detail.counts') : t('rmth:detail.notCounts'), tone: counts ? 'ok' : 'mute' }
-        }
-        if (c.kind === 'ref') {
-          const row = (ref0.data ?? []).find((x) => x.id === v)
-          return { kind: 'text', text: row ? refLabel(row, locale) : '—' }
-        }
-        if (c.col === 'reference') return { kind: 'ltr', text: typeof v === 'string' ? v : '—' }
-        return { kind: 'text', text: typeof v === 'string' ? v : '—' }
-      })
-      if (r.deleted_at) cells.push({ kind: 'chip', text: t('rmth:list.deleted'), tone: 'err' })
-      return { id: r.id, cells, filterValue: '', search: cells.map((c) => c.text).join(' ') }
-    })
-  }, [list.data, cols, names.data, ref0.data, locale, t, fid])
+        if (f.kind === 'person') return { kind: 'text', text: p.national_id ? `${p.full_name} ${SEP} ${p.national_id}` : p.full_name }
+        return { kind: 'text', text: p.full_name }
+      }
+      case 'reference': return { kind: 'ltr', text: typeof r['reference'] === 'string' ? (r['reference'] as string) : '—' }
+      case 'date': case 'stamp': return typeof v === 'string' ? { kind: 'text', text: formatShortDate(v, locale) } : dash
+      case 'bool': return v == null ? dash : { kind: 'chip', text: L.opt(f, v ? 'true' : 'false'), tone: v ? 'ok' : 'mute' }
+      case 'select': case 'calc': {
+        const row = (refs[f.list ?? ''] ?? []).find((x) => x.id === v)
+        return row ? { kind: 'text', text: refLabel(row, locale) } : dash
+      }
+      case 'record': {
+        const picks = f.table === 'rmth_activity' ? activities.data : projects.data
+        const pick = typeof v === 'string' ? picks?.find((x) => x.id === v) : undefined
+        return pick ? { kind: 'text', text: pickLabel(f.table, pick, refs, locale) } : { kind: 'text', text: typeof v === 'string' ? '…' : '—' }
+      }
+      default: return v == null || v === '' ? dash : { kind: 'text', text: String(v) }
+    }
+  }
 
-  const columns = cols.map((c) =>
-    c.kind === 'person' ? t('rmth:list.columns.person')
-    : c.kind === 'date' ? t('rmth:list.columns.date')
-    : c.kind === 'bool' || c.kind === 'ref' ? t('rmth:list.columns.counts')
-    : c.col === 'reference' ? t('rmth:list.columns.reference')
-    : t('rmth:list.columns.title'),
-  )
-  if (showDeleted) columns.push(t('rmth:list.columns.status'))
+  const source = list.data ?? []
+  const rows: ListRow[] = source.map((r) => {
+    const cells: Cell[] = []
+    if (showReference) cells.push({ kind: 'ltr', text: typeof r['reference'] === 'string' ? (r['reference'] as string) : '—' })
+    for (const f of cols) cells.push(cellOf(f, r))
+    if (def.published) {
+      const on = r['is_published'] === true
+      cells.push({ kind: 'chip', text: on ? t('rmth:list.published') : t('rmth:list.notPublished'), tone: on ? 'ok' : 'mute' })
+    }
+    if (r.deleted_at) cells.push({ kind: 'chip', text: t('rmth:list.deleted'), tone: 'err' })
+    return { id: r.id, cells, filterValue: '', search: cells.map((c) => c.text).join(' ') }
+  })
+
+  const columns = [
+    ...(showReference ? [L.label({ id: def.fields.find((f) => f.kind === 'reference')?.id ?? '' })] : []),
+    ...cols.map((f) => L.label(f)),
+    ...(def.published ? [t('rmth:list.public')] : []),
+    ...(showDeleted ? [t('rmth:list.status')] : []),
+  ]
 
   const actions = (row: ListRow): RowAction[] => [
     { id: 'open', label: t('common:actions.open'), onSelect: () => navigate(`/rmth/${fid}/${row.id}`) },
@@ -121,9 +110,9 @@ export function RmthListScreen() {
   return (
     <>
       <PageHead
-        eyebrow={L.indicator}
+        eyebrow={L.sheet}
         title={L.title}
-        description={L.calc}
+        description={def.indicators.join(` ${SEP} `)}
         action={can(role, 'record.create') ? <PrimaryButton onClick={() => navigate(`/rmth/${fid}/new`)}>{t('rmth:list.new')}</PrimaryButton> : undefined}
       />
       <ListTable
@@ -135,7 +124,9 @@ export function RmthListScreen() {
         isError={list.isError}
         error={list.error}
         onRetry={() => void list.refetch()}
-        toggles={[{ id: 'deleted', label: t('rmth:list.showDeleted'), checked: showDeleted, onChange: setShowDeleted }]}
+        toggles={[
+          { id: 'deleted', label: t('rmth:list.showDeleted'), checked: showDeleted, onChange: setShowDeleted },
+        ]}
         empty={{ title: t('rmth:list.empty'), description: t('rmth:list.emptyBody') }}
       />
     </>

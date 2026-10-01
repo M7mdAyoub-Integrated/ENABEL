@@ -7365,7 +7365,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_rmth_a12_event_type: {
+      ref_rmth_activity_category: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -7407,7 +7407,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_rmth_a12_evidence: {
+      ref_rmth_age_group: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -7449,7 +7449,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_rmth_a12_organised_by: {
+      ref_rmth_employability_outcome: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -7491,7 +7491,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_rmth_a12_partner_type: {
+      ref_rmth_incubation_service: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -7533,2947 +7533,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_rmth_a13_delivered_by: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_a13_evidence: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_a13_target_group: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_a13_topic: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_assessment_result: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_b1_evidence: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_b1_implementer_type: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_b1_operating_status: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_b1_reached: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_b11_developed_with: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_b11_evidence: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_b11_modality: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_b11_requirements_method: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_b11_specialisation: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_b12_approving_body: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_b12_decision: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_b12_evidence: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_b12_submitter_type: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_b12_support_requested: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_c11_academic_contribution: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_c11_academic_type: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_c11_evidence: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_c11_joint_evidence: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_c11_modality: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_c11_private_contribution: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_c11_sector: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_c12_employer_evaluation: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_c12_evidence: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_c12_training_type: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_e01_c1: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_e01_c2: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_e01_c3: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_e01_c4: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_e01_evidence: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_e01_field: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_e01_host: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_e01_partner_role: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_e01_service: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_e01_status: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_e02_evidence: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_e02_sector: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_e02_service: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_e02_stage: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_e02_status: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_e03_delivered_by: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_e03_evidence: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_e03_module: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_e03_org_type: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_f01_enterprise_status: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_f01_evidence: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_f01_module: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_f01_sector: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_f01_training_type: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_f02_complete: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_f02_content_basis: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_f02_developed_by: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_f02_evidence: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_f02_group: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_f02_level: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_f02_material: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_f02_module: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_f02_partner_type: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_f02_sector: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_imp0_capacity: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_imp0_criterion: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_imp0_engaged: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_imp0_pathway: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_imp0_round: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_imp0_stop_reason: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_imp0_verification: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_modality_ipob: {
+      ref_rmth_joint_partner: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -10557,7 +7617,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_rmth_project_type: {
+      ref_rmth_networking_type: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -10599,7 +7659,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_rmth_reached: {
+      ref_rmth_placement_type: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -10683,7 +7743,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_rmth_so10_current_status: {
+      ref_rmth_sex: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -10725,7 +7785,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_rmth_so10_event_type: {
+      ref_rmth_stakeholder_type: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -10767,7 +7827,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_rmth_so10_evidence: {
+      ref_rmth_training_topic: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -10809,7 +7869,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_rmth_so10_other_step: {
+      ref_rmth_training_type: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -10851,931 +7911,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ref_rmth_so10_threshold: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_so10_verifiable_step: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_so20_arrangement: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_so20_facilitated_by: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_so20_obstacle: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_so20_outcome: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_so20_placement_type: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_so20_verification: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_so20_working_time: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_so2c1_evidence: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_so2c1_headline: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_so2c1_support_way: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_so2c1_why_not: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_so30_criterion: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_so30_income_change: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_so30_role: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_so30_sector: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_so30_stop_reason: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_so30_support: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_so30_verification: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_support_component: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_support_rating: {
-        Row: {
-          allows_free_text: boolean
-          code: string
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          id: string
-          is_active: boolean
-          label_ar: string
-          label_en: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          allows_free_text?: boolean
-          code: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar: string
-          label_en: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          allows_free_text?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          id?: string
-          is_active?: boolean
-          label_ar?: string
-          label_en?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ref_rmth_vulnerability: {
+      ref_rmth_work_status: {
         Row: {
           allows_free_text: boolean
           code: string
@@ -12197,1579 +8333,571 @@ export type Database = {
           }
         ]
       }
-      rmth_enterprise: {
+      rmth_activity: {
         Row: {
+          category_id: string
           client_uuid: string | null
+          contact_hours: number | null
           created_at: string
           created_by: string | null
           deleted_at: string | null
+          end_date: string | null
           id: string
+          is_published: boolean
           municipality_id: string
-          name: string
+          networking_type_id: string | null
+          project_id: string | null
           reference: string | null
+          sector_id: string | null
+          sector_other: string | null
+          sessions_delivered: number | null
+          start_date: string
+          training_type_id: string | null
           updated_at: string
         }
         Insert: {
+          category_id: string
           client_uuid?: string | null
+          contact_hours?: number | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
+          end_date?: string | null
           id?: string
+          is_published?: boolean
           municipality_id?: string
-          name: string
+          networking_type_id?: string | null
+          project_id?: string | null
           reference?: string | null
+          sector_id?: string | null
+          sector_other?: string | null
+          sessions_delivered?: number | null
+          start_date: string
+          training_type_id?: string | null
           updated_at?: string
         }
         Update: {
+          category_id?: string
           client_uuid?: string | null
+          contact_hours?: number | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
+          end_date?: string | null
           id?: string
+          is_published?: boolean
           municipality_id?: string
-          name?: string
+          networking_type_id?: string | null
+          project_id?: string | null
           reference?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rmth_enterprise_municipality_id_fkey"
-            columns: ["municipality_id"]
-            isOneToOne: false
-            referencedRelation: "municipality"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      rmth_event: {
-        Row: {
-          age_18_24: number | null
-          age_25_35: number | null
-          age_36_45: number | null
-          age_46_plus: number | null
-          age_under_18: number | null
-          attendees_disability: number | null
-          attendees_men: number | null
-          attendees_non_jordanian: number | null
-          attendees_total: number | null
-          attendees_women: number | null
-          client_uuid: string | null
-          completed_on: string | null
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          delivered_by_id: string | null
-          delivered_by_other: string | null
-          duration_hours: number | null
-          employers_count: number | null
-          end_date: string
-          event_kind: string
-          event_type_id: string | null
-          event_type_other: string | null
-          facilitator_name: string | null
-          focal_point_name: string | null
-          focal_point_phone: string | null
-          id: string
-          location: string | null
-          modality_id: string | null
-          municipality_id: string
-          organised_by_id: string | null
-          parent_event_id: string | null
-          partner_names: string | null
-          reference: string | null
-          solely_guidance: boolean | null
-          solely_guidance_decided_by: string | null
-          solely_guidance_decided_on: string | null
-          start_date: string
-          target_group_id: string | null
-          target_group_other: string | null
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          age_18_24?: number | null
-          age_25_35?: number | null
-          age_36_45?: number | null
-          age_46_plus?: number | null
-          age_under_18?: number | null
-          attendees_disability?: number | null
-          attendees_men?: number | null
-          attendees_non_jordanian?: number | null
-          attendees_total?: number | null
-          attendees_women?: number | null
-          client_uuid?: string | null
-          completed_on?: string | null
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          delivered_by_id?: string | null
-          delivered_by_other?: string | null
-          duration_hours?: number | null
-          employers_count?: number | null
-          end_date: string
-          event_kind: string
-          event_type_id?: string | null
-          event_type_other?: string | null
-          facilitator_name?: string | null
-          focal_point_name?: string | null
-          focal_point_phone?: string | null
-          id?: string
-          location?: string | null
-          modality_id?: string | null
-          municipality_id?: string
-          organised_by_id?: string | null
-          parent_event_id?: string | null
-          partner_names?: string | null
-          reference?: string | null
-          solely_guidance?: boolean | null
-          solely_guidance_decided_by?: string | null
-          solely_guidance_decided_on?: string | null
-          start_date: string
-          target_group_id?: string | null
-          target_group_other?: string | null
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          age_18_24?: number | null
-          age_25_35?: number | null
-          age_36_45?: number | null
-          age_46_plus?: number | null
-          age_under_18?: number | null
-          attendees_disability?: number | null
-          attendees_men?: number | null
-          attendees_non_jordanian?: number | null
-          attendees_total?: number | null
-          attendees_women?: number | null
-          client_uuid?: string | null
-          completed_on?: string | null
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          delivered_by_id?: string | null
-          delivered_by_other?: string | null
-          duration_hours?: number | null
-          employers_count?: number | null
-          end_date?: string
-          event_kind?: string
-          event_type_id?: string | null
-          event_type_other?: string | null
-          facilitator_name?: string | null
-          focal_point_name?: string | null
-          focal_point_phone?: string | null
-          id?: string
-          location?: string | null
-          modality_id?: string | null
-          municipality_id?: string
-          organised_by_id?: string | null
-          parent_event_id?: string | null
-          partner_names?: string | null
-          reference?: string | null
-          solely_guidance?: boolean | null
-          solely_guidance_decided_by?: string | null
-          solely_guidance_decided_on?: string | null
+          sector_id?: string | null
+          sector_other?: string | null
+          sessions_delivered?: number | null
           start_date?: string
-          target_group_id?: string | null
-          target_group_other?: string | null
-          title?: string
+          training_type_id?: string | null
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "rmth_event_delivered_by_id_fkey"
-            columns: ["delivered_by_id"]
+            foreignKeyName: "rmth_activity_category_id_fkey"
+            columns: ["category_id"]
             isOneToOne: false
-            referencedRelation: "ref_rmth_a13_delivered_by"
+            referencedRelation: "ref_rmth_activity_category"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "rmth_event_event_type_id_fkey"
-            columns: ["event_type_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_a12_event_type"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_event_modality_id_fkey"
-            columns: ["modality_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_modality_ipob"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_event_municipality_id_fkey"
+            foreignKeyName: "rmth_activity_municipality_id_fkey"
             columns: ["municipality_id"]
             isOneToOne: false
             referencedRelation: "municipality"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "rmth_event_organised_by_id_fkey"
-            columns: ["organised_by_id"]
+            foreignKeyName: "rmth_activity_networking_type_id_fkey"
+            columns: ["networking_type_id"]
             isOneToOne: false
-            referencedRelation: "ref_rmth_a12_organised_by"
+            referencedRelation: "ref_rmth_networking_type"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "rmth_event_parent_fkey"
-            columns: ["parent_event_id", "municipality_id"]
+            foreignKeyName: "rmth_activity_project_id_fkey"
+            columns: ["project_id", "municipality_id"]
             isOneToOne: false
-            referencedRelation: "rmth_event"
+            referencedRelation: "rmth_project"
             referencedColumns: ["id", "municipality_id"]
           },
           {
-            foreignKeyName: "rmth_event_target_group_id_fkey"
-            columns: ["target_group_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_a13_target_group"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      rmth_event_option: {
-        Row: {
-          created_at: string
-          event_id: string
-          municipality_id: string
-          option_id: string
-          option_other: string | null
-          question_code: string
-        }
-        Insert: {
-          created_at?: string
-          event_id: string
-          municipality_id?: string
-          option_id: string
-          option_other?: string | null
-          question_code: string
-        }
-        Update: {
-          created_at?: string
-          event_id?: string
-          municipality_id?: string
-          option_id?: string
-          option_other?: string | null
-          question_code?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rmth_event_option_event_id_municipality_id_fkey"
-            columns: ["event_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_event"
-            referencedColumns: ["id", "municipality_id"]
-          }
-        ]
-      }
-      rmth_implementer_support: {
-        Row: {
-          component_id: string
-          component_other: string | null
-          created_at: string
-          implementer_id: string
-          municipality_id: string
-          rating_id: string
-        }
-        Insert: {
-          component_id: string
-          component_other?: string | null
-          created_at?: string
-          implementer_id: string
-          municipality_id?: string
-          rating_id: string
-        }
-        Update: {
-          component_id?: string
-          component_other?: string | null
-          created_at?: string
-          implementer_id?: string
-          municipality_id?: string
-          rating_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rmth_implementer_support_component_id_fkey"
-            columns: ["component_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_support_component"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_implementer_support_implementer_id_municipality_id_fkey"
-            columns: ["implementer_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_project_implementer"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "rmth_implementer_support_rating_id_fkey"
-            columns: ["rating_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_support_rating"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      rmth_incubation_service: {
-        Row: {
-          admitted_on: string
-          age_years: number | null
-          client_uuid: string | null
-          completed_on: string | null
-          counted_under_id: string | null
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          enterprise_id: string | null
-          focal_point_name: string | null
-          id: string
-          incubator_id: string
-          municipality_id: string
-          nationality_id: string | null
-          nationality_other: string | null
-          person_id: string
-          sector_id: string | null
-          sector_other: string | null
-          stage_id: string | null
-          status_id: string | null
-          updated_at: string
-        }
-        Insert: {
-          admitted_on: string
-          age_years?: number | null
-          client_uuid?: string | null
-          completed_on?: string | null
-          counted_under_id?: string | null
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          enterprise_id?: string | null
-          focal_point_name?: string | null
-          id?: string
-          incubator_id: string
-          municipality_id?: string
-          nationality_id?: string | null
-          nationality_other?: string | null
-          person_id: string
-          sector_id?: string | null
-          sector_other?: string | null
-          stage_id?: string | null
-          status_id?: string | null
-          updated_at?: string
-        }
-        Update: {
-          admitted_on?: string
-          age_years?: number | null
-          client_uuid?: string | null
-          completed_on?: string | null
-          counted_under_id?: string | null
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          enterprise_id?: string | null
-          focal_point_name?: string | null
-          id?: string
-          incubator_id?: string
-          municipality_id?: string
-          nationality_id?: string | null
-          nationality_other?: string | null
-          person_id?: string
-          sector_id?: string | null
-          sector_other?: string | null
-          stage_id?: string | null
-          status_id?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rmth_incubation_service_counted_under_fkey"
-            columns: ["counted_under_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_incubation_service"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "rmth_incubation_service_enterprise_fkey"
-            columns: ["enterprise_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_enterprise"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "rmth_incubation_service_incubator_fkey"
-            columns: ["incubator_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_incubator"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "rmth_incubation_service_municipality_id_fkey"
-            columns: ["municipality_id"]
-            isOneToOne: false
-            referencedRelation: "municipality"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_incubation_service_nationality_id_fkey"
-            columns: ["nationality_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_nationality"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_incubation_service_person_id_fkey"
-            columns: ["person_id"]
-            isOneToOne: false
-            referencedRelation: "person"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_incubation_service_sector_id_fkey"
-            columns: ["sector_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_e02_sector"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_incubation_service_stage_id_fkey"
-            columns: ["stage_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_e02_stage"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_incubation_service_status_id_fkey"
-            columns: ["status_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_e02_status"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      rmth_incubation_service_option: {
-        Row: {
-          created_at: string
-          municipality_id: string
-          option_id: string
-          option_other: string | null
-          question_code: string
-          service_id: string
-        }
-        Insert: {
-          created_at?: string
-          municipality_id?: string
-          option_id: string
-          option_other?: string | null
-          question_code: string
-          service_id: string
-        }
-        Update: {
-          created_at?: string
-          municipality_id?: string
-          option_id?: string
-          option_other?: string | null
-          question_code?: string
-          service_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rmth_incubation_service_option_service_id_municipality_id_fkey"
-            columns: ["service_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_incubation_service"
-            referencedColumns: ["id", "municipality_id"]
-          }
-        ]
-      }
-      rmth_incubator: {
-        Row: {
-          achieved_on: string | null
-          c1_date: string | null
-          c1_id: string | null
-          c1_location: string | null
-          c2_date: string | null
-          c2_id: string | null
-          c2_reference: string | null
-          c3_date: string | null
-          c3_id: string | null
-          c4_id: string | null
-          c4_staff_count: number | null
-          client_uuid: string | null
-          completed_on: string | null
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          established_id: string | null
-          established_id_decided_by: string | null
-          established_id_decided_on: string | null
-          established_other: string | null
-          field_id: string | null
-          field_other: string | null
-          first_cohort_admitted: boolean | null
-          first_cohort_count: number | null
-          first_cohort_date: string | null
-          host_id: string | null
-          id: string
-          municipality_id: string
-          name: string
-          partner_private: string | null
-          partner_university: string | null
-          reference: string | null
-          updated_at: string
-        }
-        Insert: {
-          achieved_on?: string | null
-          c1_date?: string | null
-          c1_id?: string | null
-          c1_location?: string | null
-          c2_date?: string | null
-          c2_id?: string | null
-          c2_reference?: string | null
-          c3_date?: string | null
-          c3_id?: string | null
-          c4_id?: string | null
-          c4_staff_count?: number | null
-          client_uuid?: string | null
-          completed_on?: string | null
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          established_id?: string | null
-          established_id_decided_by?: string | null
-          established_id_decided_on?: string | null
-          established_other?: string | null
-          field_id?: string | null
-          field_other?: string | null
-          first_cohort_admitted?: boolean | null
-          first_cohort_count?: number | null
-          first_cohort_date?: string | null
-          host_id?: string | null
-          id?: string
-          municipality_id?: string
-          name: string
-          partner_private?: string | null
-          partner_university?: string | null
-          reference?: string | null
-          updated_at?: string
-        }
-        Update: {
-          achieved_on?: string | null
-          c1_date?: string | null
-          c1_id?: string | null
-          c1_location?: string | null
-          c2_date?: string | null
-          c2_id?: string | null
-          c2_reference?: string | null
-          c3_date?: string | null
-          c3_id?: string | null
-          c4_id?: string | null
-          c4_staff_count?: number | null
-          client_uuid?: string | null
-          completed_on?: string | null
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          established_id?: string | null
-          established_id_decided_by?: string | null
-          established_id_decided_on?: string | null
-          established_other?: string | null
-          field_id?: string | null
-          field_other?: string | null
-          first_cohort_admitted?: boolean | null
-          first_cohort_count?: number | null
-          first_cohort_date?: string | null
-          host_id?: string | null
-          id?: string
-          municipality_id?: string
-          name?: string
-          partner_private?: string | null
-          partner_university?: string | null
-          reference?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rmth_incubator_c1_id_fkey"
-            columns: ["c1_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_e01_c1"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_incubator_c2_id_fkey"
-            columns: ["c2_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_e01_c2"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_incubator_c3_id_fkey"
-            columns: ["c3_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_e01_c3"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_incubator_c4_id_fkey"
-            columns: ["c4_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_e01_c4"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_incubator_established_id_fkey"
-            columns: ["established_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_e01_status"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_incubator_field_id_fkey"
-            columns: ["field_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_e01_field"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_incubator_host_id_fkey"
-            columns: ["host_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_e01_host"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_incubator_municipality_id_fkey"
-            columns: ["municipality_id"]
-            isOneToOne: false
-            referencedRelation: "municipality"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      rmth_incubator_option: {
-        Row: {
-          created_at: string
-          incubator_id: string
-          municipality_id: string
-          option_id: string
-          option_other: string | null
-          question_code: string
-        }
-        Insert: {
-          created_at?: string
-          incubator_id: string
-          municipality_id?: string
-          option_id: string
-          option_other?: string | null
-          question_code: string
-        }
-        Update: {
-          created_at?: string
-          incubator_id?: string
-          municipality_id?: string
-          option_id?: string
-          option_other?: string | null
-          question_code?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rmth_incubator_option_incubator_id_municipality_id_fkey"
-            columns: ["incubator_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_incubator"
-            referencedColumns: ["id", "municipality_id"]
-          }
-        ]
-      }
-      rmth_incubator_service_live: {
-        Row: {
-          began_on: string | null
-          created_at: string
-          incubator_id: string
-          municipality_id: string
-          service_id: string
-        }
-        Insert: {
-          began_on?: string | null
-          created_at?: string
-          incubator_id: string
-          municipality_id?: string
-          service_id: string
-        }
-        Update: {
-          began_on?: string | null
-          created_at?: string
-          incubator_id?: string
-          municipality_id?: string
-          service_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rmth_incubator_service_live_incubator_id_municipality_id_fkey"
-            columns: ["incubator_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_incubator"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "rmth_incubator_service_live_service_id_fkey"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_e01_service"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      rmth_outcome_survey: {
-        Row: {
-          age_years: number | null
-          arrangement_id: string | null
-          capacity_id: string | null
-          client_uuid: string | null
-          consecutive_months: number | null
-          contact_date: string | null
-          counted_under_id: string | null
-          created_at: string
-          created_by: string | null
-          current_status_id: string | null
-          cycle_id: string | null
-          deleted_at: string | null
-          earning_since_month: string | null
-          employer_name: string | null
-          employer_sector: string | null
-          engaged_id: string | null
-          enterprise_id: string | null
-          enterprise_name: string | null
-          enumerator_name: string | null
-          event_id: string | null
-          facilitated_by_id: string | null
-          first_access_month: string | null
-          headline_id: string | null
-          id: string
-          imp0_criterion_id: string | null
-          imp0_stop_reason_id: string | null
-          imp0_stop_reason_other: string | null
-          income_change_id: string | null
-          income_stopped_month: string | null
-          incubator_id: string | null
-          months_of_six: number | null
-          municipality_id: string
-          nationality_id: string | null
-          nationality_other: string | null
-          obstacle_id: string | null
-          obstacle_other: string | null
-          other_events: string | null
-          pathway_cycle_id: string | null
-          pathway_enterprise_id: string | null
-          pathway_event_id: string | null
-          pathway_id: string | null
-          pathway_incubator_id: string | null
-          pathway_other: string | null
-          pathway_proposal_id: string | null
-          person_id: string
-          placement_start_month: string | null
-          placement_title: string | null
-          programme_id: string | null
-          reached_id: string | null
-          role_id: string | null
-          round_id: string | null
-          so10_event_type_id: string | null
-          so10_threshold_id: string | null
-          so20_outcome_id: string | null
-          so30_criterion_id: string | null
-          so30_sector_id: string | null
-          so30_sector_other: string | null
-          so30_stop_reason_id: string | null
-          so30_stop_reason_other: string | null
-          stopped_month: string | null
-          survey_kind: string
-          three_month_reached: boolean | null
-          updated_at: string
-          why_not_id: string | null
-          why_not_other: string | null
-          working_time_id: string | null
-        }
-        Insert: {
-          age_years?: number | null
-          arrangement_id?: string | null
-          capacity_id?: string | null
-          client_uuid?: string | null
-          consecutive_months?: number | null
-          contact_date?: string | null
-          counted_under_id?: string | null
-          created_at?: string
-          created_by?: string | null
-          current_status_id?: string | null
-          cycle_id?: string | null
-          deleted_at?: string | null
-          earning_since_month?: string | null
-          employer_name?: string | null
-          employer_sector?: string | null
-          engaged_id?: string | null
-          enterprise_id?: string | null
-          enterprise_name?: string | null
-          enumerator_name?: string | null
-          event_id?: string | null
-          facilitated_by_id?: string | null
-          first_access_month?: string | null
-          headline_id?: string | null
-          id?: string
-          imp0_criterion_id?: string | null
-          imp0_stop_reason_id?: string | null
-          imp0_stop_reason_other?: string | null
-          income_change_id?: string | null
-          income_stopped_month?: string | null
-          incubator_id?: string | null
-          months_of_six?: number | null
-          municipality_id?: string
-          nationality_id?: string | null
-          nationality_other?: string | null
-          obstacle_id?: string | null
-          obstacle_other?: string | null
-          other_events?: string | null
-          pathway_cycle_id?: string | null
-          pathway_enterprise_id?: string | null
-          pathway_event_id?: string | null
-          pathway_id?: string | null
-          pathway_incubator_id?: string | null
-          pathway_other?: string | null
-          pathway_proposal_id?: string | null
-          person_id: string
-          placement_start_month?: string | null
-          placement_title?: string | null
-          programme_id?: string | null
-          reached_id?: string | null
-          role_id?: string | null
-          round_id?: string | null
-          so10_event_type_id?: string | null
-          so10_threshold_id?: string | null
-          so20_outcome_id?: string | null
-          so30_criterion_id?: string | null
-          so30_sector_id?: string | null
-          so30_sector_other?: string | null
-          so30_stop_reason_id?: string | null
-          so30_stop_reason_other?: string | null
-          stopped_month?: string | null
-          survey_kind: string
-          three_month_reached?: boolean | null
-          updated_at?: string
-          why_not_id?: string | null
-          why_not_other?: string | null
-          working_time_id?: string | null
-        }
-        Update: {
-          age_years?: number | null
-          arrangement_id?: string | null
-          capacity_id?: string | null
-          client_uuid?: string | null
-          consecutive_months?: number | null
-          contact_date?: string | null
-          counted_under_id?: string | null
-          created_at?: string
-          created_by?: string | null
-          current_status_id?: string | null
-          cycle_id?: string | null
-          deleted_at?: string | null
-          earning_since_month?: string | null
-          employer_name?: string | null
-          employer_sector?: string | null
-          engaged_id?: string | null
-          enterprise_id?: string | null
-          enterprise_name?: string | null
-          enumerator_name?: string | null
-          event_id?: string | null
-          facilitated_by_id?: string | null
-          first_access_month?: string | null
-          headline_id?: string | null
-          id?: string
-          imp0_criterion_id?: string | null
-          imp0_stop_reason_id?: string | null
-          imp0_stop_reason_other?: string | null
-          income_change_id?: string | null
-          income_stopped_month?: string | null
-          incubator_id?: string | null
-          months_of_six?: number | null
-          municipality_id?: string
-          nationality_id?: string | null
-          nationality_other?: string | null
-          obstacle_id?: string | null
-          obstacle_other?: string | null
-          other_events?: string | null
-          pathway_cycle_id?: string | null
-          pathway_enterprise_id?: string | null
-          pathway_event_id?: string | null
-          pathway_id?: string | null
-          pathway_incubator_id?: string | null
-          pathway_other?: string | null
-          pathway_proposal_id?: string | null
-          person_id?: string
-          placement_start_month?: string | null
-          placement_title?: string | null
-          programme_id?: string | null
-          reached_id?: string | null
-          role_id?: string | null
-          round_id?: string | null
-          so10_event_type_id?: string | null
-          so10_threshold_id?: string | null
-          so20_outcome_id?: string | null
-          so30_criterion_id?: string | null
-          so30_sector_id?: string | null
-          so30_sector_other?: string | null
-          so30_stop_reason_id?: string | null
-          so30_stop_reason_other?: string | null
-          stopped_month?: string | null
-          survey_kind?: string
-          three_month_reached?: boolean | null
-          updated_at?: string
-          why_not_id?: string | null
-          why_not_other?: string | null
-          working_time_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rmth_outcome_survey_arrangement_id_fkey"
-            columns: ["arrangement_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_so20_arrangement"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_capacity_id_fkey"
-            columns: ["capacity_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_imp0_capacity"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_counted_under_fkey"
-            columns: ["counted_under_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_outcome_survey"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_current_status_id_fkey"
-            columns: ["current_status_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_so10_current_status"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_cycle_fkey"
-            columns: ["cycle_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_training_cycle"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_engaged_id_fkey"
-            columns: ["engaged_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_imp0_engaged"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_enterprise_fkey"
-            columns: ["enterprise_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_enterprise"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_event_fkey"
-            columns: ["event_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_event"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_facilitated_by_id_fkey"
-            columns: ["facilitated_by_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_so20_facilitated_by"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_headline_id_fkey"
-            columns: ["headline_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_so2c1_headline"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_imp0_criterion_id_fkey"
-            columns: ["imp0_criterion_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_imp0_criterion"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_imp0_stop_reason_id_fkey"
-            columns: ["imp0_stop_reason_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_imp0_stop_reason"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_income_change_id_fkey"
-            columns: ["income_change_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_so30_income_change"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_incubator_fkey"
-            columns: ["incubator_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_incubator"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_municipality_id_fkey"
-            columns: ["municipality_id"]
-            isOneToOne: false
-            referencedRelation: "municipality"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_nationality_id_fkey"
-            columns: ["nationality_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_nationality"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_obstacle_id_fkey"
-            columns: ["obstacle_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_so20_obstacle"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_pathway_cycle_fkey"
-            columns: ["pathway_cycle_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_training_cycle"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_pathway_enterprise_fkey"
-            columns: ["pathway_enterprise_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_enterprise"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_pathway_event_fkey"
-            columns: ["pathway_event_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_event"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_pathway_id_fkey"
-            columns: ["pathway_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_imp0_pathway"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_pathway_incubator_fkey"
-            columns: ["pathway_incubator_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_incubator"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_pathway_proposal_fkey"
-            columns: ["pathway_proposal_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_proposal"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_person_id_fkey"
-            columns: ["person_id"]
-            isOneToOne: false
-            referencedRelation: "person"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_programme_fkey"
-            columns: ["programme_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_training_programme"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_reached_id_fkey"
-            columns: ["reached_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_reached"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_role_id_fkey"
-            columns: ["role_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_so30_role"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_round_id_fkey"
-            columns: ["round_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_imp0_round"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_so10_event_type_id_fkey"
-            columns: ["so10_event_type_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_so10_event_type"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_so10_threshold_id_fkey"
-            columns: ["so10_threshold_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_so10_threshold"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_so20_outcome_id_fkey"
-            columns: ["so20_outcome_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_so20_outcome"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_so30_criterion_id_fkey"
-            columns: ["so30_criterion_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_so30_criterion"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_so30_sector_id_fkey"
-            columns: ["so30_sector_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_so30_sector"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_so30_stop_reason_id_fkey"
-            columns: ["so30_stop_reason_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_so30_stop_reason"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_why_not_id_fkey"
-            columns: ["why_not_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_so2c1_why_not"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_outcome_survey_working_time_id_fkey"
-            columns: ["working_time_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_so20_working_time"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      rmth_outcome_survey_option: {
-        Row: {
-          created_at: string
-          municipality_id: string
-          option_id: string
-          option_other: string | null
-          question_code: string
-          survey_id: string
-        }
-        Insert: {
-          created_at?: string
-          municipality_id?: string
-          option_id: string
-          option_other?: string | null
-          question_code: string
-          survey_id: string
-        }
-        Update: {
-          created_at?: string
-          municipality_id?: string
-          option_id?: string
-          option_other?: string | null
-          question_code?: string
-          survey_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rmth_outcome_survey_option_survey_id_municipality_id_fkey"
-            columns: ["survey_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_outcome_survey"
-            referencedColumns: ["id", "municipality_id"]
-          }
-        ]
-      }
-      rmth_project_implementer: {
-        Row: {
-          any_essential: boolean | null
-          client_uuid: string | null
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          enters_denominator: boolean | null
-          entity_name: string
-          entity_type_id: string | null
-          enumerator_name: string | null
-          first_record_of_id: string | null
-          id: string
-          interviewed_on: string | null
-          most_essential_component_id: string | null
-          municipality_id: string
-          operating_status_id: string | null
-          project_titles: string | null
-          project_type_id: string | null
-          project_type_other: string | null
-          reached_id: string | null
-          received_any: boolean | null
-          respondent_name: string | null
-          respondent_phone: string | null
-          respondent_role: string | null
-          sector_id: string | null
-          sector_other: string | null
-          updated_at: string
-          would_have_helped: string | null
-        }
-        Insert: {
-          any_essential?: boolean | null
-          client_uuid?: string | null
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          enters_denominator?: boolean | null
-          entity_name: string
-          entity_type_id?: string | null
-          enumerator_name?: string | null
-          first_record_of_id?: string | null
-          id?: string
-          interviewed_on?: string | null
-          most_essential_component_id?: string | null
-          municipality_id?: string
-          operating_status_id?: string | null
-          project_titles?: string | null
-          project_type_id?: string | null
-          project_type_other?: string | null
-          reached_id?: string | null
-          received_any?: boolean | null
-          respondent_name?: string | null
-          respondent_phone?: string | null
-          respondent_role?: string | null
-          sector_id?: string | null
-          sector_other?: string | null
-          updated_at?: string
-          would_have_helped?: string | null
-        }
-        Update: {
-          any_essential?: boolean | null
-          client_uuid?: string | null
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          enters_denominator?: boolean | null
-          entity_name?: string
-          entity_type_id?: string | null
-          enumerator_name?: string | null
-          first_record_of_id?: string | null
-          id?: string
-          interviewed_on?: string | null
-          most_essential_component_id?: string | null
-          municipality_id?: string
-          operating_status_id?: string | null
-          project_titles?: string | null
-          project_type_id?: string | null
-          project_type_other?: string | null
-          reached_id?: string | null
-          received_any?: boolean | null
-          respondent_name?: string | null
-          respondent_phone?: string | null
-          respondent_role?: string | null
-          sector_id?: string | null
-          sector_other?: string | null
-          updated_at?: string
-          would_have_helped?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rmth_project_implementer_entity_type_id_fkey"
-            columns: ["entity_type_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_b1_implementer_type"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_project_implementer_first_record_fkey"
-            columns: ["first_record_of_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_project_implementer"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "rmth_project_implementer_most_essential_component_id_fkey"
-            columns: ["most_essential_component_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_support_component"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_project_implementer_municipality_id_fkey"
-            columns: ["municipality_id"]
-            isOneToOne: false
-            referencedRelation: "municipality"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_project_implementer_operating_status_id_fkey"
-            columns: ["operating_status_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_b1_operating_status"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_project_implementer_project_type_id_fkey"
-            columns: ["project_type_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_project_type"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_project_implementer_reached_id_fkey"
-            columns: ["reached_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_b1_reached"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_project_implementer_sector_id_fkey"
-            columns: ["sector_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_sector"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      rmth_project_implementer_option: {
-        Row: {
-          created_at: string
-          implementer_id: string
-          municipality_id: string
-          option_id: string
-          option_other: string | null
-          question_code: string
-        }
-        Insert: {
-          created_at?: string
-          implementer_id: string
-          municipality_id?: string
-          option_id: string
-          option_other?: string | null
-          question_code: string
-        }
-        Update: {
-          created_at?: string
-          implementer_id?: string
-          municipality_id?: string
-          option_id?: string
-          option_other?: string | null
-          question_code?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rmth_project_implementer_opti_implementer_id_municipality__fkey"
-            columns: ["implementer_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_project_implementer"
-            referencedColumns: ["id", "municipality_id"]
-          }
-        ]
-      }
-      rmth_project_implementer_proposal: {
-        Row: {
-          created_at: string
-          implementer_id: string
-          municipality_id: string
-          proposal_id: string
-        }
-        Insert: {
-          created_at?: string
-          implementer_id: string
-          municipality_id?: string
-          proposal_id: string
-        }
-        Update: {
-          created_at?: string
-          implementer_id?: string
-          municipality_id?: string
-          proposal_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rmth_project_implementer_prop_implementer_id_municipality__fkey"
-            columns: ["implementer_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_project_implementer"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "rmth_project_implementer_propo_proposal_id_municipality_id_fkey"
-            columns: ["proposal_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_proposal"
-            referencedColumns: ["id", "municipality_id"]
-          }
-        ]
-      }
-      rmth_proposal: {
-        Row: {
-          approving_body_id: string | null
-          client_uuid: string | null
-          completed_on: string | null
-          conditions: string | null
-          contact_name: string | null
-          contact_phone: string | null
-          created_at: string
-          created_by: string | null
-          decided_on: string | null
-          decision_id: string | null
-          decision_reference: string | null
-          deleted_at: string | null
-          first_approved_on: string | null
-          id: string
-          municipality_id: string
-          proposal_type_id: string | null
-          proposal_type_other: string | null
-          reference: string | null
-          sector_id: string | null
-          sector_other: string | null
-          sub_sector: string | null
-          submitted_by_name: string
-          submitted_on: string
-          submitter_type_id: string
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          approving_body_id?: string | null
-          client_uuid?: string | null
-          completed_on?: string | null
-          conditions?: string | null
-          contact_name?: string | null
-          contact_phone?: string | null
-          created_at?: string
-          created_by?: string | null
-          decided_on?: string | null
-          decision_id?: string | null
-          decision_reference?: string | null
-          deleted_at?: string | null
-          first_approved_on?: string | null
-          id?: string
-          municipality_id?: string
-          proposal_type_id?: string | null
-          proposal_type_other?: string | null
-          reference?: string | null
-          sector_id?: string | null
-          sector_other?: string | null
-          sub_sector?: string | null
-          submitted_by_name: string
-          submitted_on: string
-          submitter_type_id: string
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          approving_body_id?: string | null
-          client_uuid?: string | null
-          completed_on?: string | null
-          conditions?: string | null
-          contact_name?: string | null
-          contact_phone?: string | null
-          created_at?: string
-          created_by?: string | null
-          decided_on?: string | null
-          decision_id?: string | null
-          decision_reference?: string | null
-          deleted_at?: string | null
-          first_approved_on?: string | null
-          id?: string
-          municipality_id?: string
-          proposal_type_id?: string | null
-          proposal_type_other?: string | null
-          reference?: string | null
-          sector_id?: string | null
-          sector_other?: string | null
-          sub_sector?: string | null
-          submitted_by_name?: string
-          submitted_on?: string
-          submitter_type_id?: string
-          title?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rmth_proposal_approving_body_id_fkey"
-            columns: ["approving_body_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_b12_approving_body"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_proposal_decision_id_fkey"
-            columns: ["decision_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_b12_decision"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_proposal_municipality_id_fkey"
-            columns: ["municipality_id"]
-            isOneToOne: false
-            referencedRelation: "municipality"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_proposal_proposal_type_id_fkey"
-            columns: ["proposal_type_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_project_type"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_proposal_sector_id_fkey"
+            foreignKeyName: "rmth_activity_sector_id_fkey"
             columns: ["sector_id"]
             isOneToOne: false
             referencedRelation: "ref_rmth_sector"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "rmth_proposal_submitter_type_id_fkey"
-            columns: ["submitter_type_id"]
+            foreignKeyName: "rmth_activity_training_type_id_fkey"
+            columns: ["training_type_id"]
             isOneToOne: false
-            referencedRelation: "ref_rmth_b12_submitter_type"
+            referencedRelation: "ref_rmth_training_type"
             referencedColumns: ["id"]
           }
         ]
       }
-      rmth_proposal_option: {
+      rmth_activity_option: {
+        Row: {
+          activity_id: string
+          created_at: string
+          municipality_id: string
+          option_id: string
+          option_other: string | null
+          question_code: string
+        }
+        Insert: {
+          activity_id: string
+          created_at?: string
+          municipality_id?: string
+          option_id: string
+          option_other?: string | null
+          question_code: string
+        }
+        Update: {
+          activity_id?: string
+          created_at?: string
+          municipality_id?: string
+          option_id?: string
+          option_other?: string | null
+          question_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rmth_activity_option_activity_id_fkey"
+            columns: ["activity_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "rmth_activity"
+            referencedColumns: ["id", "municipality_id"]
+          }
+        ]
+      }
+      rmth_beneficiary: {
+        Row: {
+          age_group_id: string
+          client_uuid: string | null
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          has_disability: boolean
+          id: string
+          municipality_id: string
+          nationality_id: string
+          nationality_other: string | null
+          person_id: string
+          registered_on: string
+          updated_at: string
+          year_of_birth: number
+        }
+        Insert: {
+          age_group_id: string
+          client_uuid?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          has_disability: boolean
+          id?: string
+          municipality_id?: string
+          nationality_id: string
+          nationality_other?: string | null
+          person_id: string
+          registered_on?: string
+          updated_at?: string
+          year_of_birth: number
+        }
+        Update: {
+          age_group_id?: string
+          client_uuid?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          has_disability?: boolean
+          id?: string
+          municipality_id?: string
+          nationality_id?: string
+          nationality_other?: string | null
+          person_id?: string
+          registered_on?: string
+          updated_at?: string
+          year_of_birth?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rmth_beneficiary_age_group_id_fkey"
+            columns: ["age_group_id"]
+            isOneToOne: false
+            referencedRelation: "ref_rmth_age_group"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rmth_beneficiary_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rmth_beneficiary_nationality_id_fkey"
+            columns: ["nationality_id"]
+            isOneToOne: false
+            referencedRelation: "ref_rmth_nationality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rmth_beneficiary_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "person"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      rmth_feedback: {
+        Row: {
+          activity_id: string
+          client_uuid: string | null
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          improved_knowledge: boolean | null
+          municipality_id: string
+          person_id: string
+          supported_employment: boolean | null
+          updated_at: string
+        }
+        Insert: {
+          activity_id: string
+          client_uuid?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          improved_knowledge?: boolean | null
+          municipality_id?: string
+          person_id: string
+          supported_employment?: boolean | null
+          updated_at?: string
+        }
+        Update: {
+          activity_id?: string
+          client_uuid?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          improved_knowledge?: boolean | null
+          municipality_id?: string
+          person_id?: string
+          supported_employment?: boolean | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rmth_feedback_activity_id_fkey"
+            columns: ["activity_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "rmth_activity"
+            referencedColumns: ["id", "municipality_id"]
+          },
+          {
+            foreignKeyName: "rmth_feedback_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rmth_feedback_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "person"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rmth_feedback_person_registered_fkey"
+            columns: ["person_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "rmth_beneficiary"
+            referencedColumns: ["person_id", "municipality_id"]
+          }
+        ]
+      }
+      rmth_followup: {
+        Row: {
+          client_uuid: string | null
+          continuous_since: string | null
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          first_placement_on: string | null
+          first_placement_type_id: string | null
+          followup_date: string
+          id: string
+          in_municipal_project: boolean | null
+          income_months: number | null
+          municipality_id: string
+          person_id: string
+          updated_at: string
+          work_status_id: string
+        }
+        Insert: {
+          client_uuid?: string | null
+          continuous_since?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          first_placement_on?: string | null
+          first_placement_type_id?: string | null
+          followup_date: string
+          id?: string
+          in_municipal_project?: boolean | null
+          income_months?: number | null
+          municipality_id?: string
+          person_id: string
+          updated_at?: string
+          work_status_id: string
+        }
+        Update: {
+          client_uuid?: string | null
+          continuous_since?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          first_placement_on?: string | null
+          first_placement_type_id?: string | null
+          followup_date?: string
+          id?: string
+          in_municipal_project?: boolean | null
+          income_months?: number | null
+          municipality_id?: string
+          person_id?: string
+          updated_at?: string
+          work_status_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rmth_followup_first_placement_type_id_fkey"
+            columns: ["first_placement_type_id"]
+            isOneToOne: false
+            referencedRelation: "ref_rmth_placement_type"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rmth_followup_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rmth_followup_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "person"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rmth_followup_person_registered_fkey"
+            columns: ["person_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "rmth_beneficiary"
+            referencedColumns: ["person_id", "municipality_id"]
+          },
+          {
+            foreignKeyName: "rmth_followup_work_status_id_fkey"
+            columns: ["work_status_id"]
+            isOneToOne: false
+            referencedRelation: "ref_rmth_work_status"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      rmth_followup_option: {
+        Row: {
+          created_at: string
+          followup_id: string
+          municipality_id: string
+          option_id: string
+          option_other: string | null
+          question_code: string
+        }
+        Insert: {
+          created_at?: string
+          followup_id: string
+          municipality_id?: string
+          option_id: string
+          option_other?: string | null
+          question_code: string
+        }
+        Update: {
+          created_at?: string
+          followup_id?: string
+          municipality_id?: string
+          option_id?: string
+          option_other?: string | null
+          question_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rmth_followup_option_followup_id_fkey"
+            columns: ["followup_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "rmth_followup"
+            referencedColumns: ["id", "municipality_id"]
+          }
+        ]
+      }
+      rmth_implementer_survey: {
+        Row: {
+          client_uuid: string | null
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          municipality_id: string
+          project_id: string
+          support_essential: boolean
+          surveyed_at: string
+          updated_at: string
+        }
+        Insert: {
+          client_uuid?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          municipality_id?: string
+          project_id: string
+          support_essential: boolean
+          surveyed_at?: string
+          updated_at?: string
+        }
+        Update: {
+          client_uuid?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          municipality_id?: string
+          project_id?: string
+          support_essential?: boolean
+          surveyed_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rmth_implementer_survey_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rmth_implementer_survey_project_id_fkey"
+            columns: ["project_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "rmth_project"
+            referencedColumns: ["id", "municipality_id"]
+          }
+        ]
+      }
+      rmth_participation: {
+        Row: {
+          activity_id: string
+          activity_is_incubator: boolean
+          client_uuid: string | null
+          completed: boolean | null
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          municipality_id: string
+          person_id: string
+          service_date: string | null
+          stakeholder_type_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          activity_id: string
+          activity_is_incubator?: boolean
+          client_uuid?: string | null
+          completed?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          municipality_id?: string
+          person_id: string
+          service_date?: string | null
+          stakeholder_type_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          activity_id?: string
+          activity_is_incubator?: boolean
+          client_uuid?: string | null
+          completed?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          municipality_id?: string
+          person_id?: string
+          service_date?: string | null
+          stakeholder_type_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rmth_participation_activity_id_fkey"
+            columns: ["activity_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "rmth_activity"
+            referencedColumns: ["id", "municipality_id"]
+          },
+          {
+            foreignKeyName: "rmth_participation_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rmth_participation_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "person"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rmth_participation_person_registered_fkey"
+            columns: ["person_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "rmth_beneficiary"
+            referencedColumns: ["person_id", "municipality_id"]
+          },
+          {
+            foreignKeyName: "rmth_participation_stakeholder_type_id_fkey"
+            columns: ["stakeholder_type_id"]
+            isOneToOne: false
+            referencedRelation: "ref_rmth_stakeholder_type"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      rmth_participation_option: {
         Row: {
           created_at: string
           municipality_id: string
           option_id: string
           option_other: string | null
-          proposal_id: string
+          participation_id: string
           question_code: string
         }
         Insert: {
@@ -13777,7 +8905,7 @@ export type Database = {
           municipality_id?: string
           option_id: string
           option_other?: string | null
-          proposal_id: string
+          participation_id: string
           question_code: string
         }
         Update: {
@@ -13785,16 +8913,76 @@ export type Database = {
           municipality_id?: string
           option_id?: string
           option_other?: string | null
-          proposal_id?: string
+          participation_id?: string
           question_code?: string
         }
         Relationships: [
           {
-            foreignKeyName: "rmth_proposal_option_proposal_id_municipality_id_fkey"
-            columns: ["proposal_id", "municipality_id"]
+            foreignKeyName: "rmth_participation_option_participation_id_fkey"
+            columns: ["participation_id", "municipality_id"]
             isOneToOne: false
-            referencedRelation: "rmth_proposal"
+            referencedRelation: "rmth_participation"
             referencedColumns: ["id", "municipality_id"]
+          }
+        ]
+      }
+      rmth_project: {
+        Row: {
+          approved_on: string
+          client_uuid: string | null
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          municipality_id: string
+          reference: string | null
+          sector_id: string
+          sector_other: string | null
+          sub_sector: string
+          updated_at: string
+        }
+        Insert: {
+          approved_on: string
+          client_uuid?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          municipality_id?: string
+          reference?: string | null
+          sector_id: string
+          sector_other?: string | null
+          sub_sector: string
+          updated_at?: string
+        }
+        Update: {
+          approved_on?: string
+          client_uuid?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          municipality_id?: string
+          reference?: string | null
+          sector_id?: string
+          sector_other?: string | null
+          sub_sector?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rmth_project_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rmth_project_sector_id_fkey"
+            columns: ["sector_id"]
+            isOneToOne: false
+            referencedRelation: "ref_rmth_sector"
+            referencedColumns: ["id"]
           }
         ]
       }
@@ -13895,702 +9083,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "municipality"
             referencedColumns: ["id"]
-          }
-        ]
-      }
-      rmth_training_cycle: {
-        Row: {
-          academic_partner_names: string | null
-          academic_type_id: string | null
-          client_uuid: string | null
-          completed_count: number | null
-          completed_on: string | null
-          completed_women: number | null
-          contact_hours: number | null
-          created_at: string
-          created_by: string | null
-          cycle_kind: string
-          cycle_no: number | null
-          deleted_at: string | null
-          delivered_by_id: string | null
-          delivered_by_other: string | null
-          end_date: string
-          enrolled_count: number | null
-          hours_per_week: number | null
-          id: string
-          joint_development_met: boolean | null
-          joint_development_met_decided_by: string | null
-          joint_development_met_decided_on: string | null
-          location: string | null
-          modality_id: string | null
-          municipality_id: string
-          private_partner_names: string | null
-          programme_id: string | null
-          reference: string | null
-          sector_id: string | null
-          sector_other: string | null
-          start_date: string
-          title: string | null
-          updated_at: string
-          weeks: number | null
-        }
-        Insert: {
-          academic_partner_names?: string | null
-          academic_type_id?: string | null
-          client_uuid?: string | null
-          completed_count?: number | null
-          completed_on?: string | null
-          completed_women?: number | null
-          contact_hours?: number | null
-          created_at?: string
-          created_by?: string | null
-          cycle_kind: string
-          cycle_no?: number | null
-          deleted_at?: string | null
-          delivered_by_id?: string | null
-          delivered_by_other?: string | null
-          end_date: string
-          enrolled_count?: number | null
-          hours_per_week?: number | null
-          id?: string
-          joint_development_met?: boolean | null
-          joint_development_met_decided_by?: string | null
-          joint_development_met_decided_on?: string | null
-          location?: string | null
-          modality_id?: string | null
-          municipality_id?: string
-          private_partner_names?: string | null
-          programme_id?: string | null
-          reference?: string | null
-          sector_id?: string | null
-          sector_other?: string | null
-          start_date: string
-          title?: string | null
-          updated_at?: string
-          weeks?: number | null
-        }
-        Update: {
-          academic_partner_names?: string | null
-          academic_type_id?: string | null
-          client_uuid?: string | null
-          completed_count?: number | null
-          completed_on?: string | null
-          completed_women?: number | null
-          contact_hours?: number | null
-          created_at?: string
-          created_by?: string | null
-          cycle_kind?: string
-          cycle_no?: number | null
-          deleted_at?: string | null
-          delivered_by_id?: string | null
-          delivered_by_other?: string | null
-          end_date?: string
-          enrolled_count?: number | null
-          hours_per_week?: number | null
-          id?: string
-          joint_development_met?: boolean | null
-          joint_development_met_decided_by?: string | null
-          joint_development_met_decided_on?: string | null
-          location?: string | null
-          modality_id?: string | null
-          municipality_id?: string
-          private_partner_names?: string | null
-          programme_id?: string | null
-          reference?: string | null
-          sector_id?: string | null
-          sector_other?: string | null
-          start_date?: string
-          title?: string | null
-          updated_at?: string
-          weeks?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rmth_training_cycle_academic_type_id_fkey"
-            columns: ["academic_type_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_c11_academic_type"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_training_cycle_delivered_by_id_fkey"
-            columns: ["delivered_by_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_e03_delivered_by"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_training_cycle_modality_id_fkey"
-            columns: ["modality_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_c11_modality"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_training_cycle_municipality_id_fkey"
-            columns: ["municipality_id"]
-            isOneToOne: false
-            referencedRelation: "municipality"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_training_cycle_programme_fkey"
-            columns: ["programme_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_training_programme"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "rmth_training_cycle_sector_id_fkey"
-            columns: ["sector_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_c11_sector"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      rmth_training_cycle_option: {
-        Row: {
-          created_at: string
-          cycle_id: string
-          municipality_id: string
-          option_id: string
-          option_other: string | null
-          question_code: string
-        }
-        Insert: {
-          created_at?: string
-          cycle_id: string
-          municipality_id?: string
-          option_id: string
-          option_other?: string | null
-          question_code: string
-        }
-        Update: {
-          created_at?: string
-          cycle_id?: string
-          municipality_id?: string
-          option_id?: string
-          option_other?: string | null
-          question_code?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rmth_training_cycle_option_cycle_id_municipality_id_fkey"
-            columns: ["cycle_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_training_cycle"
-            referencedColumns: ["id", "municipality_id"]
-          }
-        ]
-      }
-      rmth_training_enrolment: {
-        Row: {
-          age_years: number | null
-          assessment_result_id: string | null
-          attendance_pct: number | null
-          c12_training_type_id: string | null
-          certificate_issued: boolean | null
-          certificate_number: string | null
-          client_uuid: string | null
-          completed_on: string | null
-          counted_under_id: string | null
-          created_at: string
-          created_by: string | null
-          cycle_id: string
-          deleted_at: string | null
-          employer_evaluation_id: string | null
-          employer_evaluation_note: string | null
-          enrolment_kind: string
-          enterprise_sector_id: string | null
-          enterprise_sector_other: string | null
-          enterprise_status_id: string | null
-          f01_training_type_id: string | null
-          id: string
-          job_ready: boolean | null
-          met_criteria: boolean | null
-          met_criteria_decided_by: string | null
-          met_criteria_decided_on: string | null
-          municipality_id: string
-          nationality_id: string | null
-          nationality_other: string | null
-          org_role: string | null
-          org_type_id: string | null
-          organisation_name: string | null
-          person_id: string
-          post_test: number | null
-          pre_test: number | null
-          trainer_name: string | null
-          updated_at: string
-        }
-        Insert: {
-          age_years?: number | null
-          assessment_result_id?: string | null
-          attendance_pct?: number | null
-          c12_training_type_id?: string | null
-          certificate_issued?: boolean | null
-          certificate_number?: string | null
-          client_uuid?: string | null
-          completed_on?: string | null
-          counted_under_id?: string | null
-          created_at?: string
-          created_by?: string | null
-          cycle_id: string
-          deleted_at?: string | null
-          employer_evaluation_id?: string | null
-          employer_evaluation_note?: string | null
-          enrolment_kind: string
-          enterprise_sector_id?: string | null
-          enterprise_sector_other?: string | null
-          enterprise_status_id?: string | null
-          f01_training_type_id?: string | null
-          id?: string
-          job_ready?: boolean | null
-          met_criteria?: boolean | null
-          met_criteria_decided_by?: string | null
-          met_criteria_decided_on?: string | null
-          municipality_id?: string
-          nationality_id?: string | null
-          nationality_other?: string | null
-          org_role?: string | null
-          org_type_id?: string | null
-          organisation_name?: string | null
-          person_id: string
-          post_test?: number | null
-          pre_test?: number | null
-          trainer_name?: string | null
-          updated_at?: string
-        }
-        Update: {
-          age_years?: number | null
-          assessment_result_id?: string | null
-          attendance_pct?: number | null
-          c12_training_type_id?: string | null
-          certificate_issued?: boolean | null
-          certificate_number?: string | null
-          client_uuid?: string | null
-          completed_on?: string | null
-          counted_under_id?: string | null
-          created_at?: string
-          created_by?: string | null
-          cycle_id?: string
-          deleted_at?: string | null
-          employer_evaluation_id?: string | null
-          employer_evaluation_note?: string | null
-          enrolment_kind?: string
-          enterprise_sector_id?: string | null
-          enterprise_sector_other?: string | null
-          enterprise_status_id?: string | null
-          f01_training_type_id?: string | null
-          id?: string
-          job_ready?: boolean | null
-          met_criteria?: boolean | null
-          met_criteria_decided_by?: string | null
-          met_criteria_decided_on?: string | null
-          municipality_id?: string
-          nationality_id?: string | null
-          nationality_other?: string | null
-          org_role?: string | null
-          org_type_id?: string | null
-          organisation_name?: string | null
-          person_id?: string
-          post_test?: number | null
-          pre_test?: number | null
-          trainer_name?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rmth_training_enrolment_assessment_result_id_fkey"
-            columns: ["assessment_result_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_assessment_result"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_training_enrolment_c12_training_type_id_fkey"
-            columns: ["c12_training_type_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_c12_training_type"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_training_enrolment_counted_under_fkey"
-            columns: ["counted_under_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_training_enrolment"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "rmth_training_enrolment_cycle_fkey"
-            columns: ["cycle_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_training_cycle"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "rmth_training_enrolment_employer_evaluation_id_fkey"
-            columns: ["employer_evaluation_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_c12_employer_evaluation"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_training_enrolment_enterprise_sector_id_fkey"
-            columns: ["enterprise_sector_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_f01_sector"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_training_enrolment_enterprise_status_id_fkey"
-            columns: ["enterprise_status_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_f01_enterprise_status"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_training_enrolment_f01_training_type_id_fkey"
-            columns: ["f01_training_type_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_f01_training_type"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_training_enrolment_municipality_id_fkey"
-            columns: ["municipality_id"]
-            isOneToOne: false
-            referencedRelation: "municipality"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_training_enrolment_nationality_id_fkey"
-            columns: ["nationality_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_nationality"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_training_enrolment_org_type_id_fkey"
-            columns: ["org_type_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_e03_org_type"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_training_enrolment_person_id_fkey"
-            columns: ["person_id"]
-            isOneToOne: false
-            referencedRelation: "person"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      rmth_training_enrolment_option: {
-        Row: {
-          created_at: string
-          enrolment_id: string
-          municipality_id: string
-          option_id: string
-          option_other: string | null
-          question_code: string
-        }
-        Insert: {
-          created_at?: string
-          enrolment_id: string
-          municipality_id?: string
-          option_id: string
-          option_other?: string | null
-          question_code: string
-        }
-        Update: {
-          created_at?: string
-          enrolment_id?: string
-          municipality_id?: string
-          option_id?: string
-          option_other?: string | null
-          question_code?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rmth_training_enrolment_optio_enrolment_id_municipality_id_fkey"
-            columns: ["enrolment_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_training_enrolment"
-            referencedColumns: ["id", "municipality_id"]
-          }
-        ]
-      }
-      rmth_training_programme: {
-        Row: {
-          b11_modality_id: string | null
-          client_uuid: string | null
-          completed_on: string | null
-          created_at: string
-          created_by: string | null
-          deleted_at: string | null
-          developed_by_id: string | null
-          developed_with_id: string | null
-          development_complete_id: string | null
-          development_complete_id_decided_by: string | null
-          development_complete_id_decided_on: string | null
-          f02_modality_id: string | null
-          group_id: string | null
-          id: string
-          level_id: string | null
-          linked_sector_id: string | null
-          linked_sector_other: string | null
-          municipality_id: string
-          occupation: string | null
-          partner_names: string | null
-          partner_type_id: string | null
-          programme_type: string
-          reference: string | null
-          requirements_document: string | null
-          sector_focus_id: string | null
-          sector_focus_other: string | null
-          sessions_count: number | null
-          source_document: string | null
-          specialisation_id: string | null
-          specialisation_other: string | null
-          tailoring_met: boolean | null
-          tailoring_met_decided_by: string | null
-          tailoring_met_decided_on: string | null
-          title: string
-          total_hours: number | null
-          updated_at: string
-        }
-        Insert: {
-          b11_modality_id?: string | null
-          client_uuid?: string | null
-          completed_on?: string | null
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          developed_by_id?: string | null
-          developed_with_id?: string | null
-          development_complete_id?: string | null
-          development_complete_id_decided_by?: string | null
-          development_complete_id_decided_on?: string | null
-          f02_modality_id?: string | null
-          group_id?: string | null
-          id?: string
-          level_id?: string | null
-          linked_sector_id?: string | null
-          linked_sector_other?: string | null
-          municipality_id?: string
-          occupation?: string | null
-          partner_names?: string | null
-          partner_type_id?: string | null
-          programme_type: string
-          reference?: string | null
-          requirements_document?: string | null
-          sector_focus_id?: string | null
-          sector_focus_other?: string | null
-          sessions_count?: number | null
-          source_document?: string | null
-          specialisation_id?: string | null
-          specialisation_other?: string | null
-          tailoring_met?: boolean | null
-          tailoring_met_decided_by?: string | null
-          tailoring_met_decided_on?: string | null
-          title: string
-          total_hours?: number | null
-          updated_at?: string
-        }
-        Update: {
-          b11_modality_id?: string | null
-          client_uuid?: string | null
-          completed_on?: string | null
-          created_at?: string
-          created_by?: string | null
-          deleted_at?: string | null
-          developed_by_id?: string | null
-          developed_with_id?: string | null
-          development_complete_id?: string | null
-          development_complete_id_decided_by?: string | null
-          development_complete_id_decided_on?: string | null
-          f02_modality_id?: string | null
-          group_id?: string | null
-          id?: string
-          level_id?: string | null
-          linked_sector_id?: string | null
-          linked_sector_other?: string | null
-          municipality_id?: string
-          occupation?: string | null
-          partner_names?: string | null
-          partner_type_id?: string | null
-          programme_type?: string
-          reference?: string | null
-          requirements_document?: string | null
-          sector_focus_id?: string | null
-          sector_focus_other?: string | null
-          sessions_count?: number | null
-          source_document?: string | null
-          specialisation_id?: string | null
-          specialisation_other?: string | null
-          tailoring_met?: boolean | null
-          tailoring_met_decided_by?: string | null
-          tailoring_met_decided_on?: string | null
-          title?: string
-          total_hours?: number | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rmth_training_programme_b11_modality_id_fkey"
-            columns: ["b11_modality_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_b11_modality"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_training_programme_developed_by_id_fkey"
-            columns: ["developed_by_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_f02_developed_by"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_training_programme_developed_with_id_fkey"
-            columns: ["developed_with_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_b11_developed_with"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_training_programme_development_complete_id_fkey"
-            columns: ["development_complete_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_f02_complete"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_training_programme_f02_modality_id_fkey"
-            columns: ["f02_modality_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_modality_ipob"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_training_programme_group_id_fkey"
-            columns: ["group_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_f02_group"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_training_programme_level_id_fkey"
-            columns: ["level_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_f02_level"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_training_programme_linked_sector_id_fkey"
-            columns: ["linked_sector_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_sector"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_training_programme_municipality_id_fkey"
-            columns: ["municipality_id"]
-            isOneToOne: false
-            referencedRelation: "municipality"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_training_programme_partner_type_id_fkey"
-            columns: ["partner_type_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_f02_partner_type"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_training_programme_sector_focus_id_fkey"
-            columns: ["sector_focus_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_f02_sector"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rmth_training_programme_specialisation_id_fkey"
-            columns: ["specialisation_id"]
-            isOneToOne: false
-            referencedRelation: "ref_rmth_b11_specialisation"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      rmth_training_programme_option: {
-        Row: {
-          created_at: string
-          municipality_id: string
-          option_id: string
-          option_other: string | null
-          programme_id: string
-          question_code: string
-        }
-        Insert: {
-          created_at?: string
-          municipality_id?: string
-          option_id: string
-          option_other?: string | null
-          programme_id: string
-          question_code: string
-        }
-        Update: {
-          created_at?: string
-          municipality_id?: string
-          option_id?: string
-          option_other?: string | null
-          programme_id?: string
-          question_code?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rmth_training_programme_optio_programme_id_municipality_id_fkey"
-            columns: ["programme_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_training_programme"
-            referencedColumns: ["id", "municipality_id"]
-          }
-        ]
-      }
-      rmth_training_programme_proposal: {
-        Row: {
-          created_at: string
-          municipality_id: string
-          programme_id: string
-          proposal_id: string
-        }
-        Insert: {
-          created_at?: string
-          municipality_id?: string
-          programme_id: string
-          proposal_id: string
-        }
-        Update: {
-          created_at?: string
-          municipality_id?: string
-          programme_id?: string
-          proposal_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rmth_training_programme_propo_programme_id_municipality_id_fkey"
-            columns: ["programme_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_training_programme"
-            referencedColumns: ["id", "municipality_id"]
-          },
-          {
-            foreignKeyName: "rmth_training_programme_propos_proposal_id_municipality_id_fkey"
-            columns: ["proposal_id", "municipality_id"]
-            isOneToOne: false
-            referencedRelation: "rmth_proposal"
-            referencedColumns: ["id", "municipality_id"]
           }
         ]
       }
@@ -15161,7 +9653,7 @@ export type Database = {
         }
         Relationships: []
       }
-      v_ind_rmth_a1_2: {
+      v_ind_rmth_a0_1: {
         Row: {
           actual: number | null
           denominator: number | null
@@ -15170,7 +9662,16 @@ export type Database = {
         }
         Relationships: []
       }
-      v_ind_rmth_a1_3: {
+      v_ind_rmth_a0_2: {
+        Row: {
+          actual: number | null
+          denominator: number | null
+          municipality_id: string | null
+          period_code: string | null
+        }
+        Relationships: []
+      }
+      v_ind_rmth_a1: {
         Row: {
           actual: number | null
           denominator: number | null
@@ -15688,6 +10189,28 @@ export type Database = {
         }
         Relationships: []
       }
+      v_public_rmth_whats_on: {
+        Row: {
+          apply_until: string | null
+          description: string | null
+          end_date: string | null
+          id: string | null
+          kind: string | null
+          municipality_slug: string | null
+          on_date: string | null
+          place_ar: string | null
+          place_en: string | null
+          sector_ar: string | null
+          sector_en: string | null
+          time_from: string | null
+          time_to: string | null
+          title: string | null
+          title_ar: string | null
+          type_ar: string | null
+          type_en: string | null
+        }
+        Relationships: []
+      }
       v_recent_activity: {
         Row: {
           detail: string | null
@@ -15701,6 +10224,35 @@ export type Database = {
           village: string | null
         }
         Relationships: []
+      }
+      v_rmth_activity_live: {
+        Row: {
+          category: string | null
+          contact_hours: number | null
+          end_date: string | null
+          id: string | null
+          municipality_id: string | null
+          networking_type: string | null
+          project_id: string | null
+          sessions_delivered: number | null
+          start_date: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rmth_activity_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rmth_activity_project_id_fkey"
+            columns: ["project_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "rmth_project"
+            referencedColumns: ["id", "municipality_id"]
+          }
+        ]
       }
       v_rmth_indicator_status: {
         Row: {
@@ -15728,6 +10280,64 @@ export type Database = {
           unique_actual: number | null
         }
         Relationships: []
+      }
+      v_rmth_participation_live: {
+        Row: {
+          activity_id: string | null
+          category: string | null
+          completed: boolean | null
+          end_date: string | null
+          id: string | null
+          municipality_id: string | null
+          person_id: string | null
+          service_date: string | null
+          start_date: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rmth_participation_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rmth_participation_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "person"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rmth_participation_person_registered_fkey"
+            columns: ["person_id", "municipality_id"]
+            isOneToOne: false
+            referencedRelation: "rmth_beneficiary"
+            referencedColumns: ["person_id", "municipality_id"]
+          }
+        ]
+      }
+      v_rmth_registered: {
+        Row: {
+          municipality_id: string | null
+          person_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rmth_beneficiary_municipality_id_fkey"
+            columns: ["municipality_id"]
+            isOneToOne: false
+            referencedRelation: "municipality"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rmth_beneficiary_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "person"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       v_upcoming_exhibitions: {
         Row: {
@@ -16049,10 +10659,39 @@ export type Database = {
         }
         Returns: Json
       }
-      rmth_ensure_person: { Args: { p: Json }; Returns: string }
-      rmth_next_reference: {
-        Args: { p_municipality_id: string; p_prefix: string; p_year: number }
+      rmth_activity_category: {
+        Args: { p_activity: string; p_check_live: boolean; p_field: string }
         Returns: string
+      }
+      rmth_child_rules: {
+        Args: { p_id: string; p_table: string }
+        Returns: undefined
+      }
+      rmth_ensure_person: { Args: { p: Json }; Returns: string }
+      rmth_field_rule: {
+        Args: { p_field: string; p_has: boolean; p_on: boolean }
+        Returns: undefined
+      }
+      rmth_next_reference: {
+        Args: { p_municipality_id: string; p_prefix: string }
+        Returns: string
+      }
+      rmth_person_lookup: {
+        Args: { p_national_id: string }
+        Returns: {
+          beneficiary_deleted_at: string
+          beneficiary_id: string
+          deleted_at: string
+          deleted_by: string
+          full_name: string
+          id: string
+          national_id: string
+          sex: Database["public"]["Enums"]["sex_t"]
+        }[]
+      }
+      rmth_require_registered: {
+        Args: { p_field: string; p_municipality: string; p_person: string }
+        Returns: undefined
       }
       rmth_threshold_bool: {
         Args: { p_key: string; p_municipality_id: string }
@@ -16066,6 +10705,7 @@ export type Database = {
         Args: { p_key: string; p_municipality_id: string }
         Returns: string
       }
+      rmth_today: { Args: never; Returns: string }
       save_followup_section_a: {
         Args: {
           p_q10?: string

@@ -89,3 +89,7 @@ __pycache__/
 # they are re-run to prove they still reproduce 0141-0149. Never committed:
 # the migrations themselves are the record.
 supabase/khalidiyah/v1/out/
+
+# What the retired seventeen-form Ramtha generators (supabase/ramtha/v1) write
+# when re-run to prove they still reproduce 0122, 0131 and the old app files.
+supabase/ramtha/v1/out/

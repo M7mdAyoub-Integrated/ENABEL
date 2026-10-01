@@ -17,7 +17,7 @@ from collections import OrderedDict
 import openpyxl
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
+ROOT = os.path.normpath(os.path.join(HERE, '..', '..', '..'))
 sys.path.insert(0, HERE)
 from forms import FORMS, STATEMENT_AR
 
@@ -289,6 +289,7 @@ begin
 end $verify$;
 """)
 # Applied on 14 September 2026 as version 20260914113931; regenerating must reproduce that file byte for byte.
-path = os.path.join(ROOT, 'supabase', 'migrations', '20260914113931_0131_ramtha_framework.sql')
+os.makedirs(os.path.join(HERE, 'out'), exist_ok=True)
+path = os.path.join(HERE, 'out', '20260914113931_0131_ramtha_framework.sql')
 io.open(path, 'w', encoding='utf-8', newline='').write('\n'.join(out))
 print('wrote', path, len(INDICATORS), 'indicators')

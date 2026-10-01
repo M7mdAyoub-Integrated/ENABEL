@@ -7,7 +7,8 @@ import { OfflineBar } from '../components/OfflineBar'
 import { useAuth } from '../auth/AuthProvider'
 import { can, modulesFor } from '../auth/permissions'
 import { useCurrentMunicipality, useMunicipalityName, useProgrammeLine } from '../data/municipalities'
-import { RMTH_FORMS, RMTH_FORM_IDS, type RmthFormId } from '../rmth/forms.generated'
+import { RMTH_FORM_IDS, RMTH_GROUPS } from '../rmth/forms.generated'
+import { formDef as rmthFormDef } from '../rmth/labels'
 import { KHLD_FORM_IDS, KHLD_GROUPS } from '../khld/forms.generated'
 import { formDef } from '../khld/labels'
 import { AccountMenu } from './AccountMenu'
@@ -53,30 +54,6 @@ type Group = { labelKey: string | null; items: Dest[] }
  * heading with nothing under it. Convenience only -- the route guards refuse
  * the same paths and RLS refuses the same data.
  */
-/**
- * Which nav group a Ramtha form belongs to, DERIVED from its indicator code
- * rather than listed here.
- *
- * `RMTH-SO1-A1.2` -> `so1`, `RMTH-IMP-0` -> `impact`. A hand-written map of
- * seventeen form ids to four groups is a second copy of something the
- * definition already states, and CLAUDE.md's register is mostly second copies
- * that drifted. Add an eighteenth form and it lands in the right group with no
- * edit here; give one an indicator code in a shape this does not recognise and
- * it returns undefined, which the caller turns into a visible group rather
- * than dropping the form silently.
- */
-function rmthGroupOf(fid: RmthFormId): 'impact' | 'so1' | 'so2' | 'so3' | undefined {
-  const code = (RMTH_FORMS[fid] as { indicator: string }).indicator
-  const part = code.split('-')[1]
-  if (part === 'IMP') return 'impact'
-  if (part === 'SO1') return 'so1'
-  if (part === 'SO2') return 'so2'
-  if (part === 'SO3') return 'so3'
-  return undefined
-}
-
-const RMTH_GROUP_ORDER = ['impact', 'so1', 'so2', 'so3'] as const
-
 /**
  * Two scopes, never mixed.
  *
@@ -193,10 +170,13 @@ function useNavGroups(): Group[] {
 
   // ── Ramtha ────────────────────────────────────────────────────────────────
   //
-  // Ramtha's seventeen forms replace the Sahel Horan groups entirely when the
+  // Ramtha's seven forms replace the Sahel Horan groups entirely when the
   // acting municipality is Ramtha: they are a different programme, not extra
   // modules, and the Sahel Horan screens would answer empty lists. The
   // dashboard entry above stays, because it is the same screen for both.
+  // Grouped under the workbook's pages (Page En / Page Ar of
+  // RMTH_Forms_and_Calculations_v2.xlsx), in the order the forms first
+  // appear on them, the page of each read from its definition.
   //
   // A super admin switching municipality switches this, because
   // useCurrentMunicipality reads the acting municipality (0117).
@@ -209,29 +189,16 @@ function useNavGroups(): Group[] {
     const byGroup = new Map<string, Dest[]>()
     let n = 0
     for (const fid of RMTH_FORM_IDS) {
-      const g = rmthGroupOf(fid)
-      // An unrecognised indicator shape gets its own visible group rather than
-      // being dropped. A form missing from the sidebar is invisible; a form
-      // under a heading nobody expected is a question someone asks.
-      const key = g ?? 'other'
+      const key = rmthFormDef(fid).group
       n += 1
-      const dest: Dest = {
-        to: `/rmth/${fid}`,
-        // `.short`, not `.title`: the English title is the sheet's full
-        // indicator statement, which belongs on the form page and not in a
-        // 238px rail. Arabic's short and title are the same string.
-        labelKey: `rmth:forms.${fid}.short`,
-        num: String(n).padStart(2, '0'),
-      }
+      // `.short` is the sheet's sub-page name ("Person Register")
+      const dest: Dest = { to: `/rmth/${fid}`, labelKey: `rmth:forms.${fid}.short`, num: String(n).padStart(2, '0') }
       byGroup.set(key, [...(byGroup.get(key) ?? []), dest])
     }
-    const ordered: Group[] = [...RMTH_GROUP_ORDER, 'other']
+    const ordered: Group[] = RMTH_GROUPS
       .filter((k) => byGroup.has(k))
-      .map((k) => ({
-        labelKey: k === 'other' ? 'rmth:nav.group.other' : `rmth:nav.group.${k}`,
-        items: byGroup.get(k) ?? [],
-      }))
-    // The seven open items, after the forms: the dashboard says "not
+      .map((k) => ({ labelKey: `rmth:nav.group.${k}`, items: byGroup.get(k) ?? [] }))
+    // The open definitions, after the forms: the dashboard says "not
     // computable until decided" and this is where it is decided. Every Ramtha
     // role can read it; the screen shows the Decide control to coordinators.
     ordered.push({

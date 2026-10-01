@@ -5,6 +5,8 @@ decisions taken on the way that the plan (`RAMTHA_IMPLEMENTATION_PLAN.md`) left
 open or that this build departed from. Written as the work was done, one section
 per part, so that nothing here is recalled. Part 12 is Al Khalidiyah, the third,
 added the same way from `KHALIDIYAH_IMPLEMENTATION_PLAN.md`.
+Parts 13 and 14 replace Khalidiyah's and then Ramtha's forms with the
+municipalities' reviewed workbooks.
 
 ---
 
@@ -1957,3 +1959,194 @@ columns and F045's rule.
 - `check-khld-forms.mjs` now needs the table's rows, columns and method
   in both languages. It failed with `cols.women` deleted from `ar`, and
   passed again once regenerated.
+
+
+---
+
+## Part 14 — Ramtha's forms replaced by RMTH_Forms_and_Calculations_v2.xlsx (1 October 2026, migrations 0174–0181, `supabase/ramtha`, `app/src/rmth`)
+
+The owner added `RMTH_Forms_and_Calculations_v2.xlsx` and asked for every
+Ramtha form to be "exactly like the forms in the xlsx": **seven forms**
+instead of seventeen — a person register, approved projects, an activity
+register, participation, participant feedback, beneficiary follow-up and a
+project implementer survey — 43 fields, each with a Field ID (PR-01 …
+IS-03), a type, a dependency and the indicators it feeds, and a
+**Calculation Method** sheet writing all eighteen indicators in those IDs.
+And: once an activity is created, a button for the Municipality to publish
+it on the public site or not.
+
+Five questions were put to the owner first; the answers are this part's
+premises:
+
+- **The old tables are dropped**, not kept hidden (OQ-77 — hard rule 5's
+  recorded exception, a second time).
+- **The workbook's codes win**: A1.2 / A1.3 become A0.1 / A0.2, and SO1-A1
+  takes the workbook's statement (OQ-79).
+- **The public sees the workbook's fields only** — FORM-03 has no name,
+  place or description (OQ-81).
+- **PR-06 is a disability question**, added: the Calculation Method sheet
+  disaggregates by "vulnerability PR-06", which FORM-01 did not ask.
+- **PR-07 "Full name" is added** after the national ID: the shared `person`
+  table needs a name, and the other forms pick people by it.
+
+### One reading, four generators, the first build kept reproducible
+
+`supabase/ramtha/` now holds, as `supabase/khalidiyah/` does:
+
+- `workbook.py` — the one reading of the workbook's two sheets, verbatim;
+- `catalogue.py` — per Field ID, what kind of control it is, which column
+  or junction question it writes, and when it is asked; the two added
+  fields; the drafted Arabic of the help texts (OQ-78); a code per option,
+  whose English is checked against the cell;
+- `model.py` — the two joined, refusing any disagreement (a field in one
+  and not the other, an option label that is not the sheet's, a help text
+  with no Arabic);
+- `gen_lists.py` → `0176`, `gen_framework.py` → `0179`, `gen_forms.py` →
+  `app/src/rmth/forms.generated.ts` and both `rmth.json`. The two migration
+  generators refuse to change an applied file and say whether they still
+  reproduce it; both do.
+
+The seventeen-form generators moved to `supabase/ramtha/v1/` and write into
+`v1/out/` (ignored). Re-run on the day, they reproduce `0122`, `0131` and the
+old `forms.generated.ts` byte for byte. The old `rmth.json` they do **not**
+reproduce: it had been edited by hand after its last generation (`objective`
+and `phoneOnFile` added, `dashboard` removed). That was history before this
+part and is recorded so nobody reads the difference as this part's.
+
+### 0174–0175 — the first build retired
+
+0153's pattern: `v_indicator_actual` recreated without the 17 Ramtha
+branches, asserted unchanged for Sahel Horan and Khalidiyah row for row; the
+two views every dashboard reads recreated empty with their columns; the 23
+tables dropped in one statement with no cascade; the functions that served
+only them dropped; `guard_rmth_other` kept (eleven Khalidiyah tables use it),
+`rmth_threshold` and the reference counter kept. `0175` drops the 106 lists
+by name after checking that the names are exactly the live ones.
+
+**That check refused on the first apply, wrongly, and stopped the drop.** It
+compared `array_agg(relname order by relname)` with an array of text sorted
+in the database's locale: `relname` sorts as `"C"`, so `b12_…` and `b1_…`
+came out in different orders and the arrays differed although the sets were
+equal. The migration rolled back with nothing dropped; both sides now sort
+`collate "C"`, a read-only run confirmed 106 names, and it applied. The
+guard did its job — a false negative that stops a drop costs a retry.
+
+### 0176–0178 — fourteen lists, seven tables, one save path
+
+- **14 option lists, 59 options**, both labels the sheet's cells. A bare
+  "Other" (nationality, sector, training topic) takes a specification
+  (OQ-53's convention); "None" in AC-08 and FU-03 is exclusive.
+- **Seven tables**, one per form (`rmth_beneficiary`, `rmth_project`,
+  `rmth_activity`, `rmth_participation`, `rmth_feedback`, `rmth_followup`,
+  `rmth_implementer_survey`), three option junctions, the standard block,
+  RLS by municipality, composite foreign keys as the only key on each pair.
+- **The Dependency column, both ways.** Each table's guard refuses a field
+  that is required for the answer chosen and missing
+  (`rmth_ac03_required`), and a field filled for an answer not chosen
+  (`rmth_ac05_not_applicable`). FORM-04's and FORM-05's conditions read the
+  category of the **activity picked**, so an activity's category locks once
+  a participation or feedback names it (`rmth_ac02_in_use`).
+- **A participant is a person in the register**: PA-02, FB-02 and FU-01
+  are a composite key into `rmth_beneficiary`, and the guards refuse a
+  deleted registration. The register is an entity — one row per person,
+  deleted rows included — so re-registering answers
+  `already_registered` / `registration_deleted` with the row's id, and the
+  screen offers *open* or *restore*.
+- **References** without a year, as the sheet's examples:
+  `RMTH-PP-001`, `RMTH-AC-001` (`rmth_reference_counter` year 0; 0124's
+  year check widened to admit it).
+- **`save_rmth_record`** is `save_khld_record`'s shape: one exception block
+  over every delete, a read-back after each, the multi-select rules checked
+  after the ticks are written, the database's own columns refused as
+  unknown. FORM-01's person is found by national ID; a refusal is answered
+  before anything is written.
+
+### 0179–0181 — the framework, eighteen views, the public page
+
+- **0179**, generated: A0.1 / A0.2 renamed, SO1-A1's statement, every
+  indicator's formula verbatim from the sheet, its breakdown line, its view.
+  The ten `rmth_threshold` values were the 16 September audit's probes, not
+  decisions: all set back to *not decided*; six retired (the new forms
+  answer them), one added (C1.1's minimum **total** hours).
+- **0180**, eighteen leaf views, each quoting the clause of the formula it
+  implements. Four wait on a definition and read blank until it is decided
+  — IMP-0, C1.1, SO3-0, F0.2 — never zero. Windows as Khalidiyah's (OQ-65).
+  The readings the sheet does not settle are OQ-80.
+- **0181**, `v_public_rmth_whats_on`: published, live, not ended; category,
+  type, sector and dates only (OQ-81).
+
+### How it was checked
+
+- **Every migration** written first as `PENDING_`, applied with its exact
+  text, the ledger md5 equal to the file's before the rename;
+  `check_migration_files.sh` passes (180 exact).
+- **As the Ramtha coordinator** (`set_config('role','authenticated')` plus
+  the JWT claims, everything raised away so it rolled back), through
+  `save_rmth_record`:
+  - each form saved; references `RMTH-PP-001`, `RMTH-AC-001`;
+  - refused by name: a stray end date on a networking event, AC-08 missing
+    on a short-term cycle, "None" beside another tick, a second
+    participation of the same person on the same activity, a participation
+    question asked of a networking event, a person not in the register, a
+    feedback on an incubator, FU-04 missing when FU-03 ticks paid
+    employment, a future approval date, a new person with no name, an
+    unspecified "Other", a client-set survey stamp, a category change once
+    a participation exists;
+  - the figures moved as the formulas say: A0.1 = 1 and A0.2 = 1 in 26/Q3;
+    A1 = 100 % of 1; C1 = 0 % of 1; C1.2 = 1, and 1 to date; SO1-0 = 1; B1.2
+    = 1 for the year to date; B1 = 100 % of 1 in 26/Q4 (the survey's
+    quarter); SO2-0 = 100 % of 1 in 26/Q4, the quarter the three-month
+    window closes; IMP-0, C1.1, SO3-0 and F0.2 blank;
+  - an incubator took two service visits from one person and E0.2 read 1;
+    deleting the registration took it to 0 and refused a new participation;
+    re-registering answered `registration_deleted`;
+  - publishing two activities showed both to `anon`; unpublishing one left
+    one; `anon` holds no grant on `rmth_activity` at all;
+  - **Sahel Horan's coordinator** saw no Ramtha row, no Ramtha figure, no
+    status row, and unpublished nothing (0 rows).
+- `check_municipality_scope.sql`: 63 views, none duplicates its key; Ramtha,
+  empty, shows no figure.
+- `.constraint_names`, `.foreign_keys` and `.soft_delete_guards`
+  regenerated from the database; the types regenerated and stripped — only
+  Ramtha's entries changed.
+- The build: every check, `tsc`, `eslint --max-warnings=0`, Vite.
+  `check-rmth-forms.mjs` was rewritten for the new definitions and
+  confirmed to fail on a deleted field label and a deleted threshold item.
+
+### The screens, opened
+
+One form, one list and one detail screen serve the seven forms, from the
+generated definitions; `answers.ts` is the one reading of `when`, so the
+form and the detail agree on what was asked. The activity's page carries
+the **Publish** switch. Ramtha's public page is a "what's on" page.
+
+They were opened in the browser pane against a **local stub of the API**
+(the dev server pointed at `localhost` with throwaway credentials): demo
+mode signs in silently with a real account's password against the live
+project, and that is not something to drive from here. On the stub:
+
+- FORM-01's first click on an empty form stopped on every field and sent
+  nothing; a full save sent the payload the live function had accepted;
+  typing a registered ID said so and linked to the registration;
+- FORM-03 switched on exactly the sheet's fields for each category tried
+  (specialised, short-term, networking); FORM-04 the right questions for
+  the activity picked; FORM-05's picker left out the incubator; FORM-06
+  turned FU-04 on with its tick, FU-05 on with FU-04, FU-07 / FU-08 on
+  for self-employment, and refused "None" beside a tick and a 7 of six;
+- Publish sent one PATCH and the public page listed the activity in both
+  languages; a refusal rendered as "PJ-04 Sub-sector: required for the
+  answer chosen";
+- all 29 Ramtha screens, in English and in Arabic, searched
+  case-insensitively for raw keys in text, aria-labels and placeholders:
+  none.
+
+### Not done
+
+- **Breakdown views.** FORM-01 now collects every dimension the sheet
+  names; no Ramtha disaggregation view exists yet (OQ-80).
+- **The `evidence` Edge Function** lists the retired tables in its deployed
+  copy; the source no longer does. Harmless — no screen asks for them and
+  the tables are gone — and redeployed when the function is next touched.
+- **The deployed app** still has the seventeen forms until this commit is
+  deployed: between the migrations and the deploy, its Ramtha screens
+  answer errors.

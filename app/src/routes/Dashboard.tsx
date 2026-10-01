@@ -64,8 +64,8 @@ import { SEP } from '../ui/glyphs'
  *
  *  ── WHOSE WORDS ──
  *
- *  Sahel Horan's `A1.2` is technical partnerships; Ramtha's is networking
- *  events. Every string that names an indicator, an objective or a source
+ *  Sahel Horan's `B1.2` is households reaching the technical office; Ramtha's
+ *  is proposals approved. Every string that names an indicator, an objective or a source
  *  form is resolved through data/dashboardConfig.ts by the municipality's
  *  code, and the municipality's name in any sentence is its row's own. There
  *  is no `t('indicators:name.' + code)` in this file, because that key is

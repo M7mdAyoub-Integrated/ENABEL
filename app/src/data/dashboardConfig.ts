@@ -1,4 +1,4 @@
-import { RMTH_FORMS, RMTH_FORM_IDS, type RmthFormId } from '../rmth/forms.generated'
+import { RMTH_INDICATOR_FORMS } from '../rmth/forms.generated'
 import { KHLD_INDICATOR_FORM } from '../khld/forms.generated'
 import type { Translate } from '../i18n/tx'
 import type { Dimension } from './disaggregation'
@@ -17,9 +17,10 @@ import type { IndicatorRow, IndicatorSource } from './indicators'
  *
  *  ── WHY THIS IS A REGISTRY AND NOT A BRANCH ──
  *
- *  `A1.2` is "technical partnerships established" in Sahel Horan and
- *  "networking events including job fairs" in Ramtha. A locale key built
- *  from a bare code -- `indicators:name.A1.2` -- is therefore right for one
+ *  `B1.2` is "farmers and productive households reaching the technical
+ *  office" in Sahel Horan and "proposals approved for implementation" in
+ *  Ramtha. A locale key built
+ *  from a bare code -- `indicators:name.B1.2` -- is therefore right for one
  *  programme and wrong for the other, and a screen that reaches for it
  *  without asking whose code it holds will say the wrong thing with complete
  *  confidence. That is what happened when the advisory screens were
@@ -29,10 +30,10 @@ import type { IndicatorRow, IndicatorSource } from './indicators'
  *  So every string that names an indicator is resolved through the
  *  municipality's own entry here, and each entry reaches only its own
  *  programme's sources: Sahel Horan's short names are its `indicators:name.*`
- *  keys; Ramtha's are the short names of its form catalogue, found from the
- *  indicator's FULL code (`RMTH-SO1-A1.2`), which cannot collide. Neither
- *  entry can see the other's keys, and a municipality with no entry gets the
- *  framework's own statement from the view -- true, if long.
+ *  keys; Ramtha's and Khalidiyah's rows take the framework's own statement
+ *  from the view, because their forms are operational and one form feeds
+ *  many rows. Neither entry can see the other's keys, and a municipality with
+ *  no entry gets the framework's statement too -- true, if long.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
@@ -168,56 +169,39 @@ const SHM: DashboardConfig = {
 
 /* ── Ramtha ──────────────────────────────────────────────────────────────── */
 
-/**
- * The form that feeds an indicator, from the catalogue's own `indicator`
- * field. An exact match on the FULL code: `RMTH-SO1-A1.2` can never be read
- * as Sahel Horan's A1.2, and RMTH-SO1-A1 -- a code with no statement and
- * therefore no form -- is simply not found.
- */
-function rmthFormFor(fullCode: string | undefined): RmthFormId | undefined {
-  if (!fullCode) return undefined
-  return RMTH_FORM_IDS.find((fid) => (RMTH_FORMS[fid] as { indicator: string }).indicator === fullCode)
-}
-
 const RMTH: DashboardConfig = {
-  // Four rows with a form each and no open item -- events held, proposals
-  // approved, incubators established, participants in incubation
-  // (09_MULTI_MUNICIPALITY.md Part 6). Two are SO1 and two SO3, because every
-  // SO2 output waits on a definition (OQ-47).
-  kpi: ['A1.2', 'B1.2', 'E0.1', 'E0.2'],
-  kpiTone: { 'A1.2': 'teal', 'B1.2': 'teal', 'E0.1': 'amber', 'E0.2': 'raised' },
-  // The form's short name, as in the sidebar, not the sheet's full statement:
-  // E0.1's statement is 26 words. Found by the full code, so `A1.2` here can
-  // only ever be Ramtha's. A row with no form -- SO1-A1 -- keeps the
-  // statement the framework gave it, which says in words that there is none.
-  indicatorName: (row, { t, exists, ar, source }) => {
-    const fid = rmthFormFor(source?.full_code)
-    const key = fid ? `rmth:forms.${fid}.short` : ''
-    return fid && exists(key) ? t(key) : statement(row, ar)
-  },
+  // Four rows with a form each and no open definition -- networking events,
+  // proposals approved, incubators established, participants in incubation
+  // (09_MULTI_MUNICIPALITY.md Part 14). Two are SO1 and two SO3.
+  kpi: ['A0.1', 'B1.2', 'E0.1', 'E0.2'],
+  kpiTone: { 'A0.1': 'teal', 'B1.2': 'teal', 'E0.1': 'amber', 'E0.2': 'raised' },
+  // The framework's own statement, in the reader's language. The forms of
+  // RMTH_Forms_and_Calculations_v2.xlsx are operational, not one per
+  // indicator: the Activity Register feeds eleven rows, so a form's name
+  // would name eleven rows the same way.
+  indicatorName: (row, { ar }) => statement(row, ar),
   // `CODE · name`, the same form as Sahel Horan's `indicators:objective.*`,
-  // so the two dashboards head their groups alike -- SO1 is the code in
-  // RMTH-SO1-A1.2 and in the rows beneath. (It used to borrow the sidebar's
-  // "Objective 1 · Job opportunities", which named the same group a second
-  // way.) The workbook's own objective name from the view if a code arrives
-  // that has no key.
+  // so the two dashboards head their groups alike. The workbook's own
+  // objective name from the view if a code arrives that has no key.
   objectiveTitle: (code, row, { t, exists, ar }) => {
     const key = `rmth:objective.${code.toLowerCase()}`
     return exists(key) ? t(key) : objectiveStatement(row, ar)
   },
-  // The form IS the source. `RMTH_FORMS[fid].indicator` is the plan's "which
-  // form feeds this", derived, not a second map.
-  sourceLinks: (_row, source) => {
-    const fid = rmthFormFor(source?.full_code)
-    return fid ? [{ to: `/rmth/${fid}`, labelKey: `rmth:forms.${fid}.short` }] : []
-  },
-  // Nine of the seventeen forms collect gender, age, nationality and a
-  // vulnerability list that includes refugee status and disability
-  // (0122, ref_rmth_vulnerability). Nothing is uncollected by design; what is
-  // missing is a breakdown VIEW, which the panel states from the data.
+  // The forms the Calculation Method sheet's "Required Field(s)" names for
+  // the indicator (catalogue.indicator_forms), generated with the forms. The
+  // bare code is safe here: this entry is reached only for Ramtha's rows.
+  sourceLinks: (row) =>
+    (RMTH_INDICATOR_FORMS[row.code] ?? []).map((fid) => ({ to: `/rmth/${fid}`, labelKey: `rmth:forms.${fid}.short` })),
+  // FORM-01 collects sex, the age group, nationality and, since the owner
+  // added PR-06, disability -- the "vulnerability PR-06" of the sheet. What is
+  // missing is a breakdown VIEW, which the panel states from
+  // `is_disaggregable`.
   uncollectedDimensions: [],
   openItemsRoute: '/rmth/thresholds',
   noTargetsNoteKey: 'indicators:noTargetsNote.RMTH',
+  // C1.2's "Cumulative total = COUNT(DISTINCT PA-02) across all periods"
+  // beside the quarter's figure (v_rmth_indicator_unique, 0180).
+  uniqueText: (code, count, { t, exists }) => (exists(`rmth:dashboard.unique.${code}`) ? t(`rmth:dashboard.unique.${code}`, { count }) : ''),
 }
 
 /* ── Khalidiyah ──────────────────────────────────────────────────────────── */

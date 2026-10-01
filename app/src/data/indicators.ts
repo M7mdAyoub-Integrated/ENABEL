@@ -92,9 +92,8 @@ export type ReportingPeriod = {
 
 /**
  * One row of `indicator` per code: where the figure comes from, and the full
- * code that ties a Ramtha row to the form that feeds it (`RMTH_FORMS[fid]
- * .indicator` is a full code). `disaggregation` is the framework's own list
- * of required breakdowns, as the workbook wrote it.
+ * code that names it beyond doubt (`RMTH-SO1-A0.1`). `disaggregation` is the
+ * framework's own list of required breakdowns, as the workbook wrote it.
  */
 export type IndicatorSource = {
   code: string

@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Generates supabase/migrations/PENDING_0122_ramtha_option_lists.sql from lists.py.
+Generates 0122 (Ramtha's first option lists) from lists.py, into v1/out/.
 
-Run from the repository root:  python supabase/ramtha/gen_0122.py
+Retired with the seventeen-form build on 1 October 2026 (0174-0176); kept
+so that it still reproduces the applied file byte for byte. It writes into
+supabase/ramtha/v1/out/ (ignored by git) and never into migrations/.
+
+Run from the repository root:  python supabase/ramtha/v1/gen_0122.py
 Writes LF only (newline=''), per CLAUDE.md rule 5.
 """
 import io, os, sys
@@ -149,6 +153,7 @@ begin
   end if;
 end $verify$;
 """)
-path = os.path.join(os.path.dirname(__file__), '..', 'migrations', 'PENDING_0122_ramtha_option_lists.sql')
+os.makedirs(os.path.join(os.path.dirname(__file__), 'out'), exist_ok=True)
+path = os.path.join(os.path.dirname(__file__), 'out', '20260913224532_0122_ramtha_option_lists.sql')
 io.open(path, 'w', encoding='utf-8', newline='').write("".join(out))
 print('wrote', os.path.normpath(path), n_lists, 'lists', n_opts, 'options')
